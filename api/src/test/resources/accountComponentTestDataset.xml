@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<dataset>
+
+    <role role="Privilege Level: Full" description="Privilege Level: Full" uuid="3666cb6d-c291-46c8-8d3a-96dc33d199fb"/>
+    <role role="Application Role: Archives" description="App: Archives" uuid="3480cb6d-c777-46c8-8d3a-96dc33d199fb"/>
+    <role role="Application Role: Registration" description="App: Registration"
+          uuid="3480c888-c291-46c8-8d3a-96dc33d199fb"/>
+
+    <providermanagement_provider_role provider_role_id="1001" name="Nurse" creator="1"
+                                      date_created="2005-09-22 00:00:00.0" retired="false"
+                                      uuid="da7f523f-27ce-4bb2-86d6-6d1d05312bd5"/>
+    <providermanagement_provider_role provider_role_id="1002" name="Doctor" creator="1"
+                                      date_created="2005-09-22 00:00:00.0" retired="false"
+                                      uuid="deef523f-27ce-4bb2-86d6-6d1d05312bd5"/>
+
+
+    <!-- add some roles and user properties to existing person/user in the test dataset -->
+    <user_role user_id="501" role="Privilege Level: Full"/>
+    <user_role user_id="501" role="Application Role: Archives"/>
+    <user_role user_id="501" role="Application Role: Registration"/>
+    <user_property user_id="501" property="defaultLocale" property_value="fr"/>
+
+    <!-- add a provider to this person -->
+    <provider provider_id="1001" person_id="501" provider_role_id="1001" identifier="123" creator="1"
+              date_created="2005-01-01 00:00:00.0" retired="false" uuid="c2299800-cca9-11e0-9572-0800200c9776"/>
+
+</dataset>
