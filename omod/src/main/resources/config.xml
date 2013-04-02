@@ -2,47 +2,47 @@
 
 <module configVersion="1.2">
 
-	<!-- Module Properties -->
-	<id>${project.parent.artifactId}</id>
-	<name>${project.parent.name}</name>
-	<version>${project.parent.version}</version>
-	<package>${project.parent.groupId}.${project.parent.artifactId}</package>
-	<author>OpenMRS</author>
-	<description>
-		${project.parent.description}
-	</description>
-	<updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
-	<require_version>${openmrsCoreVersion}</require_version>
-	<!-- / Module Properties -->
+    <!-- Module Properties -->
+    <id>${project.parent.artifactId}</id>
+    <name>${project.parent.name}</name>
+    <version>${project.parent.version}</version>
+    <package>${project.parent.groupId}.${project.parent.artifactId}</package>
+    <author>OpenMRS</author>
+    <description>
+        ${project.parent.description}
+    </description>
+    <updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
+    <require_version>${openmrsCoreVersion}</require_version>
+    <!-- / Module Properties -->
 
-	
-	<!-- Required Modules -->
-	<require_modules>
-		<require_module version="0.7.5">
-			org.openmrs.module.reporting
-		</require_module>
-	</require_modules>
-	<!-- / Required Modules -->
-	
-	<!-- Module Activator -->
-	<activator>${project.parent.groupId}.${project.parent.artifactId}.EmrApiActivator</activator>
-	
-	
-	<!-- Maps hibernate files, if present -->
-	<mappingFiles>
-	</mappingFiles>
 
-	<!-- Internationalization -->
-	<!-- All message codes should start with ${project.parent.artifactId}. -->
-	<messages>
-		<lang>en</lang>
-		<file>messages.properties</file>
-	</messages>
-	<messages>
-		<lang>fr</lang>
-		<file>messages_fr.properties</file>
-	</messages>
-	<!-- /Internationalization -->
+    <!-- Required Modules -->
+    <require_modules>
+        <require_module version="${reportingModuleVersion">org.openmrs.module.reporting</require_module>
+        <require_module version="${providermanagementModuleVersion}">org.openmrs.module.providermanagement
+        </require_module>
+    </require_modules>
+    <!-- / Required Modules -->
+
+    <!-- Module Activator -->
+    <activator>${project.parent.groupId}.${project.parent.artifactId}.EmrApiActivator</activator>
+
+
+    <!-- Maps hibernate files, if present -->
+    <mappingFiles>
+    </mappingFiles>
+
+    <!-- Internationalization -->
+    <!-- All message codes should start with ${project.parent.artifactId}. -->
+    <messages>
+        <lang>en</lang>
+        <file>messages.properties</file>
+    </messages>
+    <messages>
+        <lang>fr</lang>
+        <file>messages_fr.properties</file>
+    </messages>
+    <!-- /Internationalization -->
 
 </module>
 
