@@ -141,6 +141,15 @@ public abstract class ModuleProperties {
         }
     }
 
+    protected ConceptSource getConceptSourceByGlobalProperty(String globalPropertyName) {
+        String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
+        ConceptSource conceptSource = conceptService.getConceptSourceByUuid(globalProperty);
+        if (conceptSource == null) {
+            throw new IllegalStateException("Configuration required: " + globalPropertyName);
+        }
+        return conceptSource;
+    }
+
     protected EncounterType getEncounterTypeByGlobalProperty(String globalPropertyName) {
         String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(globalProperty);
