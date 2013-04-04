@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.ConceptSource;
+import org.openmrs.Location;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,14 @@ public class ModulePropertiesComponentTest extends BaseModuleContextSensitiveTes
         Assert.assertNotNull(source);
         Assert.assertEquals("Some Standardized Terminology", source.getName());
 
+    }
+
+    @Test
+    public void shouldFetchLocationByUuid() {
+        // this location is in the standard test data set
+        Location location = emrApiProperties.getLocationByGlobalProperty("emr.unknownLocation");
+        Assert.assertNotNull(location);
+        Assert.assertEquals("Unknown Location", location.getName());
     }
 
 }

@@ -20,6 +20,7 @@ import org.openmrs.ConceptClass;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
+import org.openmrs.Location;
 import org.openmrs.OrderType;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.VisitType;
@@ -184,6 +185,15 @@ public abstract class ModuleProperties {
             throw new IllegalStateException("Configuration required: " + globalPropertyName);
         }
         return orderType;
+    }
+
+    protected Location getLocationByGlobalProperty(String globalPropertyName) {
+        String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
+        Location location = locationService.getLocationByUuid(globalProperty);
+        if (location == null) {
+            throw new IllegalStateException("Configuration required: " + globalPropertyName);
+        }
+        return location;
     }
 
     protected PatientIdentifierType getPatientIdentifierTypeByGlobalProperty(String globalPropertyName, boolean required) {
