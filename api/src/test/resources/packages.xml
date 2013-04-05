@@ -1,0 +1,6 @@
+<!--
+	Defines the EMR metadata packages
+-->
+<packages xmlns="http://www.openmrs.org/packages">
+	<package groupUuid="12345ba6-a634-42d5-9314-e12689856ab2" filename="metadata/Visit_Type_Package-1.zip" />
+</packages>
