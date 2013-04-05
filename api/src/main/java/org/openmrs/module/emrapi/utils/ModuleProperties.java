@@ -23,6 +23,7 @@ import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.OrderType;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.Provider;
 import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
@@ -31,6 +32,7 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.VisitService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,10 @@ public abstract class ModuleProperties {
     @Qualifier("personService")
     protected PersonService personService;
 
+    @Autowired
+    @Qualifier("providerService")
+    protected ProviderService providerService;
+
     public void setConceptService(ConceptService conceptService) {
         this.conceptService = conceptService;
     }
@@ -111,6 +117,14 @@ public abstract class ModuleProperties {
 
     public void setPatientService(PatientService patientService) {
         this.patientService = patientService;
+    }
+
+    public void setPersonService(PersonService personService) {
+        this.personService = personService;
+    }
+
+    public void setProviderService(ProviderService providerService) {
+        this.providerService = providerService;
     }
 
     protected ConceptClass getConceptClassByGlobalProperty(String globalPropertyName) {
@@ -194,6 +208,15 @@ public abstract class ModuleProperties {
             throw new IllegalStateException("Configuration required: " + globalPropertyName);
         }
         return location;
+    }
+
+    protected Provider getProviderByGlobalProperty(String globalPropertyName) {
+        String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
+        Provider provider = providerService.getProviderByUuid(globalProperty);
+        if (provider == null) {
+            throw new IllegalStateException("Configuration required: " + globalPropertyName);
+        }
+        return provider;
     }
 
     protected PatientIdentifierType getPatientIdentifierTypeByGlobalProperty(String globalPropertyName, boolean required) {
