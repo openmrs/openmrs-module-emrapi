@@ -74,20 +74,6 @@ public class EmrApiActivator extends BaseModuleActivator {
 	}
 	
 	/**
-	 * @see ModuleActivator#started()
-	 * @should install initial data only once
-	 */
-	public void started() {
-		setupGlobalProperties();
-		
-		log.info("Setup core global properties");
-		
-		boolean metadataUpdated = setupStandardMetadata();
-		
-		log.info("Setup core metadata packages (" + (metadataUpdated ? "imported packages" : "already up-to-date") + ")");
-	}
-	
-	/**
 	 * Setup the standard metadata packages
 	 * 
 	 * @return
