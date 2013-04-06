@@ -14,13 +14,20 @@
 
 package org.openmrs.module.emrapi.utils;
 
+import org.openmrs.Location;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.PersonAddress;
 import org.openmrs.User;
+import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.util.LocaleUtility;
 import org.openmrs.util.OpenmrsConstants;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -149,4 +156,57 @@ public class GeneralUtils {
 
         return true;
     }
+
+    /**
+     * Gets the specified property (referenced by string) off of a person address
+     * Returns null if the underlying property is null
+     */
+    public static String getPersonAddressProperty(PersonAddress address, String property) {
+        try {
+            Class<?> personAddressClass = Context.loadClass("org.openmrs.PersonAddress");
+            Method getPersonAddressProperty;
+            getPersonAddressProperty = personAddressClass.getMethod("get" + property.substring(0, 1).toUpperCase() + property.substring(1));
+            return (String) getPersonAddressProperty.invoke(address);
+        } catch (Exception e) {
+            throw new APIException("Invalid property name " + property + " passed to getPersonAddressProperty");
+        }
+    }
+
+    /**
+     * Utility method to fetch the patient identifier for a patient of a certain type at a certain location
+     * <p/>
+     * Returns null if no identifiers found for that patient of that type at that location
+     * If the patient has multiple identifiers for that type/location, it returns the first preferred one
+     * If no preferred identifiers, returns first non-preferred one
+     *
+     * @param patient
+     * @param patientIdentifierType
+     * @param location
+     * @return
+     */
+    public static PatientIdentifier getPatientIdentifier(Patient patient, PatientIdentifierType patientIdentifierType, Location location) {
+
+        // TODO: add some sort of data quality flag if there are two or more identifiers of the same type and location?
+
+        List<PatientIdentifier> patientIdentifiers = patient.getPatientIdentifiers(patientIdentifierType);
+
+        if (patientIdentifiers == null || patientIdentifiers.size() == 0) {
+            return null;
+        }
+
+        for (PatientIdentifier patientIdentifer : patientIdentifiers) {
+            if (patientIdentifer.getLocation().equals(location) && patientIdentifer.isPreferred()) {
+                return patientIdentifer;
+            }
+        }
+
+        for (PatientIdentifier patientIdentifer : patientIdentifiers) {
+            if (patientIdentifer.getLocation().equals(location)) {
+                return patientIdentifer;
+            }
+        }
+
+        return null;
+    }
+
 }

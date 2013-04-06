@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<dataset>
+    <global_property property="emr.atFacilityVisitType" property_value="f01c54cb-2225-471a-9cd5-d348552c337c"
+                     uuid="a0ee79e5-1d6c-46bf-903f-55437441329f"/>
+    <visit_type visit_type_id="1" name="Clinic or Hospital Visit" creator="1" date_created="2012-10-23 18:04:14"
+                changed_by="1" date_changed="2012-10-23 18:04:14"
+                retired="0" uuid="f01c54cb-2225-471a-9cd5-d348552c337c"/>
+
+    <global_property property="emr.checkInEncounterType" property_value="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"
+                     uuid="6686a8c0-fcc5-4fc5-b997-906e7ee23bd1"/>
+    <encounter_type encounter_type_id="1000" name="Check-in" description="Check in for a clinic visit" creator="1"
+                    date_created="2012-10-23 18:04:14" retired="0" uuid="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"/>
+
+    <global_property property="emr.checkInClerkEncounterRole" property_value="cbfe0b9d-9923-404c-941b-f048adc8cdc0"
+                     uuid="de7a1223-990a-4714-84a3-a05f7ad89896"/>
+    <encounter_role encounter_role_id="6" name="Administrative Clerk" creator="1" date_created="2012-10-23 18:04:14"
+                    changed_by="1" date_changed="2012-10-23 18:04:14"
+                    retired="0" uuid="cbfe0b9d-9923-404c-941b-f048adc8cdc0"/>
+
+    <global_property property="visits.assignmentHandler"
+                     property_value="org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler"
+                     uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>
+
+    <!-- this sets the identifier type with id=1 in the standard test dataset to the "primary identifier type" -->
+    <global_property property="emr.primaryIdentifierType" property_value="1a339fe9-38bc-4ab3-b180-320988c0b968"
+                     uuid="776cb3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
+
+    <person_attribute_type person_attribute_type_id="10" name="Unknown patient" description="Unknown patient"
+                           format="java.lang.String" searchable="false" creator="1" date_created="2008-08-15 15:53:36.0"
+                           retired="false" uuid="a0f5521c-dbbd-4c10-81b2-1b7ab18330dz" sort_weight="2"/>
+</dataset>

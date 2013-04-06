@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <location_tag location_tag_id="1" name="Visit Location"
+                  description="Visits are only allowed to happen at locations tagged with this location tag or at locations that descend from a location tagged with this tag."
+                  creator="1" date_created="2012-10-23 16:13:45 " retired="0"
+                  uuid="0967d73d-f3c9-492b-abed-356478610a94"/>
+    <location_tag location_tag_id="1001" name="Medical Record Location" description="Medical Record Location"
+                  creator="1" date_created="2012-10-23 16:13:45 " retired="0"
+                  uuid="0967d73d-f3c9-492b-abed-356478610a66"/>
+
+    <location_tag_map location_id="1" location_tag_id="1001"/>
+    <location_tag_map location_id="2" location_tag_id="1001"/>
+    <location_tag_map location_id="2" location_tag_id="1"/>
+
+    <location location_id="1001" parent_location="1" name="Child location" description="Child location" address1=""
+              address2="" city_village="" state_province="" postal_code="" country="" latitude="" longitude=""
+              creator="1" date_created="2008-08-15 15:28:54.0" retired="true" retired_by="1"
+              date_retired="2008-08-15 00:00:00.0" retire_reason="test" uuid="1676660c-4785-4285-9119-d197268f7f4a"/>
+
+    <global_property property="emr.atFacilityVisitType" property_value="f01c54cb-2225-471a-9cd5-d348552c337c"
+                     uuid="a0ee79e5-1d6c-46bf-903f-55437441329f"/>
+    <visit_type visit_type_id="1" name="Clinic or Hospital Visit" creator="1" date_created="2012-10-23 18:04:14"
+                changed_by="1" date_changed="2012-10-23 18:04:14"
+                retired="0" uuid="f01c54cb-2225-471a-9cd5-d348552c337c"/>
+
+    <global_property property="emr.checkInEncounterType" property_value="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"
+                     uuid="6686a8c0-fcc5-4fc5-b997-906e7ee23bd1"/>
+    <encounter_type encounter_type_id="1" name="Check-in" creator="1" date_created="2012-10-23 18:04:14" retired="0"
+                    uuid="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"/>
+
+    <global_property property="emr.checkInClerkEncounterRole" property_value="cbfe0b9d-9923-404c-941b-f048adc8cdc0"
+                     uuid="de7a1223-990a-4714-84a3-a05f7ad89896"/>
+    <encounter_role encounter_role_id="6" name="Administrative Clerk" creator="1" date_created="2012-10-23 18:04:14"
+                    changed_by="1" date_changed="2012-10-23 18:04:14"
+                    retired="0" uuid="cbfe0b9d-9923-404c-941b-f048adc8cdc0"/>
+
+    <concept concept_id="221" retired="0" datatype_id="2" class_id="7" is_set="0" creator="1"
+             date_created="2012-10-23 18:04:14" changed_by="1" date_changed="2012-10-23 18:04:14"
+             uuid="36ba7721-fae0-4da4-aef2-7e476cc04bdf"/>
+    <concept concept_id="16" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1"
+             date_created="2012-10-23 18:04:14" changed_by="1" date_changed="2012-10-23 18:04:14"
+             uuid="8fea306b-a60a-4f58-997e-45d59aa2e979"/>
+    <concept concept_id="175" retired="0" datatype_id="4" class_id="11" is_set="0" creator="1"
+             date_created="2012-10-23 18:04:14" changed_by="1" date_changed="2012-10-23 18:04:14"
+             uuid="3905ed77-c41c-400e-ba1f-67cee367d4fd"/>
+    <concept_answer concept_answer_id="1" concept_id="221" answer_concept="16" creator="1"
+                    date_created="2012-10-23 18:04:14" sort_weight="1" uuid="807ba38f-7698-40dc-9d3d-e10b4c942f6b"/>
+    <concept_answer concept_answer_id="2" concept_id="221" answer_concept="175" creator="1"
+                    date_created="2012-10-23 18:04:14" sort_weight="2" uuid="e3505d43-1dbe-49b8-8862-a9e4974bb659"/>
+
+    <concept concept_id="195" retired="0" datatype_id="1" class_id="7" is_set="0" creator="1"
+             date_created="2012-10-23 18:04:14" changed_by="1" date_changed="2012-10-23 18:04:14"
+             uuid="5d1bc5de-6a35-4195-8631-7322941fe528"/>
+
+    <concept concept_id="11" retired="0" datatype_id="3" class_id="7" is_set="0" creator="1"
+             date_created="2012-10-23 18:04:14" changed_by="1" date_changed="2012-10-23 18:04:14"
+             uuid="20438dc7-c5b4-4d9c-8480-e888f4795123"/>
+    <concept concept_id="100" retired="0" datatype_id="4" class_id="10" is_set="1" creator="1"
+             date_created="2012-10-23 18:04:14" changed_by="1" date_changed="2012-10-23 18:04:14"
+             uuid="8af62975-330e-4de7-ab85-1cc5ae5da9a8"/>
+
+
+    <global_property property="emr.paymentAmountConcept" property_value="5d1bc5de-6a35-4195-8631-7322941fe528"/>
+    <global_property property="emr.paymentReasonConcept" property_value="36ba7721-fae0-4da4-aef2-7e476cc04bdf"/>
+    <global_property property="emr.paymentReceiptNumberConcept" property_value="20438dc7-c5b4-4d9c-8480-e888f4795123"/>
+    <global_property property="emr.paymentConstructConcept" property_value="8af62975-330e-4de7-ab85-1cc5ae5da9a8"/>
+    <global_property property="visits.assignmentHandler"
+                     property_value="org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler"
+                     uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>
+
+    <!-- this sets the identifier type with id=2 in the standard test dataset to the "paper record identifier type" -->
+    <global_property property="emr.paperRecordIdentifierType" property_value="2f470aa8-1d73-43b7-81b5-01f0c0dfa53c"
+                     uuid="696cb3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
+
+    <!-- this sets the identifier type with id=1 in the standard test dataset to the "primary identifier type" -->
+    <global_property property="emr.primaryIdentifierType" property_value="1a339fe9-38bc-4ab3-b180-320988c0b968"
+                     uuid="776cb3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
+
+    <person_attribute_type person_attribute_type_id="10" name="Unknown patient" description="Unknown patient"
+                           format="java.lang.String" searchable="false" creator="1" date_created="2008-08-15 15:53:36.0"
+                           retired="false" uuid="a0f5521c-dbbd-4c10-81b2-1b7ab18330dz" sort_weight="2"/>
+</dataset>

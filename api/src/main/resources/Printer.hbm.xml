@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="org.openmrs.module.emrapi.printer.Printer" table="emr_printer">
+
+        <id name="printerId" type="int" column="printer_id" unsaved-value="0">
+            <generator class="native"/>
+        </id>
+
+        <property name="uuid" type="java.lang.String" column="uuid" length="38" unique="true"/>
+
+        <property name="name" type="java.lang.String" column="name" length="255" not-null="true"/>
+
+        <property name="ipAddress" type="java.lang.String" column="ip_address" length="50" not-null="true"/>
+
+        <property name="port" type="java.lang.String" column="port" length="10" not-null="true"/>
+
+        <property name="type" column="type" length="50" not-null="true">
+            <type name="org.openmrs.util.HibernateEnumType">
+                <param name="enumClassName">org.openmrs.module.emrapi.printer.Printer$Type</param>
+            </type>
+        </property>
+
+        <many-to-one name="physicalLocation" class="org.openmrs.Location">
+            <column name="physical_location"/>
+        </many-to-one>
+
+        <property name="dateCreated" type="java.util.Date" column="date_created"/>
+
+        <many-to-one name="creator" class="org.openmrs.User" not-null="true">
+            <column name="creator"/>
+        </many-to-one>
+    </class>
+
+
+</hibernate-mapping>
+

@@ -12,26 +12,20 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.emrapi;
+package org.openmrs.module.emrapi.db;
 
-import org.junit.Before;
-import org.junit.Test;
+import java.util.List;
 
-/**
- *
- */
-public class EmrApiActivatorTest {
+public interface SingleClassDAO<T> {
 
-    EmrApiActivator activator;
+    T getById(Integer id);
 
-    @Before
-    public void setUp() throws Exception {
-        activator = new EmrApiActivator();
-    }
+    List<T> getAll();
 
-    @Test
-    public void testStarted() throws Exception {
-        activator.started();
-    }
+    T saveOrUpdate(T object);
+
+    T update(T object);
+
+    void delete(T object);
 
 }

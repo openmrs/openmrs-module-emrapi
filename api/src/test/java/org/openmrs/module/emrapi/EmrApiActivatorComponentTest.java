@@ -14,9 +14,13 @@
 
 package org.openmrs.module.emrapi;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.LocationAttributeType;
 import org.openmrs.Role;
+import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
+import org.openmrs.module.emrapi.printer.Printer;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,14 +36,43 @@ public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private LocationService locationService;
+
+    @Before
+    public void setUp() throws Exception {
+        EmrApiActivator activator = new EmrApiActivator();
+        activator.willRefreshContext();
+        activator.contextRefreshed();
+        activator.willStart();
+        activator.started();
+    }
+
     @Test
-    public void testContextRefreshed() throws Exception {
-        new EmrApiActivator().contextRefreshed();
+    public void testPrivilegeLevelsCreated() throws Exception {
+        EmrApiActivator activator = new EmrApiActivator();
+        activator.willRefreshContext();
+        activator.contextRefreshed();
 
         // ensure Privilege Level: Full role
         Role fullPrivsRole = userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);
         assertThat(fullPrivsRole, is(notNullValue()));
         assertThat(fullPrivsRole.getUuid(), is(EmrApiConstants.PRIVILEGE_LEVEL_FULL_UUID));
-
     }
+
+    @Test
+    public void confirmThatLocationAttributeTypesHaveBeenCreated() {
+        EmrApiActivator activator = new EmrApiActivator();
+        activator.willStart();
+        activator.started();
+
+        LocationAttributeType defaultIdCardPrinter = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER.get(Printer.Type.ID_CARD.name()));
+        LocationAttributeType defaultLabelPrinter = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER.get(Printer.Type.LABEL.name()));
+        LocationAttributeType nameToPrintOnIdCard = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
+
+        assertThat(defaultIdCardPrinter, is(notNullValue()));
+        assertThat(defaultLabelPrinter, is(notNullValue()));
+        assertThat(nameToPrintOnIdCard, is(notNullValue()));
+    }
+
 }
