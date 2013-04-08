@@ -27,6 +27,7 @@ import org.openmrs.module.ModuleActivator;
 import org.openmrs.module.emrapi.account.AccountService;
 import org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler;
 import org.openmrs.module.emrapi.printer.PrinterDatatype;
+import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
 
 /**
@@ -109,6 +110,12 @@ public class EmrApiActivator extends BaseModuleActivator {
             defaultLabelPrinterAttributeType.setDescription("The default label printer for this location");
 
             locationService.saveLocationAttributeType(defaultLabelPrinterAttributeType);
+        } else {
+            // if you change any field values above, you need to set them here, so existing servers can be updated
+            boolean changed = GeneralUtils.setPropertyIfDifferent(defaultLabelPrinterAttributeType, "datatypeClassname", PrinterDatatype.class.getName());
+            if (changed) {
+                locationService.saveLocationAttributeType(defaultLabelPrinterAttributeType);
+            }
         }
 
         LocationAttributeType defaultIdCardPrinterAttributeType =
@@ -125,6 +132,12 @@ public class EmrApiActivator extends BaseModuleActivator {
             defaultIdCardPrinterAttributeType.setDescription("The default id card printer for this location");
 
             locationService.saveLocationAttributeType(defaultIdCardPrinterAttributeType);
+        } else {
+            // if you change any field values above, you need to set them here, so existing servers can be updated
+            boolean changed = GeneralUtils.setPropertyIfDifferent(defaultIdCardPrinterAttributeType, "datatypeClassname", PrinterDatatype.class.getName());
+            if (changed) {
+                locationService.saveLocationAttributeType(defaultIdCardPrinterAttributeType);
+            }
         }
 
         LocationAttributeType nameToPrintOnIdCardAttributeType =
