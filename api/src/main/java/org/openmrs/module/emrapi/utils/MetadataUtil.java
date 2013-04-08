@@ -18,9 +18,9 @@ import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.h2.util.IOUtils;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.metadata.MetadataPackageConfig;
 import org.openmrs.module.emrapi.metadata.MetadataPackagesConfig;
@@ -62,7 +62,7 @@ public class MetadataUtil {
 	private synchronized static boolean loadPackagesFromXML(InputStream stream, ClassLoader loader) throws Exception {
 		boolean anyChanges = false;
 		
-		String xml = new String(IOUtils.readBytesAndClose(stream, -1));
+		String xml = IOUtils.toString(stream);
 		MetadataPackagesConfig config = Context.getSerializationService().getDefaultSerializer()
 		        .deserialize(xml, MetadataPackagesConfig.class);
 		
