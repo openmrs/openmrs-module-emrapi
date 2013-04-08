@@ -42,7 +42,7 @@ public class MetadataUtil {
 	 * @return
 	 */
 	public static boolean setupStandardMetadata(ClassLoader loader) {
-		try {//ImportMode.PEER_TO_PEER
+		try {
 			InputStream stream = loader.getResourceAsStream(PACKAGES_FILENAME);
 			return loadPackagesFromXML(stream, loader);
 		}
