@@ -13,8 +13,22 @@
  */
 package org.openmrs.module.emrapi.metadata;
 
-public class MetadataConstants {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MetadataPackagesConfig {
 	
-	// Visit Types
-	public static final String CLINIC_OR_HOSPITAL_VISIT_TYPE_UUID = "86b3d7bc-d91f-4ce2-991c-f71bba0b31e4";
+	private List<MetadataPackageConfig> packages = new ArrayList<MetadataPackageConfig>();
+	
+	public List<MetadataPackageConfig> getPackages() {
+		return packages;
+	}
+	
+	public void setPackages(List<MetadataPackageConfig> packages) {
+		this.packages = packages;
+	}
+	
+	public void addPackage(MetadataPackageConfig pkg) {
+		packages.add(pkg);
+	}
 }
