@@ -15,6 +15,8 @@
 package org.openmrs.module.emrapi.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.ConceptClass;
 import org.openmrs.ConceptSource;
@@ -46,6 +48,8 @@ import java.util.List;
  */
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public abstract class ModuleProperties {
+
+    private static final Log log = LogFactory.getLog(ModuleProperties.class);
 
     @Autowired
     @Qualifier("conceptService")
@@ -229,14 +233,15 @@ public abstract class ModuleProperties {
     }
 
     protected List<PatientIdentifierType> getPatientIdentifierTypesByGlobalProperty(String globalPropertyName, boolean required) {
-        List<PatientIdentifierType> types = null;
+        List<PatientIdentifierType> types = new ArrayList<PatientIdentifierType>();
         String globalProperty = getGlobalProperty(globalPropertyName, required);
         if (StringUtils.isNotEmpty(globalProperty)) {
-            types = new ArrayList<PatientIdentifierType>();
-            for (String type : globalPropertyName.split(",")) {
-                PatientIdentifierType patientIdentifierType = getPatientIdentifierTypeByGlobalProperty(type, false);
+            for (String type : globalProperty.split(",")) {
+                PatientIdentifierType patientIdentifierType = patientService.getPatientIdentifierTypeByUuid(type);
                 if (patientIdentifierType != null) {
                     types.add(patientIdentifierType);
+                } else {
+                    log.warn("Global property " + globalPropertyName + " specifies an unknown patient identifier type: " + type);
                 }
             }
         }

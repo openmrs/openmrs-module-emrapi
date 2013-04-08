@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi.utils;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -25,6 +26,7 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.util.LocaleUtility;
 import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -207,6 +209,28 @@ public class GeneralUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Ensures that bean.propertyName is equal to newValue
+     *
+     * @param bean
+     * @param propertyName
+     * @param newValue
+     * @return true if we changed the value, false if we left it as-was
+     */
+    public static boolean setPropertyIfDifferent(Object bean, String propertyName, Object newValue) {
+        try {
+            Object currentValue = PropertyUtils.getProperty(bean, propertyName);
+            if (OpenmrsUtil.nullSafeEquals(currentValue, newValue)) {
+                return false;
+            } else {
+                PropertyUtils.setProperty(bean, propertyName, newValue);
+                return true;
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }

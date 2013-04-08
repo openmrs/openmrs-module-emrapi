@@ -47,7 +47,7 @@ public class PatientDomainWrapper {
 
     private Patient patient;
 
-    @Qualifier("emrProperties")
+    @Qualifier("emrApiProperties")
     @Autowired
     protected EmrApiProperties emrApiProperties;
 
@@ -152,7 +152,7 @@ public class PatientDomainWrapper {
         return patient.getPatientIdentifiers(emrApiProperties.getPrimaryIdentifierType());
     }
 
-// This can no longer be on PatientDomainWrapper.
+// This can no longer be on PatientDomainWrapper since we pulled out the paperrecord module
 //    public PatientIdentifier getPaperRecordIdentifier() {
 //        List<PatientIdentifier> paperRecordIdentifiers = getPaperRecordIdentifiers();
 //        if (paperRecordIdentifiers.size() == 0) {
@@ -163,7 +163,7 @@ public class PatientDomainWrapper {
 //    }
 
     public List<PatientIdentifier> getExtraIdentifiers() {
-        ArrayList<PatientIdentifier> patientIdentifiers = null;
+        List<PatientIdentifier> patientIdentifiers = null;
         List<PatientIdentifierType> types = emrApiProperties.getExtraPatientIdentifierTypes();
         if (types != null && types.size() > 0) {
             patientIdentifiers = new ArrayList<PatientIdentifier>();
@@ -177,7 +177,7 @@ public class PatientDomainWrapper {
         return patientIdentifiers;
     }
 
-// This can no longer be on PatientDomainWrapper.
+// This can no longer be on PatientDomainWrapper since we pulled out the paperrecord module
 //    public List<PatientIdentifier> getPaperRecordIdentifiers() {
 //        PatientIdentifierType paperRecordIdentifierType = emrApiProperties.getPaperRecordIdentifierType();
 //        if (paperRecordIdentifierType == null) {

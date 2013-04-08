@@ -38,7 +38,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EmrVisitAssignmentHandlerTest {
+public class EmrApiVisitAssignmentHandlerTest {
 
     EmrApiVisitAssignmentHandler handler;
 
