@@ -102,7 +102,7 @@ public class EmrApiProperties extends ModuleProperties {
         }
         return type;
     }
-
+                                                                        .xml
     public PatientIdentifierType getPrimaryIdentifierType() {
         return getPatientIdentifierTypeByGlobalProperty(EmrApiConstants.PRIMARY_IDENTIFIER_TYPE, true);
     }
