@@ -93,6 +93,12 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_DIAGNOSIS_ORDER_SECONDARY = "Secondary";
 
+    public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY = "Diagnosis Certainty"; // e.g. confirmed or presumed
+
+    public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY_CONFIRMED = "Confirmed";
+
+    public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY_PRESUMED = "Presumed";
+
     public static final String LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD = "a5fb5770-409a-11e2-a25f-0800200c9a66";
 
     // remember if we add more types here to also create them in the module activator

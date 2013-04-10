@@ -33,6 +33,7 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
     private Concept codedDiagnosisConcept;
     private Concept nonCodedDiagnosisConcept;
     private Concept diagnosisOrderConcept;
+    private Concept diagnosisCertaintyConcept;
 
     private ConceptSource emrConceptSource;
 
@@ -40,7 +41,8 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME, "diagnosisSetConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CONCEPT_SET,
                 "codedDiagnosisConcept", EmrApiConstants.CONCEPT_CODE_CODED_DIAGNOSIS,
                 "nonCodedDiagnosisConcept", EmrApiConstants.CONCEPT_CODE_NON_CODED_DIAGNOSIS,
-                "diagnosisOrderConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_ORDER);
+                "diagnosisOrderConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_ORDER,
+                "diagnosisCertaintyConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CERTAINTY);
         this.emrConceptSource = emrConceptSource;
     }
 
@@ -66,6 +68,10 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         return diagnosisOrderConcept;
     }
 
+    public Concept getDiagnosisCertaintyConcept() {
+        return diagnosisCertaintyConcept;
+    }
+
     public void setDiagnosisSetConcept(Concept diagnosisSetConcept) {
         this.diagnosisSetConcept = diagnosisSetConcept;
     }
@@ -82,12 +88,8 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         this.diagnosisOrderConcept = diagnosisOrderConcept;
     }
 
-    public ConceptSource getEmrConceptSource() {
-        return emrConceptSource;
-    }
-
-    public void setEmrConceptSource(ConceptSource emrConceptSource) {
-        this.emrConceptSource = emrConceptSource;
+    public void setDiagnosisCertaintyConcept(Concept diagnosisCertaintyConcept) {
+        this.diagnosisCertaintyConcept = diagnosisCertaintyConcept;
     }
 
     public Obs buildDiagnosisObsGroup(Diagnosis diagnosis) {
@@ -95,11 +97,16 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         order.setConcept(diagnosisOrderConcept);
         order.setValueCoded(findAnswer(diagnosisOrderConcept, diagnosis.getOrder().getCodeInEmrConceptSource()));
 
+        Obs certainty = new Obs();
+        certainty.setConcept(diagnosisCertaintyConcept);
+        certainty.setValueCoded(findAnswer(diagnosisCertaintyConcept, diagnosis.getCertainty().getCodeInEmrConceptSource()));
+
         Obs diagnosisObs = buildObsFor(diagnosis.getDiagnosis(), codedDiagnosisConcept, nonCodedDiagnosisConcept);
 
         Obs obs = new Obs();
         obs.setConcept(diagnosisSetConcept);
         obs.addGroupMember(order);
+        obs.addGroupMember(certainty);
         obs.addGroupMember(diagnosisObs);
         return obs;
     }
@@ -219,5 +226,4 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
             return new CodedOrFreeTextAnswer(nonCodedObs.getValueText());
         }
     }
-
 }

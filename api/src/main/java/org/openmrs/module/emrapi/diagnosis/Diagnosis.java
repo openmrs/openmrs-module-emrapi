@@ -27,6 +27,8 @@ public class Diagnosis {
 
     Order order;
 
+    Certainty certainty = Certainty.PRESUMED;
+
     public Diagnosis(CodedOrFreeTextAnswer diagnosis) {
         this.diagnosis = diagnosis;
     }
@@ -50,6 +52,14 @@ public class Diagnosis {
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+
+    public Certainty getCertainty() {
+        return certainty;
+    }
+
+    public void setCertainty(Certainty certainty) {
+        this.certainty = certainty;
     }
 
     @Override
@@ -77,9 +87,33 @@ public class Diagnosis {
         }
 
         public static Order parseConceptReferenceCode(String code) {
-            for (Order order : values()) {
-                if (order.getCodeInEmrConceptSource().equals(code)) {
-                    return order;
+            for (Order candidate : values()) {
+                if (candidate.getCodeInEmrConceptSource().equals(code)) {
+                    return candidate;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum Certainty {
+        CONFIRMED(EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CERTAINTY_CONFIRMED),
+        PRESUMED(EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CERTAINTY_PRESUMED);
+
+        String codeInEmrConceptSource;
+
+        Certainty(String codeInEmrConceptSource) {
+            this.codeInEmrConceptSource = codeInEmrConceptSource;
+        }
+
+        String getCodeInEmrConceptSource() {
+            return codeInEmrConceptSource;
+        }
+
+        public static Certainty parseConceptReferenceCode(String code) {
+            for (Certainty candidate : values()) {
+                if (candidate.getCodeInEmrConceptSource().equals(code)) {
+                    return candidate;
                 }
             }
             return null;
