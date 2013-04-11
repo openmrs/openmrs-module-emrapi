@@ -85,7 +85,9 @@ public class MetadataUtil {
 	private static boolean installMetadataPackageIfNecessary(MetadataPackageConfig config, ClassLoader loader)
 	    throws IOException {
 		try {
-			Matcher matcher = Pattern.compile("[\\w/-]+-(\\d+).zip").matcher(config.getFilenameBase());
+			String filename = config.getFilenameBase() + "-" + config.getVersion().toString() + ".zip";
+
+			Matcher matcher = Pattern.compile("\\w+-(\\d+).zip").matcher(filename);
 			if (!matcher.matches())
 				throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
 			Integer version = Integer.valueOf(matcher.group(1));
