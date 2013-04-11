@@ -18,6 +18,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
+@Ignore
 public class MetadataUtilTest extends BaseModuleContextSensitiveTest {
 	
 	@Test

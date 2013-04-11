@@ -78,4 +78,16 @@ public class ModulePropertiesTest {
         assertThat(oneIdentifierType.get(1), is(identifierType2));
     }
 
+    @Test
+    public void getIntegerByGlobalProperty_shouldParseInteger() throws Exception {
+        when(administrationService.getGlobalProperty("someInteger")).thenReturn("123");
+        assertThat(moduleProperties.getIntegerByGlobalProperty("someInteger"), is(123));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void getIntegerByGlobalProperty_shouldFailForUnparseableInteger() throws Exception {
+        when(administrationService.getGlobalProperty("someInteger")).thenReturn("AAA");
+        moduleProperties.getIntegerByGlobalProperty("someInteger");
+    }
+
 }

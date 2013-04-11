@@ -248,6 +248,16 @@ public abstract class ModuleProperties {
         return types;
     }
 
+    protected Integer getIntegerByGlobalProperty(String globalPropertyName) {
+        String globalProperty = getGlobalProperty(globalPropertyName, true);
+        try {
+            return Integer.valueOf(globalProperty);
+        }
+        catch (Exception e) {
+            throw new IllegalStateException("Global property " + globalPropertyName + " value of " + globalProperty + " is not parsable as an Integer");
+        }
+    }
+
     protected String getGlobalProperty(String globalPropertyName, boolean required) {
         String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
         if (required && StringUtils.isEmpty(globalProperty)) {
