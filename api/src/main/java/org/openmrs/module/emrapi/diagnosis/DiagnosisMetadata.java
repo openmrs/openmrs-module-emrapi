@@ -175,6 +175,7 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         }
 
         Obs orderObs = findMember(obsGroup, diagnosisOrderConcept);
+        Obs certaintyObs = findMember(obsGroup, diagnosisCertaintyConcept);
         Obs codedObs = findMember(obsGroup, codedDiagnosisConcept);
         Obs nonCodedObs = null;
         if (codedObs == null) {
@@ -185,6 +186,9 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         }
         CodedOrFreeTextAnswer diagnosisValue = buildFrom(codedObs, nonCodedObs);
         Diagnosis diagnosis = new Diagnosis(diagnosisValue, getDiagnosisOrderFrom(orderObs));
+        if (certaintyObs != null) {
+            diagnosis.setCertainty(getDiagnosisCertaintyFrom(certaintyObs));
+        }
         return diagnosis;
     }
 
@@ -203,6 +207,11 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         String mapping = findMapping(obs.getValueCoded());
         return Diagnosis.Order.parseConceptReferenceCode(mapping);
 
+    }
+
+    private Diagnosis.Certainty getDiagnosisCertaintyFrom(Obs certaintyObs) {
+        String mapping = findMapping(certaintyObs.getValueCoded());
+        return Diagnosis.Certainty.parseConceptReferenceCode(mapping);
     }
 
     private String findMapping(Concept concept) {
