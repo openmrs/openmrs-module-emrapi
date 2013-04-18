@@ -82,8 +82,10 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
             if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid()))
                 continue;
 
-            byPerson.put(user.getPerson(), new AccountDomainWrapper(user.getPerson(), this, userService,
-                    providerService, providerManagementService, personService, providerIdentifierGenerator));
+            if (!user.getPerson().isVoided()) {
+                byPerson.put(user.getPerson(), new AccountDomainWrapper(user.getPerson(), this, userService,
+                        providerService, providerManagementService, personService, providerIdentifierGenerator));
+            }
         }
 
         for (Provider provider : providerService.getAllProviders()) {
@@ -91,7 +93,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
                 throw new APIException("Providers not associated to a person are not supported");
 
             AccountDomainWrapper account = byPerson.get(provider.getPerson());
-            if (account == null) {
+            if (account == null && !provider.getPerson().isVoided()) {
                 byPerson.put(provider.getPerson(), new AccountDomainWrapper(provider.getPerson(), this, userService,
                         providerService, providerManagementService, personService, providerIdentifierGenerator));
             }
