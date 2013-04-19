@@ -190,7 +190,7 @@ public class PatientDomainWrapper {
         return adtService.getLastEncounter(patient);
     }
 
-    public Visit getActiveVisit(Location location) {
+    public VisitDomainWrapper getActiveVisit(Location location) {
         return adtService.getActiveVisit(patient, location);
     }
 

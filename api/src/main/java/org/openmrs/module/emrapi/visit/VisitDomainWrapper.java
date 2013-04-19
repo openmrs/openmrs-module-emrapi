@@ -17,7 +17,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-// TODO: merge this with VisitSummary
+/**
+ * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
+ */
 public class VisitDomainWrapper {
 
     private static final Log log = LogFactory.getLog(VisitDomainWrapper.class);
@@ -32,12 +34,40 @@ public class VisitDomainWrapper {
         this.visit = visit;
     }
 
+    public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties) {
+        this(visit);
+        this.emrApiProperties = emrApiProperties;
+    }
+
+    /**
+     * @return the visit
+     */
     public Visit getVisit() {
         return visit;
     }
 
     public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
         this.emrApiProperties = emrApiProperties;
+    }
+
+    /**
+     * @return the check-in encounter for this visit, or null if none exists
+     */
+    public Encounter getCheckInEncounter() {
+        for (Encounter e : visit.getEncounters()) {
+            if (emrApiProperties.getCheckInEncounterType().equals(e.getEncounterType()))
+                return e;
+        }
+        return null;
+    }
+
+    /**
+     * @return the most recent encounter in the visit
+     */
+    public Encounter getLastEncounter() {
+        if (visit.getEncounters().size() > 0)
+            return visit.getEncounters().iterator().next();
+        return null;
     }
 
     public int getDifferenceInDaysBetweenCurrentDateAndStartDate() {

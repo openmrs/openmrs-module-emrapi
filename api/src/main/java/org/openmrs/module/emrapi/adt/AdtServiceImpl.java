@@ -42,6 +42,7 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,9 +171,14 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         return false;
     }
 
-    @Override
-    @Transactional
-    public Visit getActiveVisit(Patient patient, Location department) {
+    /**
+     * Anything that calls this needs to be @Transactional
+     *
+     * @param patient
+     * @param department
+     * @return
+     */
+    private Visit getActiveVisitHelper(Patient patient, Location department) {
         Date now = new Date();
 
         List<Visit> candidates = visitService.getVisitsByPatient(patient);
@@ -194,6 +200,17 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     @Transactional
+    public VisitDomainWrapper getActiveVisit(Patient patient, Location location) {
+        VisitDomainWrapper visitSummary = null;
+        Visit activeVisit = getActiveVisitHelper(patient, location);
+        if (activeVisit != null) {
+            visitSummary = new VisitDomainWrapper(activeVisit, emrApiProperties);
+        }
+        return visitSummary;
+    }
+
+    @Override
+    @Transactional
     public void closeAndSaveVisit(Visit visit) {
         visit.setStopDatetime(guessVisitStopDatetime(visit));
         visitService.saveVisit(visit);
@@ -202,7 +219,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Override
     @Transactional
     public Visit ensureActiveVisit(Patient patient, Location department) {
-        Visit activeVisit = getActiveVisit(patient, department);
+        Visit activeVisit = getActiveVisitHelper(patient, department);
         if (activeVisit == null) {
             Date now = new Date();
             activeVisit = buildVisit(patient, department, now);
@@ -235,7 +252,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             checkInClerk = getProvider(Context.getAuthenticatedUser());
         }
 
-        Visit activeVisit = getActiveVisit(patient, where);
+        Visit activeVisit = getActiveVisitHelper(patient, where);
 
         if (activeVisit != null && newVisit) {
             closeAndSaveVisit(activeVisit);
@@ -371,10 +388,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     /**
-     * @see org.openmrs.module.emrapi.adt.AdtService#getActiveVisitSummaries(org.openmrs.Location)
+     * @see org.openmrs.module.emrapi.adt.AdtService#getActiveVisits(org.openmrs.Location)
      */
     @Override
-    public List<VisitSummary> getActiveVisitSummaries(Location location) {
+    public List<VisitDomainWrapper> getActiveVisits(Location location) {
         if (location == null) {
             throw new IllegalArgumentException("Location is required");
         }
@@ -382,10 +399,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         List<Visit> candidates = visitService.getVisits(null, null, locations, null, null, null, null, null, null, false,
                 false);
 
-        List<VisitSummary> active = new ArrayList<VisitSummary>();
+        List<VisitDomainWrapper> active = new ArrayList<VisitDomainWrapper>();
         for (Visit candidate : candidates) {
             if (isActive(candidate) && itBelongsToARealPatient(candidate)) {
-                active.add(new VisitSummary(candidate, emrApiProperties));
+                active.add(new VisitDomainWrapper(candidate, emrApiProperties));
             }
         }
 
@@ -407,16 +424,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         } else {
             return byPatient.get(byPatient.size() - 1);
         }
-    }
-
-    @Override
-    public VisitSummary getActiveVisitSummary(Patient patient, Location location) {
-        VisitSummary visitSummary = null;
-        Visit activeVisit = getActiveVisit(patient, location);
-        if (activeVisit != null) {
-            visitSummary = new VisitSummary(activeVisit, emrApiProperties);
-        }
-        return visitSummary;
     }
 
     @Override

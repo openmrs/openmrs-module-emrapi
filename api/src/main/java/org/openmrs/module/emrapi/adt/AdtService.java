@@ -22,6 +22,7 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.Date;
 import java.util.List;
@@ -47,11 +48,12 @@ public interface AdtService extends OpenmrsService {
      * Gets the patient's <em>active</em> visit at the given location, or null, if none exists.
      * If the patient has any non-stopped visits that are not active, they are stopped as a side-effect.
      *
+     *
      * @param patient
      * @param department
      * @return
      */
-    Visit getActiveVisit(Patient patient, Location department);
+    VisitDomainWrapper getActiveVisit(Patient patient, Location department);
 
     /**
      * Close the patient's active visit at the given location
@@ -122,19 +124,11 @@ public interface AdtService extends OpenmrsService {
     /**
      * Gets all currently-active visits (per our business logic) at the given location or any of its children
      *
-     * @param location
-     * @return
-     */
-    List<VisitSummary> getActiveVisitSummaries(Location location);
-
-    /**
-     * Gets a summary of the active visit for a given patient at a given location
      *
-     * @param patient
      * @param location
      * @return
      */
-    VisitSummary getActiveVisitSummary(Patient patient, Location location);
+    List<VisitDomainWrapper> getActiveVisits(Location location);
 
     /**
      * If any currently-open visits are now inactive per our business logic, close them

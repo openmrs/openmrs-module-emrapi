@@ -45,6 +45,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -334,7 +335,7 @@ public class AdtServiceTest {
                         any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
                         any(Boolean.class), any(Boolean.class))).thenReturn(Arrays.asList(visit1, visit2, visit3));
 
-        List<VisitSummary> activeVisitSummaries = service.getActiveVisitSummaries(mirebalaisHospital);
+        List<VisitDomainWrapper> activeVisitSummaries = service.getActiveVisits(mirebalaisHospital);
 
         assertThat(activeVisitSummaries, TestUtils.isCollectionOfExactlyElementsWithProperties("visit", visit1, visit2));
     }
