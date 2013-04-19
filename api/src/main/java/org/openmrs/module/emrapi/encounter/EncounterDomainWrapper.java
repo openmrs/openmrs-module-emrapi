@@ -4,8 +4,6 @@ import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.User;
 
-import java.util.Set;
-
 public class EncounterDomainWrapper {
 
     private Encounter encounter;
@@ -14,6 +12,11 @@ public class EncounterDomainWrapper {
         this.encounter = encounter;
     }
 
+    /**
+     * Verify if a user is the creator or one of the providers in the encounter
+     * @param currentUser
+     * @return
+     */
     public boolean participatedInEncounter(User currentUser) {
 
         if (verifyIfUserIsTheCreatorOfEncounter(currentUser)){
