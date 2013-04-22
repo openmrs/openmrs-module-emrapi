@@ -47,5 +47,21 @@
     </messages>
     <!-- /Internationalization -->
 
+    <globalProperty>
+        <property>emr.unknownLocation</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the Location that represents an Unknown Location
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>emr.unknownProvider</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the Provider that represents an Unknown Provider
+        </description>
+    </globalProperty>
+
 </module>
 

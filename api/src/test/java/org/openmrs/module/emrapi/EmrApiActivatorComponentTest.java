@@ -17,6 +17,7 @@ package org.openmrs.module.emrapi;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.LocationAttributeType;
+import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -38,6 +40,9 @@ public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest
 
     @Autowired
     private LocationService locationService;
+
+    @Autowired
+    private EmrApiProperties emrApiProperties;
 
     @Before
     public void setUp() throws Exception {
@@ -73,6 +78,21 @@ public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest
         assertThat(defaultIdCardPrinter, is(notNullValue()));
         assertThat(defaultLabelPrinter, is(notNullValue()));
         assertThat(nameToPrintOnIdCard, is(notNullValue()));
+    }
+
+    @Test
+    public void confirmThatUnknownProviderCreated() {
+        EmrApiActivator activator = new EmrApiActivator();
+        activator.willRefreshContext();
+        activator.contextRefreshed();
+
+        Provider unknownProvider = emrApiProperties.getUnknownProvider();
+
+        assertNotNull(unknownProvider);
+        assertNotNull(unknownProvider.getPerson());
+        assertThat(unknownProvider.getIdentifier(), is("UNKNOWN"));
+        assertThat(unknownProvider.getPerson().getGivenName(), is("Unknown"));
+        assertThat(unknownProvider.getPerson().getFamilyName(), is("Provider"));
     }
 
 }

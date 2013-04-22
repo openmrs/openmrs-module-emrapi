@@ -22,6 +22,11 @@ import java.util.Map;
  */
 public class EmrApiConstants {
 
+
+    public static final String GP_UNKNOWN_LOCATION = "emr.unknownLocation";
+
+    public static final String GP_UNKNOWN_PROVIDER = "emr.unknownProvider";
+
     public static final String GP_AT_FACILITY_VISIT_TYPE = "emr.atFacilityVisitType";
 
     public static final String GP_CHECK_IN_ENCOUNTER_TYPE = "emr.checkInEncounterType";
@@ -100,6 +105,7 @@ public class EmrApiConstants {
     public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY_PRESUMED = "Presumed";
 
     public static final String LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD = "a5fb5770-409a-11e2-a25f-0800200c9a66";
+
 
     // remember if we add more types here to also create them in the module activator
     public static final Map<String, String> LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER = new HashMap<String, String>() {{

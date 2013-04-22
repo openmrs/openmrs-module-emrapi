@@ -18,10 +18,12 @@ import org.openmrs.Concept;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
+import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.LocationTag;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
+import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
@@ -39,6 +41,15 @@ import java.util.List;
  */
 @Component("emrApiProperties")
 public class EmrApiProperties extends ModuleProperties {
+
+    public Location getUnknownLocation() {
+        return getLocationByGlobalProperty(EmrApiConstants.GP_UNKNOWN_LOCATION);
+    }
+
+    public Provider getUnknownProvider() {
+        return getProviderByGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+    }
+
 
     public Role getFullPrivilegeLevel() {
         return userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);

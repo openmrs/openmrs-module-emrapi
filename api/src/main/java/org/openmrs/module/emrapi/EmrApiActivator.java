@@ -13,12 +13,18 @@
  */
 package org.openmrs.module.emrapi;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.GlobalProperty;
 import org.openmrs.LocationAttributeType;
+import org.openmrs.Person;
+import org.openmrs.PersonName;
 import org.openmrs.Privilege;
+import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
+import org.openmrs.api.PersonService;
+import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.datatype.FreeTextDatatype;
@@ -78,10 +84,12 @@ public class EmrApiActivator extends BaseModuleActivator {
 
         AdministrationService administrationService = Context.getAdministrationService();
         LocationService locationService = Context.getLocationService();
+        ProviderService providerService = Context.getProviderService();
+        PersonService personService = Context.getPersonService();
 
         createGlobalProperties(administrationService);
-
         createLocationAttributeTypes(locationService);
+        createUnknownProvider(administrationService, providerService, personService);
     }
 
     private void createGlobalProperties(AdministrationService administrationService) {
@@ -154,6 +162,46 @@ public class EmrApiActivator extends BaseModuleActivator {
 
             locationService.saveLocationAttributeType(nameToPrintOnIdCardAttributeType);
         }
+    }
+
+    private void createUnknownProvider(AdministrationService adminService, ProviderService providerService, PersonService personService) {
+
+        // see if the provider exists
+        Provider provider = null;
+        String providerUuid = adminService.getGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+
+        if (StringUtils.isNotBlank(providerUuid)) {
+            provider = providerService.getProviderByUuid(providerUuid);
+        }
+
+        // create the unknown provider if necessary
+        if (provider == null) {
+            Person unknownPerson = new Person();
+            unknownPerson.setGender("F");
+            PersonName unknownPersonName = new PersonName();
+            unknownPersonName.setGivenName("Unknown");
+            unknownPersonName.setFamilyName("Provider");
+            unknownPerson.addName(unknownPersonName);
+
+            personService.savePerson(unknownPerson);
+
+            Provider unknownProvider = new Provider();
+            unknownProvider.setPerson(unknownPerson);
+            unknownProvider.setIdentifier("UNKNOWN");
+            unknownProvider.setUuid("f9badd80-ab76-11e2-9e96-0800200c9a66");
+
+            providerService.saveProvider(unknownProvider);
+
+            // also set global property
+            GlobalProperty unknownProviderUuid = adminService.getGlobalPropertyObject(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+            if (unknownProviderUuid == null) {
+                unknownProviderUuid = new GlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+            }
+            unknownProviderUuid.setPropertyValue("f9badd80-ab76-11e2-9e96-0800200c9a66");
+                  adminService.saveGlobalProperty(unknownProviderUuid);
+
+        }
+
     }
 
 }
