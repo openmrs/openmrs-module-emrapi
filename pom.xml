@@ -35,7 +35,7 @@
     </modules>
 
     <properties>
-        <openmrsCoreVersion>1.9.3</openmrsCoreVersion>
+        <openmrsCoreVersion>1.9.4-SNAPSHOT</openmrsCoreVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reportingModuleVersion>0.7.5</reportingModuleVersion>
         <serializationXstreamModuleVersion>0.2.7</serializationXstreamModuleVersion>
@@ -114,27 +114,6 @@
         <!-- End OpenMRS modules -->
 
         <!-- Begin other dependencies -->
-
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito</artifactId>
-            <version>1.4.12</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
