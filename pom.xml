@@ -41,7 +41,7 @@
         <serializationXstreamModuleVersion>0.2.7</serializationXstreamModuleVersion>
         <calculationModuleVersion>1.0</calculationModuleVersion>
         <providermanagementModuleVersion>1.1.3</providermanagementModuleVersion>
-        <metadatasharingVersion>1.1.8-SNAPSHOT</metadatasharingVersion>
+        <metadatasharingVersion>1.1.8</metadatasharingVersion>
     </properties>
 
     <dependencies>
