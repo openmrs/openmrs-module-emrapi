@@ -8,5 +8,6 @@
         <mapping resource="Provider.hbm.xml"/>
         <mapping resource="ProviderRole.hbm.xml"/>
         <mapping resource="ImportedItem.hbm.xml"/>
+        <mapping resource="Printer.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>
