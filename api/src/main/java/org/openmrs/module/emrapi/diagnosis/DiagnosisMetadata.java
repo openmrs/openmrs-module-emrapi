@@ -209,6 +209,13 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
 
     }
 
+    public Concept getConceptFor(Diagnosis.Certainty certainty) {
+        if (certainty == null) {
+            return null;
+        }
+        return findAnswer(getDiagnosisCertaintyConcept(), certainty.getCodeInEmrConceptSource());
+    }
+
     private Diagnosis.Certainty getDiagnosisCertaintyFrom(Obs certaintyObs) {
         String mapping = findMapping(certaintyObs.getValueCoded());
         return Diagnosis.Certainty.parseConceptReferenceCode(mapping);
@@ -235,4 +242,5 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
             return new CodedOrFreeTextAnswer(nonCodedObs.getValueText());
         }
     }
+
 }
