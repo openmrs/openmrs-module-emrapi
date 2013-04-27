@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi;
 
 import org.openmrs.Concept;
+import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -187,6 +188,14 @@ public class EmrApiProperties extends ModuleProperties {
         } else {
             return null;
         }
+    }
+
+    public ConceptMapType getSameAsConceptMapType() {
+        return conceptService.getConceptMapTypeByUuid(EmrApiConstants.SAME_AS_CONCEPT_MAP_TYPE_UUID);
+    }
+
+    public ConceptMapType getNarrowerThanConceptMapType() {
+        return conceptService.getConceptMapTypeByUuid(EmrApiConstants.NARROWER_THAN_CONCEPT_MAP_TYPE_UUID);
     }
 
 }

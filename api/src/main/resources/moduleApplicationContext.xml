@@ -99,4 +99,38 @@
         </property>
     </bean>
 
+    <bean id="emrConceptService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.concept.EmrConceptServiceImpl">
+                <property name="dao">
+                    <bean class="${project.parent.groupId}.${project.parent.artifactId}.concept.HibernateEmrConceptDAO">
+                        <property name="sessionFactory">
+                            <ref bean="sessionFactory"/>
+                        </property>
+                    </bean>
+                </property>
+                <property name="emrProperties" ref="emrProperties"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.concept.EmrConceptService</value>
+                <ref local="emrConceptService"/>
+            </list>
+        </property>
+    </bean>
+
+
 </beans>
