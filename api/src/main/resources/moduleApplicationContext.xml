@@ -112,7 +112,7 @@
                         </property>
                     </bean>
                 </property>
-                <property name="emrProperties" ref="emrProperties"/>
+                <property name="emrApiProperties" ref="emrApiProperties"/>
             </bean>
         </property>
         <property name="preInterceptors">

@@ -35,7 +35,7 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
         this.dao = dao;
     }
 
-    public void setEmrProperties(EmrApiProperties emrApiProperties) {
+    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
         this.emrApiProperties = emrApiProperties;
     }
 
