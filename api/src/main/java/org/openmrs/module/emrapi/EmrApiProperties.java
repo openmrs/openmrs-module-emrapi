@@ -51,6 +51,9 @@ public class EmrApiProperties extends ModuleProperties {
         return getProviderByGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
     }
 
+    public EncounterRole getOrderingProviderEncounterRole() {
+        return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_ORDERING_PROVIDER_ENCOUNTER_ROLE);
+    }
 
     public Role getFullPrivilegeLevel() {
         return userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);

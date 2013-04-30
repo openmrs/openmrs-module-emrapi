@@ -27,6 +27,8 @@ public class EmrApiConstants {
 
     public static final String GP_UNKNOWN_PROVIDER = "emr.unknownProvider";
 
+    public static final String GP_ORDERING_PROVIDER_ENCOUNTER_ROLE = "emr.orderingProviderEncounterRole";
+
     public static final String GP_AT_FACILITY_VISIT_TYPE = "emr.atFacilityVisitType";
 
     public static final String GP_CHECK_IN_ENCOUNTER_TYPE = "emr.checkInEncounterType";
