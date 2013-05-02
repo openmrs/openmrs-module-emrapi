@@ -13,17 +13,24 @@
  */
 package org.openmrs.module.emrapi.utils;
 
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.openmrs.api.context.Context;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
-@Ignore
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 public class MetadataUtilTest extends BaseModuleContextSensitiveTest {
 	
 	@Test
-	@Ignore("Not yet figured out what i get: java.util.zip.ZipException: invalid stored block lengths")
 	public void testSetupStandardMetadata() throws Exception {
-		Assert.assertTrue(MetadataUtil.setupStandardMetadata(getClass().getClassLoader()));
+        assertThat(Context.getVisitService().getVisitTypeByUuid("86b3d7bc-d91f-4ce2-991c-f71bba0b31e4"), nullValue());
+
+        boolean anyChanges = MetadataUtil.setupStandardMetadata(getClass().getClassLoader());
+
+        assertTrue(anyChanges);
+        assertThat(Context.getVisitService().getVisitTypeByUuid("86b3d7bc-d91f-4ce2-991c-f71bba0b31e4").getName(), is("Clinic or Hospital Visit"));
 	}
 }

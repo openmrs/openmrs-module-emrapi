@@ -80,10 +80,10 @@ public class MetadataUtil {
 	 */
 	private static boolean installMetadataPackageIfNecessary(MetadataPackageConfig config, ClassLoader loader)
 	    throws IOException {
-		try {
-			String filename = config.getFilenameBase() + "-" + config.getVersion().toString() + ".zip";
+        String filename = config.getFilenameBase() + "-" + config.getVersion().toString() + ".zip";
+        try {
 
-			Matcher matcher = Pattern.compile("\\w+-(\\d+).zip").matcher(filename);
+			Matcher matcher = Pattern.compile("(?:.+/)?\\w+-(\\d+).zip").matcher(filename);
 			if (!matcher.matches())
 				throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
 			Integer version = Integer.valueOf(matcher.group(1));
@@ -96,18 +96,18 @@ public class MetadataUtil {
 				return false;
 			}
 			
-			if (loader.getResource(config.getFilenameBase()) == null) {
-				throw new RuntimeException("Cannot find " + config.getFilenameBase() + " for group " + config.getGroupUuid());
+			if (loader.getResource(filename) == null) {
+				throw new RuntimeException("Cannot find " + filename + " for group " + config.getGroupUuid());
 			}
 			
 			PackageImporter metadataImporter = MetadataSharing.getInstance().newPackageImporter();
 			metadataImporter.setImportConfig(ImportConfig.valueOf(config.getImportMode()));
-			metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(config.getFilenameBase()));
+			metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(filename));
 			metadataImporter.importPackage();
 			return true;
 		}
 		catch (Exception ex) {
-			log.error("Failed to install metadata package " + config.getFilenameBase(), ex);
+			log.error("Failed to install metadata package " + filename, ex);
 			return false;
 		}
 	}
