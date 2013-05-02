@@ -13,11 +13,6 @@
  */
 package org.openmrs.module.emrapi.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,48 +25,49 @@ import org.openmrs.module.metadatasharing.MetadataSharing;
 import org.openmrs.module.metadatasharing.api.MetadataSharingService;
 import org.openmrs.module.metadatasharing.wrapper.PackageImporter;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class MetadataUtil {
 	
 	protected static final Log log = LogFactory.getLog(MetadataUtil.class);
 	
-	private static final String PACKAGES_FILENAME = "packages.xml";
+	public static final String PACKAGES_FILENAME = "packages.xml";
 	
 	/**
 	 * Setup the standard metadata packages
 	 * 
 	 * @return
 	 */
-	public static boolean setupStandardMetadata(ClassLoader loader) {
-		try {
-			InputStream stream = loader.getResourceAsStream(PACKAGES_FILENAME);
-			return loadPackagesFromXML(stream, loader);
-		}
-		catch (Exception ex) {
-			throw new RuntimeException("Cannot find " + PACKAGES_FILENAME + ". Make sure it's in api/src/main/resources");
-		}
-	}
-	
-	/**
-	 * Loads packages specified in an XML packages list
-	 * 
-	 * @param stream the input stream containing the package list
-	 * @param loader the class loader to use for loading the packages
-	 * @return whether any changes were made to the db
-	 * @throws Exception
-	 */
-	private synchronized static boolean loadPackagesFromXML(InputStream stream, ClassLoader loader) throws Exception {
-		boolean anyChanges = false;
-		
-		String xml = IOUtils.toString(stream);
-		MetadataPackagesConfig config = Context.getSerializationService().getDefaultSerializer()
-		        .deserialize(xml, MetadataPackagesConfig.class);
-		
-		for (MetadataPackageConfig pkg : config.getPackages()) {
-			anyChanges |= installMetadataPackageIfNecessary(pkg, loader);
-		}
-		
-		return anyChanges;
-	}
+	public static boolean setupStandardMetadata(ClassLoader loader) throws Exception {
+        MetadataPackagesConfig config = getMetadataPackagesForModule(loader);
+        return loadPackages(config, loader);
+    }
+
+    private synchronized static boolean loadPackages(MetadataPackagesConfig config, ClassLoader loader) throws IOException {
+        boolean anyChanges = false;
+
+        for (MetadataPackageConfig pkg : config.getPackages()) {
+            anyChanges |= installMetadataPackageIfNecessary(pkg, loader);
+        }
+
+        return anyChanges;
+    }
+
+    public static MetadataPackagesConfig getMetadataPackagesForModule(ClassLoader loader) {
+        try {
+            InputStream stream = loader.getResourceAsStream(PACKAGES_FILENAME);
+            String xml = IOUtils.toString(stream);
+            MetadataPackagesConfig config = Context.getSerializationService().getDefaultSerializer()
+                    .deserialize(xml, MetadataPackagesConfig.class);
+            return config;
+        }
+        catch (Exception ex) {
+            throw new RuntimeException("Cannot find " + PACKAGES_FILENAME + ". Make sure it's in api/src/main/resources");
+        }
+    }
 	
 	/**
 	 * Checks whether the given version of the MDS package has been installed yet, and if not,
