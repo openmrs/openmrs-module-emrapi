@@ -11,6 +11,7 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,8 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
     private ProviderManagementService providerManagementService;
 
     private ProviderIdentifierGenerator providerIdentifierGenerator = null;
+
+    private EmrApiProperties emrApiProperties;
 
     /**
      * @param userService the userService to set
@@ -68,6 +71,10 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
         this.providerIdentifierGenerator = providerIdentifierGenerator;
     }
 
+    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
+        this.emrApiProperties = emrApiProperties;
+    }
+
     /**
      * @see org.openmrs.module.emrapi.account.AccountService#getAllAccounts()
      */
@@ -89,6 +96,12 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
         }
 
         for (Provider provider : providerService.getAllProviders()) {
+
+            // skip the baked-in unknown provider
+            if (provider.equals(emrApiProperties.getUnknownProvider())) {
+                continue;
+            }
+
             if (provider.getPerson() == null)
                 throw new APIException("Providers not associated to a person are not supported");
 

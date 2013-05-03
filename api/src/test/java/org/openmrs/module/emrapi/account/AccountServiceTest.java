@@ -13,11 +13,13 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -40,18 +42,22 @@ public class AccountServiceTest {
 
     private ProviderManagementService providerManagementService;
 
+    private EmrApiProperties emrApiProperties;
+
     @Before
     public void setup() {
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
         providerManagementService = mock(ProviderManagementService.class);
+        emrApiProperties = mock(EmrApiProperties.class);
 
         accountService = new AccountServiceImpl();
         accountService.setUserService(userService);
         accountService.setPersonService(personService);
         accountService.setProviderService(providerService);
         accountService.setProviderManagementService(providerManagementService);
+        accountService.setEmrApiProperties(emrApiProperties);
     }
 
     /**
@@ -84,6 +90,18 @@ public class AccountServiceTest {
         Assert.assertEquals(3, accounts.size());
         assertThat(accounts,
                 TestUtils.isCollectionOfExactlyElementsWithProperties("person", person1, person2, person3));
+    }
+
+    @Test
+    public void getAccount_shouldNotReturnUnknownProvider() throws Exception {
+        Provider unknownProvider = new Provider();
+        Person unknownProviderPerson = new Person();
+        unknownProvider.setPerson(unknownProviderPerson);
+        when(emrApiProperties.getUnknownProvider()).thenReturn(unknownProvider);
+        when(providerService.getAllProviders()).thenReturn(Collections.singletonList(unknownProvider));
+
+        List<AccountDomainWrapper> accounts = accountService.getAllAccounts();
+        Assert.assertEquals(0, accounts.size());
     }
 
     /**
