@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- this relies on persons, patients, encounter types, etc, defined in the core test dataset -->
+    <encounter encounter_id="1000" encounter_type="2" patient_id="7" location_id="1" form_id="1" encounter_datetime="2008-08-01 00:00:00.0" creator="1" date_created="2008-08-18 14:09:05.0" voided="false" uuid="7779d653-393b-4118-9c83-a3715b82d4ac"/>
+    <encounter_provider encounter_provider_id="1000" encounter_id="1000" provider_id="1" encounter_role_id="1" creator="1" date_created="2006-03-11 15:57:35.0" voided="false" uuid="19e023e8-20ee-46b7-ade6-9e68f897b7a9" />
+    <obs obs_id="1000" person_id="7" concept_id="19" encounter_id="1000" obs_datetime="2008-08-15 00:00:00.0" location_id="1" value_text="some test value" comments="" creator="1" date_created="2008-08-19 12:32:03.0" voided="false" uuid="e26cea2c-1b9f-666e-b211-f3ef6c88af6f"/>
+
+    <!-- sme as above, but now obs is voided -->
+    <encounter encounter_id="1001" encounter_type="2" patient_id="7" location_id="1" form_id="1" encounter_datetime="2008-08-01 00:00:00.0" creator="1" date_created="2008-08-18 14:09:05.0" voided="false" uuid="7779d653-393b-4218-9c83-a3715b82d4ac"/>
+    <encounter_provider encounter_provider_id="1001" encounter_id="1001" provider_id="1" encounter_role_id="1" creator="1" date_created="2006-03-11 15:57:35.0" voided="false" uuid="19e023e8-20ee-4237-ade6-9e68f897b7a9" />
+    <obs obs_id="1001" person_id="7" concept_id="19" encounter_id="1001" obs_datetime="2008-08-15 00:00:00.0" location_id="1" value_text="some test value" comments="" creator="1" date_created="2008-08-19 12:32:03.0" voided="true" uuid="e26c432c-1b9f-666e-b211-f3ef6c88af6f"/>
+
+
+    <!-- test not returning the sam encounter twice -->
+    <obs obs_id="1002" person_id="7" concept_id="19" encounter_id="1000" obs_datetime="2008-08-15 00:00:00.0" location_id="1" value_text="duplicate" comments="" creator="1" date_created="2008-08-19 12:32:03.0" voided="false" uuid="e26cea2c-1b9f-666e-6511-f3ef6c88af6f"/>
+    <obs obs_id="1003" person_id="7" concept_id="19" encounter_id="1000" obs_datetime="2008-08-15 00:00:00.0" location_id="1" value_text="duplicate" comments="" creator="1" date_created="2008-08-19 12:32:03.0" voided="false" uuid="e26cea2c-1b9f-666e-b211-f3336c88af6f"/>
+
+</dataset>
+
+
+
