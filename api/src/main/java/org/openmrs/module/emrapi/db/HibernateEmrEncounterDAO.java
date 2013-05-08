@@ -11,7 +11,7 @@ import org.openmrs.Obs;
 
 import java.util.List;
 
-public class HibernateEmrApiDAO implements EmrApiDAO {
+public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
 
     private SessionFactory sessionFactory;
 

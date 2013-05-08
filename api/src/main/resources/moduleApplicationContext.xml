@@ -134,7 +134,7 @@
     </bean>
 
 
-    <bean id="emrApiDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrApiDAO">
+    <bean id="emrEncounterDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrEncounterDAO">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>

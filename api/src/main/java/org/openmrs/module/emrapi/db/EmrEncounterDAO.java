@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Useful queries for fetching OpenMRS objects beyond what are provided by the OpenMRS Core
  */
-public interface EmrApiDAO {
+public interface EmrEncounterDAO {
 
     /**
      * Returns all encounters that have an obs with the specified value text
