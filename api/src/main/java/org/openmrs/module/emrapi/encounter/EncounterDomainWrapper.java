@@ -3,6 +3,9 @@ package org.openmrs.module.emrapi.encounter;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.User;
+import org.openmrs.Visit;
+
+import java.util.Date;
 
 public class EncounterDomainWrapper {
 
@@ -39,5 +42,14 @@ public class EncounterDomainWrapper {
 
     private boolean verifyIfUserIsTheCreatorOfEncounter(User currentUser) {
         return encounter.getCreator().equals(currentUser);
+    }
+
+    public Visit getVisit() {
+        return encounter.getVisit();
+    }
+
+    public void closeVisit() {
+        Visit visit = encounter.getVisit();
+        visit.setStopDatetime(new Date());
     }
 }

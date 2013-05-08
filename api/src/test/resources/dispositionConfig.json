@@ -1,0 +1,23 @@
+[
+    {
+        "uuid": "d2d89630-b698-11e2-9e96-0800200c9a66",
+        "name": "disposition.death",
+        "actions": [
+            { "action": "CloseCurrentVisitAction", "name": "Close Current Visit Action" },
+            { "action": "MarkPatientDeadAction", "name": "Mark Patient as Dead Action" }
+        ],
+        "clientSideActions": [
+            {
+                "action": "include-fragment",
+                "fragment": "emr/field/date",
+                "fragmentConfig": { "label": "mirebalais.deathDate" }
+            }
+        ]
+    },
+    {
+        "uuid": "66de7f60-b73a-11e2-9e96-0800200c9a66",
+        "name": "disposition.home",
+        "actions": [],
+        "clientSideActions": []
+    }
+]

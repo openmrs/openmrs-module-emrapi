@@ -8,12 +8,18 @@ import org.openmrs.EncounterProvider;
 import org.openmrs.Person;
 import org.openmrs.Provider;
 import org.openmrs.User;
+import org.openmrs.Visit;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +55,8 @@ public class EncounterDomainWrapperTest {
         Person providerPerson1 = createPersonWithUuid("12345678-a860-11e2-9e96-0800200c9a66");
         Person providerPerson2 = createPersonWithUuid("87654321-a860-11e2-9e96-0800200c9a66");
 
-        Set<EncounterProvider> encounterProviders = createListWithEncounterProviders(providerPerson, providerPerson1, providerPerson2);
+        Set<EncounterProvider> encounterProviders = createListWithEncounterProviders(
+                                                    providerPerson, providerPerson1, providerPerson2);
 
         when(encounter.getEncounterProviders()).thenReturn(encounterProviders);
 
@@ -78,6 +85,26 @@ public class EncounterDomainWrapperTest {
         assertFalse(encounterDomainWrapper.participatedInEncounter(currentUser));
     }
 
+    @Test
+    public void shouldCloseVisit(){
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(yesterday());
+
+        when(encounter.getVisit()).thenReturn(visit);
+
+        encounterDomainWrapper.closeVisit();
+        Visit closedVisit = encounterDomainWrapper.getVisit();
+
+        assertEquals(new Date(), closedVisit.getStopDatetime());
+
+    }
+
+    private Date yesterday() {
+        Calendar startVisitDate = Calendar.getInstance();
+        startVisitDate.add(Calendar.DAY_OF_MONTH, -1);
+        return startVisitDate.getTime();
+    }
 
     private Set<EncounterProvider> createListWithEncounterProviders(Person... persons) {
 
