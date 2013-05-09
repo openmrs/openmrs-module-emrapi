@@ -56,6 +56,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -408,7 +409,8 @@ public class AdtServiceTest {
         encounter2.setEncounterType(dischargeEncounterType);
         encounter2.setEncounterDatetime(DateUtils.addHours(new Date(), -13));
 
-        // the underlying API returns these sorted in reverse chronological order (using hibernate)
+        // the underlying API returns these sorted in reverse chronological order (using hibernate), so we emulate that
+        visit.setEncounters(new LinkedHashSet<Encounter>());
         visit.addEncounter(encounter2);
         visit.addEncounter(encounter1);
 
