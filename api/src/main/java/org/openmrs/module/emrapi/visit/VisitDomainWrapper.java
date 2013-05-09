@@ -4,6 +4,7 @@ package org.openmrs.module.emrapi.visit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -111,4 +112,45 @@ public class VisitDomainWrapper {
         startDateCalendar.set(Calendar.SECOND, 0);
         return startDateCalendar;
     }
+
+    public boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType) {
+        // these are sorted by date descending
+        if (visit.getEncounters() == null) {
+            return false;
+        }
+        for (Encounter encounter : visit.getEncounters()) {
+            if (encounter.getEncounterType().equals(lookForEncounterType)) {
+                return true;
+            }
+            if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return true if the visit includes an admission encounter with no discharge encounter after it
+     */
+    public boolean isAdmitted() {
+        return hasEncounterWithoutSubsequentEncounter(emrApiProperties.getAdmissionEncounterType(), emrApiProperties.getDischargeEncounterType());
+    }
+
+    public Date getStartDatetime() {
+        return visit.getStartDatetime();
+    }
+
+    public Date getStopDatetime() {
+        return visit.getStopDatetime();
+    }
+
+    /**
+     * @param encounter
+     * @return this, for call chaining
+     */
+    public VisitDomainWrapper addEncounter(Encounter encounter) {
+        visit.addEncounter(encounter);
+        return this;
+    }
+
 }

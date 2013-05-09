@@ -18,6 +18,16 @@
                     changed_by="1" date_changed="2012-10-23 18:04:14"
                     retired="0" uuid="cbfe0b9d-9923-404c-941b-f048adc8cdc0"/>
 
+    <global_property property="emr.admissionEncounterType" property_value="2c8c3ff2-b8eb-11e2-9426-3edb8e345d35"
+                     uuid="35c57674-b8eb-11e2-9426-3edb8e345d35"/>
+    <encounter_type encounter_type_id="1001" name="Admission" description="Admit to Inpatient (prevents autoclosing visits)" creator="1"
+                    date_created="2012-10-23 18:04:14" retired="0" uuid="2c8c3ff2-b8eb-11e2-9426-3edb8e345d35"/>
+
+    <global_property property="emr.dischargeEncounterType" property_value="3bbdc54a-b8eb-11e2-9426-3edb8e345d35"
+                     uuid="453e855a-b8eb-11e2-9426-3edb8e345d35"/>
+    <encounter_type encounter_type_id="1002" name="Discharge" description="Discharge from Inpatient (allows autoclosing visits)" creator="1"
+                    date_created="2012-10-23 18:04:14" retired="0" uuid="3bbdc54a-b8eb-11e2-9426-3edb8e345d35"/>
+
     <global_property property="visits.assignmentHandler"
                      property_value="org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler"
                      uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>

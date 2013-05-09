@@ -98,10 +98,14 @@ public class AdtServiceTest {
 
     private EncounterRole checkInClerkEncounterRole;
     private EncounterType checkInEncounterType;
+    private EncounterType admissionEncounterType;
+    private EncounterType dischargeEncounterType;
     private VisitType atFacilityVisitType;
     private LocationTag supportsVisits;
+    private LocationTag supportsAdmissions;
     private Location mirebalaisHospital;
     private Location outpatientDepartment;
+    private Location inpatientDepartment;
     private PersonAttributeType unknownPatientPersonAttributeType;
     private PatientIdentifierType paperRecordIdentifierType;
 
@@ -126,16 +130,23 @@ public class AdtServiceTest {
 
         checkInClerkEncounterRole = new EncounterRole();
         checkInEncounterType = new EncounterType();
+        admissionEncounterType = new EncounterType();
+        dischargeEncounterType = new EncounterType();
         atFacilityVisitType = new VisitType();
 
         supportsVisits = new LocationTag();
         supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
 
+        supportsAdmissions = new LocationTag();
+        supportsAdmissions.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
+
         outpatientDepartment = new Location();
+        inpatientDepartment = new Location();
 
         mirebalaisHospital = new Location();
         mirebalaisHospital.addTag(supportsVisits);
         mirebalaisHospital.addChildLocation(outpatientDepartment);
+        mirebalaisHospital.addChildLocation(inpatientDepartment);
 
         unknownPatientPersonAttributeType = new PersonAttributeType();
         unknownPatientPersonAttributeType.setId(1);
@@ -148,8 +159,9 @@ public class AdtServiceTest {
         emrApiProperties = mock(EmrApiProperties.class);
         when(emrApiProperties.getVisitExpireHours()).thenReturn(10);
         when(emrApiProperties.getCheckInEncounterType()).thenReturn(checkInEncounterType);
+        when(emrApiProperties.getAdmissionEncounterType()).thenReturn(admissionEncounterType);
+        when(emrApiProperties.getDischargeEncounterType()).thenReturn(dischargeEncounterType);
         when(emrApiProperties.getAtFacilityVisitType()).thenReturn(atFacilityVisitType);
-        when(emrApiProperties.getCheckInClerkEncounterRole()).thenReturn(checkInClerkEncounterRole);
         when(emrApiProperties.getCheckInClerkEncounterRole()).thenReturn(checkInClerkEncounterRole);
         when(emrApiProperties.getUnknownPatientPersonAttributeType()).thenReturn(unknownPatientPersonAttributeType);
 
@@ -182,6 +194,7 @@ public class AdtServiceTest {
     @Test
     public void testThatOldVisitWithRecentEncounterIsActive() throws Exception {
         Encounter encounter = new Encounter();
+        encounter.setEncounterType(checkInEncounterType);
         encounter.setEncounterDatetime(new Date());
 
         Visit visit = new Visit();
@@ -329,6 +342,7 @@ public class AdtServiceTest {
         Set<Location> expectedLocations = new HashSet<Location>();
         expectedLocations.add(mirebalaisHospital);
         expectedLocations.add(outpatientDepartment);
+        expectedLocations.add(inpatientDepartment);
 
         when(
                 mockVisitService.getVisits(any(Collection.class), any(Collection.class), eq(expectedLocations),
@@ -346,11 +360,13 @@ public class AdtServiceTest {
         visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
 
         Encounter encounter1 = new Encounter();
+        encounter1.setEncounterType(checkInEncounterType);
         encounter1.setEncounterDatetime(DateUtils.addHours(new Date(), -14));
         visit.addEncounter(encounter1);
 
         Date stopDatetime = DateUtils.addHours(new Date(), -14);
         Encounter encounter2 = new Encounter();
+        encounter2.setEncounterType(checkInEncounterType);
         encounter2.setEncounterDatetime(stopDatetime);
         visit.addEncounter(encounter2);
 
@@ -359,6 +375,49 @@ public class AdtServiceTest {
         service.getActiveVisit(null, null);
 
         assertThat(visit.getStopDatetime(), is(stopDatetime));
+    }
+
+    @Test
+    public void shouldNotCloseVisitWithAnAdmissionEncounter() {
+        Visit visit = new Visit();
+        visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
+
+        Encounter encounter1 = new Encounter();
+        encounter1.setEncounterType(admissionEncounterType);
+        encounter1.setEncounterDatetime(DateUtils.addHours(new Date(), -14));
+        visit.addEncounter(encounter1);
+
+        when(mockVisitService.getVisits(null, null, null, null, null, null, null, null, null, false, false))
+                .thenReturn(Collections.singletonList(visit));
+
+        service.closeInactiveVisits();
+
+        assertNull(visit.getStopDatetime());
+    }
+
+    @Test
+    public void shouldCloseVisitWithAdmissionAndDischargeEncounters() {
+        Visit visit = new Visit();
+        visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
+
+        Encounter encounter1 = new Encounter();
+        encounter1.setEncounterType(admissionEncounterType);
+        encounter1.setEncounterDatetime(DateUtils.addHours(new Date(), -14));
+
+        Encounter encounter2 = new Encounter();
+        encounter2.setEncounterType(dischargeEncounterType);
+        encounter2.setEncounterDatetime(DateUtils.addHours(new Date(), -13));
+
+        // the underlying API returns these sorted in reverse chronological order (using hibernate)
+        visit.addEncounter(encounter2);
+        visit.addEncounter(encounter1);
+
+        when(mockVisitService.getVisits(null, null, null, null, null, null, null, null, null, false, false))
+                .thenReturn(Collections.singletonList(visit));
+
+        service.closeInactiveVisits();
+
+        assertThat(visit.getStopDatetime(), is(encounter2.getEncounterDatetime()));
     }
 
     @Test
@@ -380,6 +439,7 @@ public class AdtServiceTest {
         old1.setStartDatetime(DateUtils.addDays(new Date(), -2));
 
         Encounter oldEncounter = new Encounter();
+        oldEncounter.setEncounterType(checkInEncounterType);
         oldEncounter.setEncounterDatetime(DateUtils.addHours(DateUtils.addDays(new Date(), -2), 6));
 
         Visit old2 = new Visit();
@@ -569,6 +629,68 @@ public class AdtServiceTest {
         service.mergePatients(preferred, notPreferred);
 
         assertThat(preferred.getAttribute(unknownPatientPersonAttributeType), is(preferredIsUnknownAttribute));
+    }
+
+    @Test
+    public void test_admitPatient_ensuresActiveVisit() throws Exception {
+        final Patient patient = new Patient();
+        Admission admission = new Admission();
+        admission.setPatient(patient);
+        admission.setLocation(inpatientDepartment);
+
+        service.admitPatient(admission);
+
+        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
+            @Override
+            public boolean matches(Object o) {
+                Visit actual = (Visit) o;
+                assertThat(actual.getPatient(), is(patient));
+                assertThat(actual.getLocation(), is(mirebalaisHospital));
+                assertThat(actual.getStartDatetime(), TestUtils.isJustNow());
+                return true;
+            }
+        }));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void test_admitPatient_failsIfPatientIsAlreadyAdmitted() throws Exception {
+        Patient patient = new Patient();
+
+        Encounter admit = buildEncounter(patient, new Date());
+        admit.setEncounterType(admissionEncounterType);
+        Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
+        existing.addEncounter(admit);
+
+        when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
+
+        Admission admission = new Admission();
+        admission.setPatient(patient);
+        admission.setLocation(inpatientDepartment);
+
+        service.admitPatient(admission);
+    }
+
+    @Test
+    public void test_admitPatient_createsEncounter() throws Exception {
+        final Patient patient = new Patient();
+        Admission admission = new Admission();
+        admission.setPatient(patient);
+        admission.setLocation(inpatientDepartment);
+
+        service.admitPatient(admission);
+
+        verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
+            @Override
+            public boolean matches(Object o) {
+                Encounter actual = (Encounter) o;
+                assertThat(actual.getEncounterType(), is(admissionEncounterType));
+                assertNotNull(actual.getVisit());
+                assertThat(actual.getPatient(), is(patient));
+                assertThat(actual.getLocation(), is(inpatientDepartment));
+                assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
+                return true;
+            }
+        }));
     }
 
     private Encounter buildEncounter(Patient patient, Date encounterDatetime) {

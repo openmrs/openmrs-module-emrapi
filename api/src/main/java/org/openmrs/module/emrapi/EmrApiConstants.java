@@ -35,6 +35,10 @@ public class EmrApiConstants {
 
     public static final String GP_CONSULT_ENCOUNTER_TYPE = "emr.consultEncounterType";
 
+    public static final String GP_ADMISSION_ENCOUNTER_TYPE = "emr.admissionEncounterType";
+
+    public static final String GP_DISCHARGE_ENCOUNTER_TYPE = "emr.dischargeEncounterType";
+
     public static final String GP_CHECK_IN_CLERK_ENCOUNTER_ROLE = "emr.checkInClerkEncounterRole";
 
     public static final String GP_CLINICIAN_ENCOUNTER_ROLE = "emr.clinicianEncounterRole";
@@ -42,6 +46,8 @@ public class EmrApiConstants {
     public static final String LOCATION_TAG_SUPPORTS_VISITS = "Visit Location";
 
     public static final String LOCATION_TAG_SUPPORTS_LOGIN = "Login Location";
+
+    public static final String LOCATION_TAG_SUPPORTS_ADMISSION = "Admission Location";
 
     public static final String DAEMON_USER_UUID = "A4F30A1B-5EB9-11DF-A648-37A07F9C90FB";
 

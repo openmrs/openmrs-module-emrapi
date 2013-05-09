@@ -173,6 +173,12 @@ public interface AdtService extends OpenmrsService {
      */
     void mergePatients(Patient preferred, Patient notPreferred);
 
+    /**
+     * Admits a patient to inpatient. Throws an exception if the patient is already admitted.
+     * @param admission
+     */
+    Encounter admitPatient(Admission admission);
+
     // Commenting this out since the feature isn't in use yet, and it refers to payment, which isn't supposed to be in this module
     // Encounter createCheckinInRetrospective(Patient patient, Location location, Provider clerk, Obs paymentReason, Obs paymentAmount, Obs paymentReceipt, Date checkinDate);
 

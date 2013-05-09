@@ -63,5 +63,20 @@
         </description>
     </globalProperty>
 
+    <globalProperty>
+        <property>emr.admissionEncounterType</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the encounter type for admitting a patient
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>emr.dischargeEncounterType</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the encounter type for discharging a patient
+        </description>
+    </globalProperty>
 </module>
 

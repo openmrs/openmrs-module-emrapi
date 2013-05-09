@@ -75,6 +75,14 @@ public class EmrApiProperties extends ModuleProperties {
         return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CLINICIAN_ENCOUNTER_ROLE);
     }
 
+    public EncounterType getAdmissionEncounterType() {
+        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE);
+    }
+
+    public EncounterType getDischargeEncounterType() {
+        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_DISCHARGE_ENCOUNTER_TYPE);
+    }
+
     public int getVisitExpireHours() {
         return 12;
     }

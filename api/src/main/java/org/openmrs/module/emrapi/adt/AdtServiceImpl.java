@@ -124,6 +124,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             return false;
         }
 
+        if (new VisitDomainWrapper(visit, emrApiProperties).isAdmitted()) {
+            return true;
+        }
+
         Date now = new Date();
         Date mustHaveSomethingAfter = DateUtils.addHours(now, -emrApiProperties.getVisitExpireHours());
 
@@ -561,6 +565,41 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
         visitService.voidVisit(nonPreferred, "EMR - Merge Patients: merged into visit " + preferred.getVisitId());
         visitService.saveVisit(preferred);
+    }
+
+    @Transactional
+    @Override
+    public Encounter admitPatient(Admission admission) {
+        if (admission.getPatient() == null || admission.getLocation() == null) {
+            throw new IllegalArgumentException("Must provide a patient and a location");
+        }
+
+        VisitDomainWrapper activeVisit = getActiveVisit(admission.getPatient(), admission.getLocation());
+        if (activeVisit == null) {
+            Visit visit = ensureActiveVisit(admission.getPatient(), admission.getLocation());
+            activeVisit = new VisitDomainWrapper(visit, emrApiProperties);
+        }
+
+        if (activeVisit.isAdmitted()) {
+            throw new IllegalStateException("Patient is already admitted");
+        }
+
+        Date admitDatetime = admission.getAdmitDatetime();
+        if (admitDatetime == null) {
+            admitDatetime = new Date();
+        }
+
+        if (activeVisit.getStopDatetime() != null && OpenmrsUtil.compare(activeVisit.getStopDatetime(), admitDatetime) < 0) {
+            throw new IllegalArgumentException("Cannot admit patient after the visit has stopped (stopped on " + activeVisit.getStopDatetime() + ")");
+        }
+
+        Encounter encounter = buildEncounter(emrApiProperties.getAdmissionEncounterType(), admission.getPatient(), admission.getLocation(), admitDatetime, null, null);
+        // eventually add a provider
+
+        activeVisit.addEncounter(encounter);
+        encounterService.saveEncounter(encounter);
+        return encounter;
+
     }
 
 }
