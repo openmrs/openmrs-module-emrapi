@@ -10,6 +10,7 @@ import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -114,19 +115,21 @@ public class VisitDomainWrapper {
     }
 
     public boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType) {
-        // these are sorted by date descending
+        // these are sorted by date descending if you get the visit directly from hibernate, but not necessarily otherwise, so
+        // we have to go through all encounters
         if (visit.getEncounters() == null) {
             return false;
         }
+        Encounter mostRecentRelevant = null;
         for (Encounter encounter : visit.getEncounters()) {
-            if (encounter.getEncounterType().equals(lookForEncounterType)) {
-                return true;
-            }
-            if (withoutSubsequentEncounterType != null && encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
-                return false;
+            if (encounter.getEncounterType().equals(lookForEncounterType)
+                    || (withoutSubsequentEncounterType != null && encounter.getEncounterType().equals(withoutSubsequentEncounterType))) {
+                if (mostRecentRelevant == null || OpenmrsUtil.compare(mostRecentRelevant.getEncounterDatetime(), encounter.getEncounterDatetime()) < 0) {
+                    mostRecentRelevant = encounter;
+                }
             }
         }
-        return false;
+        return mostRecentRelevant != null && mostRecentRelevant.getEncounterType().equals(lookForEncounterType);
     }
 
     /**
