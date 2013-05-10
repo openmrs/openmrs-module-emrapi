@@ -122,7 +122,7 @@ public class VisitDomainWrapper {
             if (encounter.getEncounterType().equals(lookForEncounterType)) {
                 return true;
             }
-            if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
+            if (withoutSubsequentEncounterType != null && encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
                 return false;
             }
         }
@@ -133,7 +133,12 @@ public class VisitDomainWrapper {
      * @return true if the visit includes an admission encounter with no discharge encounter after it
      */
     public boolean isAdmitted() {
-        return hasEncounterWithoutSubsequentEncounter(emrApiProperties.getAdmissionEncounterType(), emrApiProperties.getDischargeEncounterType());
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        EncounterType dischargeEncounterType = emrApiProperties.getDischargeEncounterType();
+        if (admissionEncounterType == null) {
+            return false;
+        }
+        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType);
     }
 
     public Date getStartDatetime() {

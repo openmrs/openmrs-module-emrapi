@@ -76,11 +76,11 @@ public class EmrApiProperties extends ModuleProperties {
     }
 
     public EncounterType getAdmissionEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE);
+        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE, false);
     }
 
     public EncounterType getDischargeEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_DISCHARGE_ENCOUNTER_TYPE);
+        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_DISCHARGE_ENCOUNTER_TYPE, false);
     }
 
     public int getVisitExpireHours() {

@@ -593,7 +593,12 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalArgumentException("Cannot admit patient after the visit has stopped (stopped on " + activeVisit.getStopDatetime() + ")");
         }
 
-        Encounter encounter = buildEncounter(emrApiProperties.getAdmissionEncounterType(), admission.getPatient(), admission.getLocation(), admitDatetime, null, null);
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        if (admissionEncounterType == null) {
+            throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE);
+        }
+
+        Encounter encounter = buildEncounter(admissionEncounterType, admission.getPatient(), admission.getLocation(), admitDatetime, null, null);
         // eventually add a provider
 
         activeVisit.addEncounter(encounter);

@@ -170,9 +170,13 @@ public abstract class ModuleProperties {
     }
 
     protected EncounterType getEncounterTypeByGlobalProperty(String globalPropertyName) {
+        return getEncounterTypeByGlobalProperty(globalPropertyName, true);
+    }
+
+    protected EncounterType getEncounterTypeByGlobalProperty(String globalPropertyName, boolean required) {
         String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(globalProperty);
-        if (encounterType == null) {
+        if (required && encounterType == null) {
             throw new IllegalStateException("Configuration required: " + globalPropertyName);
         }
         return encounterType;
