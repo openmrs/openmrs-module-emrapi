@@ -19,6 +19,7 @@ public class DispositionFactory {
 
 
     public List<Disposition> getDispositions() throws IOException {
+
         Resource[] dispositionDefinitions = resourceResolver.getResources("classpath*:/dispositionConfig.json");
         for (Resource dispositionDefinition : dispositionDefinitions) {
             return objectMapper.readValue(dispositionDefinition.getInputStream(), new TypeReference<List<Disposition>>() {});

@@ -43,6 +43,22 @@ public class Disposition {
         return name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Disposition that = (Disposition) o;
+
+        if (actions != null ? !actions.equals(that.actions) : that.actions != null) return false;
+        if (clientSideActions != null ? !clientSideActions.equals(that.clientSideActions) : that.clientSideActions != null)
+            return false;
+        if (!name.equals(that.name)) return false;
+        if (!uuid.equals(that.uuid)) return false;
+
+        return true;
+    }
+
     public List<Action> getActions() {
         return actions;
     }
@@ -65,22 +81,6 @@ public class Disposition {
 
     public void setClientSideActions(List<ClientSideAction> clientSideActions) {
         this.clientSideActions = clientSideActions;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Disposition that = (Disposition) o;
-
-        if (actions != null ? !actions.equals(that.actions) : that.actions != null) return false;
-        if (clientSideActions != null ? !clientSideActions.equals(that.clientSideActions) : that.clientSideActions != null)
-            return false;
-        if (!name.equals(that.name)) return false;
-        if (!uuid.equals(that.uuid)) return false;
-
-        return true;
     }
 
     @Override

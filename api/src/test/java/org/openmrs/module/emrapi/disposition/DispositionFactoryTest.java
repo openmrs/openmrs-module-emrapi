@@ -53,7 +53,7 @@ public class DispositionFactoryTest {
         List<Action> actions = getActions();
 
         List<ClientSideAction> clientSideActions = new ArrayList<ClientSideAction>();
-        clientSideActions.add(new FragmentAction("emr/field/date", getFragmentConfig()));
+        clientSideActions.add(new FragmentAction("emr","field/date", getFragmentConfig()));
 
         return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", actions, clientSideActions);
     }

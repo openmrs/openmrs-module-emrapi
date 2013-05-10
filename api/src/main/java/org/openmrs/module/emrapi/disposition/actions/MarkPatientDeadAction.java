@@ -20,7 +20,7 @@ public class MarkPatientDeadAction implements Action {
 
    @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper) {
-        Patient patient = encounterDomainWrapper.getVisit().getPatient();
+       Patient patient = encounterDomainWrapper.getVisit().getPatient();
        Context.getPatientService().processDeath(patient, new Date(), null, "");
     }
 

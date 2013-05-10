@@ -9,7 +9,8 @@
         "clientSideActions": [
             {
                 "action": "include-fragment",
-                "fragment": "emr/field/date",
+                "module": "emr",
+                "fragment": "field/date",
                 "fragmentConfig": { "label": "mirebalais.deathDate" }
             }
         ]

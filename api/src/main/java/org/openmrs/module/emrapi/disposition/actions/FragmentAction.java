@@ -8,6 +8,9 @@ import java.util.Map;
 public class FragmentAction implements ClientSideAction{
 
     @JsonProperty
+    private String module;
+
+    @JsonProperty
     private String fragment;
 
     @JsonProperty
@@ -17,15 +20,23 @@ public class FragmentAction implements ClientSideAction{
 
     }
 
-    public FragmentAction(String fragment, Map<String, String> fragmentConfig) {
+    public FragmentAction(String module, String fragment, Map<String, String> fragmentConfig) {
+        this.module = module;
         this.fragment = fragment;
         this.fragmentConfig = fragmentConfig;
     }
 
+    @Override
+    public String getModule() {
+        return module;
+    }
+
+    @Override
     public String getFragment() {
         return fragment;
     }
 
+    @Override
     public Map<String, String> getFragmentConfig() {
         return fragmentConfig;
     }
@@ -45,16 +56,19 @@ public class FragmentAction implements ClientSideAction{
 
         FragmentAction that = (FragmentAction) o;
 
-        if (!fragment.equals(that.fragment)) return false;
-        if (!fragmentConfig.equals(that.fragmentConfig)) return false;
+        if (fragment != null ? !fragment.equals(that.fragment) : that.fragment != null) return false;
+        if (fragmentConfig != null ? !fragmentConfig.equals(that.fragmentConfig) : that.fragmentConfig != null)
+            return false;
+        if (module != null ? !module.equals(that.module) : that.module != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = fragment.hashCode();
-        result = 31 * result + fragmentConfig.hashCode();
+        int result = module != null ? module.hashCode() : 0;
+        result = 31 * result + (fragment != null ? fragment.hashCode() : 0);
+        result = 31 * result + (fragmentConfig != null ? fragmentConfig.hashCode() : 0);
         return result;
     }
 }
