@@ -7,8 +7,9 @@ import java.util.Date;
 
 /**
  * Helper class that captures details about admitting a patient to the hospital.
- * Use {@link AdtService} to save one of these (which actually creates an encounter).
- * (Eventually this class will be extended to include more properties, and support obs and orders too.)
+ * Use {@link AdtService} to save one of these (which actually creates and returns an encounter).
+ * (This is a placeholder for a class representing a proper admission note. Eventually this class will be extended to
+ * include more properties, and support obs and orders too.)
  */
 public class Admission {
 

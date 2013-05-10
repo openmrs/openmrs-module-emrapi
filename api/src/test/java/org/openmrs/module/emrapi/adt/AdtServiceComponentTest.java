@@ -26,7 +26,6 @@ import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +35,10 @@ import java.util.Date;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
@@ -97,9 +98,9 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         assertThat(checkInEncounter.getVisit(), notNullValue());
         assertThat(checkInEncounter.getPatient(), is(patient));
-        assertThat(checkInEncounter.getEncounterDatetime(), TestUtils.isJustNow());
+        assertThat(checkInEncounter.getEncounterDatetime(), isJustNow());
         assertThat(checkInEncounter.getVisit().getPatient(), is(patient));
-        assertThat(checkInEncounter.getVisit().getStartDatetime(), TestUtils.isJustNow());
+        assertThat(checkInEncounter.getVisit().getStartDatetime(), isJustNow());
         assertThat(checkInEncounter.getAllObs().size(), is(0));
 
         // step 2: admit the patient (which should create an encounter)
@@ -117,7 +118,16 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertThat(admitEncounter.getAllObs().size(), is(0));
         assertTrue(new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
 
-        // TODO once implemented, add Discharge to this test
+        Discharge discharge = new Discharge();
+        discharge.setVisit(admitEncounter.getVisit());
+        discharge.setLocation(inpatientWard);
+        Encounter dischargeEncounter = service.dischargePatient(discharge);
+
+        assertThat(dischargeEncounter.getPatient(), is(patient));
+        assertThat(dischargeEncounter.getVisit(), is(checkInEncounter.getVisit()));
+        assertThat(dischargeEncounter.getEncounterDatetime(), isJustNow());
+        assertThat(dischargeEncounter.getLocation(), is(inpatientWard));
+        assertFalse(new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
     }
 
 }

@@ -356,6 +356,25 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
     }
 
+    /**
+     * Looks at location, and if necessary its ancestors in the location hierarchy, until it finds one tagged with
+     * "Admission Location"
+     *
+     * @param location
+     * @return location, or an ancestor
+     * @throws IllegalArgumentException if neither location nor its ancestors support admissions
+     */
+    @Override
+    public Location getLocationThatSupportsAdmissions(Location location) {
+        if (location == null) {
+            throw new IllegalArgumentException("Location does not support admissions");
+        } else if (location.hasTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION)) {
+            return location;
+        } else {
+            return getLocationThatSupportsAdmissions(location.getParentLocation());
+        }
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<Location> getAllLocationsThatSupportVisits() {
@@ -598,13 +617,46 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE);
         }
 
-        Encounter encounter = buildEncounter(admissionEncounterType, admission.getPatient(), admission.getLocation(), admitDatetime, null, null);
+        Encounter encounter = buildEncounter(admissionEncounterType, admission.getPatient(), getLocationThatSupportsAdmissions(admission.getLocation()), admitDatetime, null, null);
         // eventually add a provider
 
         activeVisit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);
         return encounter;
 
+    }
+
+    @Override
+    public Encounter dischargePatient(Discharge discharge) {
+        if (discharge.getVisit() == null || discharge.getLocation() == null) {
+            throw new IllegalArgumentException("Must provide a visit and location");
+        }
+
+        VisitDomainWrapper visit = new VisitDomainWrapper(discharge.getVisit(), emrApiProperties);
+        if (!visit.isAdmitted()) {
+            throw new IllegalStateException("Patient is not currently admitted");
+        }
+
+        Date dischargeDatetime = discharge.getDischargeDatetime();
+        if (dischargeDatetime == null) {
+            dischargeDatetime = new Date();
+        }
+
+        if (visit.getStopDatetime() != null && OpenmrsUtil.compare(visit.getStopDatetime(), dischargeDatetime) < 0) {
+            throw new IllegalArgumentException("Cannot discharge patient after the visit has stopped (stopped on " + visit.getStopDatetime() + ")");
+        }
+
+        EncounterType dischargeEncounterType = emrApiProperties.getDischargeEncounterType();
+        if (dischargeEncounterType == null) {
+            throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_DISCHARGE_ENCOUNTER_TYPE);
+        }
+
+        Encounter encounter = buildEncounter(dischargeEncounterType, visit.getVisit().getPatient(), getLocationThatSupportsAdmissions(discharge.getLocation()), dischargeDatetime, null, null);
+        // eventually add a provider
+
+        visit.addEncounter(encounter);
+        encounterService.saveEncounter(encounter);
+        return encounter;
     }
 
 }

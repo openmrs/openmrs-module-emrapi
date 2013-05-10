@@ -99,13 +99,23 @@ public interface AdtService extends OpenmrsService {
 
     /**
      * Looks at this location, then its ancestors in the location hierarchy, to find a location tagged with
+     * {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS}
      *
      * @param location
      * @return location, or its closest ancestor that supports visits
      * @throws IllegalArgumentException if neither location nor its ancestors support visits
-     * @see org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS
      */
     Location getLocationThatSupportsVisits(Location location);
+
+    /**
+     * Looks at this location, then its ancestors in the location hierarchy, to find a location tagged with
+     * {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
+     *
+     * @param location
+     * @return location, or its closest ancestor that supports admissions
+     * @throws IllegalArgumentException if neither location nor its ancestors support admissions
+     */
+    Location getLocationThatSupportsAdmissions(Location location);
 
     /**
      * @return all locations that are allowed to have visits assigned to them
@@ -174,10 +184,18 @@ public interface AdtService extends OpenmrsService {
     void mergePatients(Patient preferred, Patient notPreferred);
 
     /**
-     * Admits a patient to inpatient. Throws an exception if the patient is already admitted.
+     * Admits a patient to inpatient care. Throws an exception if the patient is already admitted.
      * @param admission
+     * @return the encounter representing this admission
      */
     Encounter admitPatient(Admission admission);
+
+    /**
+     * Discharges a patient from inpatient care. Throws an exception if the patient is not currently admitted.
+     * @param discharge
+     * @return the encounter representing this discharge
+     */
+    Encounter dischargePatient(Discharge discharge);
 
     // Commenting this out since the feature isn't in use yet, and it refers to payment, which isn't supposed to be in this module
     // Encounter createCheckinInRetrospective(Patient patient, Location location, Provider clerk, Obs paymentReason, Obs paymentAmount, Obs paymentReceipt, Date checkinDate);

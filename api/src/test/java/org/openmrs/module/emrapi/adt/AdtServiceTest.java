@@ -143,6 +143,7 @@ public class AdtServiceTest {
 
         outpatientDepartment = new Location();
         inpatientDepartment = new Location();
+        inpatientDepartment.addTag(supportsAdmissions);
 
         mirebalaisHospital = new Location();
         mirebalaisHospital.addTag(supportsVisits);
@@ -694,6 +695,52 @@ public class AdtServiceTest {
             }
         }));
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void test_dischargePatient_failsIfPatientIsNotAdmitted() throws Exception {
+        Patient patient = new Patient();
+
+        Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
+        when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
+
+        Discharge discharge = new Discharge();
+        discharge.setVisit(existing);
+        discharge.setLocation(inpatientDepartment);
+
+        service.dischargePatient(discharge);
+    }
+
+    @Test
+    public void test_dischargePatient_createsEncounter() throws Exception {
+        final Patient patient = new Patient();
+
+        Encounter admit = buildEncounter(patient, new Date());
+        admit.setEncounterType(admissionEncounterType);
+        Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
+        existing.addEncounter(admit);
+
+        when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
+
+        Discharge discharge = new Discharge();
+        discharge.setVisit(existing);
+        discharge.setLocation(inpatientDepartment);
+
+        service.dischargePatient(discharge);
+
+        verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
+            @Override
+            public boolean matches(Object o) {
+                Encounter actual = (Encounter) o;
+                assertThat(actual.getEncounterType(), is(dischargeEncounterType));
+                assertNotNull(actual.getVisit());
+                assertThat(actual.getPatient(), is(patient));
+                assertThat(actual.getLocation(), is(inpatientDepartment));
+                assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
+                return true;
+            }
+        }));
+    }
+
 
     private Encounter buildEncounter(Patient patient, Date encounterDatetime) {
         Encounter encounter = new Encounter();
