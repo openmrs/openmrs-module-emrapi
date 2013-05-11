@@ -28,4 +28,13 @@ public class DispositionFactory {
 
     }
 
+    public Disposition getDispositionByUniqueId(String uniqueId) throws IOException {
+        for (Disposition candidate : getDispositions()) {
+            if (candidate.getUuid().equals(uniqueId)) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
 }

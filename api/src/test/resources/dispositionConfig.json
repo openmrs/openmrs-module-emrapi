@@ -2,6 +2,7 @@
     {
         "uuid": "d2d89630-b698-11e2-9e96-0800200c9a66",
         "name": "disposition.death",
+        "conceptCode": "SNOMED CT:397709008",
         "actions": [
             { "action": "CloseCurrentVisitAction", "name": "Close Current Visit Action" },
             { "action": "MarkPatientDeadAction", "name": "Mark Patient as Dead Action" }
@@ -18,6 +19,7 @@
     {
         "uuid": "66de7f60-b73a-11e2-9e96-0800200c9a66",
         "name": "disposition.home",
+        "conceptCode": "SNOMED CT:3780001",
         "actions": [],
         "clientSideActions": []
     }

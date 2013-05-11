@@ -6,6 +6,11 @@ import org.openmrs.api.ConceptService;
 
 public abstract class ConceptSetDescriptor {
 
+    /**
+     * @param conceptService
+     * @param conceptSourceName
+     * @param fieldsAndConceptCodes must have an even number of elements. The first of each pair is the field name to set (on a subclass) and the second is the code in conceptSourceName.
+     */
     protected void setup(ConceptService conceptService, String conceptSourceName, String... fieldsAndConceptCodes) {
         try {
             String primaryConceptCode = fieldsAndConceptCodes[1];

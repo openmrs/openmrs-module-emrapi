@@ -112,6 +112,10 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY_PRESUMED = "Presumed";
 
+    public static final String CONCEPT_CODE_DISPOSITION_CONCEPT_SET = "Disposition Concept Set";
+
+    public static final String CONCEPT_CODE_DISPOSITION = "Disposition";
+
     public static final String LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD = "a5fb5770-409a-11e2-a25f-0800200c9a66";
 
 

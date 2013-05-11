@@ -16,6 +16,9 @@ public class Disposition {
     @JsonProperty
     private String name;
 
+    @JsonProperty
+    private String conceptCode;
+
     @Valid
     @JsonProperty
     private List<Action> actions;
@@ -28,9 +31,10 @@ public class Disposition {
 
     }
 
-    public Disposition(String uuid, String name, List<Action> actions, List<ClientSideAction> clientSideActions) {
+    public Disposition(String uuid, String name, String conceptCode, List<Action> actions, List<ClientSideAction> clientSideActions) {
         this.uuid = uuid;
         this.name = name;
+        this.conceptCode = conceptCode;
         this.actions = actions;
         this.clientSideActions = clientSideActions;
     }
@@ -53,6 +57,7 @@ public class Disposition {
         if (actions != null ? !actions.equals(that.actions) : that.actions != null) return false;
         if (clientSideActions != null ? !clientSideActions.equals(that.clientSideActions) : that.clientSideActions != null)
             return false;
+        if (!conceptCode.equals(that.conceptCode)) return false;
         if (!name.equals(that.name)) return false;
         if (!uuid.equals(that.uuid)) return false;
 
@@ -83,10 +88,19 @@ public class Disposition {
         this.clientSideActions = clientSideActions;
     }
 
+    public String getConceptCode() {
+        return conceptCode;
+    }
+
+    public void setConceptCode(String conceptCode) {
+        this.conceptCode = conceptCode;
+    }
+
     @Override
     public int hashCode() {
         int result = uuid.hashCode();
         result = 31 * result + name.hashCode();
+        result = 31 * result + conceptCode.hashCode();
         result = 31 * result + (actions != null ? actions.hashCode() : 0);
         result = 31 * result + (clientSideActions != null ? clientSideActions.hashCode() : 0);
         return result;

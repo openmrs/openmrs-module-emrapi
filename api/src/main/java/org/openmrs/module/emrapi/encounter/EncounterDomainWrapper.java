@@ -15,6 +15,14 @@ public class EncounterDomainWrapper {
         this.encounter = encounter;
     }
 
+    public Encounter getEncounter() {
+        return encounter;
+    }
+
+    public void setEncounter(Encounter encounter) {
+        this.encounter = encounter;
+    }
+
     /**
      * Verify if a user is the creator or one of the providers in the encounter
      * @param currentUser

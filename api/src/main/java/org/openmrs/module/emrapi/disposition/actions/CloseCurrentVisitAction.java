@@ -2,7 +2,10 @@ package org.openmrs.module.emrapi.disposition.actions;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.openmrs.Obs;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
+
+import java.util.Map;
 
 public class CloseCurrentVisitAction implements Action{
 
@@ -11,7 +14,7 @@ public class CloseCurrentVisitAction implements Action{
 
 
     @Override
-    public void action(EncounterDomainWrapper encounterDomainWrapper){
+    public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters){
         encounterDomainWrapper.closeVisit();
     }
 

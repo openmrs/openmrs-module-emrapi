@@ -46,7 +46,7 @@ public class DispositionFactoryTest {
     }
 
     private Disposition getHomeDisposition() {
-        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.home", Collections.<Action>emptyList(), Collections.<ClientSideAction>emptyList());
+        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.home", "SNOMED CT:3780001", Collections.<Action>emptyList(), Collections.<ClientSideAction>emptyList());
     }
 
     private Disposition getDeathDisposition() {
@@ -55,7 +55,7 @@ public class DispositionFactoryTest {
         List<ClientSideAction> clientSideActions = new ArrayList<ClientSideAction>();
         clientSideActions.add(new FragmentAction("emr","field/date", getFragmentConfig()));
 
-        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", actions, clientSideActions);
+        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "SNOMED CT:397709008", actions, clientSideActions);
     }
 
     private List<Action> getActions() {

@@ -30,4 +30,13 @@ public interface EmrConceptService {
      */
     List<Concept> getConceptsSameOrNarrowerThan(ConceptReferenceTerm term);
 
+    /**
+     * Searches for a concept by treating mappingOrUuid as (in order):
+     * (1) source_name:code
+     * (2) uuid
+     * @param mappingOrUuid
+     * @return
+     */
+    Concept getConcept(String mappingOrUuid);
+
 }
