@@ -15,8 +15,8 @@ import java.util.Map;
 /**
  * Sets the death and deathDate fields on a Patient, and saves those changes.
  */
-@Component
-public class MarkPatientDeadAction implements Action {
+@Component("markPatientDeadDispositionAction")
+public class MarkPatientDeadDispositionAction implements DispositionAction {
 
     public final String DEATH_DATE_PARAMETER = "deathDate";
 
@@ -49,4 +49,5 @@ public class MarkPatientDeadAction implements Action {
     public void setPatientService(PatientService patientService) {
         this.patientService = patientService;
     }
+
 }

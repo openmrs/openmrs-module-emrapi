@@ -5,7 +5,7 @@ import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 
 import java.util.Map;
 
-public interface Action {
+public interface DispositionAction {
 
     /**
      * Actions will be called before the framework saves the encounter, but within the same transaction.
