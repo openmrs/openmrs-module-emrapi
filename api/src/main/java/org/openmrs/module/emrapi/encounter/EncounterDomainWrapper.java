@@ -58,6 +58,13 @@ public class EncounterDomainWrapper {
 
     public void closeVisit() {
         Visit visit = encounter.getVisit();
-        visit.setStopDatetime(new Date());
+        if (visit == null) {
+            throw new IllegalArgumentException("This encounter does not belong to a visit");
+        }
+        if (visit.getStopDatetime() == null) {
+            visit.setStopDatetime(new Date());
+        }
+        // TODO save the visit via service
     }
+
 }

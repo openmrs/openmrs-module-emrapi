@@ -1,22 +1,27 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
-import org.openmrs.api.context.Context;
+import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.reporting.common.DateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * Sets the death and deathDate fields on a Patient, and saves those changes.
+ */
+@Component
 public class MarkPatientDeadAction implements Action {
 
     public final String DEATH_DATE_PARAMETER = "deathDate";
 
-    @JsonProperty
-    private String name;
+    @Autowired
+    PatientService patientService;
 
    @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
@@ -38,31 +43,10 @@ public class MarkPatientDeadAction implements Action {
        if (deathDate != null) {
            patient.setDeathDate(deathDate);
        }
-       Context.getPatientService().savePatient(patient);
+       patientService.savePatient(patient);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        MarkPatientDeadAction that = (MarkPatientDeadAction) o;
-
-        if (!name.equals(that.name)) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
+    public void setPatientService(PatientService patientService) {
+        this.patientService = patientService;
     }
 }

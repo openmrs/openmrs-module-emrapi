@@ -4,8 +4,8 @@
         "name": "disposition.death",
         "conceptCode": "SNOMED CT:397709008",
         "actions": [
-            { "action": "CloseCurrentVisitAction", "name": "Close Current Visit Action" },
-            { "action": "MarkPatientDeadAction", "name": "Mark Patient as Dead Action" }
+            "closeCurrentVisitAction",
+            "markPatientDeadAction"
         ],
         "clientSideActions": [
             {

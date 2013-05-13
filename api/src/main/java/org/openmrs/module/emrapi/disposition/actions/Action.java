@@ -1,19 +1,10 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 
 import java.util.Map;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "action")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = CloseCurrentVisitAction.class, name = "CloseCurrentVisitAction"),
-        @JsonSubTypes.Type(value = MarkPatientDeadAction.class, name = "MarkPatientDeadAction") })
 public interface Action {
 
     /**

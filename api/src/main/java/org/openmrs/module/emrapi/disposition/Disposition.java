@@ -2,7 +2,6 @@ package org.openmrs.module.emrapi.disposition;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.openmrs.module.emrapi.disposition.actions.Action;
 import org.openmrs.module.emrapi.disposition.actions.ClientSideAction;
 
 import javax.validation.Valid;
@@ -19,9 +18,11 @@ public class Disposition {
     @JsonProperty
     private String conceptCode;
 
-    @Valid
+    /**
+     * These should be the names of existing Spring beans
+     */
     @JsonProperty
-    private List<Action> actions;
+    private List<String> actions;
 
     @Valid
     @JsonProperty
@@ -31,7 +32,7 @@ public class Disposition {
 
     }
 
-    public Disposition(String uuid, String name, String conceptCode, List<Action> actions, List<ClientSideAction> clientSideActions) {
+    public Disposition(String uuid, String name, String conceptCode, List<String> actions, List<ClientSideAction> clientSideActions) {
         this.uuid = uuid;
         this.name = name;
         this.conceptCode = conceptCode;
@@ -64,7 +65,7 @@ public class Disposition {
         return true;
     }
 
-    public List<Action> getActions() {
+    public List<String> getActions() {
         return actions;
     }
 
@@ -80,7 +81,7 @@ public class Disposition {
         this.name = name;
     }
 
-    public void setActions(List<Action> actions) {
+    public void setActions(List<String> actions) {
         this.actions = actions;
     }
 
