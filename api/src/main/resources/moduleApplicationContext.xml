@@ -114,6 +114,7 @@
                     </bean>
                 </property>
                 <property name="emrApiProperties" ref="emrApiProperties"/>
+                <property name="conceptService" ref="conceptService"/>
             </bean>
         </property>
         <property name="preInterceptors">

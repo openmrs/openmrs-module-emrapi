@@ -17,6 +17,14 @@ public class Admission {
     private Date admitDatetime;
     private Location location;
 
+    public Admission() {
+    }
+
+    public Admission(Patient patient, Location location) {
+        this.patient = patient;
+        this.location = location;
+    }
+
     public void setPatient(Patient patient) {
         this.patient = patient;
     }

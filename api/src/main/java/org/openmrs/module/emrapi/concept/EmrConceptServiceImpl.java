@@ -56,6 +56,10 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
         this.emrApiProperties = emrApiProperties;
     }
 
+    public void setConceptService(ConceptService conceptService) {
+        this.conceptService = conceptService;
+    }
+
     @Override
     public List<Concept> getConceptsSameOrNarrowerThan(ConceptReferenceTerm term) {
         if (term == null) {

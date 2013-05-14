@@ -14,6 +14,8 @@ import java.util.Map;
 
 /**
  * Sets the death and deathDate fields on a Patient, and saves those changes.
+ * TODO implement an API method for recording a patient's death in this module (based on, but cleaner than, the PatientService.processDeath method)
+ * Note: this currently is failing because it isn't setting causeOfDeath
  */
 @Component("markPatientDeadDispositionAction")
 public class MarkPatientDeadDispositionAction implements DispositionAction {
@@ -25,17 +27,12 @@ public class MarkPatientDeadDispositionAction implements DispositionAction {
 
    @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
+       String deathDateParam = DispositionActionUtils.getSingleRequiredParameter(requestParameters, DEATH_DATE_PARAMETER);
        Date deathDate = null;
-       String[] deathDateParam = requestParameters.get(DEATH_DATE_PARAMETER);
-       if (deathDateParam != null) {
-           if (deathDateParam.length != 1) {
-               throw new IllegalArgumentException("deathDate parameter should only be a single element, but it is: " + deathDateParam);
-           }
-           try {
-               deathDate = DateUtil.parseDate(deathDateParam[0], "yyyy-MM-dd");
-           } catch (Exception ex) {
-               throw new IllegalArgumentException("cannot parse deathDate", ex);
-           }
+       try {
+           deathDate = DateUtil.parseDate(deathDateParam, "yyyy-MM-dd");
+       } catch (Exception ex) {
+           throw new IllegalArgumentException("cannot parse deathDate", ex);
        }
 
        Patient patient = encounterDomainWrapper.getEncounter().getPatient();
@@ -44,7 +41,7 @@ public class MarkPatientDeadDispositionAction implements DispositionAction {
            patient.setDeathDate(deathDate);
        }
        patientService.savePatient(patient);
-    }
+   }
 
     public void setPatientService(PatientService patientService) {
         this.patientService = patientService;
