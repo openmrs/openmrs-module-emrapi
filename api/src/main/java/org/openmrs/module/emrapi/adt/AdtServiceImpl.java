@@ -45,6 +45,8 @@ import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.openmrs.util.OpenmrsUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +63,7 @@ import java.util.Set;
 
 public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
-    private final Log log = LogFactory.getLog(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private EmrApiProperties emrApiProperties;
 
@@ -248,9 +250,15 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         return latest.getEncounterDatetime();
     }
 
+    /**
+     * This method is synchronized to prevent multiple check-ins in a row at the same location and during the same visit.
+     * See #579.
+     * 
+     * @see org.openmrs.module.emrapi.adt.AdtService#checkInPatient(org.openmrs.Patient, org.openmrs.Location, org.openmrs.Provider, java.util.List, java.util.List, boolean)
+     */
     @Override
     @Transactional
-    public Encounter checkInPatient(Patient patient, Location where, Provider checkInClerk,
+    public synchronized Encounter checkInPatient(Patient patient, Location where, Provider checkInClerk,
                                     List<Obs> obsForCheckInEncounter, List<Order> ordersForCheckInEncounter, boolean newVisit) {
         if (checkInClerk == null) {
             checkInClerk = getProvider(Context.getAuthenticatedUser());
@@ -266,6 +274,14 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         if (activeVisit == null) {
             activeVisit = ensureActiveVisit(patient, where);
         }
+        
+        Encounter lastEncounter = getLastEncounter(patient);
+		if (lastEncounter != null && activeVisit.equals(lastEncounter.getVisit())
+		        && emrApiProperties.getCheckInEncounterType().equals(lastEncounter.getEncounterType())
+		        && where.equals(lastEncounter.getLocation())) {
+			log.warn("Patient id:{} tried to check-in twice in a row at id:{} during the same visit", patient.getId(), where.getId());
+			return lastEncounter;
+		}
 
         Encounter encounter = buildEncounter(emrApiProperties.getCheckInEncounterType(), patient, where, new Date(), obsForCheckInEncounter, ordersForCheckInEncounter);
         encounter.addProvider(emrApiProperties.getCheckInClerkEncounterRole(), checkInClerk);
