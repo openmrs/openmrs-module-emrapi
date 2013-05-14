@@ -14,6 +14,22 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.openmrs.module.emrapi.TestUtils.isJustNow;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,15 +46,6 @@ import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.Date;
-
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
@@ -130,4 +137,61 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertFalse(new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
     }
 
+	@Test
+	public void integrationTest_ADT_workflow_duplicate_visits() throws Exception {
+		final Integer numberOfThreads = 5;
+		final CyclicBarrier threadsBarrier = new CyclicBarrier(numberOfThreads);
+		
+		Callable<Integer> checkInCall = new Callable<Integer>() {
+			
+			@Override
+			public Integer call() throws Exception {
+				Context.openSession();
+				authenticate();
+				try {
+					LocationService locationService = Context.getLocationService();
+					
+					Patient patient = Context.getPatientService().getPatient(7);
+					
+					// parent location should support visits
+					LocationTag supportsVisits = new LocationTag();
+					supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
+					locationService.saveLocationTag(supportsVisits);
+					
+					Location parentLocation = locationService.getLocation(2);
+					parentLocation.addTag(supportsVisits);
+					locationService.saveLocation(parentLocation);
+					
+					threadsBarrier.await();
+					
+					Encounter checkInEncounter = service.checkInPatient(patient, parentLocation, null, null, null,
+					    false);
+					
+					return checkInEncounter.getVisit().getVisitId();
+				}
+				finally {
+					Context.closeSession();
+				}
+			}
+		};
+		
+		List<Callable<Integer>> checkInCalls = new ArrayList<Callable<Integer>>();
+		for (int i = 0; i < numberOfThreads; i++) {
+	        checkInCalls.add(checkInCall);
+        }
+		
+		ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+		
+		List<Future<Integer>> checkIns = executorService.invokeAll(checkInCalls);
+		
+		Integer visitId = null;
+		for (Future<Integer> checkIn : checkIns) {
+			Integer nextVisitId = checkIn.get();
+			if (visitId != null) {
+				assertThat(nextVisitId, is(visitId));
+			} else {
+				visitId = nextVisitId;
+			}
+		}
+	}
 }
