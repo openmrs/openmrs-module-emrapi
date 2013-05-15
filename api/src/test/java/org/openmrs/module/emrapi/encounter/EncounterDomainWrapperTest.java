@@ -15,13 +15,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 
 public class EncounterDomainWrapperTest {
 
@@ -96,7 +95,7 @@ public class EncounterDomainWrapperTest {
         encounterDomainWrapper.closeVisit();
         Visit closedVisit = encounterDomainWrapper.getVisit();
 
-        assertEquals(new Date(), closedVisit.getStopDatetime());
+        assertThat(closedVisit.getStopDatetime(), isJustNow());
 
     }
 
