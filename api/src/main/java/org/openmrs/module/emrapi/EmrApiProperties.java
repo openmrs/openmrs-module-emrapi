@@ -164,6 +164,10 @@ public class EmrApiProperties extends ModuleProperties {
         return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_CONSULT_FREE_TEXT_COMMENT);
     }
 
+    public Concept getUnknownCauseOfDeathConcept() {
+        return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH);
+    }
+
     public LocationAttributeType getLocationAttributeTypeNameToPrintOnIdCard() {
         LocationAttributeType type = null;
         type = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);

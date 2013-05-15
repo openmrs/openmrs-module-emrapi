@@ -22,9 +22,17 @@ import java.util.Map;
 public class DispositionActionUtils {
 
     public static String getSingleRequiredParameter(Map<String, String[]> requestParameters, String parameterName) {
+        String value = getSingleOptionalParameter(requestParameters, parameterName);
+        if (value == null) {
+            throw new IllegalArgumentException("Missing required request parameter: " + parameterName);
+        }
+        return value;
+    }
+
+    public static String getSingleOptionalParameter(Map<String, String[]> requestParameters, String parameterName) {
         String[] values = requestParameters.get(parameterName);
         if (values == null || values.length == 0) {
-            throw new IllegalArgumentException("Missing required request parameter: " + parameterName);
+            return null;
         }
         else if (values.length > 1) {
             throw new IllegalArgumentException("Expected just one request parameter named " + parameterName + " but got " + values.length);
@@ -33,5 +41,4 @@ public class DispositionActionUtils {
             return values[0];
         }
     }
-
 }

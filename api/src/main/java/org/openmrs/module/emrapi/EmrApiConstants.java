@@ -116,6 +116,8 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_DISPOSITION = "Disposition";
 
+    public static final String CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH = "Unknown Cause of Death";
+
     public static final String LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD = "a5fb5770-409a-11e2-a25f-0800200c9a66";
 
 
