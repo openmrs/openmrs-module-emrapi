@@ -65,7 +65,7 @@ public class MetadataUtil {
             return config;
         }
         catch (Exception ex) {
-            throw new RuntimeException("Cannot find " + PACKAGES_FILENAME + ". Make sure it's in api/src/main/resources");
+            throw new RuntimeException("Cannot find " + PACKAGES_FILENAME + ", or error deserializing it. Make sure it's in api/src/main/resources", ex);
         }
     }
 	
