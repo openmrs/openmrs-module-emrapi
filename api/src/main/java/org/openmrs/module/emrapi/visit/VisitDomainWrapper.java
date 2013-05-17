@@ -161,4 +161,17 @@ public class VisitDomainWrapper {
         return this;
     }
 
+    /**
+     * Throws an {@link IllegalArgumentException} if checkDatetime is not within the start/stop date bounds of this visit
+     * @param checkDatetime
+     * @param errorMessage base of the error message to throw (some details may be added)
+     */
+    public void errorIfOutsideVisit(Date checkDatetime, String errorMessage) throws IllegalArgumentException {
+        if (visit.getStartDatetime() != null && OpenmrsUtil.compare(checkDatetime, visit.getStartDatetime()) < 0) {
+            throw new IllegalArgumentException(errorMessage + ": visit started at " + visit.getStartDatetime() + " but testing an earlier date");
+        }
+        if (visit.getStopDatetime() != null && OpenmrsUtil.compare(visit.getStopDatetime(), checkDatetime) < 0) {
+            throw new IllegalArgumentException(errorMessage + ": visit stopped at " + visit.getStopDatetime() + " but testing a later date");
+        }
+    }
 }

@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -78,6 +79,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -101,12 +103,14 @@ public class AdtServiceTest {
     private EncounterType checkInEncounterType;
     private EncounterType admissionEncounterType;
     private EncounterType dischargeEncounterType;
+    private EncounterType transferWithinHospitalEncounterType;
     private VisitType atFacilityVisitType;
     private LocationTag supportsVisits;
     private LocationTag supportsAdmissions;
     private Location mirebalaisHospital;
     private Location outpatientDepartment;
     private Location inpatientDepartment;
+    private Location radiologyDepartment;
     private PersonAttributeType unknownPatientPersonAttributeType;
     private PatientIdentifierType paperRecordIdentifierType;
 
@@ -133,6 +137,7 @@ public class AdtServiceTest {
         checkInEncounterType = new EncounterType();
         admissionEncounterType = new EncounterType();
         dischargeEncounterType = new EncounterType();
+        transferWithinHospitalEncounterType = new EncounterType();
         atFacilityVisitType = new VisitType();
 
         supportsVisits = new LocationTag();
@@ -142,6 +147,7 @@ public class AdtServiceTest {
         supportsAdmissions.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
 
         outpatientDepartment = new Location();
+        radiologyDepartment = new Location();
         inpatientDepartment = new Location();
         inpatientDepartment.addTag(supportsAdmissions);
 
@@ -163,6 +169,7 @@ public class AdtServiceTest {
         when(emrApiProperties.getCheckInEncounterType()).thenReturn(checkInEncounterType);
         when(emrApiProperties.getAdmissionEncounterType()).thenReturn(admissionEncounterType);
         when(emrApiProperties.getDischargeEncounterType()).thenReturn(dischargeEncounterType);
+        when(emrApiProperties.getTransferWithinHospitalEncounterType()).thenReturn(transferWithinHospitalEncounterType);
         when(emrApiProperties.getAtFacilityVisitType()).thenReturn(atFacilityVisitType);
         when(emrApiProperties.getCheckInClerkEncounterRole()).thenReturn(checkInClerkEncounterRole);
         when(emrApiProperties.getUnknownPatientPersonAttributeType()).thenReturn(unknownPatientPersonAttributeType);
@@ -640,6 +647,7 @@ public class AdtServiceTest {
         Admission admission = new Admission();
         admission.setPatient(patient);
         admission.setLocation(inpatientDepartment);
+        admission.setProviders(buildProviderMap());
 
         service.admitPatient(admission);
 
@@ -653,6 +661,12 @@ public class AdtServiceTest {
                 return true;
             }
         }));
+    }
+
+    private Map<EncounterRole, Set<Provider>> buildProviderMap() {
+        HashMap<EncounterRole, Set<Provider>> map = new HashMap<EncounterRole, Set<Provider>>();
+        map.put(new EncounterRole(), Collections.singleton(new Provider()));
+        return map;
     }
 
     @Test(expected = IllegalStateException.class)
@@ -669,6 +683,7 @@ public class AdtServiceTest {
         Admission admission = new Admission();
         admission.setPatient(patient);
         admission.setLocation(inpatientDepartment);
+        admission.setProviders(buildProviderMap());
 
         service.admitPatient(admission);
     }
@@ -676,9 +691,10 @@ public class AdtServiceTest {
     @Test
     public void test_admitPatient_createsEncounter() throws Exception {
         final Patient patient = new Patient();
-        Admission admission = new Admission();
+        final Admission admission = new Admission();
         admission.setPatient(patient);
         admission.setLocation(inpatientDepartment);
+        admission.setProviders(buildProviderMap());
 
         service.admitPatient(admission);
 
@@ -691,6 +707,7 @@ public class AdtServiceTest {
                 assertThat(actual.getPatient(), is(patient));
                 assertThat(actual.getLocation(), is(inpatientDepartment));
                 assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
+                assertThat(actual, hasProviders(admission.getProviders()));
                 return true;
             }
         }));
@@ -706,6 +723,7 @@ public class AdtServiceTest {
         Discharge discharge = new Discharge();
         discharge.setVisit(existing);
         discharge.setLocation(inpatientDepartment);
+        discharge.setProviders(buildProviderMap());
 
         service.dischargePatient(discharge);
     }
@@ -721,9 +739,10 @@ public class AdtServiceTest {
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        Discharge discharge = new Discharge();
+        final Discharge discharge = new Discharge();
         discharge.setVisit(existing);
         discharge.setLocation(inpatientDepartment);
+        discharge.setProviders(buildProviderMap());
 
         service.dischargePatient(discharge);
 
@@ -736,11 +755,39 @@ public class AdtServiceTest {
                 assertThat(actual.getPatient(), is(patient));
                 assertThat(actual.getLocation(), is(inpatientDepartment));
                 assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
+                assertThat(actual, hasProviders(discharge.getProviders()));
                 return true;
             }
         }));
     }
 
+    @Test
+    public void test_transferPatient_createsAnEncounter() throws Exception {
+        final Patient patient = new Patient();
+
+        final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
+        when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
+
+        final Transfer transfer = new Transfer();
+        transfer.setVisit(visit);
+        transfer.setToLocation(radiologyDepartment);
+        transfer.setProviders(buildProviderMap());
+        service.transferPatient(transfer);
+
+        verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
+            @Override
+            public boolean matches(Object o) {
+                Encounter actual = (Encounter) o;
+                assertThat(actual.getEncounterType(), is(transferWithinHospitalEncounterType));
+                assertThat(actual.getVisit(), is(visit));
+                assertThat(actual.getPatient(), is(patient));
+                assertThat(actual.getLocation(), is(radiologyDepartment));
+                assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
+                assertThat(actual, hasProviders(transfer.getProviders()));
+                return true;
+            }
+        }));
+    }
 
     private Encounter buildEncounter(Patient patient, Date encounterDatetime) {
         Encounter encounter = new Encounter();

@@ -15,9 +15,8 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Obs;
@@ -58,6 +57,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -605,8 +605,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional
     @Override
     public Encounter admitPatient(Admission admission) {
-        if (admission.getPatient() == null || admission.getLocation() == null) {
-            throw new IllegalArgumentException("Must provide a patient and a location");
+        if (admission.getPatient() == null || admission.getLocation() == null || !hasAny(admission.getProviders())) {
+            throw new IllegalArgumentException("Must provide a patient, location, and provider");
         }
 
         VisitDomainWrapper activeVisit = getActiveVisit(admission.getPatient(), admission.getLocation());
@@ -634,7 +634,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         Encounter encounter = buildEncounter(admissionEncounterType, admission.getPatient(), getLocationThatSupportsAdmissions(admission.getLocation()), admitDatetime, null, null);
-        // eventually add a provider
+        addProviders(encounter, admission.getProviders());
 
         activeVisit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);
@@ -642,10 +642,32 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     }
 
+    private void addProviders(Encounter encounter, Map<EncounterRole, ? extends Collection<Provider>> providers) {
+        for (Map.Entry<EncounterRole, ? extends Collection<Provider>> entry : providers.entrySet()) {
+            EncounterRole encounterRole = entry.getKey();
+            for (Provider provider : entry.getValue()) {
+                encounter.addProvider(encounterRole, provider);
+            }
+        }
+    }
+
+    private boolean hasAny(Map<?, ? extends Collection<?>> providers) {
+        if (providers == null) {
+            return false;
+        }
+        for (Collection<?> byType : providers.values()) {
+            if (byType != null && byType.size() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional
     @Override
     public Encounter dischargePatient(Discharge discharge) {
-        if (discharge.getVisit() == null || discharge.getLocation() == null) {
-            throw new IllegalArgumentException("Must provide a visit and location");
+        if (discharge.getVisit() == null || discharge.getLocation() == null || !hasAny(discharge.getProviders())) {
+            throw new IllegalArgumentException("Must provide a visit, location, and provider");
         }
 
         VisitDomainWrapper visit = new VisitDomainWrapper(discharge.getVisit(), emrApiProperties);
@@ -658,17 +680,44 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             dischargeDatetime = new Date();
         }
 
-        if (visit.getStopDatetime() != null && OpenmrsUtil.compare(visit.getStopDatetime(), dischargeDatetime) < 0) {
-            throw new IllegalArgumentException("Cannot discharge patient after the visit has stopped (stopped on " + visit.getStopDatetime() + ")");
-        }
+        visit.errorIfOutsideVisit(dischargeDatetime, "Invalid dischargeDatetime");
 
         EncounterType dischargeEncounterType = emrApiProperties.getDischargeEncounterType();
         if (dischargeEncounterType == null) {
             throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_DISCHARGE_ENCOUNTER_TYPE);
         }
 
-        Encounter encounter = buildEncounter(dischargeEncounterType, visit.getVisit().getPatient(), getLocationThatSupportsAdmissions(discharge.getLocation()), dischargeDatetime, null, null);
-        // eventually add a provider
+        Encounter encounter = buildEncounter(dischargeEncounterType, visit.getVisit().getPatient(), discharge.getLocation(), dischargeDatetime, null, null);
+        addProviders(encounter, discharge.getProviders());
+
+        visit.addEncounter(encounter);
+        encounterService.saveEncounter(encounter);
+        return encounter;
+    }
+
+    @Transactional
+    @Override
+    public Encounter transferPatient(Transfer transfer) {
+        if (transfer.getVisit() == null || transfer.getToLocation() == null || !hasAny(transfer.getProviders())) {
+            throw new IllegalArgumentException("Must provide visit, toLocation, and provider");
+        }
+
+        VisitDomainWrapper visit = new VisitDomainWrapper(transfer.getVisit(), emrApiProperties);
+
+        Date transferDatetime = transfer.getTransferDatetime();
+        if (transferDatetime == null) {
+            transferDatetime = new Date();
+        }
+
+        visit.errorIfOutsideVisit(transferDatetime, "Invalid transferDatetime");
+
+        EncounterType transferWithinHospitalEncounterType = emrApiProperties.getTransferWithinHospitalEncounterType();
+        if (transferWithinHospitalEncounterType == null) {
+            throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE);
+        }
+
+        Encounter encounter = buildEncounter(transferWithinHospitalEncounterType, visit.getVisit().getPatient(), transfer.getToLocation(), transferDatetime, null, null);
+        addProviders(encounter, transfer.getProviders());
 
         visit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);

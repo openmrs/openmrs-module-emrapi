@@ -14,13 +14,20 @@
 package org.openmrs.module.emrapi;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.mockito.ArgumentMatcher;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterRole;
+import org.openmrs.Provider;
 import org.openmrs.util.OpenmrsUtil;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.core.Is.is;
@@ -214,4 +221,31 @@ public class TestUtils {
         return ret.toString();
     }
 
+    public static boolean sameProviders(Map<EncounterRole, Set<Provider>> a, Map<EncounterRole, Set<Provider>> b) {
+        Collection<EncounterRole> roles = CollectionUtils.union(a.keySet(), b.keySet());
+        for (EncounterRole role : roles) {
+            Set<Provider> aSet = a.get(role);
+            Set<Provider> bSet = b.get(role);
+            if (aSet == null) {
+                aSet = Collections.emptySet();
+            }
+            if (bSet == null) {
+                bSet = Collections.emptySet();
+            }
+            if (!CollectionUtils.isEqualCollection(aSet, bSet)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Matcher<Encounter> hasProviders(final Map<EncounterRole, Set<Provider>> providers) {
+        return new ArgumentMatcher<Encounter>() {
+            @Override
+            public boolean matches(Object argument) {
+                Encounter actual = (Encounter) argument;
+                return sameProviders(actual.getProvidersByRoles(), providers);
+            }
+        };
+    }
 }

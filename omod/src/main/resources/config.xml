@@ -78,5 +78,13 @@
             UUID of the encounter type for discharging a patient
         </description>
     </globalProperty>
+
+    <globalProperty>
+        <property>emr.transferWithinHospitalEncounterType</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the encounter type for transferring a patient within the hospital
+        </description>
+    </globalProperty>
 </module>
 

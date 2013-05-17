@@ -2,10 +2,15 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
+import org.openmrs.EncounterRole;
+import org.openmrs.Location;
+import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.Visit;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 public class EncounterDomainWrapper {
 
@@ -56,6 +61,10 @@ public class EncounterDomainWrapper {
         return encounter.getVisit();
     }
 
+    public Location getLocation() {
+        return encounter.getLocation();
+    }
+
     public void closeVisit() {
         Visit visit = encounter.getVisit();
         if (visit == null) {
@@ -65,6 +74,10 @@ public class EncounterDomainWrapper {
             visit.setStopDatetime(new Date());
         }
         // TODO save the visit via service
+    }
+
+    public Map<EncounterRole, Set<Provider>> getProviders() {
+        return encounter.getProvidersByRoles();
     }
 
 }

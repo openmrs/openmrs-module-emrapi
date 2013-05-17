@@ -1,9 +1,13 @@
 package org.openmrs.module.emrapi.adt;
 
+import org.openmrs.EncounterRole;
 import org.openmrs.Location;
 import org.openmrs.Patient;
+import org.openmrs.Provider;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper class that captures details about admitting a patient to the hospital.
@@ -16,13 +20,15 @@ public class Admission {
     private Patient patient;
     private Date admitDatetime;
     private Location location;
+    private Map<EncounterRole, Set<Provider>> providers;
 
     public Admission() {
     }
 
-    public Admission(Patient patient, Location location) {
+    public Admission(Patient patient, Location location, Map<EncounterRole, Set<Provider>> providers) {
         this.patient = patient;
         this.location = location;
+        this.providers = providers;
     }
 
     public void setPatient(Patient patient) {
@@ -48,4 +54,13 @@ public class Admission {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    public Map<EncounterRole, Set<Provider>> getProviders() {
+        return providers;
+    }
+
+    public void setProviders(Map<EncounterRole, Set<Provider>> providers) {
+        this.providers = providers;
+    }
+
 }

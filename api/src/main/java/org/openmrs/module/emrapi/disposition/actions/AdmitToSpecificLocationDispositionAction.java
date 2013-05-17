@@ -37,7 +37,7 @@ import java.util.Map;
 @Component("admitToSpecificLocationDispositionAction")
 public class AdmitToSpecificLocationDispositionAction implements DispositionAction {
 
-    public final String ADMISSION_LOCATION_PARAMETER = "admitToLocationId";
+    public final static String ADMISSION_LOCATION_PARAMETER = "admitToLocationId";
 
     @Autowired
     LocationService locationService;
@@ -62,7 +62,7 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
     }
 
     /**
-     * Requires a request parameter of admitToLocationId
+     * Requires a request parameter of {@link #ADMISSION_LOCATION_PARAMETER}
      * @param encounterDomainWrapper encounter that is being created (has not had dispositionObsGroupBeingCreated added yet)
      * @param dispositionObsGroupBeingCreated the obs group being created for this disposition (has not been added to the encounter yet)
      * @param requestParameters parameters submitted with the HTTP request, which may contain additional data neede by this action
@@ -71,7 +71,7 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
         String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, ADMISSION_LOCATION_PARAMETER);
         Location location = locationService.getLocation(Integer.valueOf(locationId));
-        adtService.admitPatient(new Admission(encounterDomainWrapper.getEncounter().getPatient(), location));
+        adtService.admitPatient(new Admission(encounterDomainWrapper.getEncounter().getPatient(), location, encounterDomainWrapper.getProviders()));
     }
 
 }

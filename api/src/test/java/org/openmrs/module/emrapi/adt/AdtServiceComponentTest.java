@@ -14,29 +14,15 @@
 
 package org.openmrs.module.emrapi.adt;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.openmrs.module.emrapi.TestUtils.isJustNow;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterRole;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.Patient;
+import org.openmrs.Provider;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
@@ -46,6 +32,27 @@ import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.openmrs.module.emrapi.TestUtils.hasProviders;
+import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
@@ -70,6 +77,8 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     @Test
     public void integrationTest_ADT_workflow() {
         LocationService locationService = Context.getLocationService();
+
+        Provider provider = Context.getProviderService().getProvider(1);
 
         Patient patient = Context.getPatientService().getPatient(7);
 
@@ -110,30 +119,41 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertThat(checkInEncounter.getVisit().getStartDatetime(), isJustNow());
         assertThat(checkInEncounter.getAllObs().size(), is(0));
 
+        Map<EncounterRole,Set<Provider>> providers = new HashMap<EncounterRole, Set<Provider>>();
+        providers.put(Context.getEncounterService().getEncounterRole(1), Collections.singleton(provider));
+
         // step 2: admit the patient (which should create an encounter)
         Date admitDatetime = new Date();
         Admission admission = new Admission();
         admission.setPatient(patient);
         admission.setAdmitDatetime(admitDatetime);
         admission.setLocation(inpatientWard);
+        admission.setProviders(providers);
         Encounter admitEncounter = service.admitPatient(admission);
 
         assertThat(admitEncounter.getPatient(), is(patient));
         assertThat(admitEncounter.getVisit(), is(checkInEncounter.getVisit()));
         assertThat(admitEncounter.getEncounterDatetime(), is(admitDatetime));
         assertThat(admitEncounter.getLocation(), is(inpatientWard));
+        assertThat(admitEncounter, hasProviders(providers));
         assertThat(admitEncounter.getAllObs().size(), is(0));
         assertTrue(new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
+
+        // TODO transfer the patient within the hospital
+
+        // step 3: discharge the patient (which should create an encounter)
 
         Discharge discharge = new Discharge();
         discharge.setVisit(admitEncounter.getVisit());
         discharge.setLocation(inpatientWard);
+        discharge.setProviders(providers);
         Encounter dischargeEncounter = service.dischargePatient(discharge);
 
         assertThat(dischargeEncounter.getPatient(), is(patient));
         assertThat(dischargeEncounter.getVisit(), is(checkInEncounter.getVisit()));
         assertThat(dischargeEncounter.getEncounterDatetime(), isJustNow());
         assertThat(dischargeEncounter.getLocation(), is(inpatientWard));
+        assertThat(dischargeEncounter, hasProviders(providers));
         assertFalse(new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
     }
 

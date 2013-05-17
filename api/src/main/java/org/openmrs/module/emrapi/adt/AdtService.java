@@ -174,6 +174,8 @@ public interface AdtService extends OpenmrsService {
      * Merges patients using the underlying OpenMRS core mechanism, but applying extra business logic:
      * <ul>
      * <li>Any two visits that overlap will be joined together into one</li>
+     * <li>Merging an "unknown" patient into a known one does _not_ copy the unknown flag to the target patient</li>
+     * <li>Any additional {@link org.openmrs.module.emrapi.merge.PatientMergeAction}s</li>
      * </ul>
      *
      * @param preferred
@@ -185,6 +187,8 @@ public interface AdtService extends OpenmrsService {
 
     /**
      * Admits a patient to inpatient care. Throws an exception if the patient is already admitted.
+     * Looks for a location tagged with {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
+     * in the hierarchy of admission.location.
      * @param admission
      * @return the encounter representing this admission
      */
@@ -196,6 +200,15 @@ public interface AdtService extends OpenmrsService {
      * @return the encounter representing this discharge
      */
     Encounter dischargePatient(Discharge discharge);
+
+    /**
+     * Transfers a patient within the hospital. This does not require the patient to be previously admitted, nor does
+     * it admit them. (For example you might transfer a patient from an outpatient clinic to the ER, but neither of these
+     * are inpatient departments.)
+     * @param transfer
+     * @return the encounter representing this transfer
+     */
+    Encounter transferPatient(Transfer transfer);
 
     // Commenting this out since the feature isn't in use yet, and it refers to payment, which isn't supposed to be in this module
     // Encounter createCheckinInRetrospective(Patient patient, Location location, Provider clerk, Obs paymentReason, Obs paymentAmount, Obs paymentReceipt, Date checkinDate);
