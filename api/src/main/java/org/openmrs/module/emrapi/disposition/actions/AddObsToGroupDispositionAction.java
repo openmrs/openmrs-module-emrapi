@@ -11,6 +11,7 @@ import java.util.Map;
 
 @Component("addObsToGroupDispositionAction")
 public class AddObsToGroupDispositionAction implements DispositionAction {
+
     private static final String CONCEPT = "concept";
     private static final String VALUE = "valueCoded";
 
@@ -28,8 +29,6 @@ public class AddObsToGroupDispositionAction implements DispositionAction {
         Obs obs = createObs(question, answer);
 
         encounterDomainWrapper.getEncounter().addObs(obs);
-
-
     }
 
     private Obs createObs(Concept question, Concept answer) {
@@ -38,4 +37,5 @@ public class AddObsToGroupDispositionAction implements DispositionAction {
         obs.setValueCoded(answer);
         return obs;
     }
+
 }
