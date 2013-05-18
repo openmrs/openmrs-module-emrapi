@@ -15,37 +15,42 @@ import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import static org.mockito.Mockito.when;
 
 /**
- *
+ * Contains helper methods to set up standard metadata on mock services
  */
 public class MockMetadataTestUtil {
 
     public static void setupMockConceptService(ConceptService conceptService, EmrApiProperties emrApiProperties) {
-        ConceptDatatype naDatatype = buildConceptDatatype("N/A", "ZZ", ConceptDatatype.N_A_UUID);
-        ConceptDatatype codedDatatype = buildConceptDatatype("Coded", ConceptDatatype.CODED, ConceptDatatype.CODED_UUID);
-        ConceptDatatype textDatatype = buildConceptDatatype("Text", ConceptDatatype.TEXT, ConceptDatatype.TEXT_UUID);
+        ConceptDatatype naDatatype = setupConceptDatatype(conceptService, "N/A", "ZZ", ConceptDatatype.N_A_UUID);
+        ConceptDatatype codedDatatype = setupConceptDatatype(conceptService, "Coded", ConceptDatatype.CODED, ConceptDatatype.CODED_UUID);
+        ConceptDatatype textDatatype = setupConceptDatatype(conceptService, "Text", ConceptDatatype.TEXT, ConceptDatatype.TEXT_UUID);
 
-        ConceptClass misc = new ConceptClass();
-        ConceptClass convSet = new ConceptClass();
+        ConceptClass misc = setupConceptClass(conceptService, "Misc");
+        ConceptClass convSet = setupConceptClass(conceptService, "ConvSet");
 
         ConceptSource emrConceptSource = new ConceptSource();
         emrConceptSource.setName(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
-
-        when(conceptService.getConceptDatatypeByName("N/A")).thenReturn(naDatatype);
-        when(conceptService.getConceptDatatypeByName("Coded")).thenReturn(codedDatatype);
-        when(conceptService.getConceptDatatypeByName("Text")).thenReturn(textDatatype);
-
-        when(conceptService.getConceptClassByName("Misc")).thenReturn(misc);
-        when(conceptService.getConceptClassByName("ConvSet")).thenReturn(convSet);
 
         when(conceptService.getConceptSourceByName(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME)).thenReturn(emrConceptSource);
         when(emrApiProperties.getEmrApiConceptSource()).thenReturn(emrConceptSource);
     }
 
-    private static ConceptDatatype buildConceptDatatype(String name, String hl7Code, String uuid) {
-        ConceptDatatype conceptDatatype = new ConceptDatatype();
-        conceptDatatype.setName(name);
-        conceptDatatype.setHl7Abbreviation(hl7Code);
-        conceptDatatype.setUuid(uuid);
+    private static ConceptClass setupConceptClass(ConceptService mockConceptService, String name) {
+        ConceptClass conceptClass = new ConceptClass();
+        conceptClass.setName(name);
+        when(mockConceptService.getConceptClassByName(name)).thenReturn(conceptClass);
+        return conceptClass;
+    }
+
+    private static ConceptDatatype setupConceptDatatype(ConceptService mockConceptService, String name, String hl7Code, String uuid) {
+        ConceptDatatype conceptDatatype = mockConceptService.getConceptDatatypeByName(name);
+        if (conceptDatatype == null) {
+            conceptDatatype = new ConceptDatatype();
+            conceptDatatype.setName(name);
+            conceptDatatype.setHl7Abbreviation(hl7Code);
+            conceptDatatype.setUuid(uuid);
+            when(mockConceptService.getConceptDatatypeByName(name)).thenReturn(conceptDatatype);
+            when(mockConceptService.getConceptDatatypeByUuid(uuid)).thenReturn(conceptDatatype);
+        }
         return conceptDatatype;
     }
 
