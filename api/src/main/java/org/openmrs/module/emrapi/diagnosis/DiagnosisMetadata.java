@@ -92,6 +92,10 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         this.diagnosisCertaintyConcept = diagnosisCertaintyConcept;
     }
 
+    public void setEmrConceptSource(ConceptSource emrConceptSource) {
+        this.emrConceptSource = emrConceptSource;
+    }
+
     public Obs buildDiagnosisObsGroup(Diagnosis diagnosis) {
         Obs order = new Obs();
         order.setConcept(diagnosisOrderConcept);
@@ -158,15 +162,6 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         Obs orderObs = findMember(obsGroup, diagnosisOrderConcept);
         //return orderObs.getValueCoded()
         throw new RuntimeException("Not Yet Implemented");
-    }
-
-    private Obs findMember(Obs obsGroup, Concept concept) {
-        for (Obs candidate : obsGroup.getGroupMembers(false)) {
-            if (candidate.getConcept().equals(concept)) {
-                return candidate;
-            }
-        }
-        return null;
     }
 
     public Diagnosis toDiagnosis(Obs obsGroup) {

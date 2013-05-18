@@ -28,7 +28,7 @@ public class AddObsToGroupDispositionAction implements DispositionAction {
 
         Obs obs = createObs(question, answer);
 
-        encounterDomainWrapper.getEncounter().addObs(obs);
+        dispositionObsGroupBeingCreated.addGroupMember(obs);
     }
 
     private Obs createObs(Concept question, Concept answer) {

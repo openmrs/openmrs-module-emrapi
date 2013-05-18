@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.descriptor;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.openmrs.Concept;
+import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 
 public abstract class ConceptSetDescriptor {
@@ -40,4 +41,12 @@ public abstract class ConceptSetDescriptor {
         }
     }
 
+    protected Obs findMember(Obs obsGroup, Concept concept) {
+        for (Obs candidate : obsGroup.getGroupMembers(false)) {
+            if (candidate.getConcept().equals(concept)) {
+                return candidate;
+            }
+        }
+        return null;
+    }
 }

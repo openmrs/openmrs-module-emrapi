@@ -21,6 +21,9 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.descriptor.ConceptSetDescriptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Describes the concepts necessary for recording a Disposition concept set
  */
@@ -68,4 +71,21 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         return group;
     }
 
+    public boolean isDisposition(Obs obs) {
+        return obs.getConcept().equals(dispositionSetConcept);
+    }
+
+    public Obs getDispositionObs(Obs obsGroup) {
+        return findMember(obsGroup, dispositionConcept);
+    }
+
+    public List<Obs> getAdditionalObs(Obs obsGroup) {
+        List<Obs> notDisposition = new ArrayList<Obs>();
+        for (Obs candidate : obsGroup.getGroupMembers()) {
+            if (!candidate.getConcept().equals(dispositionConcept)) {
+                notDisposition.add(candidate);
+            }
+        }
+        return notDisposition;
+    }
 }
