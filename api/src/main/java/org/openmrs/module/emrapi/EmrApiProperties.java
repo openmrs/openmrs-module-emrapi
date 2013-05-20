@@ -104,6 +104,10 @@ public class EmrApiProperties extends ModuleProperties {
         return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_LOGIN);
     }
 
+    public LocationTag getSupportsAdmissionLocationTag() {
+        return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
+    }
+
     public PersonAttributeType getTestPatientPersonAttributeType() {
         PersonAttributeType type = null;
         type = personService.getPersonAttributeTypeByUuid(EmrApiConstants.TEST_PATIENT_ATTRIBUTE_UUID);
