@@ -14,13 +14,13 @@ public class FragmentAction implements ClientSideAction{
     private String fragment;
 
     @JsonProperty
-    private Map<String, String> fragmentConfig;
+    private Map<String, Object> fragmentConfig;
 
     public FragmentAction(){
 
     }
 
-    public FragmentAction(String module, String fragment, Map<String, String> fragmentConfig) {
+    public FragmentAction(String module, String fragment, Map<String, Object> fragmentConfig) {
         this.module = module;
         this.fragment = fragment;
         this.fragmentConfig = fragmentConfig;
@@ -37,7 +37,7 @@ public class FragmentAction implements ClientSideAction{
     }
 
     @Override
-    public Map<String, String> getFragmentConfig() {
+    public Map<String, Object> getFragmentConfig() {
         return fragmentConfig;
     }
 
@@ -45,7 +45,7 @@ public class FragmentAction implements ClientSideAction{
         this.fragment = fragment;
     }
 
-    public void setFragmentConfig(Map<String, String> fragmentConfig) {
+    public void setFragmentConfig(Map<String, Object> fragmentConfig) {
         this.fragmentConfig = fragmentConfig;
     }
 

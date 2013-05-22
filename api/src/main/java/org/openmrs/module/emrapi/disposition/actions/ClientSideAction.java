@@ -15,7 +15,7 @@ import java.util.Map;
 public interface ClientSideAction {
     String getFragment();
 
-    Map<String, String> getFragmentConfig();
+    Map<String, Object> getFragmentConfig();
 
     String getModule();
 }

@@ -59,8 +59,8 @@ public class DispositionFactoryTest {
         return asList("closeCurrentVisitAction", "markPatientDeadAction");
     }
 
-    private Map<String, String> getFragmentConfig() {
-        Map<String, String> properties = new HashMap<String, String>();
+    private Map<String, Object> getFragmentConfig() {
+        Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("label", "mirebalais.deathDate");
         return properties;
     }
