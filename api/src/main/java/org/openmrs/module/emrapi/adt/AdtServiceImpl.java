@@ -682,9 +682,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         visit.errorIfOutsideVisit(dischargeDatetime, "Invalid dischargeDatetime");
 
-        EncounterType dischargeEncounterType = emrApiProperties.getDischargeEncounterType();
+        EncounterType dischargeEncounterType = emrApiProperties.getExitFromInpatientEncounterType();
         if (dischargeEncounterType == null) {
-            throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_DISCHARGE_ENCOUNTER_TYPE);
+            throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE);
         }
 
         Encounter encounter = buildEncounter(dischargeEncounterType, visit.getVisit().getPatient(), discharge.getLocation(), dischargeDatetime, null, null);
@@ -722,6 +722,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         visit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);
         return encounter;
+    }
+
+    @Override
+    public VisitDomainWrapper wrap(Visit visit) {
+        return new VisitDomainWrapper(visit, emrApiProperties);
     }
 
 }

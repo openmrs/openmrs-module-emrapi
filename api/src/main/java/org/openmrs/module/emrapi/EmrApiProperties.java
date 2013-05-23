@@ -80,8 +80,8 @@ public class EmrApiProperties extends ModuleProperties {
         return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE, false);
     }
 
-    public EncounterType getDischargeEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_DISCHARGE_ENCOUNTER_TYPE, false);
+    public EncounterType getExitFromInpatientEncounterType() {
+        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE, false);
     }
 
     public EncounterType getTransferWithinHospitalEncounterType() {

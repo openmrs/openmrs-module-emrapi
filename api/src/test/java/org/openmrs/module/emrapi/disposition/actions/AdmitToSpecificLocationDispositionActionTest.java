@@ -23,18 +23,22 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
+import org.openmrs.Visit;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.Admission;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,6 +64,13 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
 
     @Test
     public void testAction() throws Exception {
+        when(adtService.wrap(any(Visit.class))).thenReturn(new VisitDomainWrapper(null) {
+            @Override
+            public boolean isAdmitted() {
+                return false;
+            }
+        });
+
         Map<String, String[]> request = new HashMap<String, String[]>();
         request.put(AdmitToSpecificLocationDispositionAction.ADMISSION_LOCATION_PARAMETER, new String[] { "7" });
         request.put("something", new String[] { "unrelated" });
@@ -81,6 +92,19 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
             }
         }));
 
+    }
+
+    @Test
+    public void testActionWhenAlreadyAdmitted() throws Exception {
+        when(adtService.wrap(any(Visit.class))).thenReturn(new VisitDomainWrapper(null) {
+            @Override
+            public boolean isAdmitted() {
+                return true;
+            }
+        });
+
+        action.action(new EncounterDomainWrapper(new Encounter()), new Obs(), new HashMap<String, String[]>());
+        verify(adtService, never()).admitPatient(any(Admission.class));
     }
 
 }

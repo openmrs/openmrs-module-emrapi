@@ -137,7 +137,7 @@ public class VisitDomainWrapperTest {
 
         EmrApiProperties props = mock(EmrApiProperties.class);
         when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
-        when(props.getDischargeEncounterType()).thenReturn(dischargeEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
         visitDomainWrapper.setEmrApiProperties(props);
 
         Encounter admit = new Encounter();

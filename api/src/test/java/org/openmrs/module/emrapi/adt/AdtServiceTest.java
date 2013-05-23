@@ -168,7 +168,7 @@ public class AdtServiceTest {
         when(emrApiProperties.getVisitExpireHours()).thenReturn(10);
         when(emrApiProperties.getCheckInEncounterType()).thenReturn(checkInEncounterType);
         when(emrApiProperties.getAdmissionEncounterType()).thenReturn(admissionEncounterType);
-        when(emrApiProperties.getDischargeEncounterType()).thenReturn(dischargeEncounterType);
+        when(emrApiProperties.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
         when(emrApiProperties.getTransferWithinHospitalEncounterType()).thenReturn(transferWithinHospitalEncounterType);
         when(emrApiProperties.getAtFacilityVisitType()).thenReturn(atFacilityVisitType);
         when(emrApiProperties.getCheckInClerkEncounterRole()).thenReturn(checkInClerkEncounterRole);

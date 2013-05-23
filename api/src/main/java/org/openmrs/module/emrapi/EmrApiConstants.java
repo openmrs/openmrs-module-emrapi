@@ -37,7 +37,7 @@ public class EmrApiConstants {
 
     public static final String GP_ADMISSION_ENCOUNTER_TYPE = "emr.admissionEncounterType";
 
-    public static final String GP_DISCHARGE_ENCOUNTER_TYPE = "emr.dischargeEncounterType";
+    public static final String GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE = "emr.exitFromInpatientEncounterType";
 
     public static final String GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE = "emr.transferWithinHospitalEncounterType";
 

@@ -29,17 +29,26 @@ import java.util.List;
 
 /**
  * <pre>
- * API methods related to Admission, Discharge, and Transfer
+ * API methods related to Check-In, Admission, Discharge, and Transfer
  *
  * Since patients frequently leave the facility without having any formal electronic check-out process, we ensure that
  * old stale visits are automatically closed, even if they are never intentionally stopped. Our business logic is built
  * on the idea of <em>active</em> visits, per #isActive(Visit, Date). A visit with stopDatetime==null is not necessarily
- * active from our perspective. Non-active visits are liable to be stopped at any time.
+ * active from our perspective. Non-active visits are liable to be stopped at any time, unless the visit is marked as
+ * inpatient.
+ *
+ * A patient may be Admitted to inpatient care, which flags their visit as inpatient (by creating an Admission
+ * encounter). Any visit flagged as inpatient will not be auto-closed. A patient may be discharged (which means generally
+ * exited from inpatient, e.g. leaving against medical advice is still a "discharge"), which creates a discharge encounter
+ * and frees the visit to be auto-closed.
  *
  * Visits are only allowed to happen at locations tagged with the EmrConstants.LOCATION_TAG_SUPPORTS_VISITS tag. When
  * you pass a location without that tag to a service method, we look from that location and above in the location
  * hierarchy until we find a location with this tag. (This allows you to configure the setup such that doing a check-in
  * at Outpatient Department creates a visit at its parent, with an Encounter at the location itself.)
+ *
+ * Admission encounters can only happen at locations tagged with the {@link org.openmrs.module.emrapi.EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION}
+ * tag.
  * </pre>
  */
 public interface AdtService extends OpenmrsService {
@@ -195,7 +204,7 @@ public interface AdtService extends OpenmrsService {
     Encounter admitPatient(Admission admission);
 
     /**
-     * Discharges a patient from inpatient care. Throws an exception if the patient is not currently admitted.
+     * Exits a patient from inpatient care. Throws an exception if the patient is not currently admitted.
      * @param discharge
      * @return the encounter representing this discharge
      */
@@ -210,7 +219,11 @@ public interface AdtService extends OpenmrsService {
      */
     Encounter transferPatient(Transfer transfer);
 
-    // Commenting this out since the feature isn't in use yet, and it refers to payment, which isn't supposed to be in this module
-    // Encounter createCheckinInRetrospective(Patient patient, Location location, Provider clerk, Obs paymentReason, Obs paymentAmount, Obs paymentReceipt, Date checkinDate);
+    /**
+     * Helper method to get a {@link VisitDomainWrapper} given a {@link Visit}
+     * @param visit
+     * @return
+     */
+    VisitDomainWrapper wrap(Visit visit);
 
 }

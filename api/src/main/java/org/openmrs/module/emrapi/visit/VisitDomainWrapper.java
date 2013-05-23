@@ -137,7 +137,7 @@ public class VisitDomainWrapper {
      */
     public boolean isAdmitted() {
         EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
-        EncounterType dischargeEncounterType = emrApiProperties.getDischargeEncounterType();
+        EncounterType dischargeEncounterType = emrApiProperties.getExitFromInpatientEncounterType();
         if (admissionEncounterType == null) {
             return false;
         }

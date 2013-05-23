@@ -69,9 +69,15 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
      */
     @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
-        String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, ADMISSION_LOCATION_PARAMETER);
-        Location location = locationService.getLocation(Integer.valueOf(locationId));
-        adtService.admitPatient(new Admission(encounterDomainWrapper.getEncounter().getPatient(), location, encounterDomainWrapper.getProviders()));
+        if (adtService.wrap(encounterDomainWrapper.getVisit()).isAdmitted()) {
+            // consider doing a transfer-within-hospital here
+            return;
+        }
+        else {
+            String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, ADMISSION_LOCATION_PARAMETER);
+            Location location = locationService.getLocation(Integer.valueOf(locationId));
+            adtService.admitPatient(new Admission(encounterDomainWrapper.getEncounter().getPatient(), location, encounterDomainWrapper.getProviders()));
+        }
     }
 
 }

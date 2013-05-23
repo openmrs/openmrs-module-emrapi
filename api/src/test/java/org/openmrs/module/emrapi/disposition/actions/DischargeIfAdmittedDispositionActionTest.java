@@ -43,7 +43,7 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
 
         emrApiProperties = mock(EmrApiProperties.class);
         when(emrApiProperties.getAdmissionEncounterType()).thenReturn(admissionEncounterType);
-        when(emrApiProperties.getDischargeEncounterType()).thenReturn(dischargeEncounterType);
+        when(emrApiProperties.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
 
         action = new DischargeIfAdmittedDispositionAction();
         action.setAdtService(adtService);

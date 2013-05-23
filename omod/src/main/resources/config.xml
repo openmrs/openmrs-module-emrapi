@@ -72,10 +72,10 @@
     </globalProperty>
 
     <globalProperty>
-        <property>emr.dischargeEncounterType</property>
+        <property>emr.exitFromInpatientEncounterType</property>
         <defaultValue></defaultValue>
         <description>
-            UUID of the encounter type for discharging a patient
+            UUID of the encounter type for exiting a patient from inpatient care
         </description>
     </globalProperty>
 
