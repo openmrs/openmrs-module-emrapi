@@ -141,4 +141,7 @@
         </property>
     </bean>
 
+    <bean id="visitDomainWrapperFactory" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory"/>
+    <bean id="visitDomainWrapperRepository" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperRepository"/>
+
 </beans>
