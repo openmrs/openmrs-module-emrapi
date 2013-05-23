@@ -52,6 +52,21 @@ public class VisitDomainWrapper {
         this.emrApiProperties = emrApiProperties;
     }
 
+    public Encounter getAdmissionEncounter(){
+        for (Encounter e : visit.getEncounters()) {
+            if (emrApiProperties.getAdmissionEncounterType().equals(e.getEncounterType()))
+                return e;
+        }
+        return null;
+    }
+    public Encounter getLatestAdtEncounter(){
+        for (Encounter e : visit.getEncounters()) {
+            if (emrApiProperties.getAdmissionEncounterType().equals(e.getEncounterType()) ||
+                    emrApiProperties.getTransferWithinHospitalEncounterType().equals(e.getEncounterType()) )
+                return e;
+        }
+        return null;
+    }
     /**
      * @return the check-in encounter for this visit, or null if none exists
      */

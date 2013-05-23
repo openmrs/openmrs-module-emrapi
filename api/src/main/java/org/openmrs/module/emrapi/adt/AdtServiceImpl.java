@@ -448,6 +448,32 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         return active;
     }
 
+    @Override
+    public List<VisitDomainWrapper> getInpatientVisits(Location visitLocation) {
+
+        if (visitLocation == null) {
+            throw new IllegalArgumentException("Location is required");
+        }
+        Set<Location> locations = getChildLocationsRecursively(visitLocation, null);
+        List<Visit> candidates = visitService.getVisits(null, null, locations, null, null, null, null, null, null, false,
+                false);
+
+        List<VisitDomainWrapper> inpatientVisits = new ArrayList<VisitDomainWrapper>();
+        for (Visit candidate : candidates) {
+            VisitDomainWrapper visitDomainWrapper = new VisitDomainWrapper(candidate, emrApiProperties);
+            if (isActive(candidate) && itBelongsToARealPatient(candidate)
+                    && visitDomainWrapper.isAdmitted()) {
+                inpatientVisits.add(visitDomainWrapper);
+            }
+        }
+
+        return inpatientVisits;
+    }
+
+    private boolean isInpatient(Visit candidate) {
+        return false;
+    }
+
     private boolean itBelongsToARealPatient(Visit candidate) {
         Patient patient = candidate.getPatient();
         PatientDomainWrapper domainWrapper = new PatientDomainWrapper(patient, emrApiProperties, null, null, null);

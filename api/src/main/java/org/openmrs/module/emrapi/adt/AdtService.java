@@ -226,4 +226,10 @@ public interface AdtService extends OpenmrsService {
      */
     VisitDomainWrapper wrap(Visit visit);
 
+    /**
+     * Gets all currently-active inpatient visits (patients who have been admitted) at the given location or any of its children
+     * @param visitLocation
+     * @return
+     */
+    List<VisitDomainWrapper> getInpatientVisits(Location visitLocation);
 }
