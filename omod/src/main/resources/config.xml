@@ -87,5 +87,21 @@
             UUID of the encounter type for transferring a patient within the hospital
         </description>
     </globalProperty>
+
+    <globalProperty>
+        <property>emr.primaryIdentifierType</property>
+        <defaultValue></defaultValue>
+        <description>
+            Primary identifier type for looking up patients, generating barcodes, etc
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>emr.atFacilityVisitType</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the VisitType that we use for newly-created visits
+        </description>
+    </globalProperty>
 </module>
 
