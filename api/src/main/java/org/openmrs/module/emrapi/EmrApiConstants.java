@@ -71,7 +71,7 @@ public class EmrApiConstants {
 
     public static final String PRIVILEGE_PRINTERS_MANAGE_PRINTERS = "Printers - Manage Printers";
 
-    public static final String PRIVILEGE_DELETE_ENCOUNTER = "emr.infoMessage";
+    public static final String PRIVILEGE_DELETE_ENCOUNTER = "Task: emr.patient.encounter.delete";
 
     public static final String UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME = "Unknown patient";
 
@@ -123,10 +123,6 @@ public class EmrApiConstants {
     public static final String CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH = "Unknown Cause of Death";
 
     public static final String LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD = "a5fb5770-409a-11e2-a25f-0800200c9a66";
-
-    public static final String SESSION_ATTRIBUTE_INFO_MESSAGE = "emr.infoMessage";
-
-    public static final String SESSION_ATTRIBUTE_TOAST_MESSAGE = "emr.toastMessage";
 
     // remember if we add more types here to also create them in the module activator
     public static final Map<String, String> LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER = new HashMap<String, String>() {{
