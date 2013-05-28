@@ -449,7 +449,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     @Override
-    public List<VisitDomainWrapper> getInpatientVisits(Location visitLocation) {
+    public List<VisitDomainWrapper> getInpatientVisits(Location visitLocation, Location ward) {
 
         if (visitLocation == null) {
             throw new IllegalArgumentException("Location is required");
@@ -463,7 +463,15 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             VisitDomainWrapper visitDomainWrapper = new VisitDomainWrapper(candidate, emrApiProperties);
             if (isActive(candidate) && itBelongsToARealPatient(candidate)
                     && visitDomainWrapper.isAdmitted()) {
-                inpatientVisits.add(visitDomainWrapper);
+                if(ward!=null){
+                    Encounter latestAdtEncounter = visitDomainWrapper.getLatestAdtEncounter();
+                    if(latestAdtEncounter!=null &&
+                            ( latestAdtEncounter.getLocation().getId().compareTo(ward.getId())==0 )){
+                        inpatientVisits.add(visitDomainWrapper);
+                    }
+                }else{
+                    inpatientVisits.add(visitDomainWrapper);
+                }
             }
         }
 

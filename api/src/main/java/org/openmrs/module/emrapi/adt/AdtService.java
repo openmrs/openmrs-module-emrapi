@@ -231,5 +231,5 @@ public interface AdtService extends OpenmrsService {
      * @param visitLocation
      * @return
      */
-    List<VisitDomainWrapper> getInpatientVisits(Location visitLocation);
+    List<VisitDomainWrapper> getInpatientVisits(Location visitLocation, Location ward);
 }
