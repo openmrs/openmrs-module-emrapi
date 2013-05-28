@@ -14,55 +14,6 @@
 	<description>API project for EMRAPI</description>
 
 	<dependencies>
-
-        <!-- Begin OpenMRS core -->
-
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <version>${openmrsCoreVersion}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <version>${openmrsCoreVersion}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.test</groupId>
-            <artifactId>openmrs-test</artifactId>
-            <version>${openmrsCoreVersion}</version>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- End OpenMRS core -->
-
-        <!-- Begin OpenMRS modules -->
-
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>uiframework-api</artifactId>
-            <version>${uiframeworkVersion}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- End OpenMRS modules -->
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-
 	</dependencies>
 	
 	<build>
