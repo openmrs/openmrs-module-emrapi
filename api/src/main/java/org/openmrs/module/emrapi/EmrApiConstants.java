@@ -51,6 +51,8 @@ public class EmrApiConstants {
 
     public static final String LOCATION_TAG_SUPPORTS_ADMISSION = "Admission Location";
 
+    public static final String LOCATION_TAG_SUPPORTS_TRANSFER = "Transfer Location";
+
     public static final String DAEMON_USER_UUID = "A4F30A1B-5EB9-11DF-A648-37A07F9C90FB";
 
     public static final String ROLE_PREFIX_CAPABILITY = "Application Role: ";

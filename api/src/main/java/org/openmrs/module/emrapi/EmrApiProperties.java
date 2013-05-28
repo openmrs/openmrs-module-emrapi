@@ -14,6 +14,11 @@
 
 package org.openmrs.module.emrapi;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.openmrs.Concept;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptSource;
@@ -32,11 +37,6 @@ import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.utils.ModuleProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Properties (some constant, some configured via GPs) for this module.
@@ -106,6 +106,10 @@ public class EmrApiProperties extends ModuleProperties {
 
     public LocationTag getSupportsAdmissionLocationTag() {
         return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
+    }
+
+    public LocationTag getSupportsTransferLocationTag() {
+        return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_TRANSFER);
     }
 
     public PersonAttributeType getTestPatientPersonAttributeType() {
