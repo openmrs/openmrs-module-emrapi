@@ -31,8 +31,6 @@
 
     <!-- Maps hibernate files, if present -->
     <mappingFiles>
-        PaperRecordRequest.hbm.xml
-        PaperRecordMergeRequest.hbm.xml
         Printer.hbm.xml
     </mappingFiles>
 
