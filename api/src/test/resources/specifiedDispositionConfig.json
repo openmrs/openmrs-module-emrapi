@@ -1,0 +1,33 @@
+[
+    {
+        "uuid": "d2d89630-b698-11e2-9e96-0800200c9a66",
+        "name": "disposition.death",
+        "conceptCode": "SNOMED CT:397709008",
+        "actions": [
+            "closeCurrentVisitAction",
+            "markPatientDeadAction"
+        ],
+        "clientSideActions": [
+            {
+                "action": "include-fragment",
+                "module": "emr",
+                "fragment": "field/date",
+                "fragmentConfig": { "label": "mirebalais.deathDate" }
+            }
+        ]
+    },
+    {
+        "uuid": "66de7f60-b73a-11e2-9e96-0800200c9a66",
+        "name": "disposition.home",
+        "conceptCode": "SNOMED CT:3780001",
+        "actions": [],
+        "clientSideActions": []
+    },
+    {
+        "uuid": "1",
+        "name": "disposition.transfer",
+        "conceptCode": "SNOMED CT:3780002",
+        "actions": [],
+        "clientSideActions": []
+    }
+]

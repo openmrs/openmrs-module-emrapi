@@ -27,7 +27,7 @@ public class DispositionFactoryTest {
     }
 
     @Test
-    public void shouldParserJsonIntoObjects() throws IOException {
+    public void shouldParseDispositionJsonFromDefaultConfig() throws IOException {
         Disposition deathDisposition = getDeathDisposition();
 
         Disposition homeDisposition = getHomeDisposition();
@@ -40,6 +40,13 @@ public class DispositionFactoryTest {
 
         assertEquals(homeDisposition, dispositions.get(1));
 
+    }
+
+    @Test
+    public void shouldParseDispositionJsonFromSpecifiedConfig() throws IOException {
+        List<Disposition> dispositions = dispositionFactory.getDispositionsFrom("specifiedDispositionConfig.json");
+
+        assertEquals(dispositions.size(), 3);
     }
 
     private Disposition getHomeDisposition() {
