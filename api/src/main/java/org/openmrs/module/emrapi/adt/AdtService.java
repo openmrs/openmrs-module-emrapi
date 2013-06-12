@@ -232,4 +232,43 @@ public interface AdtService extends OpenmrsService {
      * @return
      */
     List<VisitDomainWrapper> getInpatientVisits(Location visitLocation, Location ward);
+
+    /**
+     * Creates a retrospective visit for the specified patient with the specified start and stop dates
+     * If stopDate is null, stopDate is set to the end of the startDate day (for example, if start date = 2012-1-22 9:20:34,
+     * then stopDate would be set to 2012-1-22 23:59:59)
+     *
+     * @param patient
+     * @param location
+     * @param startDatetime
+     * @param stopDatetime
+     * @return
+     */
+    Visit createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+
+    /**
+     * Gets all visits for the patient at the visit location associated with the specified location
+     * during the specified datetime range
+     *
+     * @param patient
+     * @param location
+     * @param startDatetime
+     * @param stopDatetime
+     * @return
+     */
+    List<Visit> getVisits(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+
+    /**
+     * Returns true/false whether or not the patient has any visits at the visit location associated with
+     * the specified location during the specified datetime range
+     *
+     * @param patient
+     * @param location
+     * @param startDatetime
+     * @param stopDatetime
+     * @return
+     */
+    boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+
+
 }

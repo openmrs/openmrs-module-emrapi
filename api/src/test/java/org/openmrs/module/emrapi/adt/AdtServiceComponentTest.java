@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,7 @@ import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
+import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
@@ -51,6 +53,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 
@@ -64,9 +67,6 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     private EmrApiProperties emrApiProperties;
 
     @Autowired
-    private ConceptService conceptService;
-
-    @Autowired
     LocationService locationService;
 
     @Before
@@ -76,7 +76,6 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void integrationTest_ADT_workflow() {
-        LocationService locationService = Context.getLocationService();
 
         Provider provider = Context.getProviderService().getProvider(1);
 
@@ -170,18 +169,18 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 				authenticate();
 				try {
 					LocationService locationService = Context.getLocationService();
-					
+
 					Patient patient = Context.getPatientService().getPatient(7);
-					
+
 					// parent location should support visits
 					LocationTag supportsVisits = new LocationTag();
 					supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
 					locationService.saveLocationTag(supportsVisits);
-					
+
 					Location parentLocation = locationService.getLocation(2);
 					parentLocation.addTag(supportsVisits);
 					locationService.saveLocation(parentLocation);
-					
+
 					threadsBarrier.await();
 					
 					Encounter checkInEncounter = service.checkInPatient(patient, parentLocation, null, null, null,
@@ -214,4 +213,124 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 			}
 		}
 	}
+
+    @Test
+    public void test_createRetrospectiveVisit() throws Exception {
+
+        // parent location should support visits
+        LocationTag supportsVisits = new LocationTag();
+        supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
+        locationService.saveLocationTag(supportsVisits);
+
+        Location parentLocation = locationService.getLocation(2);
+        parentLocation.addTag(supportsVisits);
+        locationService.saveLocation(parentLocation);
+
+        // add a child location where we'll enter the actual visit
+        Location outpatientDepartment = new Location();
+        outpatientDepartment.setName("Outpatient Clinic in Xanadu");
+        outpatientDepartment.setParentLocation(parentLocation);
+        locationService.saveLocation(outpatientDepartment);
+
+        Patient patient = Context.getPatientService().getPatient(7);
+
+        // create a retrospective visit
+        Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
+        Date stopDate = new DateTime(2012, 1, 3, 0, 0, 0).toDate();
+
+        Visit visit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+
+        // test that the visit was successfully created
+        assertNotNull(visit);
+        assertThat(visit.getPatient(), is (patient));
+        assertThat(visit.getStartDatetime(), is(startDate));
+        assertThat(visit.getStopDatetime(), is(stopDate));
+        assertThat(visit.getLocation(), is(parentLocation));
+        assertThat(visit.getVisitType(), is(emrApiProperties.getAtFacilityVisitType()));
+    }
+
+    @Test
+    public void test_getVisitsAndHasVisitDuring() throws Exception {
+
+        // parent location should support visits
+        LocationTag supportsVisits = new LocationTag();
+        supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
+        locationService.saveLocationTag(supportsVisits);
+
+        Location parentLocation = locationService.getLocation(2);
+        parentLocation.addTag(supportsVisits);
+        locationService.saveLocation(parentLocation);
+
+        // add a child location where we'll do the actual visit
+        Location outpatientDepartment = new Location();
+        outpatientDepartment.setName("Outpatient Clinic in Xanadu");
+        outpatientDepartment.setParentLocation(parentLocation);
+        locationService.saveLocation(outpatientDepartment);
+
+        Patient patient = Context.getPatientService().getPatient(7);
+
+        // create a retrospective visit
+        Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
+        Date stopDate = new DateTime(2012, 1, 3, 0, 0, 0).toDate();
+
+        Visit visit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+
+        // start date falls within existing visit
+        startDate =  new DateTime(2012, 1, 2, 0, 0, 0).toDate();
+        stopDate =  new DateTime(2012, 1, 4, 0, 0, 0).toDate();
+        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, startDate, stopDate));
+
+        // end date falls within existing visit
+        startDate =  new DateTime(2011, 12, 29, 0, 0, 0).toDate();
+        stopDate =  new DateTime(2012, 1, 2, 0, 0, 0).toDate();
+        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, startDate, stopDate));
+
+        // range falls within existing visit
+        startDate =  new DateTime(2012, 1, 1, 12, 0, 0).toDate();
+        stopDate =  new DateTime(2012, 1, 2, 0, 0, 0).toDate();
+        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, startDate, stopDate));
+
+        // range encompasses existing visit
+        startDate =  new DateTime(2011, 12, 29, 0, 0, 0).toDate();
+        stopDate =  new DateTime(2012, 1, 5, 0, 0, 0).toDate();
+        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, startDate, stopDate));
+
+        // no stopDate specified
+        startDate =  new DateTime(2011, 12, 29, 0, 0, 0).toDate();
+        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, startDate, null));
+
+        // range is before existing visit
+        startDate =  new DateTime(2011, 12, 29, 0, 0, 0).toDate();
+        stopDate =  new DateTime(2011, 12, 30, 0, 0, 0).toDate();
+        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, startDate, stopDate));
+
+        // range is after existing visit
+        startDate =  new DateTime(2012, 1, 4, 0, 0, 0).toDate();
+        stopDate =  new DateTime(2012, 1, 5, 0, 0, 0).toDate();
+        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, startDate, stopDate));
+
+        // now lets create an active visit to make sure that hasVisitDuring properly handles visits with no stopDate
+        Date now = new Date();
+        Date futureDate = new DateTime(3000, 12, 30, 0, 0, 0).toDate(); //  this test will start to fail after the year 3000! :)
+
+        service.ensureActiveVisit(patient, outpatientDepartment);
+        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, now, futureDate));
+        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, now));
+
+        // now lets just add another retrospective visit to do a quick test of the getVisits method
+        startDate = new DateTime(2012, 1, 5, 0, 0, 0).toDate();
+        stopDate = new DateTime(2012, 1, 7, 0, 0, 0).toDate();
+
+        Visit anotherVisit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+
+        startDate = new DateTime(2012, 1, 2, 0, 0, 0).toDate();
+        stopDate = new DateTime(2012, 1, 6, 0, 0, 0).toDate();
+        List<Visit> visits = service.getVisits(patient, outpatientDepartment, startDate, stopDate);
+
+        assertThat(visits.size(), is(2));
+        assertTrue(visits.contains(visit));
+        assertTrue(visits.contains(anotherVisit));
+
+    }
+
 }

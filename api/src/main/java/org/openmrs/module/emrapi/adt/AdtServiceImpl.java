@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -763,4 +764,43 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         return new VisitDomainWrapper(visit, emrApiProperties);
     }
 
+    @Override
+    @Transactional
+    public Visit createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
+
+        if (stopDatetime != null && startDatetime.after(stopDatetime)) {
+            throw new IllegalArgumentException("Start date cannot be after stop date");
+        }
+
+        if (hasVisitDuring(patient, location, startDatetime, stopDatetime)) {
+            throw new IllegalStateException("Patient already has a visit between " + startDatetime + " and " + stopDatetime);
+        }
+
+        Visit visit = buildVisit(patient, location, startDatetime);
+
+        if (stopDatetime != null) {
+            visit.setStopDatetime(stopDatetime);
+        }
+        else {
+            // if no stop date, set it to the end of the day specified by the start date
+            visit.setStopDatetime(new DateTime(startDatetime).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
+        }
+
+        return visitService.saveVisit(visit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Visit> getVisits(Patient patient, Location location, Date startDatetime, Date endDatetime) {
+        return visitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
+            Collections.singletonList(patient), Collections.singletonList(getLocationThatSupportsVisits(location)), null,
+            null, endDatetime, startDatetime, null, null, true, false);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
+        List<Visit> visits = getVisits(patient, location, startDatetime, stopDatetime);
+        return visits == null || visits.size() == 0 ? false : true;
+    }
 }
