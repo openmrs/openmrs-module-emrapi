@@ -215,7 +215,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 	}
 
     @Test
-    public void test_createRetrospectiveVisit() throws Exception {
+    public void integrationTest_createRetrospectiveVisit() throws Exception {
 
         // parent location should support visits
         LocationTag supportsVisits = new LocationTag();
@@ -238,15 +238,15 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
         Date stopDate = new DateTime(2012, 1, 3, 0, 0, 0).toDate();
 
-        Visit visit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+        VisitDomainWrapper visit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 
         // test that the visit was successfully created
         assertNotNull(visit);
-        assertThat(visit.getPatient(), is (patient));
+        assertThat(visit.getVisit().getPatient(), is (patient));
         assertThat(visit.getStartDatetime(), is(startDate));
         assertThat(visit.getStopDatetime(), is(stopDate));
-        assertThat(visit.getLocation(), is(parentLocation));
-        assertThat(visit.getVisitType(), is(emrApiProperties.getAtFacilityVisitType()));
+        assertThat(visit.getVisit().getLocation(), is(parentLocation));
+        assertThat(visit.getVisit().getVisitType(), is(emrApiProperties.getAtFacilityVisitType()));
     }
 
     @Test
@@ -273,7 +273,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
         Date stopDate = new DateTime(2012, 1, 3, 0, 0, 0).toDate();
 
-        Visit visit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+        VisitDomainWrapper visit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 
         // start date falls within existing visit
         startDate =  new DateTime(2012, 1, 2, 0, 0, 0).toDate();
@@ -321,15 +321,21 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         startDate = new DateTime(2012, 1, 5, 0, 0, 0).toDate();
         stopDate = new DateTime(2012, 1, 7, 0, 0, 0).toDate();
 
-        Visit anotherVisit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+        VisitDomainWrapper anotherVisit = service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 
         startDate = new DateTime(2012, 1, 2, 0, 0, 0).toDate();
         stopDate = new DateTime(2012, 1, 6, 0, 0, 0).toDate();
-        List<Visit> visits = service.getVisits(patient, outpatientDepartment, startDate, stopDate);
+        List<VisitDomainWrapper> visitDomainWrappers = service.getVisits(patient, outpatientDepartment, startDate, stopDate);
 
-        assertThat(visits.size(), is(2));
-        assertTrue(visits.contains(visit));
-        assertTrue(visits.contains(anotherVisit));
+        assertThat(visitDomainWrappers.size(), is(2));
+
+        List<Visit> visits = new ArrayList<Visit>();
+        for (VisitDomainWrapper visitDomainWrapper : visitDomainWrappers) {
+            visits.add(visitDomainWrapper.getVisit());
+        }
+
+        assertTrue(visits.contains(visit.getVisit()));
+        assertTrue(visits.contains(anotherVisit.getVisit()));
 
     }
 

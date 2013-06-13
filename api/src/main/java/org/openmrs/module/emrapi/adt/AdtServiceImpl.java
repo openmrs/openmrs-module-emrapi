@@ -766,7 +766,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     @Transactional
-    public Visit createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
+    public VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
 
         if (stopDatetime != null && startDatetime.after(stopDatetime)) {
             throw new IllegalArgumentException("Start date cannot be after stop date");
@@ -786,21 +786,28 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             visit.setStopDatetime(new DateTime(startDatetime).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
         }
 
-        return visitService.saveVisit(visit);
+        return wrap(visitService.saveVisit(visit));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Visit> getVisits(Patient patient, Location location, Date startDatetime, Date endDatetime) {
-        return visitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
-            Collections.singletonList(patient), Collections.singletonList(getLocationThatSupportsVisits(location)), null,
-            null, endDatetime, startDatetime, null, null, true, false);
+    public List<VisitDomainWrapper> getVisits(Patient patient, Location location, Date startDatetime, Date endDatetime) {
+
+        List<VisitDomainWrapper> visitDomainWrappers = new ArrayList<VisitDomainWrapper>();
+
+        for (Visit visit : visitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
+                Collections.singletonList(patient), Collections.singletonList(getLocationThatSupportsVisits(location)), null,
+                null, endDatetime, startDatetime, null, null, true, false)) {
+            visitDomainWrappers.add(wrap(visit));
+        }
+
+        return visitDomainWrappers;
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
-        List<Visit> visits = getVisits(patient, location, startDatetime, stopDatetime);
+        List<VisitDomainWrapper> visits = getVisits(patient, location, startDatetime, stopDatetime);
         return visits == null || visits.size() == 0 ? false : true;
     }
 }

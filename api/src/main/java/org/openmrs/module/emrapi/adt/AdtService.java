@@ -244,7 +244,7 @@ public interface AdtService extends OpenmrsService {
      * @param stopDatetime
      * @return
      */
-    Visit createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+    VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime);
 
     /**
      * Gets all visits for the patient at the visit location associated with the specified location
@@ -256,7 +256,7 @@ public interface AdtService extends OpenmrsService {
      * @param stopDatetime
      * @return
      */
-    List<Visit> getVisits(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+    List<VisitDomainWrapper> getVisits(Patient patient, Location location, Date startDatetime, Date stopDatetime);
 
     /**
      * Returns true/false whether or not the patient has any visits at the visit location associated with
