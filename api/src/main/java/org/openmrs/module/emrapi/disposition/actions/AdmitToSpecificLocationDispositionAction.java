@@ -25,6 +25,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
+
 /**
  * Will actually admit the patient to inpatient (using {@link AdtService#admitPatient(org.openmrs.module.emrapi.adt.Admission)}).
  *
@@ -76,9 +78,9 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
         else {
             String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, ADMISSION_LOCATION_PARAMETER);
             Location location = locationService.getLocation(Integer.valueOf(locationId));
-            AdtAction admission = new AdtAction(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders());
+            AdtAction admission = new AdtAction(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders(), ADMISSION);
             admission.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
-            adtService.admitPatient(admission);
+            adtService.createAdtEncounterFor(admission);
         }
     }
 

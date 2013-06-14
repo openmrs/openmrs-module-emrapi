@@ -82,6 +82,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.TRANSFER;
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -660,9 +663,9 @@ public class AdtServiceTest {
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        AdtAction admission = new AdtAction(existing, inpatientDepartment, buildProviderMap());
+        AdtAction admission = new AdtAction(existing, inpatientDepartment, buildProviderMap(), ADMISSION);
 
-        service.admitPatient(admission);
+        service.createAdtEncounterFor(admission);
     }
 
     @Test
@@ -672,9 +675,9 @@ public class AdtServiceTest {
         final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
 
-        final AdtAction admission = new AdtAction(visit, inpatientDepartment, buildProviderMap());
+        final AdtAction admission = new AdtAction(visit, inpatientDepartment, buildProviderMap(), ADMISSION);
 
-        service.admitPatient(admission);
+        service.createAdtEncounterFor(admission);
 
         verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
             @Override
@@ -698,9 +701,9 @@ public class AdtServiceTest {
         Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        AdtAction discharge = new AdtAction(existing, inpatientDepartment, buildProviderMap());
+        AdtAction discharge = new AdtAction(existing, inpatientDepartment, buildProviderMap(), DISCHARGE);
 
-        service.dischargePatient(discharge);
+        service.createAdtEncounterFor(discharge);
     }
 
     @Test
@@ -714,9 +717,9 @@ public class AdtServiceTest {
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        final AdtAction discharge = new AdtAction(existing,inpatientDepartment, buildProviderMap());
+        final AdtAction discharge = new AdtAction(existing,inpatientDepartment, buildProviderMap(), DISCHARGE);
 
-        service.dischargePatient(discharge);
+        service.createAdtEncounterFor(discharge);
 
         verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
             @Override
@@ -740,8 +743,8 @@ public class AdtServiceTest {
         final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
 
-        final AdtAction transfer = new AdtAction(visit, radiologyDepartment, buildProviderMap());
-        service.transferPatient(transfer);
+        final AdtAction transfer = new AdtAction(visit, radiologyDepartment, buildProviderMap(), TRANSFER);
+        service.createAdtEncounterFor(transfer);
 
         verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
             @Override
@@ -797,7 +800,7 @@ public class AdtServiceTest {
                 assertThat(actual.getVisitType(), is(atFacilityVisitType));
                 assertThat(actual.getPatient(), is(patient));
                 assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), is (startDate));
+                assertThat(actual.getStartDatetime(), is(startDate));
                 assertThat(actual.getStopDatetime(), is(expectedStopDate));
                 return true;
             }
@@ -840,7 +843,7 @@ public class AdtServiceTest {
                 assertThat(actual.getVisitType(), is(atFacilityVisitType));
                 assertThat(actual.getPatient(), is(patient));
                 assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), is (startDate));
+                assertThat(actual.getStartDatetime(), is(startDate));
                 assertThat(actual.getStopDatetime(), is(expectedStopDate));
                 return true;
             }

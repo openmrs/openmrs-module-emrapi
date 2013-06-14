@@ -62,7 +62,7 @@ public class TransferToSpecificLocationDispositionActionTest extends Authenticat
         encounter.setEncounterDatetime(encounterDate);
 
         action.action(new EncounterDomainWrapper(encounter), new Obs(), request);
-        verify(adtService).transferPatient(argThat(new ArgumentMatcher<AdtAction>() {
+        verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
             public boolean matches(Object argument) {
                 AdtAction actual = (AdtAction) argument;

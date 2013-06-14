@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.TRANSFER;
+
 /**
  *
  */
@@ -51,9 +53,9 @@ public class TransferToSpecificLocationDispositionAction implements DispositionA
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
         String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, TRANSFER_LOCATION_PARAMETER);
         Location location = locationService.getLocation(Integer.valueOf(locationId));
-        AdtAction transfer = new AdtAction(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders());
+        AdtAction transfer = new AdtAction(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders(), TRANSFER);
         transfer.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
-        adtService.transferPatient(transfer);
+        adtService.createAdtEncounterFor(transfer);
     }
 
 }

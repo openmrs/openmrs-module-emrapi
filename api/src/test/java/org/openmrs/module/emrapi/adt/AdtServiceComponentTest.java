@@ -55,6 +55,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.TestUtils.isJustNow;
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
@@ -122,9 +124,9 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         // step 2: admit the patient (which should create an encounter)
         Date admitDatetime = new Date();
-        AdtAction admission = new AdtAction(checkInEncounter.getVisit(), inpatientWard, providers);
+        AdtAction admission = new AdtAction(checkInEncounter.getVisit(), inpatientWard, providers, ADMISSION);
         admission.setActionDatetime(admitDatetime);
-        Encounter admitEncounter = service.admitPatient(admission);
+        Encounter admitEncounter = service.createAdtEncounterFor(admission);
 
         assertThat(admitEncounter.getPatient(), is(patient));
         assertThat(admitEncounter.getVisit(), is(checkInEncounter.getVisit()));
@@ -138,8 +140,8 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         // step 3: discharge the patient (which should create an encounter)
 
-        AdtAction discharge = new AdtAction(admitEncounter.getVisit(), inpatientWard, providers);
-        Encounter dischargeEncounter = service.dischargePatient(discharge);
+        AdtAction discharge = new AdtAction(admitEncounter.getVisit(), inpatientWard, providers, DISCHARGE);
+        Encounter dischargeEncounter = service.createAdtEncounterFor(discharge);
 
         assertThat(dischargeEncounter.getPatient(), is(patient));
         assertThat(dischargeEncounter.getVisit(), is(checkInEncounter.getVisit()));

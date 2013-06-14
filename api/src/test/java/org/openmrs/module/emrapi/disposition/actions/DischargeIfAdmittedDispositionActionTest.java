@@ -79,7 +79,7 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
 
         action.action(new EncounterDomainWrapper(beingCreated), new Obs(), new HashMap<String, String[]>());
 
-        verify(adtService).dischargePatient(argThat(new ArgumentMatcher<AdtAction>() {
+        verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
             public boolean matches(Object argument) {
                 AdtAction actual = (AdtAction) argument;

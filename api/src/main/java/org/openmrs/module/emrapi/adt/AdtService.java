@@ -24,6 +24,7 @@ import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -118,16 +119,6 @@ public interface AdtService extends OpenmrsService {
     Location getLocationThatSupportsVisits(Location location);
 
     /**
-     * Looks at this location, then its ancestors in the location hierarchy, to find a location tagged with
-     * {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
-     *
-     * @param location
-     * @return location, or its closest ancestor that supports admissions
-     * @throws IllegalArgumentException if neither location nor its ancestors support admissions
-     */
-    Location getLocationThatSupportsAdmissions(Location location);
-
-    /**
      * @return all locations that are allowed to have visits assigned to them
      * @see org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS
      */
@@ -196,29 +187,12 @@ public interface AdtService extends OpenmrsService {
     void mergePatients(Patient preferred, Patient notPreferred);
 
     /**
-     * Admits a patient to inpatient care. Throws an exception if the patient is already admitted.
-     * Looks for a location tagged with {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
-     * in the hierarchy of admission.location.
-     * @param admission
-     * @return the encounter representing this admission
-     */
-    Encounter admitPatient(AdtAction admission);
-
-    /**
-     * Exits a patient from inpatient care. Throws an exception if the patient is not currently admitted.
-     * @param discharge
+     * Creates an encounter for specific adt action.
+     * Throws an exception if not valid with visit.
+     * @param action
      * @return the encounter representing this discharge
      */
-    Encounter dischargePatient(AdtAction discharge);
-
-    /**
-     * Transfers a patient within the hospital. This does not require the patient to be previously admitted, nor does
-     * it admit them. (For example you might transfer a patient from an outpatient clinic to the ER, but neither of these
-     * are inpatient departments.)
-     * @param transfer
-     * @return the encounter representing this transfer
-     */
-    Encounter transferPatient(AdtAction transfer);
+    Encounter createAdtEncounterFor(AdtAction action);
 
     /**
      * Helper method to get a {@link VisitDomainWrapper} given a {@link Visit}
@@ -271,6 +245,5 @@ public interface AdtService extends OpenmrsService {
      * @return
      */
     boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
-
 
 }

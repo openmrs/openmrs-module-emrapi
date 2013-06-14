@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
+
 /**
  * Will actually discharge the patient from inpatient care (using
  * {@link org.openmrs.module.emrapi.adt.AdtService#admitPatient(org.openmrs.module.emrapi.adt.Admission)})
@@ -37,9 +39,9 @@ public class DischargeIfAdmittedDispositionAction implements DispositionAction {
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
         Visit visit = encounterDomainWrapper.getVisit();
         if (new VisitDomainWrapper(visit, emrApiProperties).isAdmitted()) {
-            AdtAction discharge = new AdtAction(visit, encounterDomainWrapper.getLocation(), encounterDomainWrapper.getProviders());
+            AdtAction discharge = new AdtAction(visit, encounterDomainWrapper.getLocation(), encounterDomainWrapper.getProviders(), DISCHARGE);
             discharge.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
-            adtService.dischargePatient(discharge);
+            adtService.createAdtEncounterFor(discharge);
         }
     }
 

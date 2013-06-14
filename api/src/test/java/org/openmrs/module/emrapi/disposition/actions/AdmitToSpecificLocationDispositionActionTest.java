@@ -87,7 +87,7 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
         encounter.setEncounterDatetime(encounterDate);
 
         action.action(new EncounterDomainWrapper(encounter), new Obs(), request);
-        verify(adtService).admitPatient(argThat(new ArgumentMatcher<AdtAction>() {
+        verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
             public boolean matches(Object argument) {
                 AdtAction actual = (AdtAction) argument;
@@ -110,7 +110,7 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
         });
 
         action.action(new EncounterDomainWrapper(new Encounter()), new Obs(), new HashMap<String, String[]>());
-        verify(adtService, never()).admitPatient(any(AdtAction.class));
+        verify(adtService, never()).createAdtEncounterFor(any(AdtAction.class));
     }
 
 }
