@@ -701,6 +701,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         VisitDomainWrapper visit = new VisitDomainWrapper(discharge.getVisit(), emrApiProperties);
+
         if (!visit.isAdmitted()) {
             throw new IllegalStateException("Patient is not currently admitted");
         }

@@ -22,9 +22,6 @@ public class AdtAction {
     private Date actionDatetime;
     private Map<EncounterRole, Set<Provider>> providers;
 
-    public AdtAction() {
-    }
-
     public AdtAction(Visit visit, Location toLocation, Map<EncounterRole, Set<Provider>> providers) {
         this.visit = visit;
         this.location = toLocation;

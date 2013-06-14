@@ -25,7 +25,6 @@ import org.openmrs.LocationTag;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
-import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
@@ -51,9 +50,9 @@ import java.util.concurrent.Future;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 
@@ -123,11 +122,8 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         // step 2: admit the patient (which should create an encounter)
         Date admitDatetime = new Date();
-        AdtAction admission = new AdtAction();
-        admission.setVisit(checkInEncounter.getVisit());
+        AdtAction admission = new AdtAction(checkInEncounter.getVisit(), inpatientWard, providers);
         admission.setActionDatetime(admitDatetime);
-        admission.setLocation(inpatientWard);
-        admission.setProviders(providers);
         Encounter admitEncounter = service.admitPatient(admission);
 
         assertThat(admitEncounter.getPatient(), is(patient));
@@ -142,10 +138,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         // step 3: discharge the patient (which should create an encounter)
 
-        AdtAction discharge = new AdtAction();
-        discharge.setVisit(admitEncounter.getVisit());
-        discharge.setLocation(inpatientWard);
-        discharge.setProviders(providers);
+        AdtAction discharge = new AdtAction(admitEncounter.getVisit(), inpatientWard, providers);
         Encounter dischargeEncounter = service.dischargePatient(discharge);
 
         assertThat(dischargeEncounter.getPatient(), is(patient));
@@ -160,9 +153,9 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 	public void integrationTest_ADT_workflow_duplicate_visits() throws Exception {
 		final Integer numberOfThreads = 5;
 		final CyclicBarrier threadsBarrier = new CyclicBarrier(numberOfThreads);
-		
+
 		Callable<Integer> checkInCall = new Callable<Integer>() {
-			
+
 			@Override
 			public Integer call() throws Exception {
 				Context.openSession();
@@ -182,10 +175,10 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 					locationService.saveLocation(parentLocation);
 
 					threadsBarrier.await();
-					
+
 					Encounter checkInEncounter = service.checkInPatient(patient, parentLocation, null, null, null,
 					    false);
-					
+
 					return checkInEncounter.getVisit().getVisitId();
 				}
 				finally {
@@ -193,16 +186,16 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 				}
 			}
 		};
-		
+
 		List<Callable<Integer>> checkInCalls = new ArrayList<Callable<Integer>>();
 		for (int i = 0; i < numberOfThreads; i++) {
 	        checkInCalls.add(checkInCall);
         }
-		
+
 		ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-		
+
 		List<Future<Integer>> checkIns = executorService.invokeAll(checkInCalls);
-		
+
 		Integer visitId = null;
 		for (Future<Integer> checkIn : checkIns) {
 			Integer nextVisitId = checkIn.get();

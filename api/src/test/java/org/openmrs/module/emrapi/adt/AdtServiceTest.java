@@ -660,10 +660,7 @@ public class AdtServiceTest {
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        AdtAction admission = new AdtAction();
-        admission.setVisit(existing);
-        admission.setLocation(inpatientDepartment);
-        admission.setProviders(buildProviderMap());
+        AdtAction admission = new AdtAction(existing, inpatientDepartment, buildProviderMap());
 
         service.admitPatient(admission);
     }
@@ -675,10 +672,7 @@ public class AdtServiceTest {
         final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
 
-        final AdtAction admission = new AdtAction();
-        admission.setVisit(visit);
-        admission.setLocation(inpatientDepartment);
-        admission.setProviders(buildProviderMap());
+        final AdtAction admission = new AdtAction(visit, inpatientDepartment, buildProviderMap());
 
         service.admitPatient(admission);
 
@@ -704,10 +698,7 @@ public class AdtServiceTest {
         Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        AdtAction discharge = new AdtAction();
-        discharge.setVisit(existing);
-        discharge.setLocation(inpatientDepartment);
-        discharge.setProviders(buildProviderMap());
+        AdtAction discharge = new AdtAction(existing, inpatientDepartment, buildProviderMap());
 
         service.dischargePatient(discharge);
     }
@@ -723,10 +714,7 @@ public class AdtServiceTest {
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        final AdtAction discharge = new AdtAction();
-        discharge.setVisit(existing);
-        discharge.setLocation(inpatientDepartment);
-        discharge.setProviders(buildProviderMap());
+        final AdtAction discharge = new AdtAction(existing,inpatientDepartment, buildProviderMap());
 
         service.dischargePatient(discharge);
 
@@ -752,10 +740,7 @@ public class AdtServiceTest {
         final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
 
-        final AdtAction transfer = new AdtAction();
-        transfer.setVisit(visit);
-        transfer.setLocation(radiologyDepartment);
-        transfer.setProviders(buildProviderMap());
+        final AdtAction transfer = new AdtAction(visit, radiologyDepartment, buildProviderMap());
         service.transferPatient(transfer);
 
         verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
