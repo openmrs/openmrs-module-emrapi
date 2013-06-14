@@ -17,7 +17,7 @@ package org.openmrs.module.emrapi.disposition.actions;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.emrapi.adt.Admission;
+import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,8 +76,8 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
         else {
             String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, ADMISSION_LOCATION_PARAMETER);
             Location location = locationService.getLocation(Integer.valueOf(locationId));
-            Admission admission = new Admission(encounterDomainWrapper.getEncounter().getPatient(), location, encounterDomainWrapper.getProviders());
-            admission.setAdmitDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
+            AdtAction admission = new AdtAction(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders());
+            admission.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
             adtService.admitPatient(admission);
         }
     }

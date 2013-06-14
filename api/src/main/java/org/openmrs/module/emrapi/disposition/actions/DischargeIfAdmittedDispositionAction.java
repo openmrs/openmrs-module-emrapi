@@ -3,8 +3,8 @@ package org.openmrs.module.emrapi.disposition.actions;
 import org.openmrs.Obs;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
-import org.openmrs.module.emrapi.adt.Discharge;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +37,8 @@ public class DischargeIfAdmittedDispositionAction implements DispositionAction {
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
         Visit visit = encounterDomainWrapper.getVisit();
         if (new VisitDomainWrapper(visit, emrApiProperties).isAdmitted()) {
-            Discharge discharge = new Discharge(visit, encounterDomainWrapper.getLocation(), encounterDomainWrapper.getProviders());
-            discharge.setDischargeDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
+            AdtAction discharge = new AdtAction(visit, encounterDomainWrapper.getLocation(), encounterDomainWrapper.getProviders());
+            discharge.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
             adtService.dischargePatient(discharge);
         }
     }

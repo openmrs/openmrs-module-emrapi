@@ -639,39 +639,33 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Transactional
     @Override
-    public Encounter admitPatient(Admission admission) {
-        if (admission.getPatient() == null || admission.getLocation() == null || !hasAny(admission.getProviders())) {
-            throw new IllegalArgumentException("Must provide a patient, location, and provider");
+    public Encounter admitPatient(AdtAction admission) {
+        if (admission.getVisit() == null || admission.getLocation() == null || !hasAny(admission.getProviders())) {
+            throw new IllegalArgumentException("Must provide a visit, location, and provider");
         }
 
-        VisitDomainWrapper activeVisit = getActiveVisit(admission.getPatient(), admission.getLocation());
-        if (activeVisit == null) {
-            Visit visit = ensureActiveVisit(admission.getPatient(), admission.getLocation());
-            activeVisit = new VisitDomainWrapper(visit, emrApiProperties);
-        }
+        VisitDomainWrapper visit = new VisitDomainWrapper(admission.getVisit(), emrApiProperties);
 
-        if (activeVisit.isAdmitted()) {
+        if (visit.isAdmitted()) {
             throw new IllegalStateException("Patient is already admitted");
         }
 
-        Date admitDatetime = admission.getAdmitDatetime();
+        Date admitDatetime = admission.getActionDatetime();
         if (admitDatetime == null) {
             admitDatetime = new Date();
         }
 
-        if (activeVisit.getStopDatetime() != null && OpenmrsUtil.compare(activeVisit.getStopDatetime(), admitDatetime) < 0) {
-            throw new IllegalArgumentException("Cannot admit patient after the visit has stopped (stopped on " + activeVisit.getStopDatetime() + ")");
-        }
+        visit.errorIfOutsideVisit(admitDatetime, "Invalid transferDatetime");
 
         EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
         if (admissionEncounterType == null) {
             throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE);
         }
 
-        Encounter encounter = buildEncounter(admissionEncounterType, admission.getPatient(), getLocationThatSupportsAdmissions(admission.getLocation()), admitDatetime, null, null);
+        Encounter encounter = buildEncounter(admissionEncounterType, visit.getVisit().getPatient(), getLocationThatSupportsAdmissions(admission.getLocation()), admitDatetime, null, null);
         addProviders(encounter, admission.getProviders());
 
-        activeVisit.addEncounter(encounter);
+        visit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);
         return encounter;
 
@@ -700,7 +694,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Transactional
     @Override
-    public Encounter dischargePatient(Discharge discharge) {
+    public Encounter dischargePatient(AdtAction discharge) {
         if (discharge.getVisit() == null || discharge.getLocation() == null || !hasAny(discharge.getProviders())) {
             throw new IllegalArgumentException("Must provide a visit, location, and provider");
         }
@@ -710,7 +704,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalStateException("Patient is not currently admitted");
         }
 
-        Date dischargeDatetime = discharge.getDischargeDatetime();
+        Date dischargeDatetime = discharge.getActionDatetime();
         if (dischargeDatetime == null) {
             dischargeDatetime = new Date();
         }
@@ -732,14 +726,14 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Transactional
     @Override
-    public Encounter transferPatient(Transfer transfer) {
-        if (transfer.getVisit() == null || transfer.getToLocation() == null || !hasAny(transfer.getProviders())) {
+    public Encounter transferPatient(AdtAction transfer) {
+        if (transfer.getVisit() == null || transfer.getLocation() == null || !hasAny(transfer.getProviders())) {
             throw new IllegalArgumentException("Must provide visit, toLocation, and provider");
         }
 
         VisitDomainWrapper visit = new VisitDomainWrapper(transfer.getVisit(), emrApiProperties);
 
-        Date transferDatetime = transfer.getTransferDatetime();
+        Date transferDatetime = transfer.getActionDatetime();
         if (transferDatetime == null) {
             transferDatetime = new Date();
         }
@@ -751,7 +745,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE);
         }
 
-        Encounter encounter = buildEncounter(transferWithinHospitalEncounterType, visit.getVisit().getPatient(), transfer.getToLocation(), transferDatetime, null, null);
+        Encounter encounter = buildEncounter(transferWithinHospitalEncounterType, visit.getVisit().getPatient(), transfer.getLocation(), transferDatetime, null, null);
         addProviders(encounter, transfer.getProviders());
 
         visit.addEncounter(encounter);

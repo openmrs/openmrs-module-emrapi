@@ -2,49 +2,41 @@ package org.openmrs.module.emrapi.adt;
 
 import org.openmrs.EncounterRole;
 import org.openmrs.Location;
-import org.openmrs.Patient;
 import org.openmrs.Provider;
+import org.openmrs.Visit;
 
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Helper class that captures details about admitting a patient to the hospital.
+ * Helper class that captures details about admitting, discharging and transfering a patient within the hospital.
  * Use {@link AdtService} to save one of these (which actually creates and returns an encounter).
- * (This is a placeholder for a class representing a proper admission note. Eventually this class will be extended to
+ * (This is a placeholder for a class representing a proper transfer note. Eventually this class will be extended to
  * include more properties, and support obs and orders too.)
  */
-public class Admission {
+public class AdtAction {
 
-    private Patient patient;
-    private Date admitDatetime;
+    private Visit visit;
     private Location location;
+    private Date actionDatetime;
     private Map<EncounterRole, Set<Provider>> providers;
 
-    public Admission() {
+    public AdtAction() {
     }
 
-    public Admission(Patient patient, Location location, Map<EncounterRole, Set<Provider>> providers) {
-        this.patient = patient;
-        this.location = location;
+    public AdtAction(Visit visit, Location toLocation, Map<EncounterRole, Set<Provider>> providers) {
+        this.visit = visit;
+        this.location = toLocation;
         this.providers = providers;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public Visit getVisit() {
+        return visit;
     }
 
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setAdmitDatetime(Date admitDatetime) {
-        this.admitDatetime = admitDatetime;
-    }
-
-    public Date getAdmitDatetime() {
-        return admitDatetime;
+    public void setVisit(Visit visit) {
+        this.visit = visit;
     }
 
     public Location getLocation() {
@@ -53,6 +45,14 @@ public class Admission {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public Date getActionDatetime() {
+        return actionDatetime;
+    }
+
+    public void setActionDatetime(Date actionDatetime) {
+        this.actionDatetime = actionDatetime;
     }
 
     public Map<EncounterRole, Set<Provider>> getProviders() {

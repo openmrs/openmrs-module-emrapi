@@ -123,9 +123,9 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         // step 2: admit the patient (which should create an encounter)
         Date admitDatetime = new Date();
-        Admission admission = new Admission();
-        admission.setPatient(patient);
-        admission.setAdmitDatetime(admitDatetime);
+        AdtAction admission = new AdtAction();
+        admission.setVisit(checkInEncounter.getVisit());
+        admission.setActionDatetime(admitDatetime);
         admission.setLocation(inpatientWard);
         admission.setProviders(providers);
         Encounter admitEncounter = service.admitPatient(admission);
@@ -142,7 +142,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         // step 3: discharge the patient (which should create an encounter)
 
-        Discharge discharge = new Discharge();
+        AdtAction discharge = new AdtAction();
         discharge.setVisit(admitEncounter.getVisit());
         discharge.setLocation(inpatientWard);
         discharge.setProviders(providers);

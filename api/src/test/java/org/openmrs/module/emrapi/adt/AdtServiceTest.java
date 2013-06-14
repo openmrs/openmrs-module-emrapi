@@ -642,28 +642,6 @@ public class AdtServiceTest {
         assertThat(preferred.getAttribute(unknownPatientPersonAttributeType), is(preferredIsUnknownAttribute));
     }
 
-    @Test
-    public void test_admitPatient_ensuresActiveVisit() throws Exception {
-        final Patient patient = new Patient();
-        Admission admission = new Admission();
-        admission.setPatient(patient);
-        admission.setLocation(inpatientDepartment);
-        admission.setProviders(buildProviderMap());
-
-        service.admitPatient(admission);
-
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), TestUtils.isJustNow());
-                return true;
-            }
-        }));
-    }
-
     private Map<EncounterRole, Set<Provider>> buildProviderMap() {
         HashMap<EncounterRole, Set<Provider>> map = new HashMap<EncounterRole, Set<Provider>>();
         map.put(new EncounterRole(), Collections.singleton(new Provider()));
@@ -681,8 +659,8 @@ public class AdtServiceTest {
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        Admission admission = new Admission();
-        admission.setPatient(patient);
+        AdtAction admission = new AdtAction();
+        admission.setVisit(existing);
         admission.setLocation(inpatientDepartment);
         admission.setProviders(buildProviderMap());
 
@@ -692,8 +670,12 @@ public class AdtServiceTest {
     @Test
     public void test_admitPatient_createsEncounter() throws Exception {
         final Patient patient = new Patient();
-        final Admission admission = new Admission();
-        admission.setPatient(patient);
+
+        final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
+        when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
+
+        final AdtAction admission = new AdtAction();
+        admission.setVisit(visit);
         admission.setLocation(inpatientDepartment);
         admission.setProviders(buildProviderMap());
 
@@ -721,7 +703,7 @@ public class AdtServiceTest {
         Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        Discharge discharge = new Discharge();
+        AdtAction discharge = new AdtAction();
         discharge.setVisit(existing);
         discharge.setLocation(inpatientDepartment);
         discharge.setProviders(buildProviderMap());
@@ -740,7 +722,7 @@ public class AdtServiceTest {
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 
-        final Discharge discharge = new Discharge();
+        final AdtAction discharge = new AdtAction();
         discharge.setVisit(existing);
         discharge.setLocation(inpatientDepartment);
         discharge.setProviders(buildProviderMap());
@@ -769,9 +751,9 @@ public class AdtServiceTest {
         final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
 
-        final Transfer transfer = new Transfer();
+        final AdtAction transfer = new AdtAction();
         transfer.setVisit(visit);
-        transfer.setToLocation(radiologyDepartment);
+        transfer.setLocation(radiologyDepartment);
         transfer.setProviders(buildProviderMap());
         service.transferPatient(transfer);
 

@@ -22,12 +22,11 @@ import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.Location;
 import org.openmrs.Obs;
-import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.TestUtils;
-import org.openmrs.module.emrapi.adt.Admission;
+import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
@@ -80,22 +79,22 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
         final Location toLocation = new Location();
         when(locationService.getLocation(7)).thenReturn(toLocation);
 
-        final Patient patient = new Patient();
+        final Visit visit = new Visit();
         final Encounter encounter = new Encounter();
         final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
-        encounter.setPatient(patient);
+        encounter.setVisit(visit);
         encounter.addProvider(new EncounterRole(), new Provider());
         encounter.setEncounterDatetime(encounterDate);
 
         action.action(new EncounterDomainWrapper(encounter), new Obs(), request);
-        verify(adtService).admitPatient(argThat(new ArgumentMatcher<Admission>() {
+        verify(adtService).admitPatient(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
             public boolean matches(Object argument) {
-                Admission actual = (Admission) argument;
-                return actual.getPatient().equals(patient) &&
+                AdtAction actual = (AdtAction) argument;
+                return actual.getVisit().equals(visit) &&
                         actual.getLocation().equals(toLocation) &&
                         TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles()) &&
-                        actual.getAdmitDatetime().equals(encounterDate);
+                        actual.getActionDatetime().equals(encounterDate);
             }
         }));
 
@@ -111,7 +110,7 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
         });
 
         action.action(new EncounterDomainWrapper(new Encounter()), new Obs(), new HashMap<String, String[]>());
-        verify(adtService, never()).admitPatient(any(Admission.class));
+        verify(adtService, never()).admitPatient(any(AdtAction.class));
     }
 
 }

@@ -12,8 +12,8 @@ import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.TestUtils;
+import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
-import org.openmrs.module.emrapi.adt.Transfer;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 
@@ -62,14 +62,14 @@ public class TransferToSpecificLocationDispositionActionTest extends Authenticat
         encounter.setEncounterDatetime(encounterDate);
 
         action.action(new EncounterDomainWrapper(encounter), new Obs(), request);
-        verify(adtService).transferPatient(argThat(new ArgumentMatcher<Transfer>() {
+        verify(adtService).transferPatient(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
             public boolean matches(Object argument) {
-                Transfer actual = (Transfer) argument;
+                AdtAction actual = (AdtAction) argument;
                 return actual.getVisit().equals(visit) &&
-                        actual.getToLocation().equals(toLocation) &&
+                        actual.getLocation().equals(toLocation) &&
                         TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles()) &&
-                        actual.getTransferDatetime().equals(encounterDate);
+                        actual.getActionDatetime().equals(encounterDate);
             }
         }));
     }

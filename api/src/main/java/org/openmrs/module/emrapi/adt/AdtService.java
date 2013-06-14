@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * <pre>
- * API methods related to Check-In, Admission, Discharge, and Transfer
+ * API methods related to Check-In, Admission, Discharge, and AdtAction
  *
  * Since patients frequently leave the facility without having any formal electronic check-out process, we ensure that
  * old stale visits are automatically closed, even if they are never intentionally stopped. Our business logic is built
@@ -201,14 +201,14 @@ public interface AdtService extends OpenmrsService {
      * @param admission
      * @return the encounter representing this admission
      */
-    Encounter admitPatient(Admission admission);
+    Encounter admitPatient(AdtAction admission);
 
     /**
      * Exits a patient from inpatient care. Throws an exception if the patient is not currently admitted.
      * @param discharge
      * @return the encounter representing this discharge
      */
-    Encounter dischargePatient(Discharge discharge);
+    Encounter dischargePatient(AdtAction discharge);
 
     /**
      * Transfers a patient within the hospital. This does not require the patient to be previously admitted, nor does
@@ -217,7 +217,7 @@ public interface AdtService extends OpenmrsService {
      * @param transfer
      * @return the encounter representing this transfer
      */
-    Encounter transferPatient(Transfer transfer);
+    Encounter transferPatient(AdtAction transfer);
 
     /**
      * Helper method to get a {@link VisitDomainWrapper} given a {@link Visit}

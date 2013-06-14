@@ -13,8 +13,8 @@ import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
+import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
-import org.openmrs.module.emrapi.adt.Discharge;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 
@@ -79,14 +79,14 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
 
         action.action(new EncounterDomainWrapper(beingCreated), new Obs(), new HashMap<String, String[]>());
 
-        verify(adtService).dischargePatient(argThat(new ArgumentMatcher<Discharge>() {
+        verify(adtService).dischargePatient(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
             public boolean matches(Object argument) {
-                Discharge actual = (Discharge) argument;
+                AdtAction actual = (AdtAction) argument;
                 return actual.getLocation().equals(beingCreated.getLocation()) &&
                         actual.getVisit().equals(beingCreated.getVisit()) &&
                         TestUtils.sameProviders(actual.getProviders(), beingCreated.getProvidersByRoles()) &&
-                        actual.getDischargeDatetime().equals(encounterDate);
+                        actual.getActionDatetime().equals(encounterDate);
             }
         }));
     }

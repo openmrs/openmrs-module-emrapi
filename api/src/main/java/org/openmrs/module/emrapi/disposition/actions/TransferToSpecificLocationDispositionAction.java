@@ -4,7 +4,7 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.adt.AdtService;
-import org.openmrs.module.emrapi.adt.Transfer;
+import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,8 +51,8 @@ public class TransferToSpecificLocationDispositionAction implements DispositionA
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
         String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, TRANSFER_LOCATION_PARAMETER);
         Location location = locationService.getLocation(Integer.valueOf(locationId));
-        Transfer transfer = new Transfer(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders());
-        transfer.setTransferDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
+        AdtAction transfer = new AdtAction(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders());
+        transfer.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
         adtService.transferPatient(transfer);
     }
 
