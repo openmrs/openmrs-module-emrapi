@@ -851,6 +851,34 @@ public class AdtServiceTest {
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
     }
 
+    @Test
+    public void test_createRetrospectiveVisit_shouldSetStopDateBeforeTestingForPriorVisit() throws Exception {
+
+        final Patient patient = new Patient();
+
+        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
+        final Date expectedStopDate = new DateTime(2012, 1, 1, 23, 59, 59).toDate();
+
+        service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
+
+        verify(mockVisitService).getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
+                Collections.singletonList(patient), Collections.singletonList(mirebalaisHospital), null,
+                null, expectedStopDate, startDate, null, null, true, false);
+
+        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
+            @Override
+            public boolean matches(Object o) {
+                Visit actual = (Visit) o;
+                assertThat(actual.getVisitType(), is(atFacilityVisitType));
+                assertThat(actual.getPatient(), is(patient));
+                assertThat(actual.getLocation(), is(mirebalaisHospital));
+                assertThat(actual.getStartDatetime(), is (startDate));
+                assertThat(actual.getStopDatetime(), is(expectedStopDate));
+                return true;
+            }
+        }));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void test_createRetrospectiveVisit_shouldThrowExceptionIfStartTimeAfterStopTime() throws Exception {
 
@@ -860,6 +888,16 @@ public class AdtServiceTest {
         final Date stopDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
 
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_createRetrospectiveVisit_shouldFailExceptionIfStartTimeInFuture() throws Exception {
+
+        final Patient patient = new Patient();
+
+        final Date startDate = new DateTime(3000, 1, 2, 0, 0, 0).toDate();
+
+        service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
     }
 
     private Encounter buildEncounter(Patient patient, Date encounterDatetime) {

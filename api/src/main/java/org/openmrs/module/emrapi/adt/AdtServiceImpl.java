@@ -768,23 +768,25 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional
     public VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
 
-        if (stopDatetime != null && startDatetime.after(stopDatetime)) {
-            throw new IllegalArgumentException("Start date cannot be after stop date");
+        if (startDatetime.after(new Date())) {
+            throw new IllegalArgumentException("emrapi.retrospectiveVisit.startDateCannotBeInFuture");
+        }
+
+        // if no stop date, set it to the end of the day specified by the start date
+        if (stopDatetime == null) {
+            stopDatetime = new DateTime(startDatetime).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate();
+        }
+
+        if (startDatetime.after(stopDatetime)) {
+            throw new IllegalArgumentException("emrapi.retrospectiveVisit.endDateBeforeStartDateMessage");
         }
 
         if (hasVisitDuring(patient, location, startDatetime, stopDatetime)) {
-            throw new IllegalStateException("Patient already has a visit between " + startDatetime + " and " + stopDatetime);
+            throw new IllegalStateException("emrapi.retrospectiveVisit.patientAlreadyHasVisit");
         }
 
         Visit visit = buildVisit(patient, location, startDatetime);
-
-        if (stopDatetime != null) {
-            visit.setStopDatetime(stopDatetime);
-        }
-        else {
-            // if no stop date, set it to the end of the day specified by the start date
-            visit.setStopDatetime(new DateTime(startDatetime).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate());
-        }
+        visit.setStopDatetime(stopDatetime);
 
         return wrap(visitService.saveVisit(visit));
     }
