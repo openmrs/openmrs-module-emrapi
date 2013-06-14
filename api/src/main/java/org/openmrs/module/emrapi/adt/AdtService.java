@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * <pre>
- * API methods related to Check-In, Admission, Discharge, and AdtAction
+ * API methods related to Check-In, Admission, Discharge, and Transfer
  *
  * Since patients frequently leave the facility without having any formal electronic check-out process, we ensure that
  * old stale visits are automatically closed, even if they are never intentionally stopped. Our business logic is built
