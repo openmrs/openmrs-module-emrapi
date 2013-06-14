@@ -22,6 +22,7 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.Date;
@@ -244,7 +245,8 @@ public interface AdtService extends OpenmrsService {
      * @param stopDatetime
      * @return
      */
-    VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+    VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
+        throws ExistingVisitDuringTimePeriodException;
 
     /**
      * Gets all visits for the patient at the visit location associated with the specified location

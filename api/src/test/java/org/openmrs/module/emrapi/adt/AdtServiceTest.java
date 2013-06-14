@@ -46,6 +46,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
+import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -818,7 +819,7 @@ public class AdtServiceTest {
         }));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ExistingVisitDuringTimePeriodException.class)
     public void test_createRetrospectiveVisit_shouldThrowExceptionIfExistingVisitDuringDatetime() throws Exception {
 
         final Patient patient = new Patient();

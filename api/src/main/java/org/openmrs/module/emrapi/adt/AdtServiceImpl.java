@@ -40,6 +40,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
@@ -760,7 +761,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     @Transactional
-    public VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
+    public VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
+        throws ExistingVisitDuringTimePeriodException {
 
         if (startDatetime.after(new Date())) {
             throw new IllegalArgumentException("emrapi.retrospectiveVisit.startDateCannotBeInFuture");
@@ -776,7 +778,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         if (hasVisitDuring(patient, location, startDatetime, stopDatetime)) {
-            throw new IllegalStateException("emrapi.retrospectiveVisit.patientAlreadyHasVisit");
+            throw new ExistingVisitDuringTimePeriodException("emrapi.retrospectiveVisit.patientAlreadyHasVisit");
         }
 
         Visit visit = buildVisit(patient, location, startDatetime);
