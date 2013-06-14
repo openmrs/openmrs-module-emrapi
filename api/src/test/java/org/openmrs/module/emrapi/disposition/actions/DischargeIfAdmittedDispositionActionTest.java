@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -70,9 +71,11 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
         visit.addEncounter(admission);
 
         final Encounter beingCreated = new Encounter();
+        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
         beingCreated.setVisit(visit);
         beingCreated.setLocation(new Location());
         beingCreated.addProvider(new EncounterRole(), new Provider());
+        beingCreated.setEncounterDatetime(encounterDate);
 
         action.action(new EncounterDomainWrapper(beingCreated), new Obs(), new HashMap<String, String[]>());
 
@@ -82,7 +85,8 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
                 Discharge actual = (Discharge) argument;
                 return actual.getLocation().equals(beingCreated.getLocation()) &&
                         actual.getVisit().equals(beingCreated.getVisit()) &&
-                        TestUtils.sameProviders(actual.getProviders(), beingCreated.getProvidersByRoles());
+                        TestUtils.sameProviders(actual.getProviders(), beingCreated.getProvidersByRoles()) &&
+                        actual.getDischargeDatetime().equals(encounterDate);
             }
         }));
     }

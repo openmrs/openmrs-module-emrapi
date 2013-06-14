@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -16,6 +17,7 @@ import org.openmrs.module.emrapi.adt.Transfer;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,15 +56,20 @@ public class TransferToSpecificLocationDispositionActionTest extends Authenticat
 
         final Visit visit = new Visit();
         final Encounter encounter = new Encounter();
+        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
         encounter.setVisit(visit);
         encounter.addProvider(new EncounterRole(), new Provider());
+        encounter.setEncounterDatetime(encounterDate);
 
         action.action(new EncounterDomainWrapper(encounter), new Obs(), request);
         verify(adtService).transferPatient(argThat(new ArgumentMatcher<Transfer>() {
             @Override
             public boolean matches(Object argument) {
                 Transfer actual = (Transfer) argument;
-                return actual.getVisit().equals(visit) && actual.getToLocation().equals(toLocation) && TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles());
+                return actual.getVisit().equals(visit) &&
+                        actual.getToLocation().equals(toLocation) &&
+                        TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles()) &&
+                        actual.getTransferDatetime().equals(encounterDate);
             }
         }));
     }

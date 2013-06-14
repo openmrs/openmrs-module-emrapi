@@ -51,7 +51,9 @@ public class TransferToSpecificLocationDispositionAction implements DispositionA
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
         String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, TRANSFER_LOCATION_PARAMETER);
         Location location = locationService.getLocation(Integer.valueOf(locationId));
-        adtService.transferPatient(new Transfer(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders()));
+        Transfer transfer = new Transfer(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders());
+        transfer.setTransferDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
+        adtService.transferPatient(transfer);
     }
 
 }

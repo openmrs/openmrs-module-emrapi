@@ -76,7 +76,9 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
         else {
             String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, ADMISSION_LOCATION_PARAMETER);
             Location location = locationService.getLocation(Integer.valueOf(locationId));
-            adtService.admitPatient(new Admission(encounterDomainWrapper.getEncounter().getPatient(), location, encounterDomainWrapper.getProviders()));
+            Admission admission = new Admission(encounterDomainWrapper.getEncounter().getPatient(), location, encounterDomainWrapper.getProviders());
+            admission.setAdmitDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
+            adtService.admitPatient(admission);
         }
     }
 

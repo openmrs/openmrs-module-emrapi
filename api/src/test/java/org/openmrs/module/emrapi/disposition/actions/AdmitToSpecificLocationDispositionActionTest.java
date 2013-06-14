@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi.disposition.actions;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -32,6 +33,7 @@ import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,15 +82,20 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
 
         final Patient patient = new Patient();
         final Encounter encounter = new Encounter();
+        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
         encounter.setPatient(patient);
         encounter.addProvider(new EncounterRole(), new Provider());
+        encounter.setEncounterDatetime(encounterDate);
 
         action.action(new EncounterDomainWrapper(encounter), new Obs(), request);
         verify(adtService).admitPatient(argThat(new ArgumentMatcher<Admission>() {
             @Override
             public boolean matches(Object argument) {
                 Admission actual = (Admission) argument;
-                return actual.getPatient().equals(patient) && actual.getLocation().equals(toLocation) && TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles());
+                return actual.getPatient().equals(patient) &&
+                        actual.getLocation().equals(toLocation) &&
+                        TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles()) &&
+                        actual.getAdmitDatetime().equals(encounterDate);
             }
         }));
 

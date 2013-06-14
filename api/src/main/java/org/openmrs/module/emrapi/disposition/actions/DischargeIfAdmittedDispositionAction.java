@@ -38,6 +38,7 @@ public class DischargeIfAdmittedDispositionAction implements DispositionAction {
         Visit visit = encounterDomainWrapper.getVisit();
         if (new VisitDomainWrapper(visit, emrApiProperties).isAdmitted()) {
             Discharge discharge = new Discharge(visit, encounterDomainWrapper.getLocation(), encounterDomainWrapper.getProviders());
+            discharge.setDischargeDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
             adtService.dischargePatient(discharge);
         }
     }
