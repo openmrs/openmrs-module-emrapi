@@ -210,4 +210,11 @@ public class VisitDomainWrapper {
 
         return oneMinuteAfterStartTime.toDate();
     }
+
+    public Date getEncounterStopDateRange() {
+        DateTime endDate = new DateTime(visit.getStopDatetime());
+        DateTime oneMinuteBeforeStartTime = endDate.minusMinutes(1);
+
+        return oneMinuteBeforeStartTime.toDate();
+    }
 }
