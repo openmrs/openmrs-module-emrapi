@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.visit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
@@ -201,5 +202,12 @@ public class VisitDomainWrapper {
         if (visit.getStopDatetime() != null && OpenmrsUtil.compare(visit.getStopDatetime(), checkDatetime) < 0) {
             throw new IllegalArgumentException(errorMessage + ": visit stopped at " + visit.getStopDatetime() + " but testing a later date");
         }
+    }
+
+    public Date getEncounterStartDateRange() {
+        DateTime startDate = new DateTime(visit.getStartDatetime());
+        DateTime oneMinuteAfterStartTime = startDate.plusMinutes(1);
+
+        return oneMinuteAfterStartTime.toDate();
     }
 }

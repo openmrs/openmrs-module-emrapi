@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.visit;
 
 
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,9 +24,7 @@ import java.util.Set;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -219,6 +218,19 @@ public class VisitDomainWrapperTest {
 
         when(visit.getEncounters()).thenReturn(encounters);
         assertTrue(visitDomainWrapper.hasEncounterWithoutSubsequentEncounter(lookForType, cancelType));
+    }
+
+    @Test
+    public void test_encounterStartDateRangeShouldBeOneMinuteAfterTheStartDateOfTheVisit() {
+        DateTime oneMinuteAfter = new DateTime(2013, 1, 15, 12, 13, 12);
+        DateTime visitStartDate = new DateTime(2013, 1, 15, 12, 12, 12);
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(visitStartDate.toDate());
+
+        VisitDomainWrapper wrapper = new VisitDomainWrapper(visit);
+
+        assertEquals(oneMinuteAfter.toDate(), wrapper.getEncounterStartDateRange());
     }
 
 }
