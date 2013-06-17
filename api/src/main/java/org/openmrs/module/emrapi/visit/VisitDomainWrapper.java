@@ -212,9 +212,15 @@ public class VisitDomainWrapper {
     }
 
     public Date getEncounterStopDateRange() {
-        DateTime endDate = new DateTime(visit.getStopDatetime());
-        DateTime oneMinuteBeforeStartTime = endDate.minusMinutes(1);
+        Date stopDateRange;
 
-        return oneMinuteBeforeStartTime.toDate();
+        if (visit.getStopDatetime() == null) {
+            stopDateRange = new Date();
+        } else {
+            DateTime endDate = new DateTime(visit.getStopDatetime());
+            stopDateRange = endDate.minusMinutes(1).toDate();
+        }
+
+        return stopDateRange;
     }
 }

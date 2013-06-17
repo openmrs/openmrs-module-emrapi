@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.visit;
 
 
 import org.apache.commons.lang.time.DateUtils;
+import org.dbunit.Assertion;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.reporting.common.DateRange;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -23,10 +25,15 @@ import java.util.Set;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
+import static org.apache.commons.lang3.Range.between;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 
 @PrepareForTest(Calendar.class)
 @RunWith(PowerMockRunner.class)
@@ -234,7 +241,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_encounterEndDateRangeShouldBeOneMinuteBeforeTheEndDateOfTheVisit() {
+    public void test_encounterStopDateRangeShouldBeOneMinuteBeforeTheStopDateOfTheVisit() {
         DateTime oneMinuteBefore = new DateTime(2013, 1, 15, 12, 11, 12);
         DateTime visitEndDate = new DateTime(2013, 1, 15, 12, 12, 12);
 
@@ -244,6 +251,16 @@ public class VisitDomainWrapperTest {
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit);
 
         assertEquals(oneMinuteBefore.toDate(), wrapper.getEncounterStopDateRange());
+    }
+
+    @Test
+    public void test_encounterStopDateRangeShouldNowIfStopDateOfTheVisitIsNull() {
+        Visit visit = new Visit();
+        visit.setStopDatetime(null);
+
+        VisitDomainWrapper wrapper = new VisitDomainWrapper(visit);
+
+        assertThat(wrapper.getEncounterStopDateRange(), isJustNow());
     }
 
 }
