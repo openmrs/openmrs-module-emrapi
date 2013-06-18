@@ -196,15 +196,15 @@ public class GeneralUtils {
             return null;
         }
 
-        for (PatientIdentifier patientIdentifer : patientIdentifiers) {
-            if (patientIdentifer.getLocation().equals(location) && patientIdentifer.isPreferred()) {
-                return patientIdentifer;
+        for (PatientIdentifier patientIdentifier : patientIdentifiers) {
+            if (location.equals(patientIdentifier.getLocation()) && patientIdentifier.isPreferred()) {
+                return patientIdentifier;
             }
         }
 
-        for (PatientIdentifier patientIdentifer : patientIdentifiers) {
-            if (patientIdentifer.getLocation().equals(location)) {
-                return patientIdentifer;
+        for (PatientIdentifier patientIdentifier : patientIdentifiers) {
+            if (location.equals(patientIdentifier.getLocation())) {
+                return patientIdentifier;
             }
         }
 
