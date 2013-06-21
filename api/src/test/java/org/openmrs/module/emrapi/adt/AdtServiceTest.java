@@ -788,8 +788,8 @@ public class AdtServiceTest {
     public void test_createRetrospectiveVisit_shouldSetStopDateToEndOfDayIfNotSpecified() throws Exception {
         final Patient patient = new Patient();
 
-        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
-        final Date expectedStopDate = new DateTime(2012, 1, 1, 23, 59, 59).toDate();
+        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
+        final Date expectedStopDate = new DateTime(2012, 1, 1, 23, 59, 59, 999).toDate();
 
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
 
@@ -812,8 +812,8 @@ public class AdtServiceTest {
 
         final Patient patient = new Patient();
 
-        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
-        final Date stopDate = new DateTime(2012, 1, 2, 0, 0, 0).toDate();
+        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
+        final Date stopDate = new DateTime(2012, 1, 2, 0, 0, 0, 999).toDate();
 
         when(mockVisitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
                 Collections.singletonList(patient), Collections.singletonList(mirebalaisHospital), null,
@@ -827,8 +827,8 @@ public class AdtServiceTest {
 
         final Patient patient = new Patient();
 
-        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
-        final Date expectedStopDate = new DateTime(2012, 1, 1, 23, 59, 59).toDate();
+        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
+        final Date expectedStopDate = new DateTime(2012, 1, 1, 23, 59, 59, 999).toDate();
 
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
 
@@ -855,8 +855,8 @@ public class AdtServiceTest {
 
         final Patient patient = new Patient();
 
-        final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0).toDate();
-        final Date stopDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
+        final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
+        final Date stopDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
 
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
     }
@@ -866,7 +866,7 @@ public class AdtServiceTest {
 
         final Patient patient = new Patient();
 
-        final Date startDate = new DateTime(3000, 1, 2, 0, 0, 0).toDate();
+        final Date startDate = new DateTime(3000, 1, 2, 0, 0, 0, 0).toDate();
 
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
     }

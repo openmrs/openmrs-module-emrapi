@@ -684,7 +684,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         // if no stop date, set it to the end of the day specified by the start date
         if (stopDatetime == null) {
-            stopDatetime = new DateTime(startDatetime).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).toDate();
+            stopDatetime = new DateTime(startDatetime).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).withMillisOfSecond(999).toDate();
         }
 
         if (startDatetime.after(stopDatetime)) {
