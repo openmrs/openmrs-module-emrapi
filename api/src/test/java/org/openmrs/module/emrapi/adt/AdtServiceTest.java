@@ -784,29 +784,6 @@ public class AdtServiceTest {
         }));
     }
 
-    @Test
-    public void test_createRetrospectiveVisit_shouldSetStopDateToEndOfDayIfNotSpecified() throws Exception {
-        final Patient patient = new Patient();
-
-        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
-        final Date expectedStopDate = new DateTime(2012, 1, 1, 23, 59, 59, 999).toDate();
-
-        service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
-
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                assertThat(actual.getVisitType(), is(atFacilityVisitType));
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), is(startDate));
-                assertThat(actual.getStopDatetime(), is(expectedStopDate));
-                return true;
-            }
-        }));
-    }
-
     @Test(expected = ExistingVisitDuringTimePeriodException.class)
     public void test_createRetrospectiveVisit_shouldThrowExceptionIfExistingVisitDuringDatetime() throws Exception {
 
@@ -820,34 +797,6 @@ public class AdtServiceTest {
                 null, stopDate, startDate, null, null, true, false)).thenReturn(Collections.singletonList(new Visit()));
 
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
-    }
-
-    @Test
-    public void test_createRetrospectiveVisit_shouldSetStopDateBeforeTestingForPriorVisit() throws Exception {
-
-        final Patient patient = new Patient();
-
-        final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
-        final Date expectedStopDate = new DateTime(2012, 1, 1, 23, 59, 59, 999).toDate();
-
-        service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
-
-        verify(mockVisitService).getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
-                Collections.singletonList(patient), Collections.singletonList(mirebalaisHospital), null,
-                null, expectedStopDate, startDate, null, null, true, false);
-
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                assertThat(actual.getVisitType(), is(atFacilityVisitType));
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), is(startDate));
-                assertThat(actual.getStopDatetime(), is(expectedStopDate));
-                return true;
-            }
-        }));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -867,9 +816,23 @@ public class AdtServiceTest {
         final Patient patient = new Patient();
 
         final Date startDate = new DateTime(3000, 1, 2, 0, 0, 0, 0).toDate();
+        final Date stopDate = new DateTime(3000, 1, 2, 1, 1, 1, 1).toDate();
 
-        service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, null);
+        service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_createRetrospectiveVisit_shouldFailExceptionIfStopTimeInFuture() throws Exception {
+
+        final Patient patient = new Patient();
+
+        final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
+        final Date stopDate = new DateTime(3000, 1, 1, 0, 0, 0, 0).toDate();
+
+        service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+    }
+
+
 
     private Encounter buildEncounter(Patient patient, Date encounterDatetime) {
         Encounter encounter = new Encounter();

@@ -210,14 +210,16 @@ public interface AdtService extends OpenmrsService {
 
     /**
      * Creates a retrospective visit for the specified patient with the specified start and stop dates
-     * If stopDate is null, stopDate is set to the end of the startDate day (for example, if start date = 2012-1-22 9:20:34,
-     * then stopDate would be set to 2012-1-22 23:59:59)
      *
      * @param patient
      * @param location
      * @param startDatetime
      * @param stopDatetime
-     * @return
+     * @should throw IllegalArgumentException if startDatetime in future
+     * @should throw IllegalArgumentException it stopDatetime in future
+     * @should throw IllegalArgumentException if stopDatetime before startDatetime
+     * @should throw ExistingVisitDuringTimePeriodException if existing visit during date range
+     * @return the created visit
      */
     VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
         throws ExistingVisitDuringTimePeriodException;

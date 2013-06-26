@@ -15,7 +15,6 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -682,9 +681,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalArgumentException("emrapi.retrospectiveVisit.startDateCannotBeInFuture");
         }
 
-        // if no stop date, set it to the end of the day specified by the start date
-        if (stopDatetime == null) {
-            stopDatetime = new DateTime(startDatetime).withHourOfDay(23).withMinuteOfHour(59).withSecondOfMinute(59).withMillisOfSecond(999).toDate();
+        if (stopDatetime.after(new Date())) {
+            throw new IllegalArgumentException("emrapi.retrospectiveVisit.stopDateCannotBeInFuture");
         }
 
         if (startDatetime.after(stopDatetime)) {
