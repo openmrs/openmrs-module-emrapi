@@ -28,10 +28,7 @@ import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
@@ -98,6 +95,12 @@ public class VisitDomainWrapper {
     public Encounter getLastEncounter() {
         if (visit.getEncounters().size() > 0)
             return visit.getEncounters().iterator().next();
+        return null;
+    }
+
+    public Encounter getOldestEncounter() {
+        if (visit.getEncounters().size() != 0)
+            return (Encounter) visit.getEncounters().toArray()[visit.getEncounters().size() - 1];
         return null;
     }
 
