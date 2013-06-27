@@ -59,6 +59,10 @@ public class VisitDomainWrapper {
         return visit;
     }
 
+    public int getVisitId() {
+        return visit.getVisitId();
+    }
+
     public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
         this.emrApiProperties = emrApiProperties;
     }
