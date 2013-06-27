@@ -228,21 +228,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_encounterStartDateRangeShouldBeOneMinuteAfterTheStartDateOfTheVisit() {
-        DateTime oneMinuteAfter = new DateTime(2013, 1, 15, 12, 13, 12);
-        DateTime visitStartDate = new DateTime(2013, 1, 15, 12, 12, 12);
-
-        Visit visit = new Visit();
-        visit.setStartDatetime(visitStartDate.toDate());
-
-        VisitDomainWrapper wrapper = new VisitDomainWrapper(visit);
-
-        assertEquals(oneMinuteAfter.toDate(), wrapper.getEncounterStartDateRange());
-    }
-
-    @Test
-    public void test_encounterStopDateRangeShouldBeOneMinuteBeforeTheStopDateOfTheVisit() {
-        DateTime oneMinuteBefore = new DateTime(2013, 1, 15, 12, 11, 12);
+    public void test_encounterStopDateRangeShouldBeTheStopDateOfTheVisit() {
         DateTime visitEndDate = new DateTime(2013, 1, 15, 12, 12, 12);
 
         Visit visit = new Visit();
@@ -250,7 +236,7 @@ public class VisitDomainWrapperTest {
 
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit);
 
-        assertEquals(oneMinuteBefore.toDate(), wrapper.getEncounterStopDateRange());
+        assertThat(wrapper.getEncounterStopDateRange(), is(visitEndDate.toDate()));
     }
 
     @Test

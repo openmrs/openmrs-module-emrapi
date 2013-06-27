@@ -207,23 +207,7 @@ public class VisitDomainWrapper {
         }
     }
 
-    public Date getEncounterStartDateRange() {
-        DateTime startDate = new DateTime(visit.getStartDatetime());
-        DateTime oneMinuteAfterStartTime = startDate.plusMinutes(1);
-
-        return oneMinuteAfterStartTime.toDate();
-    }
-
     public Date getEncounterStopDateRange() {
-        Date stopDateRange;
-
-        if (visit.getStopDatetime() == null) {
-            stopDateRange = new Date();
-        } else {
-            DateTime endDate = new DateTime(visit.getStopDatetime());
-            stopDateRange = endDate.minusMinutes(1).toDate();
-        }
-
-        return stopDateRange;
+        return getStopDatetime() == null ? new Date() : getStopDatetime();
     }
 }
