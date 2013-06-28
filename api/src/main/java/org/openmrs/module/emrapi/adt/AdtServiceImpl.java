@@ -235,6 +235,30 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         return activeVisit;
     }
 
+    @Transactional
+    public Visit ensureVisit(Patient patient, Date visitTime, Location department){
+        if (visitTime == null) {
+            visitTime = new Date();
+        }
+        Visit visit = null;
+        List<Patient> patientList = Collections.singletonList(patient);
+
+        // visits that have not ended by the encounter date.
+        List<Visit> candidates = visitService.getVisits(null, patientList, null, null, null,
+                visitTime, null, null, null, true, false);
+        if(candidates != null){
+            for (Visit candidate : candidates) {
+                if (isSuitableVisit(candidate, department, visitTime)) {
+                    return candidate;
+                }
+            }
+        }
+        if(visit == null){
+            visit = buildVisit(patient, department, visitTime);
+            visitService.saveVisit(visit);
+        }
+        return visit;
+    }
     private Date guessVisitStopDatetime(Visit visit) {
         if (visit.getEncounters() == null || visit.getEncounters().size() == 0) {
             return visit.getStartDatetime();

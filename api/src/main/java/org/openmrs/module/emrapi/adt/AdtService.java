@@ -86,6 +86,17 @@ public interface AdtService extends OpenmrsService {
     Visit ensureActiveVisit(Patient patient, Location department);
 
     /**
+     * If the patient has no active visit on the day of @visitTime, one is created (and persisted).
+     * The visit's location will be a valid visit location per our business logic.
+     *
+     * @param patient
+     * @param visitTime
+     * @param department
+     * @return
+     */
+    Visit ensureVisit(Patient patient, Date visitTime, Location department);
+
+    /**
      * Our business logic is that a visit has ended if it has no recent encounter.
      *
      * @return whether we think this visit has ended, according to our business logic
