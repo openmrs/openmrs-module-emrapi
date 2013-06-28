@@ -166,14 +166,16 @@ public class TestUtils {
 		string = string.replaceAll("\\s", "");
 		return string;
 	}
-	
+
+    //use DateMatchers.within(1, SECONDS, date)
+    @Deprecated
 	public static Matcher<Date> isJustNow() {
 		return new ArgumentMatcher<Date>() {
-			
+
 			@Override
 			public boolean matches(Object o) {
 				// within the last second should be safe enough...
-				return System.currentTimeMillis() - ((Date) o).getTime() < 1000;
+				return Math.abs(System.currentTimeMillis() - ((Date) o).getTime()) < 1000;
 			}
 		};
 	}
