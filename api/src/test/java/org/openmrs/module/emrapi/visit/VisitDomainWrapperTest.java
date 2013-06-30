@@ -2,7 +2,6 @@ package org.openmrs.module.emrapi.visit;
 
 
 import org.apache.commons.lang.time.DateUtils;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,8 +10,6 @@ import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.adt.exception.EncounterDateAfterVisitStopDateException;
-import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDateException;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -26,8 +23,6 @@ import java.util.Set;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -249,146 +244,5 @@ public class VisitDomainWrapperTest {
 
         assertThat(wrapper.getEncounterStopDateRange(), isJustNow());
     }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldFailIfEncounterAlreadyHasTimeComponent()
-            throws Exception {
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new Date());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldFailIfEncounterDateInFuture()
-            throws Exception {
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateTime(3000,1,1,0,0,0,0).toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-    }
-
-    @Test(expected = EncounterDateBeforeVisitStartDateException.class)
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldFailIfEncounterDateBeforeVisitStartDate()
-            throws Exception {
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,12).toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-        visit.getVisit().setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
-        visit.getVisit().setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-    }
-
-    @Test(expected = EncounterDateAfterVisitStopDateException.class)
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldFailIfEncounterDateAfterVisitStopDate()
-            throws Exception {
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,16).toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-        visit.getVisit().setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
-        visit.getVisit().setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-    }
-
-    @Test
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldSetEncounterDatetimeToMidnightOfEncounterDate()
-            throws Exception {
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,14).toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-        visit.getVisit().setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
-        visit.getVisit().setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-
-        assertThat(encounter.getEncounterDatetime(), is(new DateMidnight(2012,12,14).toDate()));
-    }
-
-    @Test
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldSetEncounterDatetimeToVisitStartDate()
-            throws Exception {
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,13).toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-        visit.getVisit().setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
-        visit.getVisit().setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-
-        assertThat(encounter.getEncounterDatetime(), is(visit.getStartDatetime()));
-    }
-
-    @Test
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldNotFailIfVisitStopDatetimeNull()
-            throws Exception {
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,13).toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-        visit.getVisit().setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-
-        assertThat(encounter.getEncounterDatetime(), is(visit.getStartDatetime()));
-    }
-
-    @Test
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldSetStartDateToVisitStartDateOnCurrentDayForClosedVisit()
-            throws Exception {
-
-        DateTime currentDateTime = new DateTime();
-        DateMidnight currentDate = currentDateTime.toDateMidnight();
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(currentDate.toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-        visit.getVisit().setStartDatetime(currentDateTime.minus(1000).toDate());   // i guess this test will fail if run in the first minute of the day
-        visit.getVisit().setStopDatetime(currentDateTime.plus(1000).toDate());
-
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-
-        assertThat(encounter.getEncounterDatetime(), is(visit.getStartDatetime()));
-    }
-
-    @Test
-    public void test_determineTimeComponentOfEncounterDateTimeBasedOnVisit_shouldSetStartDateToCurrentDatetimeForOpenVisit()
-            throws Exception {
-
-        DateTime currentDate = new DateTime().withTime(0,0,0,0);
-
-        Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(currentDate.toDate());
-
-        VisitDomainWrapper visit = new VisitDomainWrapper(new Visit());
-        visit.getVisit().setStartDatetime(currentDate.toDateMidnight().toDate());
-
-        Date shouldBeLessThanEncounterDatetime = new Date();
-        visit.setTimeComponentOfEncounterDateTimeBasedOnVisit(encounter);
-        Date shouldBeGreaterThanEncounterDatetime = new Date();
-
-        assertThat(encounter.getEncounterDatetime(), greaterThanOrEqualTo(shouldBeLessThanEncounterDatetime));
-        assertThat(encounter.getEncounterDatetime(), lessThanOrEqualTo(shouldBeGreaterThanEncounterDatetime));
-    }
-
-
 
 }

@@ -16,22 +16,21 @@ package org.openmrs.module.emrapi.visit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.adt.exception.EncounterDateAfterVisitStopDateException;
-import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDateException;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
@@ -222,53 +221,4 @@ public class VisitDomainWrapper {
         return getStopDatetime() == null ? new Date() : getStopDatetime();
     }
 
-
-    /**
-     * Many times when entering forms, end users only specify the date of an encounter (not the date & time)
-     * This method applies the business logic to set the time component of an encounter datetime based on the associated visit
-     *
-     * @param encounter
-     * @return
-     */
-    public void setTimeComponentOfEncounterDateTimeBasedOnVisit(Encounter encounter)
-            throws EncounterDateBeforeVisitStartDateException, EncounterDateAfterVisitStopDateException {
-
-        DateTime encounterDatetime = new DateTime(encounter.getEncounterDatetime());
-        DateMidnight encounterDate = encounterDatetime.toDateMidnight();
-
-        // this method  is only valid for a date with no time component
-        if (!encounterDatetime.equals(encounterDate)) {
-            throw new IllegalArgumentException("Invalid argument: encounterDatetime has time component");
-        }
-
-        if (encounterDate.isAfter(new DateTime())) {
-            throw new IllegalArgumentException("Encounter date cannot be in the future");
-        }
-
-        DateMidnight currentDate = new DateMidnight();
-        DateMidnight visitStartDate = new DateMidnight(visit.getStartDatetime());
-        DateMidnight visitStopDate = visit.getStopDatetime() != null ? new DateMidnight(visit.getStopDatetime()) : null;
-
-        if (encounterDate.isBefore(visitStartDate)) {
-            throw new EncounterDateBeforeVisitStartDateException();
-        }
-
-        if (encounterDate.isAfter(visitStopDate)) {
-            throw new EncounterDateAfterVisitStopDateException();
-        }
-
-        // now determine what the encounter date should actually be
-
-        // if encounter date = today and open visit, consider this a real-time transaction and timestamp with current datetime
-        if (encounterDate.equals(currentDate) && this.isOpen()) {
-            encounter.setEncounterDatetime(new Date());
-        }
-
-        // otherwise, set the encounterDatetime to the visit date time if encounterDate is before visit start date
-        else if (encounterDate.isBefore(new DateTime(visit.getStartDatetime()))) {
-                encounter.setEncounterDatetime(visit.getStartDatetime());
-        }
-
-        // otherwise, leave encounter date as is
-    }
 }
