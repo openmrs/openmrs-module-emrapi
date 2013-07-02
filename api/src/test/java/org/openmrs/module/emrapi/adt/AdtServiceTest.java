@@ -303,6 +303,62 @@ public class AdtServiceTest {
     }
 
     @Test
+    public void testEnsureVisitFindsOldVisit() throws Exception {
+        Patient patient = new Patient();
+        VisitType visitType = new VisitType();
+
+        Date now = new Date();
+        Date tenDaysAgo = DateUtils.addDays(now, -10);
+        Date nineDaysAgo = DateUtils.addDays(now, -9);
+        Date eightDaysAgo = DateUtils.addDays(now, -8);
+        Date sevenDaysAgo = DateUtils.addDays(now, -7);
+        Date sixDaysAgo = DateUtils.addDays(now, -6);
+        Date fiveDaysAgo = DateUtils.addDays(now, -5);
+        Date threeDaysAgo = DateUtils.addDays(now, -3);
+        Date oneDayAgo = DateUtils.addDays(now, -1);
+
+        Visit visit1 = buildVisit(patient, visitType, mirebalaisHospital, tenDaysAgo, nineDaysAgo);
+        Visit visit2 = buildVisit(patient, visitType, mirebalaisHospital, eightDaysAgo, sixDaysAgo);
+        Visit visit3 = buildVisit(patient, visitType, mirebalaisHospital, fiveDaysAgo, threeDaysAgo);
+        Visit visit4 = buildVisit(patient, visitType, mirebalaisHospital, oneDayAgo, null);
+
+        when(mockVisitService.getVisits(null, Collections.singletonList(patient), null, null, null,
+                sevenDaysAgo, null, null, null, true, false)).thenReturn(Collections.singletonList(visit2));
+
+        Visit foundVisit = service.ensureVisit(patient, sevenDaysAgo, mirebalaisHospital);
+        assertNotNull(foundVisit);
+        assertSame(foundVisit, visit2);
+    }
+
+    @Test
+    public void testEnsureVisitReturnsNewVisit() throws Exception {
+        Patient patient = new Patient();
+        VisitType visitType = new VisitType();
+
+        Date now = new Date();
+        Date tenDaysAgo = DateUtils.addDays(now, -10);
+        Date nineDaysAgo = DateUtils.addDays(now, -9);
+        Date eightDaysAgo = DateUtils.addDays(now, -8);
+        Date sevenDaysAgo = DateUtils.addDays(now, -7);
+        Date sixDaysAgo = DateUtils.addDays(now, -6);
+        Date fiveDaysAgo = DateUtils.addDays(now, -5);
+        Date threeDaysAgo = DateUtils.addDays(now, -3);
+        Date oneDayAgo = DateUtils.addDays(now, -1);
+
+        Visit visit1 = buildVisit(patient, visitType, mirebalaisHospital, tenDaysAgo, nineDaysAgo);
+        Visit visit2 = buildVisit(patient, visitType, mirebalaisHospital, eightDaysAgo, sixDaysAgo);
+        Visit visit3 = buildVisit(patient, visitType, mirebalaisHospital, fiveDaysAgo, threeDaysAgo);
+        //Visit visit4 = buildVisit(patient, visitType, mirebalaisHospital, oneDayAgo, null);
+
+        when(mockVisitService.getVisits(null, Collections.singletonList(patient), null, null, null,
+                oneDayAgo, null, null, null, true, false)).thenReturn(null);
+
+        Visit foundVisit = service.ensureVisit(patient, oneDayAgo, mirebalaisHospital);
+        assertNotNull(foundVisit);
+
+    }
+
+    @Test
     public void test_checkInPatient_forNewVisit() throws Exception {
         final Patient patient = new Patient();
 
