@@ -123,7 +123,7 @@ public class VisitDomainWrapper {
         return null;
     }
 
-    private List<Encounter> getNonVoidedSortedEncounters() {
+    public List<Encounter> getNonVoidedSortedEncounters() {
         if (visit.getEncounters() != null) {
             List<Encounter> nonVoidedEncounters = (List<Encounter>) select(visit.getEncounters(), EncounterDomainWrapper.NON_VOIDED_PREDICATE);
             sort(nonVoidedEncounters, reverseOrder(EncounterDomainWrapper.DATETIME_COMPARATOR));
