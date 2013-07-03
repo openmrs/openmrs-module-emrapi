@@ -23,13 +23,15 @@ import java.util.Set;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.openmrs.module.emrapi.TestUtils.isJustNow;
+import static uk.co.it.modular.hamcrest.date.DateMatchers.within;
 
 @PrepareForTest(Calendar.class)
 @RunWith(PowerMockRunner.class)
@@ -46,31 +48,35 @@ public class VisitDomainWrapperTest {
 
     // this test was merged in when VisitSummary was merged into VisitDomainWrapper
     @Test
-    public void test() throws Exception {
+    public void shouldReturnMostRecentNonVoidedEncounterAndCheckInEncounter() throws Exception {
         EncounterType checkInEncounterType = new EncounterType();
 
         EmrApiProperties props = mock(EmrApiProperties.class);
         when(props.getCheckInEncounterType()).thenReturn(checkInEncounterType);
 
         Encounter checkIn = new Encounter();
-        checkIn.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+        checkIn.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
         checkIn.setEncounterType(checkInEncounterType);
         Encounter vitals = new Encounter();
-        vitals.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+        vitals.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
         Encounter consult = new Encounter();
+        consult.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+        Encounter voided = new Encounter();
+        voided.setVoided(true);
         consult.setEncounterDatetime(new Date());
 
         // per the hbm.xml file, visit.encounters are sorted by encounterDatetime desc
         Visit visit = new Visit();
         visit.setStartDatetime(checkIn.getEncounterDatetime());
-        visit.setEncounters(new LinkedHashSet<Encounter>(3));
+        visit.setEncounters(new LinkedHashSet<Encounter>(4));
+        visit.addEncounter(voided);
         visit.addEncounter(consult);
         visit.addEncounter(vitals);
         visit.addEncounter(checkIn);
 
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
         assertThat(wrapper.getCheckInEncounter(), is(checkIn));
-        assertThat(wrapper.getLastEncounter(), is(consult));
+        assertThat(wrapper.getMostRecentEncounter(), is(consult));
     }
 
     @Test
@@ -107,7 +113,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_isAdmitted_isFalseWhenNeverAdmitted() throws Exception {
+    public void shouldNotBeAdmittedWhenNeverAdmitted() throws Exception {
         when(visit.getEncounters()).thenReturn(Collections.<Encounter>emptySet());
         visitDomainWrapper.setEmrApiProperties(mock(EmrApiProperties.class));
 
@@ -115,7 +121,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_isAdmitted_isTrueWhenAlreadyAdmitted() throws Exception {
+    public void shouldBeAdmittedWhenAlreadyAdmitted() throws Exception {
         EncounterType admitEncounterType = new EncounterType();
 
         EmrApiProperties props = mock(EmrApiProperties.class);
@@ -133,7 +139,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_isAdmitted_isFalseWhenAdmittedAndDischarged() throws Exception {
+    public void shouldNotBeAdmittedWhenAdmittedAndDischarged() throws Exception {
         EncounterType admitEncounterType = new EncounterType();
         EncounterType dischargeEncounterType = new EncounterType();
 
@@ -159,13 +165,13 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_hasEncounterWithoutSubsequentEncounter_returnsFalseIfNoRelevantEncounters() throws Exception {
+    public void shouldNotHaveEncounterWithoutSubsequentEncounterIfNoRelevantEncounters() throws Exception {
         when(visit.getEncounters()).thenReturn(new LinkedHashSet<Encounter>());
         assertFalse(visitDomainWrapper.hasEncounterWithoutSubsequentEncounter(new EncounterType(), new EncounterType()));
     }
 
     @Test
-    public void test_hasEncounterWithoutSubsequentEncounter_returnsTrueIfOneEncounterOfCorrectType() throws Exception {
+    public void shouldHaveEncounterWithoutSubsequentEncounterIfOneEncounterOfCorrectType() throws Exception {
         EncounterType targetType = new EncounterType();
 
         Encounter encounter = new Encounter();
@@ -180,7 +186,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_hasEncounterWithoutSubsequentEncounter_returnsTrueIfOneEncounterOfWrongType() throws Exception {
+    public void shouldNotHaveEncounterWithoutSubsequentEncounterIfOneEncounterOfWrongType() throws Exception {
         Encounter encounter = new Encounter();
         encounter.setEncounterType(new EncounterType());
         encounter.setEncounterDatetime(new Date());
@@ -193,7 +199,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_hasEncounterWithoutSubsequentEncounter_returnsTrueIfMostRecentRelevantEncounterIsOfCorrectType() throws Exception {
+    public void shouldHaveEncounterWithoutSubsequentEncounterIfMostRecentRelevantEncounterIsOfCorrectType() throws Exception {
         EncounterType lookForType = new EncounterType();
         EncounterType cancelType = new EncounterType();
 
@@ -224,7 +230,7 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_encounterStopDateRangeShouldBeTheStopDateOfTheVisit() {
+    public void shouldUseTheStopDateOfTheVisitForEncounterStopDateRange() {
         DateTime visitEndDate = new DateTime(2013, 1, 15, 12, 12, 12);
 
         Visit visit = new Visit();
@@ -236,13 +242,40 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void test_encounterStopDateRangeShouldNowIfStopDateOfTheVisitIsNull() {
+    public void shouldReturnNowForStopDateRangeIfStopDateOfTheVisitIsNull() {
         Visit visit = new Visit();
         visit.setStopDatetime(null);
 
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit);
 
-        assertThat(wrapper.getEncounterStopDateRange(), isJustNow());
+        assertThat(wrapper.getEncounterStopDateRange(), within(1, SECONDS, new Date()));
     }
 
+    @Test
+    public void shouldReturnOldestNonVoidedEncounter() throws Exception {
+        Visit visit = new Visit();
+
+        Encounter voidedEncounter = new Encounter();
+        voidedEncounter.setId(0);
+        voidedEncounter.setVoided(true);
+
+        Encounter encounter1 = new Encounter();
+        encounter1.setId(1);
+        encounter1.setEncounterDatetime(DateUtils.addMinutes(new Date(), -1));
+
+        Encounter encounter2 = new Encounter();
+        encounter2.setId(2);
+        encounter2.setEncounterDatetime(new Date());
+
+        visit.addEncounter(voidedEncounter);
+        visit.addEncounter(encounter2);
+        visit.addEncounter(encounter1);
+
+        assertThat(new VisitDomainWrapper(visit).getOldestEncounter(), is(encounter1));
+    }
+
+    @Test
+    public void shouldReturnNullOnMostRecentEncounterIfNoEncounters() throws Exception {
+        assertThat(new VisitDomainWrapper(new Visit()).getMostRecentEncounter(), is(nullValue()));
+    }
 }

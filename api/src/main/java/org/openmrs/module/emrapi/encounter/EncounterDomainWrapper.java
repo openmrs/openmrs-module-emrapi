@@ -1,7 +1,9 @@
 package org.openmrs.module.emrapi.encounter;
 
+import org.apache.commons.collections.Predicate;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeComparator;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterRole;
@@ -14,11 +16,24 @@ import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDate
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 public class EncounterDomainWrapper {
+    public static final Predicate NON_VOIDED_PREDICATE = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return !((Encounter) o).isVoided();
+        }
+    };
+    public static final Comparator<Encounter> DATETIME_COMPARATOR = new Comparator<Encounter>() {
+        @Override
+        public int compare(Encounter encounter, Encounter encounter2) {
+            return DateTimeComparator.getInstance().compare(encounter.getEncounterDatetime(), encounter2.getEncounterDatetime());
+        }
+    };
 
     private Encounter encounter;
 
@@ -36,14 +51,15 @@ public class EncounterDomainWrapper {
 
     /**
      * Verify if a user is the creator or one of the providers in the encounter
+     *
      * @param currentUser
      * @return
      */
     public boolean participatedInEncounter(User currentUser) {
 
-        if (verifyIfUserIsTheCreatorOfEncounter(currentUser)){
+        if (verifyIfUserIsTheCreatorOfEncounter(currentUser)) {
             return true;
-        } else if (verifyIfUserIsOneOfTheProviders(currentUser)){
+        } else if (verifyIfUserIsOneOfTheProviders(currentUser)) {
             return true;
         }
 
@@ -52,7 +68,7 @@ public class EncounterDomainWrapper {
 
     private boolean verifyIfUserIsOneOfTheProviders(User currentUser) {
         for (EncounterProvider encounterProvider : encounter.getEncounterProviders()) {
-            if (encounterProvider.getProvider().getPerson().equals(currentUser.getPerson())){
+            if (encounterProvider.getProvider().getPerson().equals(currentUser.getPerson())) {
                 return true;
             }
         }
@@ -94,7 +110,9 @@ public class EncounterDomainWrapper {
      *
      * @param visit
      * @throws EncounterDateBeforeVisitStartDateException
+     *
      * @throws EncounterDateAfterVisitStopDateException
+     *
      */
     @Transactional
     public void attachToVisit(VisitDomainWrapper visit)
@@ -150,7 +168,9 @@ public class EncounterDomainWrapper {
      *
      * @param visit
      * @throws EncounterDateBeforeVisitStartDateException
+     *
      * @throws EncounterDateAfterVisitStopDateException
+     *
      */
     @Transactional
     public void attachToVisit(Visit visit)
@@ -158,9 +178,7 @@ public class EncounterDomainWrapper {
         attachToVisit(new VisitDomainWrapper(visit));
     }
 
-
     private boolean dateHasTimeComponent(Date date) {
         return !new DateTime(date).equals(new DateMidnight(date));
     }
-
 }

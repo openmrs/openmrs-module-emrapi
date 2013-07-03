@@ -23,6 +23,7 @@ import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,11 +33,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.reverseOrder;
+import static java.util.Collections.sort;
+import static org.apache.commons.collections.CollectionUtils.select;
+
 /**
  * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
  */
 public class VisitDomainWrapper {
-
     private static final Log log = LogFactory.getLog(VisitDomainWrapper.class);
 
     @Autowired
@@ -99,19 +104,32 @@ public class VisitDomainWrapper {
         return null;
     }
 
-    /**
-     * @return the most recent encounter in the visit
-     */
-    public Encounter getLastEncounter() {
-        if (visit.getEncounters().size() > 0)
-            return visit.getEncounters().iterator().next();
+    public Encounter getMostRecentEncounter() {
+        List<Encounter> encounters = getNonVoidedSortedEncounters();
+        if (encounters.size() > 0)
+            return encounters.get(0);
         return null;
     }
 
+    @Deprecated //use getMostRecentEncounter because this method name doesn't make sense
+    public Encounter getLastEncounter() {
+        return getMostRecentEncounter();
+    }
+
     public Encounter getOldestEncounter() {
-        if (visit.getEncounters().size() != 0)
-            return (Encounter) visit.getEncounters().toArray()[visit.getEncounters().size() - 1];
+        List<Encounter> encounters = getNonVoidedSortedEncounters();
+        if (encounters.size() != 0)
+            return encounters.get(encounters.size() - 1);
         return null;
+    }
+
+    private List<Encounter> getNonVoidedSortedEncounters() {
+        if (visit.getEncounters() != null) {
+            List<Encounter> nonVoidedEncounters = (List<Encounter>) select(visit.getEncounters(), EncounterDomainWrapper.NON_VOIDED_PREDICATE);
+            sort(nonVoidedEncounters, reverseOrder(EncounterDomainWrapper.DATETIME_COMPARATOR));
+            return nonVoidedEncounters;
+        }
+        return EMPTY_LIST;
     }
 
     public int getDifferenceInDaysBetweenCurrentDateAndStartDate() {
