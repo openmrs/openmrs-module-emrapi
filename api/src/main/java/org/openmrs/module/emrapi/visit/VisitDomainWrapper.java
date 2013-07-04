@@ -105,7 +105,7 @@ public class VisitDomainWrapper {
     }
 
     public Encounter getMostRecentEncounter() {
-        List<Encounter> encounters = getNonVoidedSortedEncounters();
+        List<Encounter> encounters = getSortedEncounters();
         if (encounters.size() > 0)
             return encounters.get(0);
         return null;
@@ -117,13 +117,13 @@ public class VisitDomainWrapper {
     }
 
     public Encounter getOldestEncounter() {
-        List<Encounter> encounters = getNonVoidedSortedEncounters();
+        List<Encounter> encounters = getSortedEncounters();
         if (encounters.size() != 0)
             return encounters.get(encounters.size() - 1);
         return null;
     }
 
-    public List<Encounter> getNonVoidedSortedEncounters() {
+    public List<Encounter> getSortedEncounters() {
         if (visit.getEncounters() != null) {
             List<Encounter> nonVoidedEncounters = (List<Encounter>) select(visit.getEncounters(), EncounterDomainWrapper.NON_VOIDED_PREDICATE);
             sort(nonVoidedEncounters, reverseOrder(EncounterDomainWrapper.DATETIME_COMPARATOR));
