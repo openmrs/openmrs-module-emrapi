@@ -14,6 +14,7 @@
 package org.openmrs.module.emrapi.visit;
 
 
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
@@ -36,6 +37,7 @@ import java.util.List;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.reverseOrder;
 import static java.util.Collections.sort;
+import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.collections.CollectionUtils.select;
 
 /**
@@ -74,13 +76,11 @@ public class VisitDomainWrapper {
         this.emrApiProperties = emrApiProperties;
     }
 
-    public Encounter getAdmissionEncounter(){
-        for (Encounter e : visit.getEncounters()) {
-            if (emrApiProperties.getAdmissionEncounterType().equals(e.getEncounterType()))
-                return e;
-        }
-        return null;
+    public Encounter getAdmissionEncounter() {
+        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getAdmissionEncounterType()));
     }
+
+    // TODO: refactor this to use EncounterTypePredicate
     public Encounter getLatestAdtEncounter(){
         for (Encounter e : visit.getEncounters()) {
             if (emrApiProperties.getAdmissionEncounterType().equals(e.getEncounterType()) ||
@@ -89,19 +89,13 @@ public class VisitDomainWrapper {
         }
         return null;
     }
+
     public boolean isOpen() {
         return visit.getStopDatetime() == null;
     }
 
-    /**
-     * @return the check-in encounter for this visit, or null if none exists
-     */
     public Encounter getCheckInEncounter() {
-        for (Encounter e : visit.getEncounters()) {
-            if (emrApiProperties.getCheckInEncounterType().equals(e.getEncounterType()))
-                return e;
-        }
-        return null;
+        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getCheckInEncounterType()));
     }
 
     public Encounter getMostRecentEncounter() {
@@ -239,4 +233,16 @@ public class VisitDomainWrapper {
         return getStopDatetime() == null ? new Date() : getStopDatetime();
     }
 
+    private class EncounterTypePredicate implements Predicate {
+        private EncounterType type;
+
+        public EncounterTypePredicate(EncounterType type) {
+            this.type = type;
+        }
+
+        @Override
+        public boolean evaluate(Object o) {
+            return type.equals(((Encounter) o).getEncounterType());
+        }
+    }
 }
