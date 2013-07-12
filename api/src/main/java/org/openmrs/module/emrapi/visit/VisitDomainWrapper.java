@@ -82,7 +82,7 @@ public class VisitDomainWrapper {
 
     // TODO: refactor this to use EncounterTypePredicate
     public Encounter getLatestAdtEncounter(){
-        for (Encounter e : visit.getEncounters()) {
+        for (Encounter e : getSortedEncounters()) {
             if (emrApiProperties.getAdmissionEncounterType().equals(e.getEncounterType()) ||
                     emrApiProperties.getTransferWithinHospitalEncounterType().equals(e.getEncounterType()) )
                 return e;
@@ -169,21 +169,21 @@ public class VisitDomainWrapper {
     }
 
     public boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType) {
-        // these are sorted by date descending if you get the visit directly from hibernate, but not necessarily otherwise, so
-        // we have to go through all encounters
+
         if (visit.getEncounters() == null) {
             return false;
         }
-        Encounter mostRecentRelevant = null;
-        for (Encounter encounter : visit.getEncounters()) {
-            if (encounter.getEncounterType().equals(lookForEncounterType)
-                    || (withoutSubsequentEncounterType != null && encounter.getEncounterType().equals(withoutSubsequentEncounterType))) {
-                if (mostRecentRelevant == null || OpenmrsUtil.compare(mostRecentRelevant.getEncounterDatetime(), encounter.getEncounterDatetime()) < 0) {
-                    mostRecentRelevant = encounter;
-                }
+
+        for (Encounter encounter : getSortedEncounters()) {
+            if (encounter.getEncounterType().equals(lookForEncounterType)) {
+                return true;
+            }
+            else if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
+                return false;
             }
         }
-        return mostRecentRelevant != null && mostRecentRelevant.getEncounterType().equals(lookForEncounterType);
+
+        return false;
     }
 
     /**

@@ -165,6 +165,26 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
+    public void shouldNotBeAdmittedWhenAdmissionIsVoided() throws Exception {
+        EncounterType admitEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+        admit.setVoided(true);
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertFalse(visitDomainWrapper.isAdmitted());
+    }
+
+    @Test
     public void shouldNotHaveEncounterWithoutSubsequentEncounterIfNoRelevantEncounters() throws Exception {
         when(visit.getEncounters()).thenReturn(new LinkedHashSet<Encounter>());
         assertFalse(visitDomainWrapper.hasEncounterWithoutSubsequentEncounter(new EncounterType(), new EncounterType()));
