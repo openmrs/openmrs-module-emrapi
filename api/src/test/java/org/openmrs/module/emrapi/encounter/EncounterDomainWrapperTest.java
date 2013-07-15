@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
+import org.openmrs.EncounterRole;
 import org.openmrs.Person;
 import org.openmrs.Provider;
 import org.openmrs.User;
@@ -25,6 +26,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.openmrs.module.emrapi.TestUtils.isJustNow;
@@ -247,6 +249,62 @@ public class EncounterDomainWrapperTest {
         assertThat(encounter.getEncounterDatetime(), greaterThanOrEqualTo(shouldBeLessThanEncounterDatetime));
         assertThat(encounter.getEncounterDatetime(), lessThanOrEqualTo(shouldBeGreaterThanEncounterDatetime));
         assertThat(encounter.getVisit(), is(visit));
+    }
+
+    @Test
+    public void  test_getPrimaryProvider_shouldReturnFirstNonVoidedEncounterProvider() {
+
+        Encounter encounter = new Encounter();
+
+        Provider provider1 = new Provider();
+        Provider provider2 = new Provider();
+
+        EncounterRole role = new EncounterRole();
+
+        EncounterProvider encounterProvider1 = new EncounterProvider();
+        encounterProvider1.setVoided(true);
+        encounterProvider1.setProvider(provider1);
+        encounterProvider1.setEncounterRole(role);
+
+        EncounterProvider encounterProvider2 = new EncounterProvider();
+        encounterProvider2.setVoided(false);
+        encounterProvider2.setProvider(provider2);
+        encounterProvider2.setEncounterRole(role);
+
+        Set<EncounterProvider> encounterProviders = new HashSet<EncounterProvider>();
+        encounterProviders.add(encounterProvider1);
+        encounterProviders.add(encounterProvider2);
+        encounter.setEncounterProviders(encounterProviders);
+
+        assertThat(new EncounterDomainWrapper(encounter).getPrimaryProvider(), is(provider2));
+    }
+
+    @Test
+    public void  test_getPrimaryProvider_shouldReturnNullIfNoNonVoidedEncounterProviders() {
+
+        Encounter encounter = new Encounter();
+
+        Provider provider1 = new Provider();
+        Provider provider2 = new Provider();
+
+        EncounterRole role = new EncounterRole();
+
+        EncounterProvider encounterProvider1 = new EncounterProvider();
+        encounterProvider1.setVoided(true);
+        encounterProvider1.setProvider(provider1);
+        encounterProvider1.setEncounterRole(role);
+
+        EncounterProvider encounterProvider2 = new EncounterProvider();
+        encounterProvider2.setVoided(true);
+        encounterProvider2.setProvider(provider2);
+        encounterProvider2.setEncounterRole(role);
+
+        Set<EncounterProvider> encounterProviders = new HashSet<EncounterProvider>();
+        encounterProviders.add(encounterProvider1);
+        encounterProviders.add(encounterProvider2);
+        encounter.setEncounterProviders(encounterProviders);
+
+        assertNull(new EncounterDomainWrapper(encounter).getPrimaryProvider());
     }
 
     private Date yesterday() {

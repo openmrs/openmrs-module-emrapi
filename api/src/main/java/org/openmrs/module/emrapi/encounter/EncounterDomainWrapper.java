@@ -49,6 +49,24 @@ public class EncounterDomainWrapper {
         this.encounter = encounter;
     }
 
+    public Visit getVisit() {
+        return encounter.getVisit();
+    }
+
+    public Location getLocation() {
+        return encounter.getLocation();
+    }
+
+    public Provider getPrimaryProvider() {
+        // TODO for now we just return the first non-voided provider as the primary provider; we should improve this
+        for (EncounterProvider provider : encounter.getEncounterProviders()) {
+            if (!provider.isVoided()) {
+                return provider.getProvider();
+            }
+        }
+        return null;
+    }
+
     /**
      * Verify if a user is the creator or one of the providers in the encounter
      *
@@ -77,14 +95,6 @@ public class EncounterDomainWrapper {
 
     private boolean verifyIfUserIsTheCreatorOfEncounter(User currentUser) {
         return encounter.getCreator().equals(currentUser);
-    }
-
-    public Visit getVisit() {
-        return encounter.getVisit();
-    }
-
-    public Location getLocation() {
-        return encounter.getLocation();
     }
 
     public void closeVisit() {
