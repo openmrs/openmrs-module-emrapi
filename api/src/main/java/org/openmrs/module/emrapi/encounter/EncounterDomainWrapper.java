@@ -7,6 +7,7 @@ import org.joda.time.DateTimeComparator;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterRole;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.Provider;
 import org.openmrs.User;
@@ -49,6 +50,10 @@ public class EncounterDomainWrapper {
         this.encounter = encounter;
     }
 
+    /**
+     * Convenience getters for underlying encounter properties
+     */
+
     public Visit getVisit() {
         return encounter.getVisit();
     }
@@ -56,6 +61,27 @@ public class EncounterDomainWrapper {
     public Location getLocation() {
         return encounter.getLocation();
     }
+
+    public Date getEncounterDatetime() {
+        return encounter.getEncounterDatetime();
+    }
+
+    public int getEncounterId() {
+        return encounter.getEncounterId();
+    }
+
+    public Form getForm() {
+        return encounter.getForm();
+    }
+
+    public Boolean getVoided() {
+        return encounter.getVoided();
+    }
+
+    public Set<EncounterProvider> getEncounterProviders() {
+        return encounter.getEncounterProviders();
+    }
+
 
     public Provider getPrimaryProvider() {
         // TODO for now we just return the first non-voided provider as the primary provider; we should improve this
