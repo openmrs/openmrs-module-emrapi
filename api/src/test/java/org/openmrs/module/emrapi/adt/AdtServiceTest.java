@@ -26,6 +26,7 @@ import org.mockito.stubbing.Answer;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.Patient;
@@ -109,6 +110,8 @@ public class AdtServiceTest {
     private EncounterType admissionEncounterType;
     private EncounterType dischargeEncounterType;
     private EncounterType transferWithinHospitalEncounterType;
+    private Form admissionForm;
+    private Form transferForm;
     private VisitType atFacilityVisitType;
     private LocationTag supportsVisits;
     private LocationTag supportsAdmissions;
@@ -143,6 +146,8 @@ public class AdtServiceTest {
         admissionEncounterType = new EncounterType();
         dischargeEncounterType = new EncounterType();
         transferWithinHospitalEncounterType = new EncounterType();
+        admissionForm = new Form();
+        transferForm = new Form();
         atFacilityVisitType = new VisitType();
 
         supportsVisits = new LocationTag();
@@ -178,6 +183,9 @@ public class AdtServiceTest {
         when(emrApiProperties.getAtFacilityVisitType()).thenReturn(atFacilityVisitType);
         when(emrApiProperties.getCheckInClerkEncounterRole()).thenReturn(checkInClerkEncounterRole);
         when(emrApiProperties.getUnknownPatientPersonAttributeType()).thenReturn(unknownPatientPersonAttributeType);
+        when(emrApiProperties.getAdmissionForm()).thenReturn(admissionForm);
+        when(emrApiProperties.getDischargeForm()).thenReturn(null); // to test the case when no form is specified
+        when(emrApiProperties.getTransferForm()).thenReturn(transferForm);
 
         AdtServiceImpl service = new AdtServiceImpl();
         service.setPatientService(mockPatientService);
@@ -743,6 +751,7 @@ public class AdtServiceTest {
                 assertNotNull(actual.getVisit());
                 assertThat(actual.getPatient(), is(patient));
                 assertThat(actual.getLocation(), is(inpatientDepartment));
+                assertThat(actual.getForm(), is(admissionForm));
                 assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
                 assertThat(actual, hasProviders(admission.getProviders()));
                 return true;
@@ -785,6 +794,7 @@ public class AdtServiceTest {
                 assertNotNull(actual.getVisit());
                 assertThat(actual.getPatient(), is(patient));
                 assertThat(actual.getLocation(), is(inpatientDepartment));
+                assertNull(actual.getForm()); // because in our sample data we didn't set a discharge form
                 assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
                 assertThat(actual, hasProviders(discharge.getProviders()));
                 return true;
@@ -810,6 +820,7 @@ public class AdtServiceTest {
                 assertThat(actual.getVisit(), is(visit));
                 assertThat(actual.getPatient(), is(patient));
                 assertThat(actual.getLocation(), is(radiologyDepartment));
+                assertThat(actual.getForm(), is(transferForm));
                 assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
                 assertThat(actual, hasProviders(transfer.getProviders()));
                 return true;

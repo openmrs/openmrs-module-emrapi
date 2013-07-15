@@ -14,16 +14,12 @@
 
 package org.openmrs.module.emrapi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.openmrs.Concept;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.LocationTag;
@@ -37,6 +33,11 @@ import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.utils.ModuleProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Properties (some constant, some configured via GPs) for this module.
@@ -86,6 +87,18 @@ public class EmrApiProperties extends ModuleProperties {
 
     public EncounterType getTransferWithinHospitalEncounterType() {
         return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE, false);
+    }
+
+    public Form getAdmissionForm() {
+        return getFormByGlobalProperty(EmrApiConstants.GP_ADMISSION_FORM);
+    }
+
+    public Form getDischargeForm() {
+        return getFormByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_IMPATIENT_FORM);
+    }
+
+    public Form getTransferForm() {
+        return getFormByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_FORM);
     }
 
     public int getVisitExpireHours() {

@@ -18,6 +18,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Order;
@@ -308,7 +309,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 			return lastEncounter;
 		}
 
-        Encounter encounter = buildEncounter(emrApiProperties.getCheckInEncounterType(), patient, where, new Date(), obsForCheckInEncounter, ordersForCheckInEncounter);
+        Encounter encounter = buildEncounter(emrApiProperties.getCheckInEncounterType(), patient, where, null, new Date(), obsForCheckInEncounter, ordersForCheckInEncounter);
         encounter.addProvider(emrApiProperties.getCheckInClerkEncounterRole(), checkInClerk);
         activeVisit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);
@@ -349,11 +350,12 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
     }
 
-    private Encounter buildEncounter(EncounterType encounterType, Patient patient, Location location, Date when, List<Obs> obsToCreate, List<Order> ordersToCreate) {
+    private Encounter buildEncounter(EncounterType encounterType, Patient patient, Location location, Form form, Date when, List<Obs> obsToCreate, List<Order> ordersToCreate) {
         Encounter encounter = new Encounter();
         encounter.setPatient(patient);
         encounter.setEncounterType(encounterType);
         encounter.setLocation(location);
+        encounter.setForm(form);
         encounter.setEncounterDatetime(when);
         if (obsToCreate != null) {
             for (Obs obs : obsToCreate) {
@@ -674,16 +676,17 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         action.getType().checkVisitValid(visit);
 
-        Date dischargeDatetime = action.getActionDatetime();
-        if (dischargeDatetime == null) {
-            dischargeDatetime = new Date();
+        Date adtDatetime = action.getActionDatetime();
+        if (adtDatetime == null) {
+            adtDatetime = new Date();
         }
 
-        visit.errorIfOutsideVisit(dischargeDatetime, "ADT Datetime outside of visit bounds");
+        visit.errorIfOutsideVisit(adtDatetime, "ADT Datetime outside of visit bounds");
 
-        EncounterType dischargeEncounterType = action.getType().getEncounterType(emrApiProperties);
+        EncounterType adtEncounterType = action.getType().getEncounterType(emrApiProperties);
+        Form adtForm = action.getType().getForm(emrApiProperties);
 
-        Encounter encounter = buildEncounter(dischargeEncounterType, visit.getVisit().getPatient(), action.getLocation(), dischargeDatetime, null, null);
+        Encounter encounter = buildEncounter(adtEncounterType, visit.getVisit().getPatient(), action.getLocation(), adtForm, adtDatetime, null, null);
         addProviders(encounter, action.getProviders());
 
         visit.addEncounter(encounter);

@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.ConceptSource;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.Provider;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -46,5 +47,11 @@ public class ModulePropertiesComponentTest extends BaseModuleContextSensitiveTes
         Assert.assertEquals("Test", provider.getIdentifier());
     }
 
+    @Test
+    public void shouldFetchFormByUuid() {
+        Form form = emrApiProperties.getFormByGlobalProperty("emr.unknownForm");
+        Assert.assertNotNull(form);
+        Assert.assertEquals("Basic Form", form.getName());
+    }
 
 }

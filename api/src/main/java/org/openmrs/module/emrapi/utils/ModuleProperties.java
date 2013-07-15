@@ -22,6 +22,7 @@ import org.openmrs.ConceptClass;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.OrderType;
 import org.openmrs.PatientIdentifierType;
@@ -30,6 +31,7 @@ import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
+import org.openmrs.api.FormService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
@@ -90,6 +92,10 @@ public abstract class ModuleProperties {
     @Autowired
     @Qualifier("providerService")
     protected ProviderService providerService;
+
+    @Autowired
+    @Qualifier("formService")
+    protected FormService formService;
 
     public void setConceptService(ConceptService conceptService) {
         this.conceptService = conceptService;
@@ -225,6 +231,12 @@ public abstract class ModuleProperties {
             throw new IllegalStateException("Configuration required: " + globalPropertyName);
         }
         return provider;
+    }
+
+    protected Form getFormByGlobalProperty(String globalPropertyName) {
+        // note that we are allowing forms to be null at this point
+        String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
+        return formService.getFormByUuid(globalProperty);
     }
 
     protected PatientIdentifierType getPatientIdentifierTypeByGlobalProperty(String globalPropertyName, boolean required) {

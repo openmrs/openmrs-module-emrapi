@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.adt;
 
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
@@ -83,6 +84,12 @@ public class AdtAction {
             }
 
             @Override
+            public Form getForm(EmrApiProperties properties) {
+                // allowed to be null
+                return properties.getAdmissionForm();
+            }
+
+            @Override
             public void checkVisitValid(VisitDomainWrapper visit) {
                 if (visit.isAdmitted()) {
                     throw new IllegalStateException("Patient is already admitted");
@@ -96,6 +103,12 @@ public class AdtAction {
                     throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE);
                 }
                 return encounterType;
+            }
+
+            @Override
+            public Form getForm(EmrApiProperties properties) {
+                // allowed to be null
+                return properties.getDischargeForm();
             }
 
             @Override
@@ -115,11 +128,18 @@ public class AdtAction {
             }
 
             @Override
+            public Form getForm(EmrApiProperties properties) {
+                // allowed to be null
+                return properties.getTransferForm();
+            }
+
+            @Override
             public void checkVisitValid(VisitDomainWrapper visit) {
             }
         };
 
         public abstract EncounterType getEncounterType(EmrApiProperties properties);
+        public abstract Form getForm(EmrApiProperties form);
         public abstract void checkVisitValid(VisitDomainWrapper visit);
     }
 

@@ -45,6 +45,12 @@ public class EmrApiConstants {
 
     public static final String GP_CLINICIAN_ENCOUNTER_ROLE = "emr.clinicianEncounterRole";
 
+    public static final String GP_ADMISSION_FORM = "emr.admissionForm";
+
+    public static final String GP_TRANSFER_WITHIN_HOSPITAL_FORM = "emr.transferWithinHospitalForm";
+
+    public static final String GP_EXIT_FROM_IMPATIENT_FORM = "emr.exitFromImpatientForm";
+
     public static final String LOCATION_TAG_SUPPORTS_VISITS = "Visit Location";
 
     public static final String LOCATION_TAG_SUPPORTS_LOGIN = "Login Location";

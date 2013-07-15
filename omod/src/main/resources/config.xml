@@ -101,5 +101,30 @@
             UUID of the VisitType that we use for newly-created visits
         </description>
     </globalProperty>
+
+    <globalProperty>
+        <property>emr.admissionForm</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the Admission Form (not required)
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>emr.transferWithinHospitalForm</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the Transfer Form (not required)
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>emr.exitFromImpatientForm</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the Discharge Form (not required)
+        </description>
+    </globalProperty>
+
 </module>
 
