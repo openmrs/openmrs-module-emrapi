@@ -81,9 +81,11 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 
     public List<Obs> getAdditionalObs(Obs obsGroup) {
         List<Obs> notDisposition = new ArrayList<Obs>();
-        for (Obs candidate : obsGroup.getGroupMembers()) {
-            if (!candidate.getConcept().equals(dispositionConcept)) {
-                notDisposition.add(candidate);
+        if (obsGroup.hasGroupMembers()) {
+            for (Obs candidate : obsGroup.getGroupMembers()) {
+                if (!candidate.getConcept().equals(dispositionConcept)) {
+                    notDisposition.add(candidate);
+                }
             }
         }
         return notDisposition;
