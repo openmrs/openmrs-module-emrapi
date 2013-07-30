@@ -15,7 +15,6 @@
 package org.openmrs.module.emrapi.diagnosis;
 
 import org.openmrs.Concept;
-import org.openmrs.ConceptAnswer;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
@@ -97,57 +96,27 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
     }
 
     public Obs buildDiagnosisObsGroup(Diagnosis diagnosis) {
-        Obs order = new Obs();
-        order.setConcept(diagnosisOrderConcept);
-        order.setValueCoded(findAnswer(diagnosisOrderConcept, diagnosis.getOrder().getCodeInEmrConceptSource()));
+        Concept orderAnswer = findAnswer(diagnosisOrderConcept, diagnosis.getOrder().getCodeInEmrConceptSource());
+        Concept certaintyAnswer = findAnswer(diagnosisCertaintyConcept, diagnosis.getCertainty().getCodeInEmrConceptSource());
 
-        Obs certainty = new Obs();
-        certainty.setConcept(diagnosisCertaintyConcept);
-        certainty.setValueCoded(findAnswer(diagnosisCertaintyConcept, diagnosis.getCertainty().getCodeInEmrConceptSource()));
-
-        Obs diagnosisObs = buildObsFor(diagnosis.getDiagnosis(), codedDiagnosisConcept, nonCodedDiagnosisConcept);
-
-        Obs obs = new Obs();
-        obs.setConcept(diagnosisSetConcept);
-        obs.addGroupMember(order);
-        obs.addGroupMember(certainty);
-        obs.addGroupMember(diagnosisObs);
-        return obs;
-    }
-
-    private Obs buildObsFor(CodedOrFreeTextAnswer codedOrFreeTextAnswer, Concept questionIfCoded, Concept questionIfNonCoded) {
-        Obs obs = new Obs();
-        if (codedOrFreeTextAnswer.getNonCodedAnswer() != null) {
-            obs.setConcept(nonCodedDiagnosisConcept);
-            obs.setValueText(codedOrFreeTextAnswer.getNonCodedAnswer());
-        } else {
-            obs.setConcept(codedDiagnosisConcept);
-            obs.setValueCoded(codedOrFreeTextAnswer.getCodedAnswer());
-            obs.setValueCodedName(codedOrFreeTextAnswer.getSpecificCodedAnswer());
+        if (diagnosis.getExistingObs() != null) {
+            setCodedMember(diagnosis.getExistingObs(), diagnosisOrderConcept, orderAnswer, null);
+            setCodedMember(diagnosis.getExistingObs(), diagnosisCertaintyConcept, certaintyAnswer, null);
+            setCodedOrFreeTextMember(diagnosis.getExistingObs(), diagnosis.getDiagnosis(), codedDiagnosisConcept, nonCodedDiagnosisConcept);
+            return diagnosis.getExistingObs();
         }
-        return obs;
-    }
+        else {
+            Obs order = buildObsFor(diagnosisOrderConcept, orderAnswer, null);
+            Obs certainty = buildObsFor(diagnosisCertaintyConcept, certaintyAnswer, null);
+            Obs diagnosisObs = buildObsFor(diagnosis.getDiagnosis(), codedDiagnosisConcept, nonCodedDiagnosisConcept);
 
-    private Concept findAnswer(Concept concept, String codeForAnswer) {
-        for (ConceptAnswer conceptAnswer : concept.getAnswers()) {
-            Concept answerConcept = conceptAnswer.getAnswerConcept();
-            if (answerConcept != null) {
-                if (hasConceptMapping(answerConcept, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME, codeForAnswer)) {
-                    return answerConcept;
-                }
-            }
+            Obs obs = new Obs();
+            obs.setConcept(diagnosisSetConcept);
+            obs.addGroupMember(order);
+            obs.addGroupMember(certainty);
+            obs.addGroupMember(diagnosisObs);
+            return obs;
         }
-        throw new IllegalStateException("Cannot find answer mapped with " + EmrApiConstants.EMR_CONCEPT_SOURCE_NAME + ":" + codeForAnswer + " in the concept " + concept.getName());
-    }
-
-    private boolean hasConceptMapping(Concept concept, String sourceName, String codeToLookFor) {
-        for (ConceptMap conceptMap : concept.getConceptMappings()) {
-            ConceptReferenceTerm conceptReferenceTerm = conceptMap.getConceptReferenceTerm();
-            if (sourceName.equals(conceptReferenceTerm.getConceptSource().getName()) && codeToLookFor.equals(conceptReferenceTerm.getCode())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean isDiagnosis(Obs obsGroup) {
@@ -184,6 +153,7 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         if (certaintyObs != null) {
             diagnosis.setCertainty(getDiagnosisCertaintyFrom(certaintyObs));
         }
+        diagnosis.setExistingObs(obsGroup);
         return diagnosis;
     }
 

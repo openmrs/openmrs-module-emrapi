@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi.diagnosis;
 
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptName;
@@ -40,6 +41,9 @@ public class CodedOrFreeTextAnswer {
     ConceptName specificCodedAnswer;
 
     String nonCodedAnswer;
+
+    public CodedOrFreeTextAnswer() {
+    }
 
     public CodedOrFreeTextAnswer(String spec, ConceptService conceptService) {
         if (spec.startsWith(CONCEPT_NAME_PREFIX)) {
@@ -68,10 +72,23 @@ public class CodedOrFreeTextAnswer {
         this.nonCodedAnswer = nonCodedAnswer;
     }
 
+    public String toClientString() {
+        if (specificCodedAnswer != null) {
+            return CONCEPT_NAME_PREFIX + specificCodedAnswer.getId();
+        }
+        else if (codedAnswer != null) {
+            return CONCEPT_PREFIX + codedAnswer.getId();
+        }
+        else {
+            return NON_CODED_PREFIX + nonCodedAnswer;
+        }
+    }
+
     public Concept getCodedAnswer() {
         return codedAnswer;
     }
 
+    @JsonDeserialize(using = ConceptCodeDeserializer.class)
     public void setCodedAnswer(Concept codedAnswer) {
         this.codedAnswer = codedAnswer;
     }

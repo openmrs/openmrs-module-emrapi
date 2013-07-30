@@ -15,11 +15,15 @@
 package org.openmrs.module.emrapi.concept;
 
 import org.openmrs.Concept;
+import org.openmrs.ConceptClass;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptReferenceTerm;
+import org.openmrs.ConceptSearchResult;
+import org.openmrs.ConceptSource;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 /**
  *
@@ -27,5 +31,7 @@ import java.util.List;
 public interface EmrConceptDAO {
 
     List<Concept> getConceptsMappedTo(Collection<ConceptMapType> mapTypes, ConceptReferenceTerm term);
+
+    List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit);
 
 }

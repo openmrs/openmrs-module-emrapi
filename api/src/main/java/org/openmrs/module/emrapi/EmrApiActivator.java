@@ -14,6 +14,7 @@
 package org.openmrs.module.emrapi;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.ConceptSource;
 import org.openmrs.GlobalProperty;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.Person;
@@ -22,6 +23,7 @@ import org.openmrs.Privilege;
 import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
@@ -86,10 +88,13 @@ public class EmrApiActivator extends BaseModuleActivator {
         LocationService locationService = Context.getLocationService();
         ProviderService providerService = Context.getProviderService();
         PersonService personService = Context.getPersonService();
+        ConceptService conceptService = Context.getConceptService();
 
         createGlobalProperties(administrationService);
         createLocationAttributeTypes(locationService);
         createUnknownProvider(administrationService, providerService, personService);
+
+        createConceptSource(conceptService);
     }
 
     private void createGlobalProperties(AdministrationService administrationService) {
@@ -202,6 +207,24 @@ public class EmrApiActivator extends BaseModuleActivator {
 
         }
 
+    }
+
+    /**
+     * (public so that it can be used in tests, but you shouldn't use this in production code)
+     * Creates a single ConceptSource which we will use to tag concepts relevant to this module
+     *
+     * @param conceptService
+     */
+    public ConceptSource createConceptSource(ConceptService conceptService) {
+        ConceptSource conceptSource = conceptService.getConceptSourceByName(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
+        if (conceptSource == null) {
+            conceptSource = new ConceptSource();
+            conceptSource.setName(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
+            conceptSource.setDescription(EmrApiConstants.EMR_CONCEPT_SOURCE_DESCRIPTION);
+            conceptSource.setUuid(EmrApiConstants.EMR_CONCEPT_SOURCE_UUID);
+            conceptService.saveConceptSource(conceptSource);
+        }
+        return conceptSource;
     }
 
 }

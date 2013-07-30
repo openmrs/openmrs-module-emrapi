@@ -14,8 +14,11 @@
 
 package org.openmrs.module.emrapi.diagnosis;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.openmrs.Concept;
 import org.openmrs.ConceptAnswer;
 import org.openmrs.ConceptMap;
@@ -23,8 +26,11 @@ import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
+import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 
 import java.util.Locale;
 
@@ -82,4 +88,77 @@ public class DiagnosisMetadataTest {
         when(mockConceptService.getConceptByMapping(mappingCode, emrConceptSource.getName())).thenReturn(concept);
         return concept;
     }
+
+    @Test
+    public void buildDiagnosisObsGroup_should_createNewObsGroup() throws Exception {
+        String nonCodedAnswer = "Free text";
+
+        EmrApiProperties emrApiProperties = mock(EmrApiProperties.class);
+        MockMetadataTestUtil.setupMockConceptService(conceptService, emrApiProperties);
+        MockMetadataTestUtil.setupDiagnosisMetadata(emrApiProperties, conceptService);
+
+        Diagnosis diagnosis = new Diagnosis(new CodedOrFreeTextAnswer(nonCodedAnswer), Diagnosis.Order.PRIMARY);
+        diagnosis.setCertainty(Diagnosis.Certainty.PRESUMED);
+
+        DiagnosisMetadata dmd = emrApiProperties.getDiagnosisMetadata();
+        Obs obs = dmd.buildDiagnosisObsGroup(diagnosis);
+
+        assertThat(obs.getConcept(), is(dmd.getDiagnosisSetConcept()));
+        assertThat(obs.getGroupMembers().size(), is(3));
+        assertThat(obs, hasGroupMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.PRIMARY), false));
+        assertThat(obs, hasGroupMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.PRESUMED), false));
+        assertThat(obs, hasGroupMember(dmd.getNonCodedDiagnosisConcept(), nonCodedAnswer, false));
+    }
+
+    @Test
+    public void buildDiagnosisObsGroup_should_editExistingObsGroup() throws Exception {
+        String oldNonCodedAnswer = "Free text";
+        String newNonCodedAnswer = "Another answer";
+
+        EmrApiProperties emrApiProperties = mock(EmrApiProperties.class);
+        MockMetadataTestUtil.setupMockConceptService(conceptService, emrApiProperties);
+        MockMetadataTestUtil.setupDiagnosisMetadata(emrApiProperties, conceptService);
+
+        // first, build the original obs
+        Diagnosis diagnosis = new Diagnosis(new CodedOrFreeTextAnswer(oldNonCodedAnswer), Diagnosis.Order.PRIMARY);
+        diagnosis.setCertainty(Diagnosis.Certainty.PRESUMED);
+
+        DiagnosisMetadata dmd = emrApiProperties.getDiagnosisMetadata();
+        Obs obs = dmd.buildDiagnosisObsGroup(diagnosis);
+
+        // now modify it
+        diagnosis.setExistingObs(obs);
+        diagnosis.setCertainty(Diagnosis.Certainty.CONFIRMED);
+        diagnosis.setDiagnosis(new CodedOrFreeTextAnswer(newNonCodedAnswer));
+        obs = dmd.buildDiagnosisObsGroup(diagnosis);
+
+        assertThat(obs.getConcept(), is(dmd.getDiagnosisSetConcept()));
+        assertThat(obs.getGroupMembers(false).size(), is(3));
+        assertThat(obs.getGroupMembers(true).size(), is(5));
+        assertThat(obs, hasGroupMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.PRIMARY), false));
+        assertThat(obs, hasGroupMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.CONFIRMED), false));
+        assertThat(obs, hasGroupMember(dmd.getNonCodedDiagnosisConcept(), newNonCodedAnswer, false));
+        assertThat(obs, hasGroupMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.PRESUMED), true));
+        assertThat(obs, hasGroupMember(dmd.getNonCodedDiagnosisConcept(), oldNonCodedAnswer, true));
+    }
+
+    private Matcher<? super Obs> hasGroupMember(final Concept question, final Object answer, final boolean isVoided) {
+        return new ArgumentMatcher<Obs>() {
+            @Override
+            public boolean matches(Object argument) {
+                Obs actualGroup = (Obs) argument;
+                return CoreMatchers.hasItem(new ArgumentMatcher<Obs>() {
+                    @Override
+                    public boolean matches(Object argument) {
+                        Obs actual = (Obs) argument;
+                        return actual.getConcept().equals(question) &&
+                                actual.isVoided() == isVoided &&
+                                (answer instanceof Concept && actual.getValueCoded().equals(answer)
+                                        || answer instanceof String && actual.getValueText().equals(answer));
+                    }
+                }).matches(actualGroup.getGroupMembers(true));
+            }
+        };
+    }
+
 }

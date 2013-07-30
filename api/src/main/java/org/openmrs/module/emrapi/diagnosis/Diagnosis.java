@@ -14,6 +14,8 @@
 
 package org.openmrs.module.emrapi.diagnosis;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.openmrs.Obs;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -25,9 +27,16 @@ public class Diagnosis {
 
     CodedOrFreeTextAnswer diagnosis;
 
+    @JsonProperty
     Order order;
 
+    @JsonProperty
     Certainty certainty = Certainty.PRESUMED;
+
+    Obs existingObs;
+
+    public Diagnosis() {
+    }
 
     public Diagnosis(CodedOrFreeTextAnswer diagnosis) {
         this.diagnosis = diagnosis;
@@ -60,6 +69,14 @@ public class Diagnosis {
 
     public void setCertainty(Certainty certainty) {
         this.certainty = certainty;
+    }
+
+    public Obs getExistingObs() {
+        return existingObs;
+    }
+
+    public void setExistingObs(Obs existingObs) {
+        this.existingObs = existingObs;
     }
 
     @Override

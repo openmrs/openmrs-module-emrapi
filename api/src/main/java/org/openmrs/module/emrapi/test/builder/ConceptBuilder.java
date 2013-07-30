@@ -96,6 +96,9 @@ public class ConceptBuilder {
     }
 
     public ConceptBuilder addAnswers(Concept... answers) {
+        if (!concept.getDatatype().isCoded()) {
+            throw new IllegalStateException("Cannot add answers to a concept with datatype " + concept.getDatatype().getName());
+        }
         for (Concept answer : answers) {
             concept.addAnswer(new ConceptAnswer(answer));
         }
