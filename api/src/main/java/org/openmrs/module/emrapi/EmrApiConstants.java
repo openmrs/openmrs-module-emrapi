@@ -49,7 +49,7 @@ public class EmrApiConstants {
 
     public static final String GP_TRANSFER_WITHIN_HOSPITAL_FORM = "emr.transferWithinHospitalForm";
 
-    public static final String GP_EXIT_FROM_IMPATIENT_FORM = "emr.exitFromImpatientForm";
+    public static final String GP_EXIT_FROM_INPATIENT_FORM = "emr.exitFromInpatientForm";
 
     public static final String LOCATION_TAG_SUPPORTS_VISITS = "Visit Location";
 

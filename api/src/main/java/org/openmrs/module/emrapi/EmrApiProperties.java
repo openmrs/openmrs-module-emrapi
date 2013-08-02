@@ -94,7 +94,7 @@ public class EmrApiProperties extends ModuleProperties {
     }
 
     public Form getDischargeForm() {
-        return getFormByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_IMPATIENT_FORM);
+        return getFormByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_FORM);
     }
 
     public Form getTransferForm() {
