@@ -119,7 +119,7 @@
     </globalProperty>
 
     <globalProperty>
-        <property>emr.exitFromImpatientForm</property>
+        <property>emr.exitFromInpatientForm</property>
         <defaultValue></defaultValue>
         <description>
             UUID of the Discharge Form (not required)
