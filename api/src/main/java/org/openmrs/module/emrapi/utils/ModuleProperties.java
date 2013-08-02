@@ -175,6 +175,14 @@ public abstract class ModuleProperties {
         return conceptSource;
     }
 
+    protected EncounterType getEncounterTypeByUuid(String uuid, boolean required) {
+        EncounterType encounterType = encounterService.getEncounterTypeByUuid(uuid);
+        if (required && encounterType == null) {
+            throw new IllegalStateException("Cannot find required EncounterType with uuid = " + uuid);
+        }
+        return encounterType;
+    }
+
     protected EncounterType getEncounterTypeByGlobalProperty(String globalPropertyName) {
         return getEncounterTypeByGlobalProperty(globalPropertyName, true);
     }
@@ -202,6 +210,14 @@ public abstract class ModuleProperties {
         VisitType visitType = visitService.getVisitTypeByUuid(globalProperty);
         if (visitType == null) {
             throw new IllegalStateException("Configuration required: " + globalPropertyName);
+        }
+        return visitType;
+    }
+
+    protected VisitType getVisitTypeByUuid(String uuid, boolean required) {
+        VisitType visitType = visitService.getVisitTypeByUuid(uuid);
+        if (required && visitType == null) {
+            throw new IllegalStateException("Cannot find required VisitType with uuid = " + uuid);
         }
         return visitType;
     }

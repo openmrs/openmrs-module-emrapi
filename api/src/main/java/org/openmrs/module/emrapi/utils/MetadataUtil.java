@@ -30,9 +30,12 @@ import org.openmrs.module.metadatasharing.wrapper.PackageImporter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -53,6 +56,25 @@ public class MetadataUtil {
 	 */
 	public static boolean setupStandardMetadata(ClassLoader loader) throws Exception {
         MetadataPackagesConfig config = getMetadataPackagesForModule(loader);
+        return loadPackages(config, loader);
+    }
+
+    /**
+     * Useful for testing, e.g. if you need to load up a specific MDS package
+     * @param loader
+     * @param namesToLoad something like Reference_Application_Visit_and_Encounter_Types
+     * @return
+     * @throws Exception
+     */
+    public static boolean setupSpecificMetadata(ClassLoader loader, String... namesToLoad) throws Exception {
+        List<String> namesToKeep = Arrays.asList(namesToLoad);
+        MetadataPackagesConfig config = getMetadataPackagesForModule(loader);
+        for (Iterator<MetadataPackageConfig> i = config.getPackages().iterator(); i.hasNext(); ) {
+            MetadataPackageConfig packageConfig = i.next();
+            if (!namesToKeep.contains(packageConfig.getFilenameBase())) {
+                i.remove();
+            }
+        }
         return loadPackages(config, loader);
     }
 
