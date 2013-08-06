@@ -14,8 +14,11 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.Encounter;
@@ -25,7 +28,10 @@ import org.openmrs.LocationTag;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
+import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -61,6 +67,13 @@ import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
+    public static final Predicate NON_VOIDED = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return !((Encounter) o).isVoided();
+        }
+    };
+
     @Autowired
     private AdtService service;
 
@@ -69,6 +82,12 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     LocationService locationService;
+
+    @Autowired
+    PatientService patientService;
+
+    @Autowired
+    VisitService visitService;
 
     @Before
     public void setUp() throws Exception {
@@ -332,6 +351,24 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertTrue(visits.contains(visit.getVisit()));
         assertTrue(visits.contains(anotherVisit.getVisit()));
 
+    }
+
+    @Test
+    @Ignore
+    public void test_MergePatientsWithOverlappingVisits() throws Exception {
+
+        Patient preferred = patientService.getPatient(7);
+        Patient notPreferred = patientService.getPatient(8);
+
+        service.mergePatients(preferred, notPreferred);
+
+        List<Visit> visits = visitService.getVisitsByPatient(preferred);
+
+        // sanity check
+        assertThat(visits.size(), is(1));
+
+        Set<Encounter> encounters = visits.get(0).getEncounters();
+        assertThat(CollectionUtils.select(encounters, NON_VOIDED).size(), is(2));
     }
 
 }
