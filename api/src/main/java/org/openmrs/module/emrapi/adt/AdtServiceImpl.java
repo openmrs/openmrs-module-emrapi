@@ -640,6 +640,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
                 encounterService.saveEncounter(e);
             }
         }
+        nonPreferred.setEncounters(null); // we need to manually the encounters from the non-preferred visit before voiding or all the encounters we just moved will also get voided!
+
         visitService.voidVisit(nonPreferred, "EMR - Merge Patients: merged into visit " + preferred.getVisitId());
         visitService.saveVisit(preferred);
     }

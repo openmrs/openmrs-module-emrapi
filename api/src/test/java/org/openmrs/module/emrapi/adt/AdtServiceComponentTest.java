@@ -354,7 +354,6 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    @Ignore
     public void test_MergePatientsWithOverlappingVisits() throws Exception {
 
         Patient preferred = patientService.getPatient(7);
