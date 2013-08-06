@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openmrs.Encounter;
@@ -66,11 +67,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyCollection;
@@ -308,6 +305,120 @@ public class AdtServiceTest {
                 }
             }
         }));
+    }
+
+    @Test
+    public void testMergeVisits() throws Exception {
+        Patient patient = new Patient();
+        VisitType visitType = new VisitType();
+
+        Date now = new Date();
+        Date tenDaysAgo = DateUtils.addDays(now, -10);
+        Date nineDaysAgo = DateUtils.addDays(now, -9);
+        Date eightDaysAgo = DateUtils.addDays(now, -8);
+        Date sevenDaysAgo = DateUtils.addDays(now, -7);
+        Date sixDaysAgo = DateUtils.addDays(now, -6);
+        Date fiveDaysAgo = DateUtils.addDays(now, -5);
+        Date threeDaysAgo = DateUtils.addDays(now, -3);
+        Date oneDayAgo = DateUtils.addDays(now, -1);
+
+        Visit visit1 = buildVisit(patient, visitType, mirebalaisHospital, tenDaysAgo, nineDaysAgo);
+        Visit visit2 = buildVisit(patient, visitType, mirebalaisHospital, eightDaysAgo, sixDaysAgo);
+        Visit visit3 = buildVisit(patient, visitType, mirebalaisHospital, fiveDaysAgo, threeDaysAgo);
+        Visit visit4 = buildVisit(patient, visitType, mirebalaisHospital, oneDayAgo, null);
+
+        Visit mergedVisit = service.mergeVisits(visit2, visit3);
+        assertNotNull(mergedVisit);
+        assertSame(visit2, mergedVisit);
+    }
+
+    @Test
+    public void testMergeConsecutiveVisits() throws Exception {
+        Patient patient = new Patient();
+        VisitType visitType = new VisitType();
+
+        Date now = new Date();
+        Date twelveDaysAgo = DateUtils.addDays(now, -13);
+        Date eleventhDaysAgo = DateUtils.addDays(now, -11);
+        Date tenDaysAgo = DateUtils.addDays(now, -10);
+        Date nineDaysAgo = DateUtils.addDays(now, -9);
+        Date eightDaysAgo = DateUtils.addDays(now, -8);
+        Date sevenDaysAgo = DateUtils.addDays(now, -7);
+        Date sixDaysAgo = DateUtils.addDays(now, -6);
+        Date fiveDaysAgo = DateUtils.addDays(now, -5);
+        Date threeDaysAgo = DateUtils.addDays(now, -3);
+        Date oneDayAgo = DateUtils.addDays(now, -1);
+        int index = 1234;
+        Visit visit0 = buildVisit(patient, visitType, mirebalaisHospital, twelveDaysAgo, eleventhDaysAgo);
+        visit0.setId(new Integer(index++));
+        Visit visit1 = buildVisit(patient, visitType, mirebalaisHospital, tenDaysAgo, nineDaysAgo);
+        visit1.setId(new Integer(index++));
+        Visit visit2 = buildVisit(patient, visitType, mirebalaisHospital, eightDaysAgo, sixDaysAgo);
+        when(mockVisitService.getVisit(index)).thenReturn(visit2);
+        visit2.setId(new Integer(index++));
+        Visit visit3 = buildVisit(patient, visitType, mirebalaisHospital, fiveDaysAgo, threeDaysAgo);
+        when(mockVisitService.getVisit(index)).thenReturn(visit3);
+        visit3.setId(new Integer(index++));
+        Visit visit4 = buildVisit(patient, visitType, mirebalaisHospital, oneDayAgo, null);
+        visit4.setId(new Integer(index++));
+
+        when(mockVisitService.getVisitsByPatient(patient, true, false)).thenReturn(Arrays.asList(visit1, visit2, visit3, visit4));
+        List<Integer> consecutiveVisits =  new ArrayList<Integer>();
+        consecutiveVisits.add(visit2.getId());
+        consecutiveVisits.add(visit3.getId());
+
+        boolean areConsecutive = service.areConsecutiveVisits(consecutiveVisits, patient);
+        assertTrue(areConsecutive);
+        Visit mergedVisit = service.mergeConsecutiveVisits(consecutiveVisits, patient);
+        assertSame(mergedVisit, visit2);
+        assertThat(mergedVisit.getStopDatetime(), is(visit3.getStopDatetime()));
+    }
+
+
+    @Test
+    public void testEnsureConsecutiveVisits() throws Exception {
+        Patient patient = new Patient();
+        VisitType visitType = new VisitType();
+
+        Date now = new Date();
+        Date twelveDaysAgo = DateUtils.addDays(now, -13);
+        Date eleventhDaysAgo = DateUtils.addDays(now, -11);
+        Date tenDaysAgo = DateUtils.addDays(now, -10);
+        Date nineDaysAgo = DateUtils.addDays(now, -9);
+        Date eightDaysAgo = DateUtils.addDays(now, -8);
+        Date sevenDaysAgo = DateUtils.addDays(now, -7);
+        Date sixDaysAgo = DateUtils.addDays(now, -6);
+        Date fiveDaysAgo = DateUtils.addDays(now, -5);
+        Date threeDaysAgo = DateUtils.addDays(now, -3);
+        Date oneDayAgo = DateUtils.addDays(now, -1);
+        int index = 1234;
+        Visit visit0 = buildVisit(patient, visitType, mirebalaisHospital, twelveDaysAgo, eleventhDaysAgo);
+        visit0.setId(new Integer(index++));
+        Visit visit1 = buildVisit(patient, visitType, mirebalaisHospital, tenDaysAgo, nineDaysAgo);
+        visit1.setId(new Integer(index++));
+        Visit visit2 = buildVisit(patient, visitType, mirebalaisHospital, eightDaysAgo, sixDaysAgo);
+        visit2.setId(new Integer(index++));
+        Visit visit3 = buildVisit(patient, visitType, mirebalaisHospital, fiveDaysAgo, threeDaysAgo);
+        visit3.setId(new Integer(index++));
+        Visit visit4 = buildVisit(patient, visitType, mirebalaisHospital, oneDayAgo, null);
+        visit4.setId(new Integer(index++));
+
+        when(mockVisitService.getVisitsByPatient(patient, true, false)).thenReturn(Arrays.asList(visit1, visit2, visit3, visit4));
+        List<Integer> consecutiveVisits =  new ArrayList<Integer>();
+        consecutiveVisits.add(visit2.getId());
+        consecutiveVisits.add(visit3.getId());
+        boolean areConsecutive = service.areConsecutiveVisits(consecutiveVisits, patient);
+        assertTrue(areConsecutive);
+
+        List<Integer> nonConsecutiveVisits =  new ArrayList<Integer>();
+        nonConsecutiveVisits.add(visit2.getId());
+        nonConsecutiveVisits.add(visit4.getId());
+        areConsecutive = service.areConsecutiveVisits(nonConsecutiveVisits, patient);
+        assertFalse(areConsecutive);
+
+        nonConsecutiveVisits.add(visit0.getId());
+        areConsecutive = service.areConsecutiveVisits(nonConsecutiveVisits, patient);
+        assertFalse(areConsecutive);
     }
 
     @Test

@@ -24,10 +24,10 @@ import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <pre>
@@ -198,6 +198,30 @@ public interface AdtService extends OpenmrsService {
     void mergePatients(Patient preferred, Patient notPreferred);
 
     /**
+     * Merge a set of consecutive patient visits
+     * @param visits
+     * @param patient
+     * @return a list representing the newly merged visits
+     */
+    Visit mergeConsecutiveVisits(List<Integer> visits, Patient patient);
+
+    /**
+     * Merges patient visits
+     * @param preferred
+     * @param nonPreferred
+     * @return
+     */
+    Visit mergeVisits(Visit preferred, Visit nonPreferred);
+
+    /**
+     * Checks if the list of visits passed in are consecutive
+     * @param visits
+     * @param patient
+     * @return
+     */
+    boolean areConsecutiveVisits(List<Integer> visits, Patient patient);
+
+    /**
      * Creates an encounter for specific adt action.
      * Throws an exception if not valid with visit.
      * @param action
@@ -258,5 +282,6 @@ public interface AdtService extends OpenmrsService {
      * @return
      */
     boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+
 
 }

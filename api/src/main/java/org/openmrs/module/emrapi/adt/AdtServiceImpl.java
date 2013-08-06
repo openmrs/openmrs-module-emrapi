@@ -52,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -623,7 +624,50 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
     }
 
-    private void mergeVisits(Visit preferred, Visit nonPreferred) {
+    public  boolean areConsecutiveVisits(List<Integer> visits, Patient patient){
+        if(patient != null && (visits !=null) && (visits.size() > 0) ){
+            List<Visit> patientVisits = visitService.getVisitsByPatient(patient, true, false);
+            if ( (patientVisits != null) && (patientVisits.size() > 0) ){
+                ArrayList<Integer> allVisits = new ArrayList<Integer>();
+                int j = 0;
+                for (Visit visit : patientVisits){
+                    allVisits.add(j++, visit.getId());
+                }
+                if (allVisits.containsAll(visits) ){
+                    ArrayList<Integer> candidateVisits = new ArrayList<Integer>(visits);
+                    //find the index of the first candidate for a consecutive visit
+                    int i = allVisits.indexOf(candidateVisits.get(0));
+                    if ((allVisits.size() - i) >= candidateVisits.size()){
+                        //make sure there are still more elements in the list than the the number of candidate consecutives
+                        for (Integer candidateVisit : candidateVisits){
+                            if (allVisits.get(i).compareTo(candidateVisit) == 0 ){
+                                i++;
+                            }else{
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public Visit mergeConsecutiveVisits(List<Integer> visits, Patient patient){
+        if (areConsecutiveVisits(visits, patient) ) {
+            ArrayList<Integer> candidateVisits = new ArrayList<Integer>(visits);
+            Visit mergedVisit = visitService.getVisit(candidateVisits.get(0));
+            if (candidateVisits.size() > 1){
+                for (int i =1; i < candidateVisits.size(); i++){
+                    mergedVisit = mergeVisits(mergedVisit, visitService.getVisit(candidateVisits.get(i)));
+                }
+            }
+            return mergedVisit;
+        }
+        return null;
+    }
+    public Visit mergeVisits(Visit preferred, Visit nonPreferred) {
         // extend date range of winning
         if (OpenmrsUtil.compareWithNullAsEarliest(nonPreferred.getStartDatetime(), preferred.getStartDatetime()) < 0) {
             preferred.setStartDatetime(nonPreferred.getStartDatetime());
@@ -644,6 +688,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         visitService.voidVisit(nonPreferred, "EMR - Merge Patients: merged into visit " + preferred.getVisitId());
         visitService.saveVisit(preferred);
+        return preferred;
     }
 
     private void addProviders(Encounter encounter, Map<EncounterRole, ? extends Collection<Provider>> providers) {
