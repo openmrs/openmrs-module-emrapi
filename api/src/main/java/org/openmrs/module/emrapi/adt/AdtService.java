@@ -201,7 +201,7 @@ public interface AdtService extends OpenmrsService {
      * Merge a set of consecutive patient visits
      * @param visits
      * @param patient
-     * @return a list representing the newly merged visits
+     * @return a visit representing the newly merged visit
      */
     Visit mergeConsecutiveVisits(List<Integer> visits, Patient patient);
 
@@ -209,7 +209,7 @@ public interface AdtService extends OpenmrsService {
      * Merges patient visits
      * @param preferred
      * @param nonPreferred
-     * @return
+     * @return a visit representing the newly merged visit
      */
     Visit mergeVisits(Visit preferred, Visit nonPreferred);
 
@@ -217,7 +217,7 @@ public interface AdtService extends OpenmrsService {
      * Checks if the list of visits passed in are consecutive
      * @param visits
      * @param patient
-     * @return
+     * @return a boolean indicating whether or not the visits are consecutives
      */
     boolean areConsecutiveVisits(List<Integer> visits, Patient patient);
 

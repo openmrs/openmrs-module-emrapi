@@ -625,7 +625,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     public  boolean areConsecutiveVisits(List<Integer> visits, Patient patient){
-        if(patient != null && (visits !=null) && (visits.size() > 0) ){
+        if (patient != null && visits != null && (visits.size() > 0) ){
             List<Visit> patientVisits = visitService.getVisitsByPatient(patient, true, false);
             if ( (patientVisits != null) && (patientVisits.size() > 0) ){
                 ArrayList<Integer> allVisits = new ArrayList<Integer>();
@@ -634,12 +634,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
                     allVisits.add(j++, visit.getId());
                 }
                 if (allVisits.containsAll(visits) ){
-                    ArrayList<Integer> candidateVisits = new ArrayList<Integer>(visits);
                     //find the index of the first candidate for a consecutive visit
-                    int i = allVisits.indexOf(candidateVisits.get(0));
-                    if ((allVisits.size() - i) >= candidateVisits.size()){
-                        //make sure there are still more elements in the list than the the number of candidate consecutives
-                        for (Integer candidateVisit : candidateVisits){
+                    int i = allVisits.indexOf(visits.get(0));
+                    //make sure there are still more elements in the list than the the number of candidate consecutives
+                    if ((allVisits.size() - i) >= visits.size()){
+                        for (Integer candidateVisit : visits){
                             if (allVisits.get(i).compareTo(candidateVisit) == 0 ){
                                 i++;
                             }else{
@@ -656,11 +655,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     public Visit mergeConsecutiveVisits(List<Integer> visits, Patient patient){
         if (areConsecutiveVisits(visits, patient) ) {
-            ArrayList<Integer> candidateVisits = new ArrayList<Integer>(visits);
-            Visit mergedVisit = visitService.getVisit(candidateVisits.get(0));
-            if (candidateVisits.size() > 1){
-                for (int i =1; i < candidateVisits.size(); i++){
-                    mergedVisit = mergeVisits(mergedVisit, visitService.getVisit(candidateVisits.get(i)));
+            Visit mergedVisit = visitService.getVisit(visits.get(0));
+            if (visits.size() > 1){
+                for (int i =1; i < visits.size(); i++){
+                    mergedVisit = mergeVisits(mergedVisit, visitService.getVisit(visits.get(i)));
                 }
             }
             return mergedVisit;

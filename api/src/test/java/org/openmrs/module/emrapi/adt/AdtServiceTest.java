@@ -406,8 +406,11 @@ public class AdtServiceTest {
         when(mockVisitService.getVisitsByPatient(patient, true, false)).thenReturn(Arrays.asList(visit1, visit2, visit3, visit4));
         List<Integer> consecutiveVisits =  new ArrayList<Integer>();
         consecutiveVisits.add(visit2.getId());
-        consecutiveVisits.add(visit3.getId());
         boolean areConsecutive = service.areConsecutiveVisits(consecutiveVisits, patient);
+        assertTrue(areConsecutive);
+        
+        consecutiveVisits.add(visit3.getId());
+        areConsecutive = service.areConsecutiveVisits(consecutiveVisits, patient);
         assertTrue(areConsecutive);
 
         List<Integer> nonConsecutiveVisits =  new ArrayList<Integer>();
