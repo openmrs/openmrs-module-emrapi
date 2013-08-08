@@ -408,7 +408,7 @@ public class AdtServiceTest {
         consecutiveVisits.add(visit2.getId());
         boolean areConsecutive = service.areConsecutiveVisits(consecutiveVisits, patient);
         assertTrue(areConsecutive);
-        
+
         consecutiveVisits.add(visit3.getId());
         areConsecutive = service.areConsecutiveVisits(consecutiveVisits, patient);
         assertTrue(areConsecutive);

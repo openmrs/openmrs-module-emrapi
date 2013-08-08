@@ -20,6 +20,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
+import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
@@ -168,6 +169,14 @@ public class VisitDomainWrapper {
         return startDateCalendar;
     }
 
+    public boolean hasEncounters(){
+        List<Encounter> encounters = getSortedEncounters();
+        if (encounters != null && encounters.size() > 0){
+            return true;
+        }
+        return false;
+    }
+
     public boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType) {
 
         if (visit.getEncounters() == null) {
@@ -231,6 +240,14 @@ public class VisitDomainWrapper {
 
     public Date getEncounterStopDateRange() {
         return getStopDatetime() == null ? new Date() : getStopDatetime();
+    }
+
+    private boolean verifyIfUserIsTheCreatorOfVisit(User currentUser) {
+        return visit.getCreator().equals(currentUser);
+    }
+
+    public boolean participatedInVisit(User authenticatedUser) {
+        return verifyIfUserIsTheCreatorOfVisit(authenticatedUser);
     }
 
     private class EncounterTypePredicate implements Predicate {
