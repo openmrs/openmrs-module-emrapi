@@ -242,12 +242,8 @@ public class VisitDomainWrapper {
         return getStopDatetime() == null ? new Date() : getStopDatetime();
     }
 
-    private boolean verifyIfUserIsTheCreatorOfVisit(User currentUser) {
+    public boolean verifyIfUserIsTheCreatorOfVisit(User currentUser) {
         return visit.getCreator().equals(currentUser);
-    }
-
-    public boolean participatedInVisit(User authenticatedUser) {
-        return verifyIfUserIsTheCreatorOfVisit(authenticatedUser);
     }
 
     private class EncounterTypePredicate implements Predicate {
