@@ -124,12 +124,40 @@
             <ref bean="transactionAttributeSource"/>
         </property>
     </bean>
+    
+     <bean id="emrPatientService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.patient.EmrPatientServiceImpl">
+                <property name="dao">
+                    <bean class="${project.parent.groupId}.${project.parent.artifactId}.patient.HibernateEmrPatientDAO">
+                        <property name="sessionFactory">
+                            <ref bean="sessionFactory"/>
+                        </property>
+                    </bean>
+                </property>
+                <property name="emrApiProperties" ref="emrApiProperties"/>
+                <property name="patientService" ref="patientService"/>
+                <property name="adtService" ref="adtService"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
 
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.concept.EmrConceptService</value>
                 <ref local="emrConceptService"/>
+                <value>${project.parent.groupId}.${project.parent.artifactId}.patient.EmrPatientService</value>
+                <ref local="emrPatientService"/>
             </list>
         </property>
     </bean>
