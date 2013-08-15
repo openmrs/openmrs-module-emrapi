@@ -224,6 +224,17 @@ public class VisitDomainWrapper {
         return this;
     }
 
+    public void closeOnLastEncounterDatetime() {
+
+        Encounter mostRecentEncounter = getMostRecentEncounter();
+
+        if (mostRecentEncounter == null) {
+            throw new IllegalStateException("Visit has no encounters");
+        }
+
+        visit.setStopDatetime(mostRecentEncounter.getEncounterDatetime());
+    }
+
     /**
      * Throws an {@link IllegalArgumentException} if checkDatetime is not within the start/stop date bounds of this visit
      * @param checkDatetime

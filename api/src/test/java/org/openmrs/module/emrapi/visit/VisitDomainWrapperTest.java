@@ -298,4 +298,41 @@ public class VisitDomainWrapperTest {
     public void shouldReturnNullOnMostRecentEncounterIfNoEncounters() throws Exception {
         assertThat(new VisitDomainWrapper(new Visit()).getMostRecentEncounter(), is(nullValue()));
     }
+
+    @Test
+    public void shouldCloseOnLastEncounterDate() throws Exception {
+
+        Date startDate = new DateTime(2012,2,20,10,10).toDate();
+        Date firstEncounterDate = new DateTime(2012,2,24,10,10).toDate();
+        Date secondEncounterDate = new DateTime(2012,2,28,10,10).toDate();
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(startDate);
+
+        Encounter encounter = new Encounter();
+        encounter.setEncounterDatetime(secondEncounterDate);
+
+        Encounter anotherEncounter = new Encounter();
+        anotherEncounter.setEncounterDatetime(firstEncounterDate);
+
+        visit.addEncounter(encounter);
+        visit.addEncounter(anotherEncounter);
+
+        new VisitDomainWrapper(visit).closeOnLastEncounterDatetime();
+
+        assertThat(visit.getStopDatetime(), is(secondEncounterDate));
+
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldFailIfNoEncounters() throws Exception {
+
+        Date startDate = new DateTime(2012,2,20,10,10).toDate();
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(startDate);
+
+        new VisitDomainWrapper(visit).closeOnLastEncounterDatetime();
+    }
+
 }
