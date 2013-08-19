@@ -24,6 +24,9 @@ public class MetadataPackageConfig {
 	private Integer version;
 	
 	private ImportMode importMode;
+
+	public MetadataPackageConfig() {
+	}
 	
 	public MetadataPackageConfig(String filenameBase, String groupUuid, Integer version, ImportMode importMode) {
 		this.filenameBase = filenameBase;

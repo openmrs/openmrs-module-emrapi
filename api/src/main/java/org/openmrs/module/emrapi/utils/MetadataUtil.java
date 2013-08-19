@@ -55,9 +55,13 @@ public class MetadataUtil {
 	 * @return
 	 */
 	public static boolean setupStandardMetadata(ClassLoader loader) throws Exception {
-        MetadataPackagesConfig config = getMetadataPackagesForModule(loader);
-        return loadPackages(config, loader);
+        return setupStandardMetadata(loader, PACKAGES_FILENAME);
     }
+
+	public static boolean setupStandardMetadata(ClassLoader loader, String packagesFilePath) throws Exception {
+		MetadataPackagesConfig config = getMetadataPackagesForModule(loader, packagesFilePath);
+		return loadPackages(config, loader);
+	}
 
     /**
      * Useful for testing, e.g. if you need to load up a specific MDS package
@@ -89,17 +93,21 @@ public class MetadataUtil {
     }
 
     public static MetadataPackagesConfig getMetadataPackagesForModule(ClassLoader loader) {
-        try {
-            InputStream stream = loader.getResourceAsStream(PACKAGES_FILENAME);
-            String xml = IOUtils.toString(stream);
-            MetadataPackagesConfig config = Context.getSerializationService().getDefaultSerializer()
-                    .deserialize(xml, MetadataPackagesConfig.class);
-            return config;
-        }
-        catch (Exception ex) {
-            throw new RuntimeException("Cannot find " + PACKAGES_FILENAME + ", or error deserializing it. Make sure it's in api/src/main/resources", ex);
-        }
-    }
+		return getMetadataPackagesForModule(loader, PACKAGES_FILENAME);
+	}
+
+	public static MetadataPackagesConfig getMetadataPackagesForModule(ClassLoader loader, String packageFilePath) {
+		try {
+			InputStream stream = loader.getResourceAsStream(packageFilePath);
+			String xml = IOUtils.toString(stream);
+			MetadataPackagesConfig config = Context.getSerializationService().getDefaultSerializer()
+					.deserialize(xml, MetadataPackagesConfig.class);
+			return config;
+		}
+		catch (Exception ex) {
+			throw new RuntimeException("Cannot find " + packageFilePath + ", or error deserializing it", ex);
+		}
+	}
 	
 	/**
 	 * Checks whether the given version of the MDS package has been installed yet, and if not,
