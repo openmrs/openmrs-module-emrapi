@@ -21,18 +21,16 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
     }
 
     @Override
-    public Obs codeNonCodedDiagnosis(Integer nonCodedObsId, Concept codedDiagnosis) {
+    public Obs codeNonCodedDiagnosis(Obs nonCodedObs, Concept codedDiagnosis) {
 
-        if ( (nonCodedObsId != null) && (codedDiagnosis != null) ){
-            Obs obs = obsService.getObs(nonCodedObsId);
-            if(obs != null) {
-                Concept codedDiagnosisConcept = emrApiProperties.getDiagnosisMetadata().getCodedDiagnosisConcept();
-                obs.setConcept(codedDiagnosisConcept);
-                obs.setValueCoded(codedDiagnosis);
-                obs.setValueText("");
-                obs =  obsService.saveObs(obs, "code a diagnosis");
-                return obs;
-            }
+        if ( (nonCodedObs != null) && (codedDiagnosis != null) ){
+            Concept codedDiagnosisConcept = emrApiProperties.getDiagnosisMetadata().getCodedDiagnosisConcept();
+            nonCodedObs.setConcept(codedDiagnosisConcept);
+            nonCodedObs.setValueCoded(codedDiagnosis);
+            nonCodedObs.setValueText("");
+            nonCodedObs =  obsService.saveObs(nonCodedObs, "code a diagnosis");
+            return nonCodedObs;
+
         }
         return null;
     }
