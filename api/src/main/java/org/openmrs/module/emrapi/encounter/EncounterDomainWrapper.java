@@ -141,8 +141,8 @@ public class EncounterDomainWrapper {
     /**
      * Associates the encounter with the specified visit
      * If the encounterDatetime has only a Date component, adds a time component (if necessary) based on our business logic:
-     * if this is an open visit and encounter date = today, we stamp with the current time, otherwise we add a time
-     * component (if necessary) to make sure the encounter falls within the specified visit
+     * if this is an open visit and encounter date = today, consider a real-tiome transaction and we stamp with the current time,
+     * otherwise we add a time component (if necessary) to make sure the encounter falls within the specified visit
      *
      * @param visit
      * @throws EncounterDateBeforeVisitStartDateException
