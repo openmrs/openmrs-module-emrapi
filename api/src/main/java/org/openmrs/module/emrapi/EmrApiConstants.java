@@ -85,6 +85,8 @@ public class EmrApiConstants {
 
     public static final String PRIVILEGE_DELETE_VISIT = "Task: emr.patient.visit.delete";
 
+	public static final String PRIVILEGE_END_VISIT = "Task: End Visit";
+
     public static final String UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME = "Unknown patient";
 
     public static final String TEST_PATIENT_ATTRIBUTE_UUID = "4f07985c-88a5-4abd-aa0c-f3ec8324d8e7";
