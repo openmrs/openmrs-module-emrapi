@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
+import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.User;
 import org.openmrs.Visit;
@@ -178,17 +179,23 @@ public class VisitDomainWrapper {
     }
 
     public boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType) {
+        return hasEncounterWithoutSubsequentEncounter(lookForEncounterType, withoutSubsequentEncounterType, null);
+    }
+
+    private boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType, Date onDate) {
 
         if (visit.getEncounters() == null) {
             return false;
         }
 
         for (Encounter encounter : getSortedEncounters()) {
-            if (encounter.getEncounterType().equals(lookForEncounterType)) {
-                return true;
-            }
-            else if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
-                return false;
+            if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
+                if (encounter.getEncounterType().equals(lookForEncounterType)) {
+                    return true;
+                }
+                else if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
+                    return false;
+                }
             }
         }
 
@@ -205,6 +212,43 @@ public class VisitDomainWrapper {
             return false;
         }
         return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType);
+    }
+
+    public boolean isAdmitted(Date onDate) {
+
+        if (visit.getStartDatetime().after(onDate) || (visit.getStopDatetime() != null && visit.getStopDatetime().before(onDate))) {
+            throw new IllegalArgumentException("date does not fall within visit");
+        }
+
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        EncounterType dischargeEncounterType = emrApiProperties.getExitFromInpatientEncounterType();
+        if (admissionEncounterType == null) {
+            return false;
+        }
+
+        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType, onDate);
+    }
+
+    public Location getInpatientLocation(Date onDate) {
+
+        if (!isAdmitted(onDate)) {
+            return null;
+        }
+
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        EncounterType transferEncounterType = emrApiProperties.getTransferWithinHospitalEncounterType();
+
+        for (Encounter encounter : getSortedEncounters()) {
+            if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
+                if (encounter.getEncounterType().equals(admissionEncounterType) ||
+                        encounter.getEncounterType().equals(transferEncounterType)) {
+                    return encounter.getLocation();
+                }
+            }
+        }
+
+        // should never get here if isAdmitted == true
+        return null;
     }
 
     public Date getStartDatetime() {

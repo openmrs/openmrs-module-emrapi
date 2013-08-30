@@ -31,6 +31,9 @@ public class DispositionFactory {
 
     private PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
+    public DispositionDescriptor getDispositionDescriptor() {
+        return emrApiProperties.getDispositionDescriptor();
+    }
 
     public List<Disposition> getDispositions() throws IOException {
         return getDispositionsFrom("dispositionConfig.json");

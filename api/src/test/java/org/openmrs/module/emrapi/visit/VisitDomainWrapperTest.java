@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
+import org.openmrs.Location;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.powermock.api.mockito.PowerMockito;
@@ -27,6 +28,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -183,6 +185,196 @@ public class VisitDomainWrapperTest {
 
         assertFalse(visitDomainWrapper.isAdmitted());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailIfDateOutsideOfVisit() {
+        Date now = new Date();
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -3));
+        visitDomainWrapper.isAdmitted(DateUtils.addHours(now, -4));
+    }
+
+    @Test
+    public void shouldNotBeAdmittedIfTestDateBeforeAdmitDate() throws Exception {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType dischargeEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+
+        Encounter discharge = new Encounter();
+        discharge.setEncounterType(dischargeEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(discharge);
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+       assertFalse(visitDomainWrapper.isAdmitted(DateUtils.addHours(new Date(), -4)));
+    }
+
+    @Test
+    public void shouldBeAdmittedIfTestDateBetweenAdmissionAndDischargeDate() throws Exception {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType dischargeEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+
+        Encounter discharge = new Encounter();
+        discharge.setEncounterType(dischargeEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(discharge);
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertTrue(visitDomainWrapper.isAdmitted(DateUtils.addHours(new Date(), -2)));
+    }
+
+    @Test
+    public void shouldNotAdmittedIfTestDateAfterAndDischargeDate() throws Exception {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType dischargeEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+
+        Encounter discharge = new Encounter();
+        discharge.setEncounterType(dischargeEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(discharge);
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertFalse(visitDomainWrapper.isAdmitted(new Date()));
+    }
+
+   @Test
+   public void shouldReturnCurrentLocationForAdmittedPatient() {
+
+       EncounterType admitEncounterType = new EncounterType();
+       EncounterType transferEncounterType = new EncounterType();
+
+       Location icu = new Location();
+       Location surgery = new Location();
+
+       when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+       EmrApiProperties props = mock(EmrApiProperties.class);
+       when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+       when(props.getTransferWithinHospitalEncounterType()).thenReturn(transferEncounterType);
+       visitDomainWrapper.setEmrApiProperties(props);
+
+       Encounter admit = new Encounter();
+       admit.setEncounterType(admitEncounterType);
+       admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+       admit.setLocation(icu);
+
+       Encounter transfer = new Encounter();
+       transfer.setEncounterType(transferEncounterType);
+       transfer.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+       transfer.setLocation(surgery);
+
+       Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+       encounters.add(transfer);
+       encounters.add(admit);
+       when(visit.getEncounters()).thenReturn(encounters);
+
+       assertThat(visitDomainWrapper.getInpatientLocation(DateUtils.addHours(new Date(), -2)), is(icu));
+       assertThat(visitDomainWrapper.getInpatientLocation(new Date()), is(surgery));
+
+   }
+
+    @Test
+    public void shouldReturnNullIfPatientNotAdmittedOnDate() {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType transferEncounterType = new EncounterType();
+
+        Location icu = new Location();
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getTransferWithinHospitalEncounterType()).thenReturn(transferEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        admit.setLocation(icu);
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertNull(visitDomainWrapper.getInpatientLocation(DateUtils.addHours(new Date(), -4)));
+    }
+
+    @Test
+    public void shouldReturnNullIfPatientDischargedOnDate() {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType dischargeEncounterType = new EncounterType();
+
+        Location icu = new Location();
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        admit.setLocation(icu);
+
+        Encounter discharge= new Encounter();
+        discharge.setEncounterType(dischargeEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(discharge);
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertNull(visitDomainWrapper.getInpatientLocation(new Date()));
+    }
+
+
 
     @Test
     public void shouldNotHaveEncounterWithoutSubsequentEncounterIfNoRelevantEncounters() throws Exception {
