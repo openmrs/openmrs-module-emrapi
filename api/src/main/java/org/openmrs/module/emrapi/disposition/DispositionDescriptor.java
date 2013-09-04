@@ -36,7 +36,7 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
     private Concept dispositionSetConcept;
     private Concept dispositionConcept;
     private Concept admissionLocationConcept;
-    private Concept transferLocationConcept;
+    private Concept internalTransferLocationConcept;
     private Concept dateOfDeathConcept;
 
     public DispositionDescriptor(ConceptService conceptService) {
@@ -44,7 +44,7 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
                 "dispositionSetConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET,
                 "dispositionConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION,
                 "admissionLocationConcept", EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION,
-                "transferLocationConcept", EmrApiConstants.CONCEPT_CODE_TRANSFER_LOCATION,
+                "internalTransferLocationConcept", EmrApiConstants.CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION,
                 "dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH);
     }
 
@@ -78,12 +78,12 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         this.admissionLocationConcept = admissionLocationConcept;
     }
 
-    public Concept getTransferLocationConcept() {
-        return transferLocationConcept;
+    public Concept getInternalTransferLocationConcept() {
+        return internalTransferLocationConcept;
     }
 
-    public void setTransferLocationConcept(Concept transferLocationConcept) {
-        this.transferLocationConcept = transferLocationConcept;
+    public void setInternalTransferLocationConcept(Concept internalTransferLocationConcept) {
+        this.internalTransferLocationConcept = internalTransferLocationConcept;
     }
 
     public Concept getDateOfDeathConcept() {
@@ -117,6 +117,14 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         return findMember(obsGroup, admissionLocationConcept);
     }
 
+    public Obs getTransferLocationObs(Obs obsGroup) {
+        return findMember(obsGroup, internalTransferLocationConcept);
+    }
+
+    public Obs getDateOfDeathObs(Obs obsGroup) {
+        return findMember(obsGroup, dateOfDeathConcept);
+    }
+
     public Location getAdmissionLocation(Obs obsGroup, LocationService locationService) {
         Obs admissionLocationObs = getAdmissionLocationObs(obsGroup);
         if (admissionLocationObs != null) {
@@ -127,7 +135,7 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         }
     }
 
-    public Location getTransferLocation(Obs obsGroup, LocationService locationService) {
+    public Location getInternalTransferLocation(Obs obsGroup, LocationService locationService) {
         Obs transferLocationObs = getTransferLocationObs(obsGroup);
         if (transferLocationObs != null) {
             return locationService.getLocation(Integer.valueOf(transferLocationObs.getValueText()));
@@ -145,14 +153,6 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         else {
             return null;
         }
-    }
-
-    public Obs getTransferLocationObs(Obs obsGroup) {
-        return findMember(obsGroup, transferLocationConcept);
-    }
-
-    public Obs getDateOfDeathObs(Obs obsGroup) {
-        return findMember(obsGroup, dateOfDeathConcept);
     }
 
     public List<Obs> getAdditionalObs(Obs obsGroup) {

@@ -44,7 +44,7 @@ public class DispositionDescriptorTest {
         dispositionDescriptor.setDispositionSetConcept(dispositionSetConcept);
         dispositionDescriptor.setDispositionConcept(dispositionConcept);
         dispositionDescriptor.setAdmissionLocationConcept(admissionLocationConcept);
-        dispositionDescriptor.setTransferLocationConcept(transferLocationConcept);
+        dispositionDescriptor.setInternalTransferLocationConcept(transferLocationConcept);
         dispositionDescriptor.setDateOfDeathConcept(dateOfDeathConcept);
 
         emrConceptService = mock(EmrConceptService.class);
@@ -173,13 +173,13 @@ public class DispositionDescriptorTest {
         transferLocationObs.setValueText(transferLocation.getId().toString());
         dispositionObsGroup.addGroupMember(transferLocationObs);
 
-        assertThat(dispositionDescriptor.getTransferLocation(dispositionObsGroup, locationService), is(transferLocation));
+        assertThat(dispositionDescriptor.getInternalTransferLocation(dispositionObsGroup, locationService), is(transferLocation));
     }
 
     @Test
     public void shouldNotFailIfNoMatchingObsWhenFetchingTransferLocation() {
         Obs dispositionObsGroup = createDispositionObsGroup();
-        assertNull(dispositionDescriptor.getTransferLocation(dispositionObsGroup, locationService));
+        assertNull(dispositionDescriptor.getInternalTransferLocation(dispositionObsGroup, locationService));
     }
 
     @Test

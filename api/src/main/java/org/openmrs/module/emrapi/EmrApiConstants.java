@@ -134,7 +134,7 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_ADMISSION_LOCATION = "Admission Location";
 
-    public static final String CONCEPT_CODE_TRANSFER_LOCATION = "Transfer Location";
+    public static final String CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION = "Internal Transfer Location";
 
     public static final String CONCEPT_CODE_DATE_OF_DEATH = "Date of Death";
 
