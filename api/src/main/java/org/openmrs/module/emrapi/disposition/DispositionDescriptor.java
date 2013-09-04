@@ -15,27 +15,37 @@
 package org.openmrs.module.emrapi.disposition;
 
 import org.openmrs.Concept;
+import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.descriptor.ConceptSetDescriptor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Describes the concepts necessary for recording a Disposition concept set
+ * Describes the concepts necessary (and optional, like admission location, transfer location, and date of death)
+ * for recording a Disposition concept set
  */
 public class DispositionDescriptor extends ConceptSetDescriptor {
 
     private Concept dispositionSetConcept;
     private Concept dispositionConcept;
+    private Concept admissionLocationConcept;
+    private Concept transferLocationConcept;
+    private Concept dateOfDeathConcept;
 
     public DispositionDescriptor(ConceptService conceptService) {
         setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME,
                 "dispositionSetConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET,
-                "dispositionConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION);
+                "dispositionConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION,
+                "admissionLocationConcept", EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION,
+                "transferLocationConcept", EmrApiConstants.CONCEPT_CODE_TRANSFER_LOCATION,
+                "dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH);
     }
 
     /**
@@ -60,6 +70,30 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         this.dispositionConcept = dispositionConcept;
     }
 
+    public Concept getAdmissionLocationConcept() {
+        return admissionLocationConcept;
+    }
+
+    public void setAdmissionLocationConcept(Concept admissionLocationConcept) {
+        this.admissionLocationConcept = admissionLocationConcept;
+    }
+
+    public Concept getTransferLocationConcept() {
+        return transferLocationConcept;
+    }
+
+    public void setTransferLocationConcept(Concept transferLocationConcept) {
+        this.transferLocationConcept = transferLocationConcept;
+    }
+
+    public Concept getDateOfDeathConcept() {
+        return dateOfDeathConcept;
+    }
+
+    public void setDateOfDeathConcept(Concept dateOfDeathConcept) {
+        this.dateOfDeathConcept = dateOfDeathConcept;
+    }
+
     public Obs buildObsGroup(Disposition disposition, EmrConceptService emrConceptService) {
         Obs dispoObs = new Obs();
         dispoObs.setConcept(dispositionConcept);
@@ -77,6 +111,48 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 
     public Obs getDispositionObs(Obs obsGroup) {
         return findMember(obsGroup, dispositionConcept);
+    }
+
+    public Obs getAdmissionLocationObs(Obs obsGroup) {
+        return findMember(obsGroup, admissionLocationConcept);
+    }
+
+    public Location getAdmissionLocation(Obs obsGroup, LocationService locationService) {
+        Obs admissionLocationObs = getAdmissionLocationObs(obsGroup);
+        if (admissionLocationObs != null) {
+            return locationService.getLocation(Integer.valueOf(admissionLocationObs.getValueText()));
+        }
+        else {
+            return null;
+        }
+    }
+
+    public Location getTransferLocation(Obs obsGroup, LocationService locationService) {
+        Obs transferLocationObs = getTransferLocationObs(obsGroup);
+        if (transferLocationObs != null) {
+            return locationService.getLocation(Integer.valueOf(transferLocationObs.getValueText()));
+        }
+        else {
+            return null;
+        }
+    }
+
+    public Date getDateOfDeath(Obs obsGroup) {
+        Obs dateOfDeathObs = getDateOfDeathObs(obsGroup);
+        if (dateOfDeathObs != null) {
+            return dateOfDeathObs.getValueDate();
+        }
+        else {
+            return null;
+        }
+    }
+
+    public Obs getTransferLocationObs(Obs obsGroup) {
+        return findMember(obsGroup, transferLocationConcept);
+    }
+
+    public Obs getDateOfDeathObs(Obs obsGroup) {
+        return findMember(obsGroup, dateOfDeathConcept);
     }
 
     public List<Obs> getAdditionalObs(Obs obsGroup) {
