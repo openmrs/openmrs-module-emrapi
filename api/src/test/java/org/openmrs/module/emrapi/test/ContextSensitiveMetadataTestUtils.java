@@ -31,6 +31,7 @@ public class ContextSensitiveMetadataTestUtils {
         ConceptDatatype naDatatype = conceptService.getConceptDatatypeByName("N/A");
         ConceptDatatype codedDatatype = conceptService.getConceptDatatypeByName("Coded");
         ConceptDatatype textDatatype = conceptService.getConceptDatatypeByName("Text");
+        ConceptDatatype dateDatatype = conceptService.getConceptDatatypeByName("Date");
 
         ConceptClass convSet = conceptService.getConceptClassByName("ConvSet");
         ConceptClass misc = conceptService.getConceptClassByName("Misc");
@@ -45,6 +46,21 @@ public class ContextSensitiveMetadataTestUtils {
         Concept transferTo = new ConceptBuilder(conceptService, textDatatype, misc)
                 .addName("Transfer to location").saveAndGet();
 
+        Concept admissionLocation = new ConceptBuilder(conceptService, textDatatype, misc)
+                .addName("Admission Location")
+                .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION)
+                .saveAndGet();
+
+        Concept internalTransferLocation = new ConceptBuilder(conceptService, textDatatype, misc)
+                .addName("Internal Transfer Location")
+                .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION)
+                .saveAndGet();
+
+        Concept dateOfDeath = new ConceptBuilder(conceptService, dateDatatype, misc)
+                .addName("Date of Death")
+                .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH)
+                .saveAndGet();
+
         Concept disposition = new ConceptBuilder(conceptService, codedDatatype, convSet)
                 .addName("Disposition")
                 .addAnswers(admit, discharge, transferOut)
@@ -52,7 +68,7 @@ public class ContextSensitiveMetadataTestUtils {
 
         new ConceptBuilder(conceptService, naDatatype, convSet)
                 .addName("Disposition Construct")
-                .addSetMembers(disposition, transferTo)
+                .addSetMembers(disposition, transferTo, admissionLocation, internalTransferLocation, dateOfDeath)
                 .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET).saveAndGet();
         return emrApiProperties.getDispositionDescriptor();
     }
