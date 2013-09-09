@@ -34,10 +34,7 @@ import org.openmrs.module.emrapi.utils.ModuleProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Properties (some constant, some configured via GPs) for this module.
@@ -234,6 +231,62 @@ public class EmrApiProperties extends ModuleProperties {
             return null;
         }
     }
+
+	public int getRecentDiagnosisPeriodInDays() {
+		String gp = getGlobalProperty(EmrApiConstants.GP_RECENT_DIAGNOSIS_PERIOD_IN_DAYS, false);
+		if (StringUtils.hasText(gp)) {
+			try {
+				return Integer.parseInt(gp);
+			} catch (NumberFormatException e) {
+				throw new IllegalStateException("Invalid configuration: number of days expected in " + EmrApiConstants.GP_RECENT_DIAGNOSIS_PERIOD_IN_DAYS, e);
+			}
+		}
+		return 730; //2 years
+	}
+
+	public Collection<Concept> getSuppressedDiagnosisConceptSets() {
+		Collection<Concept> concepts = getConceptsByUuidsOrMappingsFromGP(EmrApiConstants.GP_SUPPRESSED_DIAGNOSIS_CONCEPT_SETS);
+
+		for (Concept concept: concepts) {
+			if (!concept.isSet()) {
+				throw new IllegalStateException("Invalid configuration: concept '" + concept.getUuid() + "' defined in " + EmrApiConstants.GP_SUPPRESSED_DIAGNOSIS_CONCEPT_SETS + " is not a concept set");
+			}
+		}
+		return concepts;
+	}
+
+	public Collection<Concept> getSuppressedDiagnosisConcepts() {
+		return getConceptsByUuidsOrMappingsFromGP(EmrApiConstants.GP_SUPPRESSED_DIAGNOSIS_CONCEPTS);
+	}
+
+	private Collection<Concept> getConceptsByUuidsOrMappingsFromGP(String gp) {
+		String gpValue = getGlobalProperty(gp, false);
+
+		if (!StringUtils.hasText(gpValue)) {
+			return Collections.emptyList();
+		}
+
+		List<Concept> result = new ArrayList<Concept>();
+
+		String[] concepts = gpValue.split("\\,");
+		for (String concept: concepts) {
+			Concept foundConcept = conceptService.getConceptByUuid(concept);
+			if (foundConcept == null) {
+				String[] mapping = concept.split("\\:");
+				if (mapping.length == 2) {
+					foundConcept = conceptService.getConceptByMapping(mapping[0], mapping[1]);
+				}
+			}
+
+			if (foundConcept != null) {
+				result.add(foundConcept);
+			} else {
+				throw new IllegalStateException("Invalid configuration: concept '" + concept + "' defined in " + gp + " does not exist");
+			}
+		}
+
+		return result;
+	}
 
     public ConceptMapType getSameAsConceptMapType() {
         return conceptService.getConceptMapTypeByUuid(EmrApiConstants.SAME_AS_CONCEPT_MAP_TYPE_UUID);

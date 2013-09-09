@@ -17,28 +17,18 @@ package org.openmrs.module.emrapi.patient;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Months;
-import org.openmrs.Encounter;
-import org.openmrs.Location;
-import org.openmrs.Patient;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.PatientIdentifierType;
-import org.openmrs.PersonAddress;
-import org.openmrs.PersonAttribute;
-import org.openmrs.PersonAttributeType;
-import org.openmrs.PersonName;
-import org.openmrs.Visit;
+import org.openmrs.*;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
+import org.openmrs.module.emrapi.diagnosis.Diagnosis;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A rich-domain-model class that wraps a Patient, and lets you perform common queries.
@@ -63,16 +53,21 @@ public class PatientDomainWrapper {
     @Autowired
     protected EncounterService encounterService;
 
+	@Qualifier("diagnosisService")
+	@Autowired
+	protected DiagnosisService diagnosisService;
+
     public PatientDomainWrapper() {
     }
 
     public PatientDomainWrapper(Patient patient, EmrApiProperties emrApiProperties, AdtService adtService,
-                                VisitService visitService, EncounterService encounterService) {
+                                VisitService visitService, EncounterService encounterService, DiagnosisService diagnosisService) {
         this.patient = patient;
         this.emrApiProperties = emrApiProperties;
         this.adtService = adtService;
         this.visitService = visitService;
         this.encounterService = encounterService;
+		this.diagnosisService = diagnosisService;
     }
 
     public void setPatient(Patient patient) {
@@ -278,4 +273,14 @@ public class PatientDomainWrapper {
         }
         return testPatient;
     }
+
+	public List<Diagnosis> getRecentDiagnoses() {
+		int periodInDays = emrApiProperties.getRecentDiagnosisPeriodInDays();
+		Calendar fromDate = Calendar.getInstance();
+		fromDate.set(Calendar.DATE, -periodInDays);
+
+		List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(fromDate.getTime());
+
+		return diagnoses;
+	}
 }

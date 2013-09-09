@@ -1,10 +1,11 @@
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.openmrs.Concept;
-import org.openmrs.Obs;
+import org.openmrs.*;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
+
+import java.util.*;
 
 public class DiagnosisServiceImpl extends BaseOpenmrsService implements DiagnosisService {
 
@@ -34,4 +35,34 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
         }
         return null;
     }
+
+	@Override
+	public List<Diagnosis> getDiagnoses(Date fromDate) {
+		List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
+
+		DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+
+		List<Obs> observations = obsService.getObservations(null, null, Arrays.asList(diagnosisMetadata.getDiagnosisSetConcept()),
+				null, null, null, Arrays.asList("obsDatetime"),
+				null, null, fromDate, null, false);
+
+		for (Obs obs: observations) {
+			Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
+
+			Collection<Concept> nonDiagnosisConcepts = emrApiProperties.getSuppressedDiagnosisConcepts();
+			Collection<Concept> nonDiagnosisConceptSets = emrApiProperties.getSuppressedDiagnosisConceptSets();
+
+			Set<Concept> filter = new HashSet<Concept>();
+			filter.addAll(nonDiagnosisConcepts);
+			for (Concept conceptSet: nonDiagnosisConceptSets) {
+				filter.addAll(conceptSet.getSetMembers());
+			}
+
+			if (!filter.contains(diagnosis.getDiagnosis().getCodedAnswer())) {
+				diagnoses.add(diagnosis);
+			}
+		}
+
+		return diagnoses;
+	}
 }

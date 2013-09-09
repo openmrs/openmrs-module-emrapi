@@ -41,6 +41,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
@@ -84,10 +85,13 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private LocationService locationService;
 
+	private DiagnosisService diagnosisService;
+
     @Autowired(required = false)
     private List<PatientMergeAction> patientMergeActions;
 
-    public void setOrderService(OrderService orderService) {
+
+	public void setOrderService(OrderService orderService) {
         this.orderService = orderService;
     }
 
@@ -119,7 +123,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         this.providerService = providerService;
     }
 
-    public void setPatientMergeActions(List<PatientMergeAction> patientMergeActions) {
+	public void setDiagnosisService(DiagnosisService diagnosisService) {
+		this.diagnosisService = diagnosisService;
+	}
+
+	public void setPatientMergeActions(List<PatientMergeAction> patientMergeActions) {
         this.patientMergeActions = patientMergeActions;
     }
 
@@ -493,7 +501,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private boolean itBelongsToARealPatient(Visit candidate) {
         Patient patient = candidate.getPatient();
-        PatientDomainWrapper domainWrapper = new PatientDomainWrapper(patient, emrApiProperties, null, null, null);
+        PatientDomainWrapper domainWrapper = new PatientDomainWrapper(patient, emrApiProperties, null, null, null, null);
         return !domainWrapper.isTestPatient();
     }
 
@@ -612,7 +620,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     private PatientDomainWrapper wrap(Patient notPreferred) {
-        return new PatientDomainWrapper(notPreferred, emrApiProperties, this, visitService, encounterService);
+        return new PatientDomainWrapper(notPreferred, emrApiProperties, this, visitService, encounterService, diagnosisService);
     }
 
     private void removeAttributeOfUnknownPatient(Patient preferred) {

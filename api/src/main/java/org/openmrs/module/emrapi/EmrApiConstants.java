@@ -148,4 +148,9 @@ public class EmrApiConstants {
         put("LABEL", "bd6c1c10-38d3-11e2-81c1-0800200c9a66");
     }};
 
+	public static final String GP_RECENT_DIAGNOSIS_PERIOD_IN_DAYS = "emrapi.recentDiagnosisPeriodInDays";
+
+	public static final String GP_SUPPRESSED_DIAGNOSIS_CONCEPT_SETS = "emrapi.suppressedDiagnosisConceptSets";
+
+	public static final String GP_SUPPRESSED_DIAGNOSIS_CONCEPTS = "emrapi.suppressedDiagnosisConcepts";
 }
