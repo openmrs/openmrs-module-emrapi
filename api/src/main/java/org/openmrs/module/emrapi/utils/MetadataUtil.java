@@ -139,11 +139,16 @@ public class MetadataUtil {
 			if (loader.getResource(filename) == null) {
 				throw new RuntimeException("Cannot find " + filename + " for group " + config.getGroupUuid());
 			}
-			
+
+            log.info("About to import MDS package: " + filename);
+            long timer = System.currentTimeMillis();
 			PackageImporter metadataImporter = MetadataSharing.getInstance().newPackageImporter();
 			metadataImporter.setImportConfig(ImportConfig.valueOf(config.getImportMode()));
-			metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(filename));
-			metadataImporter.importPackage();
+            log.info("...loading package: " + filename);
+            metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(filename));
+            log.info("...importing package: " + filename);
+            metadataImporter.importPackage();
+            log.info("Imported " + filename + " in " + (System.currentTimeMillis() - timer) + "ms");
 			return true;
 		}
 		catch (Exception ex) {
