@@ -137,15 +137,7 @@
 		<property>emrapi.nonDiagnosisConceptSets</property>
 		<defaultValue></defaultValue>
 		<description>
-			UUIDs or mapping of suppressed diagnosis concept sets
-		</description>
-	</globalProperty>
-
-	<globalProperty>
-		<property>emrapi.recentDiagnosisPeriodInDays</property>
-		<defaultValue></defaultValue>
-		<description>
-			Number of days to consider diagnosis as recent
+			UUIDs or mapping of non diagnosis concept sets
 		</description>
 	</globalProperty>
 

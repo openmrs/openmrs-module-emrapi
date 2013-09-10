@@ -43,6 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -298,4 +300,32 @@ public abstract class ModuleProperties {
         return globalProperty;
     }
 
+	protected Collection<Concept> getConceptsByGlobalProperty(String gpName) {
+		String gpValue = getGlobalProperty(gpName, false);
+
+		if (!org.springframework.util.StringUtils.hasText(gpValue)) {
+			return Collections.emptyList();
+		}
+
+		List<Concept> result = new ArrayList<Concept>();
+
+		String[] concepts = gpValue.split("\\,");
+		for (String concept : concepts) {
+			Concept foundConcept = conceptService.getConceptByUuid(concept);
+			if (foundConcept == null) {
+				String[] mapping = concept.split("\\:");
+				if (mapping.length == 2) {
+					foundConcept = conceptService.getConceptByMapping(mapping[0], mapping[1]);
+				}
+			}
+
+			if (foundConcept != null) {
+				result.add(foundConcept);
+			} else {
+				throw new IllegalStateException("Invalid configuration: concept '" + concept + "' defined in " + gpName + " does not exist");
+			}
+		}
+
+		return result;
+	}
 }
