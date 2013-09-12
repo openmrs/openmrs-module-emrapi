@@ -31,12 +31,15 @@ public class DispositionFactory {
 
     private PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
+    // TODO inject this in some better way than using a setter to override?
+    private String dispositionConfig = "dispositionConfig.json";
+
     public DispositionDescriptor getDispositionDescriptor() {
         return emrApiProperties.getDispositionDescriptor();
     }
 
     public List<Disposition> getDispositions() throws IOException {
-        return getDispositionsFrom("dispositionConfig.json");
+        return getDispositionsFrom(dispositionConfig);
     }
 
     public Disposition getDispositionByUniqueId(String uniqueId) throws IOException {
@@ -83,7 +86,13 @@ public class DispositionFactory {
         this.conceptService = conceptService;
     }
 
+
+    public void setDispositionConfig(String dispositionConfig) {
+        this.dispositionConfig = dispositionConfig;
+    }
+
     public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
         this.emrApiProperties = emrApiProperties;
     }
+
 }
