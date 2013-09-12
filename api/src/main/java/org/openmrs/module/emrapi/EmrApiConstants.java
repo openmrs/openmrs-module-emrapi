@@ -108,6 +108,10 @@ public class EmrApiConstants {
 
     public static final String GP_DIAGNOSIS_SET_OF_SETS = "emr.concept.diagnosisSetOfSets";
 
+	public static final String GP_NON_DIAGNOSIS_CONCEPT_SETS = "emrapi.nonDiagnosisConceptSets";
+
+	public static final String GP_SUPPRESSED_DIAGNOSIS_CONCEPTS = "emrapi.suppressedDiagnosisConcepts";
+
     public static final String CONCEPT_CODE_DIAGNOSIS_CONCEPT_SET = "Diagnosis Concept Set";
 
     public static final String CONCEPT_CODE_CONSULT_FREE_TEXT_COMMENT = "Consult Free Text Comments";
@@ -147,5 +151,6 @@ public class EmrApiConstants {
         put("ID_CARD", "b48ef9a0-38d3-11e2-81c1-0800200c9a66");
         put("LABEL", "bd6c1c10-38d3-11e2-81c1-0800200c9a66");
     }};
+
 
 }

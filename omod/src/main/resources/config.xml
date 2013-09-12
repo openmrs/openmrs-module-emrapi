@@ -125,5 +125,21 @@
         </description>
     </globalProperty>
 
+	<globalProperty>
+		<property>emrapi.suppressedDiagnosisConcepts</property>
+		<defaultValue></defaultValue>
+		<description>
+			UUIDs or mappings of suppressed diagnosis concepts
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>emrapi.nonDiagnosisConceptSets</property>
+		<defaultValue></defaultValue>
+		<description>
+			UUIDs or mapping of non diagnosis concept sets
+		</description>
+	</globalProperty>
+
 </module>
 

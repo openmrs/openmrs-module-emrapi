@@ -45,202 +45,217 @@ import java.util.List;
 @Component("emrApiProperties")
 public class EmrApiProperties extends ModuleProperties {
 
-    public Location getUnknownLocation() {
-        return getLocationByGlobalProperty(EmrApiConstants.GP_UNKNOWN_LOCATION);
-    }
+	public Location getUnknownLocation() {
+		return getLocationByGlobalProperty(EmrApiConstants.GP_UNKNOWN_LOCATION);
+	}
 
-    public Provider getUnknownProvider() {
-        return getProviderByGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
-    }
+	public Provider getUnknownProvider() {
+		return getProviderByGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+	}
 
-    public EncounterRole getOrderingProviderEncounterRole() {
-        return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_ORDERING_PROVIDER_ENCOUNTER_ROLE);
-    }
+	public EncounterRole getOrderingProviderEncounterRole() {
+		return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_ORDERING_PROVIDER_ENCOUNTER_ROLE);
+	}
 
-    public Role getFullPrivilegeLevel() {
-        return userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);
-    }
+	public Role getFullPrivilegeLevel() {
+		return userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);
+	}
 
-    public EncounterType getCheckInEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_CHECK_IN_ENCOUNTER_TYPE);
-    }
+	public EncounterType getCheckInEncounterType() {
+		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_CHECK_IN_ENCOUNTER_TYPE);
+	}
 
-    public EncounterRole getCheckInClerkEncounterRole() {
-        return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CHECK_IN_CLERK_ENCOUNTER_ROLE);
-    }
+	public EncounterRole getCheckInClerkEncounterRole() {
+		return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CHECK_IN_CLERK_ENCOUNTER_ROLE);
+	}
 
-    public EncounterType getConsultEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_CONSULT_ENCOUNTER_TYPE);
-    }
+	public EncounterType getConsultEncounterType() {
+		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_CONSULT_ENCOUNTER_TYPE);
+	}
 
-    public EncounterRole getClinicianEncounterRole() {
-        return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CLINICIAN_ENCOUNTER_ROLE);
-    }
+	public EncounterRole getClinicianEncounterRole() {
+		return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CLINICIAN_ENCOUNTER_ROLE);
+	}
 
-    public EncounterType getAdmissionEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE, false);
-    }
+	public EncounterType getAdmissionEncounterType() {
+		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE, false);
+	}
 
-    public EncounterType getExitFromInpatientEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE, false);
-    }
+	public EncounterType getExitFromInpatientEncounterType() {
+		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE, false);
+	}
 
-    public EncounterType getTransferWithinHospitalEncounterType() {
-        return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE, false);
-    }
+	public EncounterType getTransferWithinHospitalEncounterType() {
+		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE, false);
+	}
 
-    public Form getAdmissionForm() {
-        return getFormByGlobalProperty(EmrApiConstants.GP_ADMISSION_FORM);
-    }
+	public Form getAdmissionForm() {
+		return getFormByGlobalProperty(EmrApiConstants.GP_ADMISSION_FORM);
+	}
 
-    public Form getDischargeForm() {
-        return getFormByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_FORM);
-    }
+	public Form getDischargeForm() {
+		return getFormByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_FORM);
+	}
 
-    public Form getTransferForm() {
-        return getFormByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_FORM);
-    }
+	public Form getTransferForm() {
+		return getFormByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_FORM);
+	}
 
-    public int getVisitExpireHours() {
-        return 12;
-    }
+	public int getVisitExpireHours() {
+		return 12;
+	}
 
-    public VisitType getAtFacilityVisitType() {
-        return getVisitTypeByGlobalProperty(EmrApiConstants.GP_AT_FACILITY_VISIT_TYPE);
-    }
+	public VisitType getAtFacilityVisitType() {
+		return getVisitTypeByGlobalProperty(EmrApiConstants.GP_AT_FACILITY_VISIT_TYPE);
+	}
 
-    public LocationTag getSupportsVisitsLocationTag() {
-        return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
-    }
+	public LocationTag getSupportsVisitsLocationTag() {
+		return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
+	}
 
-    public LocationTag getSupportsLoginLocationTag() {
-        return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_LOGIN);
-    }
+	public LocationTag getSupportsLoginLocationTag() {
+		return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_LOGIN);
+	}
 
-    public LocationTag getSupportsAdmissionLocationTag() {
-        return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
-    }
+	public LocationTag getSupportsAdmissionLocationTag() {
+		return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
+	}
 
-    public LocationTag getSupportsTransferLocationTag() {
-        return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_TRANSFER);
-    }
+	public LocationTag getSupportsTransferLocationTag() {
+		return locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_TRANSFER);
+	}
 
-    public PersonAttributeType getTestPatientPersonAttributeType() {
-        PersonAttributeType type = null;
-        type = personService.getPersonAttributeTypeByUuid(EmrApiConstants.TEST_PATIENT_ATTRIBUTE_UUID);
-        if (type == null) {
-            throw new IllegalStateException("Configuration required: Test Patient Attribute UUID");
-        }
-        return type;
-    }
+	public PersonAttributeType getTestPatientPersonAttributeType() {
+		PersonAttributeType type = null;
+		type = personService.getPersonAttributeTypeByUuid(EmrApiConstants.TEST_PATIENT_ATTRIBUTE_UUID);
+		if (type == null) {
+			throw new IllegalStateException("Configuration required: Test Patient Attribute UUID");
+		}
+		return type;
+	}
 
-    public PersonAttributeType getTelephoneAttributeType() {
-        PersonAttributeType type = null;
-        type = personService.getPersonAttributeTypeByName(EmrApiConstants.TELEPHONE_ATTRIBUTE_TYPE_NAME);
-        if (type == null) {
-            throw new IllegalStateException("Configuration required: " + EmrApiConstants.TELEPHONE_ATTRIBUTE_TYPE_NAME);
-        }
-        return type;
-    }
+	public PersonAttributeType getTelephoneAttributeType() {
+		PersonAttributeType type = null;
+		type = personService.getPersonAttributeTypeByName(EmrApiConstants.TELEPHONE_ATTRIBUTE_TYPE_NAME);
+		if (type == null) {
+			throw new IllegalStateException("Configuration required: " + EmrApiConstants.TELEPHONE_ATTRIBUTE_TYPE_NAME);
+		}
+		return type;
+	}
 
-    public PersonAttributeType getUnknownPatientPersonAttributeType() {
-        PersonAttributeType type = null;
-        type = personService.getPersonAttributeTypeByName(EmrApiConstants.UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME);
-        if (type == null) {
-            throw new IllegalStateException("Configuration required: " + EmrApiConstants.UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME);
-        }
-        return type;
-    }
+	public PersonAttributeType getUnknownPatientPersonAttributeType() {
+		PersonAttributeType type = null;
+		type = personService.getPersonAttributeTypeByName(EmrApiConstants.UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME);
+		if (type == null) {
+			throw new IllegalStateException("Configuration required: " + EmrApiConstants.UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME);
+		}
+		return type;
+	}
 
-    public PatientIdentifierType getPrimaryIdentifierType() {
-        return getPatientIdentifierTypeByGlobalProperty(EmrApiConstants.PRIMARY_IDENTIFIER_TYPE, true);
-    }
+	public PatientIdentifierType getPrimaryIdentifierType() {
+		return getPatientIdentifierTypeByGlobalProperty(EmrApiConstants.PRIMARY_IDENTIFIER_TYPE, true);
+	}
 
-    public List<PatientIdentifierType> getExtraPatientIdentifierTypes() {
-        return getPatientIdentifierTypesByGlobalProperty(EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES, false);
-    }
+	public List<PatientIdentifierType> getExtraPatientIdentifierTypes() {
+		return getPatientIdentifierTypesByGlobalProperty(EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES, false);
+	}
 
-    public DiagnosisMetadata getDiagnosisMetadata() {
-        return new DiagnosisMetadata(conceptService, getEmrApiConceptSource());
-    }
+	public DiagnosisMetadata getDiagnosisMetadata() {
+		return new DiagnosisMetadata(conceptService, getEmrApiConceptSource());
+	}
 
-    public DispositionDescriptor getDispositionDescriptor() {
-        return new DispositionDescriptor(conceptService);
-    }
+	public DispositionDescriptor getDispositionDescriptor() {
+		return new DispositionDescriptor(conceptService);
+	}
 
-    public List<ConceptSource> getConceptSourcesForDiagnosisSearch() {
-        ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10-WHO");
-        if (icd10 != null) {
-            return Arrays.asList(icd10);
-        } else {
-            return null;
-        }
-    }
+	public List<ConceptSource> getConceptSourcesForDiagnosisSearch() {
+		ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10-WHO");
+		if (icd10 != null) {
+			return Arrays.asList(icd10);
+		} else {
+			return null;
+		}
+	}
 
-    public ConceptSource getEmrApiConceptSource() {
-        return conceptService.getConceptSourceByName(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
-    }
+	public ConceptSource getEmrApiConceptSource() {
+		return conceptService.getConceptSourceByName(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
+	}
 
-    protected Concept getEmrApiConceptByMapping(String code) {
-        return getSingleConceptByMapping(getEmrApiConceptSource(), code);
-    }
+	protected Concept getEmrApiConceptByMapping(String code) {
+		return getSingleConceptByMapping(getEmrApiConceptSource(), code);
+	}
 
-    public Concept getConsultFreeTextCommentsConcept() {
-        return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_CONSULT_FREE_TEXT_COMMENT);
-    }
+	public Concept getConsultFreeTextCommentsConcept() {
+		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_CONSULT_FREE_TEXT_COMMENT);
+	}
 
-    public Concept getUnknownCauseOfDeathConcept() {
-        return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH);
-    }
+	public Concept getUnknownCauseOfDeathConcept() {
+		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH);
+	}
 
-    public LocationAttributeType getLocationAttributeTypeNameToPrintOnIdCard() {
-        LocationAttributeType type = null;
-        type = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
-        if (type == null) {
-            throw new IllegalStateException("Configuration required: " + EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
-        }
-        return type;
-    }
+	public LocationAttributeType getLocationAttributeTypeNameToPrintOnIdCard() {
+		LocationAttributeType type = null;
+		type = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
+		if (type == null) {
+			throw new IllegalStateException("Configuration required: " + EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
+		}
+		return type;
+	}
 
-    public List<PatientIdentifierType> getIdentifierTypesToSearch() {
-        ArrayList<PatientIdentifierType> types = new ArrayList<PatientIdentifierType>();
-        types.add(getPrimaryIdentifierType());
+	public List<PatientIdentifierType> getIdentifierTypesToSearch() {
+		ArrayList<PatientIdentifierType> types = new ArrayList<PatientIdentifierType>();
+		types.add(getPrimaryIdentifierType());
 //        PatientIdentifierType paperRecordIdentifierType = getPaperRecordIdentifierType();
 //        if (paperRecordIdentifierType != null) {
 //            types.add(paperRecordIdentifierType);
 //        }
-        List<PatientIdentifierType> extraPatientIdentifierTypes = getExtraPatientIdentifierTypes();
-        if (extraPatientIdentifierTypes != null && extraPatientIdentifierTypes.size() > 0) {
-            types.addAll(extraPatientIdentifierTypes);
-        }
-        return types;
-    }
+		List<PatientIdentifierType> extraPatientIdentifierTypes = getExtraPatientIdentifierTypes();
+		if (extraPatientIdentifierTypes != null && extraPatientIdentifierTypes.size() > 0) {
+			types.addAll(extraPatientIdentifierTypes);
+		}
+		return types;
+	}
 
-    /**
-     * Expects there to be a GP configured to point to a concept set, which is a set of other concept sets.
-     * E.g. "HUM Diagnosis Sets" contains "HUM Outpatient Diagnosis Set", "HUM ER Diagnosis Set", etc.
-     *
-     * @return
-     */
-    public Collection<Concept> getDiagnosisSets() {
-        String gp = getGlobalProperty(EmrApiConstants.GP_DIAGNOSIS_SET_OF_SETS, false);
-        if (StringUtils.hasText(gp)) {
-            Concept setOfSets = conceptService.getConceptByUuid(gp);
-            if (setOfSets == null) {
-                throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_DIAGNOSIS_SET_OF_SETS);
-            }
-            return setOfSets.getSetMembers();
-        } else {
-            return null;
-        }
-    }
+	/**
+	 * Expects there to be a GP configured to point to a concept set, which is a set of other concept sets.
+	 * E.g. "HUM Diagnosis Sets" contains "HUM Outpatient Diagnosis Set", "HUM ER Diagnosis Set", etc.
+	 *
+	 * @return
+	 */
+	public Collection<Concept> getDiagnosisSets() {
+		String gp = getGlobalProperty(EmrApiConstants.GP_DIAGNOSIS_SET_OF_SETS, false);
+		if (StringUtils.hasText(gp)) {
+			Concept setOfSets = conceptService.getConceptByUuid(gp);
+			if (setOfSets == null) {
+				throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_DIAGNOSIS_SET_OF_SETS);
+			}
+			return setOfSets.getSetMembers();
+		} else {
+			return null;
+		}
+	}
 
-    public ConceptMapType getSameAsConceptMapType() {
-        return conceptService.getConceptMapTypeByUuid(EmrApiConstants.SAME_AS_CONCEPT_MAP_TYPE_UUID);
-    }
+	public Collection<Concept> getNonDiagnosisConceptSets() {
+		Collection<Concept> concepts = getConceptsByGlobalProperty(EmrApiConstants.GP_NON_DIAGNOSIS_CONCEPT_SETS);
 
-    public ConceptMapType getNarrowerThanConceptMapType() {
-        return conceptService.getConceptMapTypeByUuid(EmrApiConstants.NARROWER_THAN_CONCEPT_MAP_TYPE_UUID);
-    }
+		for (Concept concept : concepts) {
+			if (!concept.isSet()) {
+				throw new IllegalStateException("Invalid configuration: concept '" + concept.getUuid() + "' defined in " + EmrApiConstants.GP_NON_DIAGNOSIS_CONCEPT_SETS + " is not a concept set");
+			}
+		}
+		return concepts;
+	}
+
+	public Collection<Concept> getSuppressedDiagnosisConcepts() {
+		return getConceptsByGlobalProperty(EmrApiConstants.GP_SUPPRESSED_DIAGNOSIS_CONCEPTS);
+	}
+
+	public ConceptMapType getSameAsConceptMapType() {
+		return conceptService.getConceptMapTypeByUuid(EmrApiConstants.SAME_AS_CONCEPT_MAP_TYPE_UUID);
+	}
+
+	public ConceptMapType getNarrowerThanConceptMapType() {
+		return conceptService.getConceptMapTypeByUuid(EmrApiConstants.NARROWER_THAN_CONCEPT_MAP_TYPE_UUID);
+	}
 
 }

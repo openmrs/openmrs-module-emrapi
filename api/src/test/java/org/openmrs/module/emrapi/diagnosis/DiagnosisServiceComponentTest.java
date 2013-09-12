@@ -1,5 +1,7 @@
 package org.openmrs.module.emrapi.diagnosis;
 
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +19,14 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -27,85 +35,110 @@ import static org.junit.Assert.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DiagnosisServiceComponentTest extends BaseModuleContextSensitiveTest {
 
-    @Autowired
-    ConceptService conceptService;
+	@Autowired
+	ConceptService conceptService;
 
-    @Autowired
-    ObsService obsService;
+	@Autowired
+	ObsService obsService;
 
-    @Autowired
-    EmrApiProperties emrApiProperties;
+	@Autowired
+	EmrApiProperties emrApiProperties;
 
-    @Autowired
-    PatientService patientService;
+	@Autowired
+	PatientService patientService;
 
-    @Autowired
-    DiagnosisService diagnosisService;
+	@Autowired
+	DiagnosisService diagnosisService;
 
-    DiagnosisMetadata dmd;
+	DiagnosisMetadata dmd;
 
 
-    @Before
-    public void setUp() throws Exception {
-        dmd = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
+	@Before
+	public void setUp() throws Exception {
+		dmd = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
 
-    }
+	}
 
-    private ObsBuilder buildDiagnosis(Patient patient, String dateYmd, Diagnosis.Order order, Diagnosis.Certainty certainty, Object diagnosis) {
-        ObsBuilder builder = new ObsBuilder()
-                .setPerson(patient)
-                .setObsDatetime(DateUtil.parseDate(dateYmd, "yyyy-MM-dd"))
-                .setConcept(dmd.getDiagnosisSetConcept())
-                .addMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(order))
-                .addMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(certainty));
-        if (diagnosis instanceof Concept) {
-            builder.addMember(dmd.getCodedDiagnosisConcept(), (Concept) diagnosis);
-        } else if (diagnosis instanceof String) {
-            builder.addMember(dmd.getNonCodedDiagnosisConcept(), (String) diagnosis);
-        } else {
-            throw new IllegalArgumentException("Diagnosis value must be a Concept or String");
-        }
-        return builder;
-    }
+	private ObsBuilder buildDiagnosis(Patient patient, String dateYmd, Diagnosis.Order order, Diagnosis.Certainty certainty, Object diagnosis) {
+		ObsBuilder builder = new ObsBuilder()
+				.setPerson(patient)
+				.setObsDatetime(DateUtil.parseDate(dateYmd, "yyyy-MM-dd"))
+				.setConcept(dmd.getDiagnosisSetConcept())
+				.addMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(order))
+				.addMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(certainty));
+		if (diagnosis instanceof Concept) {
+			builder.addMember(dmd.getCodedDiagnosisConcept(), (Concept) diagnosis);
+		} else if (diagnosis instanceof String) {
+			builder.addMember(dmd.getNonCodedDiagnosisConcept(), (String) diagnosis);
+		} else {
+			throw new IllegalArgumentException("Diagnosis value must be a Concept or String");
+		}
+		return builder;
+	}
 
-    private Obs createDiagnosisObs() {
-        Patient patient = patientService.getPatient(2);
-        ObsBuilder obsBuilder= buildDiagnosis(patient, "2013-01-02", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save();
-        return obsBuilder.get();
-    }
+	private Obs createDiagnosisObs() {
+		Patient patient = patientService.getPatient(2);
+		ObsBuilder obsBuilder = buildDiagnosis(patient, "2013-01-02", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save();
+		return obsBuilder.get();
+	}
 
-    private Obs getObs(Obs groupObs, Concept concept){
-        Set<Obs> groupMembers = groupObs.getGroupMembers();
-        Obs obs = null;
-        if ((groupMembers != null) && (groupMembers.size() > 0) ){
-            for (Obs groupMember : groupMembers) {
-                Concept obsConcept = groupMember.getConcept();
-                if (obsConcept == concept){
-                    obs = groupMember;
-                    break;
-                }
-            }
-        }
-        return  obs;
-    }
+	private Obs getObs(Obs groupObs, Concept concept) {
+		Set<Obs> groupMembers = groupObs.getGroupMembers();
+		Obs obs = null;
+		if ((groupMembers != null) && (groupMembers.size() > 0)) {
+			for (Obs groupMember : groupMembers) {
+				Concept obsConcept = groupMember.getConcept();
+				if (obsConcept == concept) {
+					obs = groupMember;
+					break;
+				}
+			}
+		}
+		return obs;
+	}
 
-    @Test
-    public void codeNonCodedDiagnosis(){
-        //create an ObsGroup with a non-coded diagnosis
-        Obs consultationObs = createDiagnosisObs();
-        //retrieve the Obs that contains the non-coded diagnosis
-        Obs nonCodedObs =  getObs(consultationObs, dmd.getNonCodedDiagnosisConcept());
-        assertThat(nonCodedObs, notNullValue());
-        //code the non-coded diagnosis to coded diagnosis(Malaria)
-        Concept malaria = conceptService.getConcept(11);
-        Obs codedObs = diagnosisService.codeNonCodedDiagnosis(nonCodedObs, malaria);
-        //verify the obs is a coded diagnosis now
-        assertThat(codedObs.getConcept(), is(dmd.getCodedDiagnosisConcept()));
-        assertThat(codedObs.getValueCoded(), is(malaria));
+	@Test
+	public void codeNonCodedDiagnosis() {
+		//create an ObsGroup with a non-coded diagnosis
+		Obs consultationObs = createDiagnosisObs();
+		//retrieve the Obs that contains the non-coded diagnosis
+		Obs nonCodedObs = getObs(consultationObs, dmd.getNonCodedDiagnosisConcept());
+		assertThat(nonCodedObs, notNullValue());
+		//code the non-coded diagnosis to coded diagnosis(Malaria)
+		Concept malaria = conceptService.getConcept(11);
+		Obs codedObs = diagnosisService.codeNonCodedDiagnosis(nonCodedObs, malaria);
+		//verify the obs is a coded diagnosis now
+		assertThat(codedObs.getConcept(), is(dmd.getCodedDiagnosisConcept()));
+		assertThat(codedObs.getValueCoded(), is(malaria));
 
-        //verify the old that contained the non-coded diagnosis was voided
-        nonCodedObs = obsService.getObs(nonCodedObs.getId());
-        assertThat(nonCodedObs.getVoided(), is(true));
-    }
+		//verify the old that contained the non-coded diagnosis was voided
+		nonCodedObs = obsService.getObs(nonCodedObs.getId());
+		assertThat(nonCodedObs.getVoided(), is(true));
+	}
 
+	@Test
+	public void getDiagnosesShouldReturnEmptyListIfNone() {
+		Patient patient = patientService.getPatient(2);
+		assertThat(diagnosisService.getDiagnoses(patient, new Date()), is(empty()));
+	}
+
+	@Test
+	public void getDiagnosesShouldReturnDiagnosesAfterDate() {
+		Patient patient = patientService.getPatient(2);
+		Obs obs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
+		buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded disease").save();
+
+		List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, DateUtil.parseDate("2013-09-01", "yyyy-MM-dd"));
+		assertThat(diagnoses, contains(hasObs(obs)));
+	}
+
+
+	public static Matcher<Diagnosis> hasObs(final Obs obs) {
+		return new FeatureMatcher<Diagnosis, Obs>(is(obs), "obs", "obs") {
+			@Override
+			protected Obs featureValueOf(Diagnosis actual) {
+				return actual.getExistingObs();
+			}
+		};
+	}
 }
