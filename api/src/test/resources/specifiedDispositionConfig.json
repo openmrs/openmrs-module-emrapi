@@ -7,27 +7,20 @@
             "closeCurrentVisitAction",
             "markPatientDeadAction"
         ],
-        "clientSideActions": [
-            {
-                "action": "include-fragment",
-                "module": "emr",
-                "fragment": "field/date",
-                "fragmentConfig": { "label": "mirebalais.deathDate" }
-            }
-        ]
+        "additionalObs": []
     },
     {
         "uuid": "66de7f60-b73a-11e2-9e96-0800200c9a66",
         "name": "disposition.home",
         "conceptCode": "SNOMED CT:3780001",
         "actions": [],
-        "clientSideActions": []
+        "additionalObs": []
     },
     {
         "uuid": "1",
         "name": "disposition.transfer",
         "conceptCode": "SNOMED CT:3780002",
         "actions": [],
-        "clientSideActions": []
+        "additionalObs": []
     }
 ]

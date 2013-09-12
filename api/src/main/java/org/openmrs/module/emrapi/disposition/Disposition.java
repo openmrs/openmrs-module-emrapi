@@ -2,9 +2,7 @@ package org.openmrs.module.emrapi.disposition;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.openmrs.module.emrapi.disposition.actions.ClientSideAction;
 
-import javax.validation.Valid;
 import java.util.List;
 
 public class Disposition {
@@ -24,20 +22,19 @@ public class Disposition {
     @JsonProperty
     private List<String> actions;
 
-    @Valid
     @JsonProperty
-    private List<ClientSideAction> clientSideActions;
+    private List<DispositionObs> additionalObs;
 
     public Disposition(){
 
     }
 
-    public Disposition(String uuid, String name, String conceptCode, List<String> actions, List<ClientSideAction> clientSideActions) {
+    public Disposition(String uuid, String name, String conceptCode, List<String> actions, List<DispositionObs> additionalObs) {
         this.uuid = uuid;
         this.name = name;
         this.conceptCode = conceptCode;
         this.actions = actions;
-        this.clientSideActions = clientSideActions;
+        this.additionalObs = additionalObs;
     }
 
     public String getUuid() {
@@ -56,7 +53,7 @@ public class Disposition {
         Disposition that = (Disposition) o;
 
         if (actions != null ? !actions.equals(that.actions) : that.actions != null) return false;
-        if (clientSideActions != null ? !clientSideActions.equals(that.clientSideActions) : that.clientSideActions != null)
+        if (additionalObs != null ? !additionalObs.equals(that.additionalObs) : that.additionalObs != null)
             return false;
         if (!conceptCode.equals(that.conceptCode)) return false;
         if (!name.equals(that.name)) return false;
@@ -67,10 +64,6 @@ public class Disposition {
 
     public List<String> getActions() {
         return actions;
-    }
-
-    public List<ClientSideAction> getClientSideActions() {
-        return clientSideActions;
     }
 
     public void setUuid(String uuid){
@@ -85,10 +78,6 @@ public class Disposition {
         this.actions = actions;
     }
 
-    public void setClientSideActions(List<ClientSideAction> clientSideActions) {
-        this.clientSideActions = clientSideActions;
-    }
-
     public String getConceptCode() {
         return conceptCode;
     }
@@ -97,13 +86,21 @@ public class Disposition {
         this.conceptCode = conceptCode;
     }
 
+    public List<DispositionObs> getAdditionalObs() {
+        return additionalObs;
+    }
+
+    public void setAdditionalObs(List<DispositionObs> additionalObs) {
+        this.additionalObs = additionalObs;
+    }
+
     @Override
     public int hashCode() {
         int result = uuid.hashCode();
         result = 31 * result + name.hashCode();
         result = 31 * result + conceptCode.hashCode();
         result = 31 * result + (actions != null ? actions.hashCode() : 0);
-        result = 31 * result + (clientSideActions != null ? clientSideActions.hashCode() : 0);
+        result = 31 * result + (additionalObs != null ? additionalObs.hashCode() : 0);
         return result;
     }
 }

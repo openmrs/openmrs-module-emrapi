@@ -8,8 +8,6 @@ import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
-import org.openmrs.module.emrapi.disposition.actions.ClientSideAction;
-import org.openmrs.module.emrapi.disposition.actions.FragmentAction;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 
 import java.io.IOException;
@@ -110,20 +108,24 @@ public class DispositionFactoryTest {
     }
 
     private Disposition getHomeDisposition() {
-        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.home", "SNOMED CT:3780001", Collections.<String>emptyList(), Collections.<ClientSideAction>emptyList());
+        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.home", "SNOMED CT:3780001", Collections.<String>emptyList(), Collections.<DispositionObs>emptyList());
     }
 
     private Disposition getDeathDisposition() {
-        List<String> actions = getActions();
-
-        List<ClientSideAction> clientSideActions = new ArrayList<ClientSideAction>();
-        clientSideActions.add(new FragmentAction("emr","field/date", getFragmentConfig()));
-
-        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "SNOMED CT:397709008", actions, clientSideActions);
+        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "SNOMED CT:397709008", getActions(), getAdditionalObs());
     }
 
     private List<String> getActions() {
         return asList("closeCurrentVisitAction", "markPatientDeadAction");
+    }
+
+    private List<DispositionObs> getAdditionalObs() {
+        List<DispositionObs> additionalObsList = new ArrayList<DispositionObs>();
+        DispositionObs additionalObs = new DispositionObs();
+        additionalObs.setConceptCode("org.openmrs.module.emrapi: Date of death");
+        additionalObs.setLabel("emr.dateOfDeath");
+        additionalObsList.add(additionalObs);
+        return additionalObsList;
     }
 
     private Map<String, Object> getFragmentConfig() {

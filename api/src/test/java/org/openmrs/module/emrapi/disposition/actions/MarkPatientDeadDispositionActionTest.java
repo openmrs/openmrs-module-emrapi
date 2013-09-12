@@ -1,20 +1,24 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterRole;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.Provider;
+import org.openmrs.Visit;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
-import org.openmrs.module.reporting.common.DateUtil;
+import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -26,15 +30,21 @@ import static org.mockito.Mockito.when;
 /**
  *
  */
-public class MarkPatientDeadDispositionActionTest {
+public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestHelper {
 
     private MarkPatientDeadDispositionAction action;
     private EmrApiProperties emrApiProperties;
     private PatientService patientService;
+    private DispositionDescriptor dispositionDescriptor;
+    private Concept dispositionObsGroupConcept = new Concept();
+    private Concept dateOfDeathConcept = new Concept();
 
     @Before
     public void setUp() throws Exception {
         emrApiProperties = mock(EmrApiProperties.class);
+        dispositionDescriptor = mock(DispositionDescriptor.class);
+
+        when(emrApiProperties.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
 
         patientService = mock(PatientService.class);
         when(patientService.savePatient(any(Patient.class))).thenAnswer(new Answer<Object>() {
@@ -50,25 +60,32 @@ public class MarkPatientDeadDispositionActionTest {
     }
 
     @Test
-    public void testAction() throws Exception {
+    public void testActionShouldMarkPatientAsDead() throws Exception {
         Concept unknown = new Concept();
         when(emrApiProperties.getUnknownCauseOfDeathConcept()).thenReturn(unknown);
 
-        String expectedDeathDate = "2013-05-04";
-
-        Map<String, String[]> request = new HashMap<String, String[]>();
-        request.put("deathDate", new String[]{expectedDeathDate});
-        request.put("something", new String[]{"unrelated"});
+        Date expectedDeathDate = (new DateTime(2013, 05, 10, 20, 26)).toDate();
 
         Patient patient = new Patient();
 
-        Encounter encounter = new Encounter();
+        final Visit visit = new Visit();
+        final Encounter encounter = new Encounter();
+        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
+        encounter.setVisit(visit);
+        encounter.addProvider(new EncounterRole(), new Provider());
+        encounter.setEncounterDatetime(encounterDate);
         encounter.setPatient(patient);
 
-        action.action(new EncounterDomainWrapper(encounter), new Obs(), request);
+        final Obs dispositionObsGroup = new Obs();
+        dispositionObsGroup.setConcept(dispositionObsGroupConcept);
+        encounter.addObs(dispositionObsGroup);
+
+        when(dispositionDescriptor.getDateOfDeath(dispositionObsGroup)).thenReturn(expectedDeathDate);
+
+        action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
 
         assertThat(patient.isDead(), is(true));
-        assertThat(patient.getDeathDate(), is(DateUtil.parseDate(expectedDeathDate, "yyyy-MM-dd")));
+        assertThat(patient.getDeathDate(), is(expectedDeathDate));
         assertThat(patient.getCauseOfDeath(), is(unknown));
         verify(patientService).savePatient(patient);
     }

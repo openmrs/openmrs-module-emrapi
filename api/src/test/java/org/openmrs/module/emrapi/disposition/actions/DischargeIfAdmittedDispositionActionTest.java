@@ -4,10 +4,9 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
-import org.openmrs.EncounterType;
-import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
@@ -15,16 +14,18 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.Date;
-import java.util.HashMap;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -35,16 +36,19 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
     private DischargeIfAdmittedDispositionAction action;
     private AdtService adtService;
     private EmrApiProperties emrApiProperties;
-    private EncounterType admissionEncounterType = new EncounterType();
-    private EncounterType dischargeEncounterType = new EncounterType();
+    private DispositionDescriptor dispositionDescriptor;
+    private VisitDomainWrapper visitDomainWrapper;
+    private Concept dispositionObsGroupConcept = new Concept();;
 
     @Before
     public void setUp() throws Exception {
         adtService = mock(AdtService.class);
-
         emrApiProperties = mock(EmrApiProperties.class);
-        when(emrApiProperties.getAdmissionEncounterType()).thenReturn(admissionEncounterType);
-        when(emrApiProperties.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
+        dispositionDescriptor = mock(DispositionDescriptor.class);
+        visitDomainWrapper = mock(VisitDomainWrapper.class);
+
+        when(emrApiProperties.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+        when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
 
         action = new DischargeIfAdmittedDispositionAction();
         action.setAdtService(adtService);
@@ -52,43 +56,50 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
     }
 
     @Test
-    public void testDoesNothingIfNotAdmitted() throws Exception {
-        Encounter beingCreated = new Encounter();
-        beingCreated.setVisit(new Visit());
-
-        action.action(new EncounterDomainWrapper(beingCreated), new Obs(), new HashMap<String, String[]>());
-
-        verifyZeroInteractions(adtService);
-    }
-
-    @Test
     public void testDischargesIfAdmitted() throws Exception {
-        Encounter admission = new Encounter();
-        admission.setEncounterDatetime(new Date());
-        admission.setEncounterType(admissionEncounterType);
 
-        Visit visit = new Visit();
-        visit.addEncounter(admission);
-
-        final Encounter beingCreated = new Encounter();
+        final Visit visit = new Visit();
+        final Encounter encounter = new Encounter();
         final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
-        beingCreated.setVisit(visit);
-        beingCreated.setLocation(new Location());
-        beingCreated.addProvider(new EncounterRole(), new Provider());
-        beingCreated.setEncounterDatetime(encounterDate);
+        encounter.setVisit(visit);
+        encounter.addProvider(new EncounterRole(), new Provider());
+        encounter.setEncounterDatetime(encounterDate);
 
-        action.action(new EncounterDomainWrapper(beingCreated), new Obs(), new HashMap<String, String[]>());
+        final Obs dispositionObsGroup = new Obs();
+        dispositionObsGroup.setConcept(dispositionObsGroupConcept);
 
+        when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(true);
+
+        action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
         verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
             public boolean matches(Object argument) {
                 AdtAction actual = (AdtAction) argument;
-                return actual.getLocation().equals(beingCreated.getLocation()) &&
-                        actual.getVisit().equals(beingCreated.getVisit()) &&
-                        TestUtils.sameProviders(actual.getProviders(), beingCreated.getProvidersByRoles()) &&
-                        actual.getActionDatetime().equals(encounterDate);
+                return actual.getVisit().equals(visit) &&
+                        TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles()) &&
+                        actual.getActionDatetime().equals(encounterDate) &&
+                        actual.getType().equals(AdtAction.Type.DISCHARGE);
             }
         }));
+    }
+
+    @Test
+    public void testDoesNotDischargesIfNotAdmitted() throws Exception {
+
+        final Visit visit = new Visit();
+        final Encounter encounter = new Encounter();
+        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
+        encounter.setVisit(visit);
+        encounter.addProvider(new EncounterRole(), new Provider());
+        encounter.setEncounterDatetime(encounterDate);
+
+        final Obs dispositionObsGroup = new Obs();
+        dispositionObsGroup.setConcept(dispositionObsGroupConcept);
+
+        when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
+
+        action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
+        verify(adtService, never()).createAdtEncounterFor(any(AdtAction.class));
     }
 
 }

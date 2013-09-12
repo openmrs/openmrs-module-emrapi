@@ -37,11 +37,19 @@ public class ContextSensitiveMetadataTestUtils {
         ConceptClass misc = conceptService.getConceptClassByName("Misc");
 
         Concept admit = new ConceptBuilder(conceptService, naDatatype, misc)
-                .addName("Admit to hospital").saveAndGet();
+                .addName("Admit to hospital")
+                .addMapping(sameAs, emrSource, "Admit to hospital")   // not a real code, just for testing
+                .saveAndGet();
+
         Concept discharge = new ConceptBuilder(conceptService, naDatatype, misc)
-                .addName("Discharged").saveAndGet();
+                .addName("Discharged")
+                .addMapping(sameAs, emrSource, "Discharged")    // not a real code, just for testing
+                .saveAndGet();
+
         Concept transferOut = new ConceptBuilder(conceptService, naDatatype, misc)
-                .addName("Transfer out of hospital").saveAndGet();
+                .addName("Transfer out of hospital")
+                .addMapping(sameAs, emrSource, "Transfer out of hospital")    // not a real code, just for testing
+                .saveAndGet();
 
         Concept transferTo = new ConceptBuilder(conceptService, textDatatype, misc)
                 .addName("Transfer to location").saveAndGet();
@@ -70,6 +78,7 @@ public class ContextSensitiveMetadataTestUtils {
                 .addName("Disposition Construct")
                 .addSetMembers(disposition, transferTo, admissionLocation, internalTransferLocation, dateOfDeath)
                 .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET).saveAndGet();
+
         return emrApiProperties.getDispositionDescriptor();
     }
 

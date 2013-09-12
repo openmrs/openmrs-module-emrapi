@@ -14,11 +14,15 @@
 
 package org.openmrs.module.emrapi.disposition.actions;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.LocationService;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,13 +43,16 @@ import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 @Component("admitToSpecificLocationDispositionAction")
 public class AdmitToSpecificLocationDispositionAction implements DispositionAction {
 
-    public final static String ADMISSION_LOCATION_PARAMETER = "admitToLocationId";
+    private final Log log = LogFactory.getLog(getClass());
 
     @Autowired
-    LocationService locationService;
+    private LocationService locationService;
 
     @Autowired
-    AdtService adtService;
+    private AdtService adtService;
+
+    @Autowired
+    private EmrApiProperties emrApiProperties;
 
     /**
      * For unit testing
@@ -63,24 +70,31 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
         this.adtService = adtService;
     }
 
+    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
+        this.emrApiProperties = emrApiProperties;
+    }
+
     /**
-     * Requires a request parameter of {@link #ADMISSION_LOCATION_PARAMETER}
      * @param encounterDomainWrapper encounter that is being created (has not had dispositionObsGroupBeingCreated added yet)
      * @param dispositionObsGroupBeingCreated the obs group being created for this disposition (has not been added to the encounter yet)
      * @param requestParameters parameters submitted with the HTTP request, which may contain additional data neede by this action
      */
     @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
-        if (adtService.wrap(encounterDomainWrapper.getVisit()).isAdmitted()) {
+        if (adtService.wrap(encounterDomainWrapper.getVisit()).isAdmitted(encounterDomainWrapper.getEncounterDatetime())) {
             // consider doing a transfer-within-hospital here
             return;
         }
         else {
-            String locationId = DispositionActionUtils.getSingleRequiredParameter(requestParameters, ADMISSION_LOCATION_PARAMETER);
-            Location location = locationService.getLocation(Integer.valueOf(locationId));
-            AdtAction admission = new AdtAction(encounterDomainWrapper.getVisit(), location, encounterDomainWrapper.getProviders(), ADMISSION);
-            admission.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
-            adtService.createAdtEncounterFor(admission);
+            Location admissionLocation = emrApiProperties.getDispositionDescriptor().getAdmissionLocation(dispositionObsGroupBeingCreated, locationService);
+            if (admissionLocation != null) {
+                AdtAction admission = new AdtAction(encounterDomainWrapper.getVisit(), admissionLocation, encounterDomainWrapper.getProviders(), ADMISSION);
+                admission.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
+                adtService.createAdtEncounterFor(admission);
+            }
+            else {
+                log.warn("Unable to create admission action, no admission location specified in obsgroup " + dispositionObsGroupBeingCreated);
+            }
         }
     }
 

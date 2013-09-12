@@ -38,7 +38,9 @@ public class DischargeIfAdmittedDispositionAction implements DispositionAction {
     @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
         Visit visit = encounterDomainWrapper.getVisit();
-        if (new VisitDomainWrapper(visit, emrApiProperties).isAdmitted()) {
+        VisitDomainWrapper visitDomainWrapper = adtService.wrap(visit);
+
+        if (visitDomainWrapper.isAdmitted(encounterDomainWrapper.getEncounter().getEncounterDatetime())) {
             AdtAction discharge = new AdtAction(visit, encounterDomainWrapper.getLocation(), encounterDomainWrapper.getProviders(), DISCHARGE);
             discharge.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
             adtService.createAdtEncounterFor(discharge);
