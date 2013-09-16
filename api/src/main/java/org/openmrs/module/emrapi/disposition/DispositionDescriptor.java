@@ -117,7 +117,7 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         return findMember(obsGroup, admissionLocationConcept);
     }
 
-    public Obs getTransferLocationObs(Obs obsGroup) {
+    public Obs getInternalTransferLocationObs(Obs obsGroup) {
         return findMember(obsGroup, internalTransferLocationConcept);
     }
 
@@ -136,7 +136,7 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
     }
 
     public Location getInternalTransferLocation(Obs obsGroup, LocationService locationService) {
-        Obs transferLocationObs = getTransferLocationObs(obsGroup);
+        Obs transferLocationObs = getInternalTransferLocationObs(obsGroup);
         if (transferLocationObs != null) {
             return locationService.getLocation(Integer.valueOf(transferLocationObs.getValueText()));
         }
@@ -159,7 +159,10 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
         List<Obs> notDisposition = new ArrayList<Obs>();
         if (obsGroup.hasGroupMembers()) {
             for (Obs candidate : obsGroup.getGroupMembers()) {
-                if (!candidate.getConcept().equals(dispositionConcept)) {
+                if (!candidate.getConcept().equals(dispositionConcept) &&
+                        !candidate.getConcept().equals(admissionLocationConcept) &&
+                        !candidate.getConcept().equals(internalTransferLocationConcept) &&
+                        !candidate.getConcept().equals(dateOfDeathConcept)) {
                     notDisposition.add(candidate);
                 }
             }

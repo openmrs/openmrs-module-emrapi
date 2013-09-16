@@ -8,7 +8,9 @@ import org.openmrs.Obs;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
@@ -115,13 +117,13 @@ public class DispositionDescriptorTest {
         transferLocation.setConcept(transferLocationConcept);
         dispositionObsGroup.addGroupMember(transferLocation);
 
-        assertThat(dispositionDescriptor.getTransferLocationObs(dispositionObsGroup), is(transferLocation));
+        assertThat(dispositionDescriptor.getInternalTransferLocationObs(dispositionObsGroup), is(transferLocation));
     }
 
     @Test
     public void shouldNotFailIfNoMatchingObsWhenFetchingTransferLocationOffObsGroup() {
         Obs dispositionObsGroup = createDispositionObsGroup();
-        assertNull(dispositionDescriptor.getTransferLocationObs(dispositionObsGroup));
+        assertNull(dispositionDescriptor.getInternalTransferLocationObs(dispositionObsGroup));
 
     }
 
@@ -195,6 +197,38 @@ public class DispositionDescriptorTest {
         dispositionObsGroup.addGroupMember(dateOfDeathObs);
 
         assertThat(dispositionDescriptor.getDateOfDeath(dispositionObsGroup), is(dateOfDeath));
+    }
+
+    @Test
+    public void shouldFetchAdditionalObsOffObsGroup() {
+
+        Obs dispositionObsGroup = createDispositionObsGroup();
+
+        Obs admissionLocationObs = new Obs();
+        admissionLocationObs.setConcept(admissionLocationConcept);
+        admissionLocationObs.setValueText(admissionLocation.getId().toString());
+        dispositionObsGroup.addGroupMember(admissionLocationObs);
+
+        Obs transferLocationObs = new Obs();
+        transferLocationObs.setConcept(transferLocationConcept);
+        transferLocationObs.setValueText(transferLocation.getId().toString());
+        dispositionObsGroup.addGroupMember(transferLocationObs);
+
+        Date dateOfDeath = new Date();
+        Obs dateOfDeathObs = new Obs();
+        dateOfDeathObs.setConcept(dateOfDeathConcept);
+        dateOfDeathObs.setValueDate(dateOfDeath);
+        dispositionObsGroup.addGroupMember(dateOfDeathObs);
+
+        Concept additionalObsConcept = new Concept();
+        Obs additionalObs = new Obs();
+        additionalObs.setConcept(additionalObsConcept);
+        additionalObs.setValueText("some value");
+        dispositionObsGroup.addGroupMember(additionalObs);
+
+        // additional obs function should only return the single additional obs
+        List<Obs> additionalObsList = Collections.singletonList(additionalObs);
+        assertThat(dispositionDescriptor.getAdditionalObs(dispositionObsGroup), is(additionalObsList));
     }
 
     @Test

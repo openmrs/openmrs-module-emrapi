@@ -58,6 +58,8 @@ public class MockMetadataTestUtil {
 
         ConceptDatatype naDatatype = conceptService.getConceptDatatypeByName("N/A");
         ConceptDatatype codedDatatype = conceptService.getConceptDatatypeByName("Coded");
+        ConceptDatatype dateDatatype = conceptService.getConceptDatatypeByName("Date");
+        ConceptDatatype textDatatype = conceptService.getConceptDatatypeByName("Text");
 
         ConceptClass misc = conceptService.getConceptClassByName("Misc");
 
@@ -72,9 +74,21 @@ public class MockMetadataTestUtil {
                 .addName("Disposition Construct")
                 .addSetMember(disposition).get();
 
+        Concept admissionLocation = new ConceptBuilder(conceptService, textDatatype, misc)
+                .addName("Admission Location").get();
+
+        Concept internalTransferLocation = new ConceptBuilder(conceptService, textDatatype, misc)
+                .addName("Transfer Location").get();
+
+        Concept dateOfDeath = new ConceptBuilder(conceptService, dateDatatype, misc)
+                .addName("Date of death").get();
+
         DispositionDescriptor dispositionDescriptor = new DispositionDescriptor();
         dispositionDescriptor.setDispositionSetConcept(dispositionSet);
         dispositionDescriptor.setDispositionConcept(disposition);
+        dispositionDescriptor.setAdmissionLocationConcept(admissionLocation);
+        dispositionDescriptor.setInternalTransferLocationConcept(internalTransferLocation);
+        dispositionDescriptor.setDateOfDeathConcept(dateOfDeath);
 
         when(emrApiProperties.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
         return dispositionDescriptor;
