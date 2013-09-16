@@ -32,16 +32,23 @@ import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.datatype.FreeTextDatatype;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.ModuleException;
 import org.openmrs.module.emrapi.account.AccountService;
 import org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler;
 import org.openmrs.module.emrapi.printer.PrinterDatatype;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
  */
 public class EmrApiActivator extends BaseModuleActivator {
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     /**
      * @see ModuleActivator#contextRefreshed()
@@ -95,6 +102,20 @@ public class EmrApiActivator extends BaseModuleActivator {
         createUnknownProvider(administrationService, providerService, personService);
 
         createConceptSource(conceptService);
+
+        createPersonImageFolder();
+    }
+
+    private void createPersonImageFolder() {
+        EmrApiProperties emrProperties = Context.getRegisteredComponents(EmrApiProperties.class).get(0);
+        String personImageDirectory = emrProperties.getPersonImageDirectory();
+
+        try {
+            new File(personImageDirectory).mkdirs();
+        } catch (Exception e) {
+            log.error("Could not create person images folder : " + personImageDirectory, e);
+            throw new ModuleException("Could not create person images folder : " + personImageDirectory);
+        }
     }
 
     private void createGlobalProperties(AdministrationService administrationService) {
@@ -203,7 +224,7 @@ public class EmrApiActivator extends BaseModuleActivator {
                 unknownProviderUuid = new GlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
             }
             unknownProviderUuid.setPropertyValue("f9badd80-ab76-11e2-9e96-0800200c9a66");
-                  adminService.saveGlobalProperty(unknownProviderUuid);
+            adminService.saveGlobalProperty(unknownProviderUuid);
 
         }
 

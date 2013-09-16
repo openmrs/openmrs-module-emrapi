@@ -180,6 +180,32 @@
         </property>
     </bean>
 
+    <bean id="emrPersonImageService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.patient.image.EmrPersonImageServiceImpl">
+                <constructor-arg ref="emrApiProperties"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.patient.image.EmrPersonImageService</value>
+                <ref local="emrPersonImageService"/>
+            </list>
+        </property>
+    </bean>
+
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
