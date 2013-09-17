@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi.concept;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.DetachedCriteria;
@@ -77,7 +78,12 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
         {
             Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ConceptName.class, "cn");
             criteria.add(Restrictions.eq("voided", false));
-            criteria.add(Restrictions.eq("locale", locale));
+            if (StringUtils.isNotBlank(locale.getCountry()) || StringUtils.isNotBlank(locale.getVariant())) {
+                Locale[] locales = new Locale[] { locale, new Locale(locale.getLanguage()) };
+                criteria.add(Restrictions.in("locale", locales));
+            } else {
+                criteria.add(Restrictions.eq("locale", locale));
+            }
             criteria.setMaxResults(limit);
 
             Criteria conceptCriteria = criteria.createCriteria("concept");
