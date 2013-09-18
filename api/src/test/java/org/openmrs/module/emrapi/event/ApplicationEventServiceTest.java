@@ -13,20 +13,19 @@
  */
 package org.openmrs.module.emrapi.event;
 
+import static org.junit.Assert.assertEquals;
+
+import javax.jms.MapMessage;
+import javax.jms.Message;
+
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.event.Event;
 import org.openmrs.event.MockEventListener;
 import org.openmrs.module.emrapi.EmrApiConstants;
-
-import javax.jms.MapMessage;
-import javax.jms.Message;
-
-import static org.junit.Assert.assertEquals;
 
 public class ApplicationEventServiceTest {
 	
@@ -68,7 +67,6 @@ public class ApplicationEventServiceTest {
 	 * @see ApplicationEventService#patientViewed(org.openmrs.Patient, org.openmrs.User)
 	 */
 	@Test
-    @Ignore
 	public void patientViewed_shouldPublishThePatientViewedEvent() throws Exception {
 		Patient patient = new Patient();
 		User user = new User();

@@ -33,6 +33,8 @@ import org.openmrs.customdatatype.datatype.FreeTextDatatype;
 import org.openmrs.event.Event;
 import org.openmrs.event.EventListener;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.DaemonTokenAware;
 import org.openmrs.module.ModuleActivator;
 import org.openmrs.module.emrapi.account.AccountService;
 import org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler;
@@ -44,9 +46,11 @@ import org.openmrs.util.OpenmrsConstants;
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
  */
-public class EmrApiActivator extends BaseModuleActivator {
+public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenAware {
 
     private EventListener eventListener;
+
+    private DaemonToken daemonToken;
 
     /**
      * @see ModuleActivator#contextRefreshed()
@@ -100,7 +104,7 @@ public class EmrApiActivator extends BaseModuleActivator {
         createUnknownProvider(administrationService, providerService, personService);
 
         createConceptSource(conceptService);
-        eventListener = new PatientViewedEventListener();
+        eventListener = new PatientViewedEventListener(daemonToken);
         Event.subscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, eventListener);
     }
 
@@ -239,5 +243,10 @@ public class EmrApiActivator extends BaseModuleActivator {
         if (eventListener != null){
             Event.unsubscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, eventListener);
         }
+    }
+
+    @Override
+    public void setDaemonToken(DaemonToken token) {
+        daemonToken = token;
     }
 }
