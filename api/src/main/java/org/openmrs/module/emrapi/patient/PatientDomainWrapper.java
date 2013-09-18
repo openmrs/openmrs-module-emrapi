@@ -291,4 +291,10 @@ public class PatientDomainWrapper {
 
 		return diagnoses;
 	}
+
+	public List<Diagnosis> getUniqueDiagnosesSince(Date date) {
+		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, date);
+
+		return diagnoses;
+	}
 }
