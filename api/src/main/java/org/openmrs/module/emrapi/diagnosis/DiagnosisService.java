@@ -31,4 +31,13 @@ public interface DiagnosisService extends OpenmrsService {
 	 * @return the list of diagnoses
 	 */
 	List<Diagnosis> getDiagnoses(Patient patient, Date fromDate);
+
+	/**
+	 * Gets unique diagnoses since date.
+	 *
+	 * @param patient
+	 * @param fromDate
+	 * @return the list of diagnoses
+	 */
+	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate);
 }

@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi.diagnosis;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
@@ -121,7 +122,13 @@ public class CodedOrFreeTextAnswer {
                 OpenmrsUtil.nullSafeEquals(nonCodedAnswer, other.nonCodedAnswer);
     }
 
-    /**
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37).append(codedAnswer).append(specificCodedAnswer)
+				.append(nonCodedAnswer).toHashCode();
+	}
+
+	/**
      * Format as either:
      * <ul>
      * <li>non-coded value</li>

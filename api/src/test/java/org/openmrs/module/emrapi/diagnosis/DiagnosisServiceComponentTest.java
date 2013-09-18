@@ -132,6 +132,27 @@ public class DiagnosisServiceComponentTest extends BaseModuleContextSensitiveTes
 		assertThat(diagnoses, contains(hasObs(obs)));
 	}
 
+	@Test
+	public void getUniqueDiagnosesShouldReturnNoTextDuplicates() {
+		Patient patient = patientService.getPatient(2);
+		Obs obs1 = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
+		buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
+
+		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, DateUtil.parseDate("2013-01-01", "yyyy-MM-dd"));
+		assertThat(diagnoses, contains(hasObs(obs1)));
+	}
+
+	@Test
+	public void getUniqueDiagnosesShouldReturnNoCodedDuplicates() {
+		Patient patient = patientService.getPatient(2);
+		Concept malaria = conceptService.getConcept(11);
+		Obs obs1 = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
+		buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
+
+		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, DateUtil.parseDate("2013-01-01", "yyyy-MM-dd"));
+		assertThat(diagnoses, contains(hasObs(obs1)));
+	}
+
 
 	public static Matcher<Diagnosis> hasObs(final Obs obs) {
 		return new FeatureMatcher<Diagnosis, Obs>(is(obs), "obs", "obs") {

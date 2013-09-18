@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -69,6 +70,24 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 
 			if (!filter.contains(diagnosis.getDiagnosis().getCodedAnswer())) {
 				diagnoses.add(diagnosis);
+			}
+		}
+
+		return diagnoses;
+	}
+
+	@Override
+	public List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate) {
+		List<Diagnosis> diagnoses = getDiagnoses(patient, fromDate);
+
+		Set<CodedOrFreeTextAnswer> answers = new HashSet<CodedOrFreeTextAnswer>();
+
+		Iterator<Diagnosis> it = diagnoses.iterator();
+		while(it.hasNext()) {
+			Diagnosis diagnosis = it.next();
+
+			if (!answers.add(diagnosis.getDiagnosis())) {
+				 it.remove();
 			}
 		}
 
