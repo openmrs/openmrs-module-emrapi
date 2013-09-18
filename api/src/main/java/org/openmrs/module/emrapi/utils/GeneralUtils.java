@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.utils;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
@@ -24,11 +25,14 @@ import org.openmrs.User;
 import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.util.LocaleUtility;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -231,6 +235,43 @@ public class GeneralUtils {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    /**
+     * Gets the value of the user property
+     * EmrApiConstants.USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS for the user as a list of patients
+     * in reverse order impying the patient that was first added comes last while the last added one
+     * comes first
+     *
+     * @param user
+     * @should return a list of the patients last viewed by the specified user
+     */
+    public static List<Patient> getLastViewedPatients(User user) {
+        List<Patient> lastViewed = new ArrayList<Patient>();
+        if (user != null) {
+            //The user object cached in the user's context needs to be up to date
+            user = Context.getUserService().getUser(user.getId());
+            String lastViewedPatientIdsString = user
+                    .getUserProperty(EmrApiConstants.USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS);
+            if (StringUtils.isNotBlank(lastViewedPatientIdsString)) {
+                PatientService ps = Context.getPatientService();
+                lastViewedPatientIdsString = lastViewedPatientIdsString.replaceAll("\\s", "");
+                String[] patientIds = lastViewedPatientIdsString.split(",");
+                for (String pId : patientIds) {
+                    try {
+                        Patient p = ps.getPatient(Integer.valueOf(pId));
+                        if (p != null) {
+                            lastViewed.add(p);
+                        }
+                    }
+                    catch (NumberFormatException e) {}
+                }
+            }
+        }
+
+        Collections.reverse(lastViewed);
+
+        return lastViewed;
     }
 
 }

@@ -30,10 +30,13 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.customdatatype.datatype.FreeTextDatatype;
+import org.openmrs.event.Event;
+import org.openmrs.event.EventListener;
 import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.ModuleActivator;
 import org.openmrs.module.emrapi.account.AccountService;
 import org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler;
+import org.openmrs.module.emrapi.event.PatientViewedEventListener;
 import org.openmrs.module.emrapi.printer.PrinterDatatype;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
@@ -42,6 +45,8 @@ import org.openmrs.util.OpenmrsConstants;
  * This class contains the logic that is run every time this module is either started or stopped.
  */
 public class EmrApiActivator extends BaseModuleActivator {
+
+    private EventListener eventListener;
 
     /**
      * @see ModuleActivator#contextRefreshed()
@@ -95,6 +100,8 @@ public class EmrApiActivator extends BaseModuleActivator {
         createUnknownProvider(administrationService, providerService, personService);
 
         createConceptSource(conceptService);
+        eventListener = new PatientViewedEventListener();
+        Event.subscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, eventListener);
     }
 
     private void createGlobalProperties(AdministrationService administrationService) {
@@ -227,4 +234,10 @@ public class EmrApiActivator extends BaseModuleActivator {
         return conceptSource;
     }
 
+    @Override
+    public void stopped() {
+        if (eventListener != null){
+            Event.unsubscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, eventListener);
+        }
+    }
 }

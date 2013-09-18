@@ -258,4 +258,17 @@ public class EmrApiProperties extends ModuleProperties {
 		return conceptService.getConceptMapTypeByUuid(EmrApiConstants.NARROWER_THAN_CONCEPT_MAP_TYPE_UUID);
 	}
 
+    public Integer getLastViewedPatientSizeLimit() {
+        String limit = administrationService.getGlobalProperty(EmrApiConstants.GP_LAST_VIEWED_PATIENT_SIZE_LIMIT);
+        if (StringUtils.hasText(limit)) {
+            try {
+                return Integer.valueOf(limit);
+            }
+            catch (NumberFormatException e) {
+
+            }
+        }
+        return EmrApiConstants.DEFAULT_LAST_VIEWED_PATIENT_SIZE_LIMIT;
+    }
+
 }

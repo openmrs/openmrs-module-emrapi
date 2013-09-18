@@ -146,6 +146,18 @@ public class EmrApiConstants {
 
     public static final String LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD = "a5fb5770-409a-11e2-a25f-0800200c9a66";
 
+    public static final String USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS = "emrapi.lastViewedPatientIds";
+
+    public static final String EVENT_TOPIC_NAME_PATIENT_VIEWED = "org.openmrs.module.emrapi.event.PatientViewed";
+
+    public static final String EVENT_KEY_PATIENT_UUID = "patientUuid";
+
+    public static final String EVENT_KEY_USER_UUID = "userUuid";
+
+    public static final String GP_LAST_VIEWED_PATIENT_SIZE_LIMIT = "emrapi.lastViewedPatientSizeLimit";
+
+    public static final int DEFAULT_LAST_VIEWED_PATIENT_SIZE_LIMIT = 50;
+
     // remember if we add more types here to also create them in the module activator
     public static final Map<String, String> LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER = new HashMap<String, String>() {{
         put("ID_CARD", "b48ef9a0-38d3-11e2-81c1-0800200c9a66");

@@ -42,6 +42,7 @@
         <calculationModuleVersion>1.0</calculationModuleVersion>
         <providermanagementModuleVersion>1.1.3</providermanagementModuleVersion>
         <metadatasharingVersion>1.1.8</metadatasharingVersion>
+        <eventVersion>2.1</eventVersion>
     </properties>
 
     <dependencies>
@@ -110,6 +111,22 @@
 			<version>${metadatasharingVersion}</version>
 			<scope>provided</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>org.openmrs</groupId>
+            <artifactId>event-api</artifactId>
+            <version>${eventVersion}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jms_1.1_spec</artifactId>
+            <version>1.1.1</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- End OpenMRS modules -->
 
