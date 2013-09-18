@@ -15,6 +15,9 @@ package org.openmrs.module.emrapi.event;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import javax.jms.MapMessage;
 import javax.jms.Message;
 
@@ -24,21 +27,29 @@ import org.junit.Test;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.event.Event;
-import org.openmrs.event.MockEventListener;
+import org.openmrs.event.EventListener;
 import org.openmrs.module.emrapi.EmrApiConstants;
 
 public class ApplicationEventServiceTest {
 	
-	private MockEmrEventListener listener = new MockEmrEventListener(1);
+	private MockEmrEventListener listener;
 	
-	private class MockEmrEventListener extends MockEventListener {
+	private class MockEmrEventListener implements EventListener {
+		
+		//Expects one event to get fired
+		CountDownLatch latch = new CountDownLatch(1);
 		
 		String patientUuid;
 		
 		String userUuid;
 		
-		MockEmrEventListener(int expectedEventsCount) {
-			super(expectedEventsCount);
+		/**
+		 * Waits for events for at most 2 seconds.
+		 * 
+		 * @throws InterruptedException
+		 */
+		public void waitForEvents() throws InterruptedException {
+			latch.await(2, TimeUnit.SECONDS);
 		}
 		
 		@Override
@@ -47,6 +58,8 @@ public class ApplicationEventServiceTest {
 				MapMessage mapMessage = (MapMessage) message;
 				patientUuid = mapMessage.getString(EmrApiConstants.EVENT_KEY_PATIENT_UUID);
 				userUuid = mapMessage.getString(EmrApiConstants.EVENT_KEY_USER_UUID);
+				//signal that the listener is done
+				latch.countDown();
 			}
 			catch (Exception e) {}
 		}
@@ -54,6 +67,7 @@ public class ApplicationEventServiceTest {
 	
 	@Before
 	public void setup() {
+		listener = new MockEmrEventListener();
 		Event.subscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, listener);
 	}
 	
@@ -71,7 +85,7 @@ public class ApplicationEventServiceTest {
 		Patient patient = new Patient();
 		User user = new User();
 		new ApplicationEventServiceImpl().patientViewed(patient, user);
-		
+
 		listener.waitForEvents();
 		assertEquals(patient.getUuid(), listener.patientUuid);
 		assertEquals(user.getUuid(), listener.userUuid);

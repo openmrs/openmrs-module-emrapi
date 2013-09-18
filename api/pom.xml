@@ -13,18 +13,6 @@
 	<name>EMR API Module API</name>
 	<description>API project for EMRAPI</description>
 
-	<dependencies>
-
-        <dependency>
-            <groupId>org.openmrs</groupId>
-            <artifactId>event-api</artifactId>
-            <version>${eventVersion}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-	</dependencies>
-	
 	<build>
 		<resources>
 			<resource>
