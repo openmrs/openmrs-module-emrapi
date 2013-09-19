@@ -14,6 +14,8 @@
 package org.openmrs.module.emrapi;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.ConceptSource;
 import org.openmrs.GlobalProperty;
 import org.openmrs.LocationAttributeType;
@@ -38,8 +40,6 @@ import org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler;
 import org.openmrs.module.emrapi.printer.PrinterDatatype;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -48,7 +48,7 @@ import java.io.File;
  */
 public class EmrApiActivator extends BaseModuleActivator {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    protected final Log log = LogFactory.getLog(getClass());
 
     /**
      * @see ModuleActivator#contextRefreshed()
@@ -108,13 +108,12 @@ public class EmrApiActivator extends BaseModuleActivator {
 
     private void createPersonImageFolder() {
         EmrApiProperties emrProperties = Context.getRegisteredComponents(EmrApiProperties.class).get(0);
-        String personImageDirectory = emrProperties.getPersonImageDirectory();
-
+        File personImageDirectory = emrProperties.getPersonImageDirectory();
         try {
-            new File(personImageDirectory).mkdirs();
+            personImageDirectory.mkdirs();
         } catch (Exception e) {
-            log.error("Could not create person images folder : " + personImageDirectory, e);
-            throw new ModuleException("Could not create person images folder : " + personImageDirectory);
+            log.error("Could not create person images folder : " + personImageDirectory.getAbsolutePath(), e);
+            throw new ModuleException("Could not create person images folder : " + personImageDirectory.getAbsolutePath());
         }
     }
 

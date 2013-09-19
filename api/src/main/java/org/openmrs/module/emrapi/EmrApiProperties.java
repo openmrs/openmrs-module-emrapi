@@ -35,6 +35,7 @@ import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -297,10 +298,10 @@ public class EmrApiProperties extends ModuleProperties {
         return conceptService.getConceptMapTypeByUuid(EmrApiConstants.NARROWER_THAN_CONCEPT_MAP_TYPE_UUID);
     }
 
-    public String getPersonImageDirectory() {
+    public File getPersonImageDirectory() {
         String personImagesDir = getGlobalProperty(EmrApiConstants.GP_PERSON_IMAGES_DIRECTORY, false);
         if (personImagesDir == null || personImagesDir.isEmpty())
             personImagesDir = OpenmrsUtil.getApplicationDataDirectory() + "person_images";
-        return personImagesDir;
+        return new File(personImagesDir);
     }
 }

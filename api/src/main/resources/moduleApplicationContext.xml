@@ -185,8 +185,8 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="org.openmrs.module.emrapi.patient.image.EmrPersonImageServiceImpl">
-                <constructor-arg ref="emrApiProperties"/>
+            <bean class="org.openmrs.module.emrapi.person.image.EmrPersonImageServiceImpl">
+                <property name="emrApiProperties" ref="emrApiProperties"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -200,7 +200,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.patient.image.EmrPersonImageService</value>
+                <value>${project.parent.groupId}.${project.parent.artifactId}.person.image.EmrPersonImageService</value>
                 <ref local="emrPersonImageService"/>
             </list>
         </property>

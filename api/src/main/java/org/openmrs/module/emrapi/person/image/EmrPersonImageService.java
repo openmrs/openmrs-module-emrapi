@@ -11,18 +11,24 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.patient.image;
+package org.openmrs.module.emrapi.person.image;
 
+import org.openmrs.Person;
 import org.openmrs.api.OpenmrsService;
-
-import java.io.InputStream;
 
 /**
  * Public API for person image functionality.
  */
-public interface EmrPersonImageService extends OpenmrsService{
+public interface EmrPersonImageService extends OpenmrsService {
 
-    public void save(String personUuid, String image);
-    public InputStream get(String personUuid);
+    /**
+     * Saves the provided base64-encoded string as a jpeg image for the specified <code>Person</code>.
+     *
+     * @throws org.openmrs.api.APIException
+     *          if save fails
+     */
+    public PersonImage savePersonImage(PersonImage personImage);
+
+    public PersonImage getCurrentPersonImage(Person person);
 
 }
