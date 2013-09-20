@@ -1,9 +1,9 @@
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
+
 
 import java.util.Date;
 import java.util.List;
@@ -18,10 +18,10 @@ public interface DiagnosisService extends OpenmrsService {
     /**
      * Changes a non-coded diagnosis to coded diagnosis
      * @param nonCodedObs an Obs that contains the non-coded diagnosis
-     * @param codedDiagnosis a Concept representing the coded Diagnosis to be entered
+     * @param diagnoses a List of Diagnosis representing the new diagnoses
      * @return
      */
-    Obs codeNonCodedDiagnosis(Obs nonCodedObs, Concept codedDiagnosis);
+    List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses);
 
 	/**
 	 * Gets diagnoses since date.

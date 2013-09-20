@@ -42,6 +42,7 @@
             <bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisServiceImpl">
                 <property name="emrApiProperties" ref="emrApiProperties"/>
                 <property name="obsService" ref="obsService"/>
+                <property name="encounterService" ref="encounterService"/>
             </bean>
         </property>
         <property name="preInterceptors">

@@ -1,9 +1,11 @@
 package org.openmrs.module.emrapi.diagnosis;
 
 import org.openmrs.Concept;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Person;
+import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -23,6 +25,8 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 
 	private ObsService obsService;
 
+    private EncounterService encounterService;
+
 	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
 		this.emrApiProperties = emrApiProperties;
 	}
@@ -31,20 +35,42 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 		this.obsService = obsService;
 	}
 
-	@Override
-	public Obs codeNonCodedDiagnosis(Obs nonCodedObs, Concept codedDiagnosis) {
+    public void setEncounterService(EncounterService encounterService) {
+        this.encounterService = encounterService;
+    }
 
-		if ((nonCodedObs != null) && (codedDiagnosis != null)) {
-			Concept codedDiagnosisConcept = emrApiProperties.getDiagnosisMetadata().getCodedDiagnosisConcept();
-			nonCodedObs.setConcept(codedDiagnosisConcept);
-			nonCodedObs.setValueCoded(codedDiagnosis);
-			nonCodedObs.setValueText("");
-			nonCodedObs = obsService.saveObs(nonCodedObs, "code a diagnosis");
-			return nonCodedObs;
+    @Override
+    public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses) {
 
-		}
-		return null;
-	}
+        List<Obs> newDiagnoses = null;
+        if ( (nonCodedObs != null) && (diagnoses != null && diagnoses.size() > 0) ){
+            newDiagnoses = new ArrayList<Obs>();
+
+            Obs obsGroup = nonCodedObs.getObsGroup();
+            if ( obsGroup != null ){
+                Set<Obs> groupMembers = obsGroup.getGroupMembers();
+                if( (groupMembers!=null) && (groupMembers.size() > 0) ){
+                    for (Obs groupMember : groupMembers) {
+                        obsService.voidObs(groupMember, "code a diagnosis");
+                    }
+                }
+                obsGroup = obsService.voidObs(obsGroup, "code a diagnosis");
+            }
+
+            Encounter encounter = nonCodedObs.getEncounter();
+            DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+            for(Diagnosis diagnosis : diagnoses){
+                Obs obs = diagnosisMetadata.buildDiagnosisObsGroup(diagnosis);
+                if (obs != null) {
+                    newDiagnoses.add(obs);
+                    encounter.addObs(obs);
+                }
+
+            }
+            encounterService.saveEncounter(encounter);
+        }
+        return newDiagnoses;
+    }
 
 	@Override
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
