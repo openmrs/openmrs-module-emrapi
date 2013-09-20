@@ -24,7 +24,8 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 
 public class EmrPersonImageServiceImpl extends BaseOpenmrsService implements EmrPersonImageService {
 
