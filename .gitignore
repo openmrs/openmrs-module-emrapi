@@ -6,6 +6,7 @@
 /api/.settings
 /api/.project
 /api/target
+/api/activemq-data
 /omod/.classpath
 /omod/.settings
 /omod/.project
