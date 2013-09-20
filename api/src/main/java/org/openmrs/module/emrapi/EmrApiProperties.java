@@ -31,9 +31,11 @@ import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.utils.ModuleProperties;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -271,4 +273,10 @@ public class EmrApiProperties extends ModuleProperties {
         return EmrApiConstants.DEFAULT_LAST_VIEWED_PATIENT_SIZE_LIMIT;
     }
 
+    public File getPersonImageDirectory() {
+        String personImagesDir = getGlobalProperty(EmrApiConstants.GP_PERSON_IMAGES_DIRECTORY, false);
+        if (personImagesDir == null || personImagesDir.isEmpty())
+            personImagesDir = OpenmrsUtil.getApplicationDataDirectory() + "person_images";
+        return new File(personImagesDir);
+    }
 }

@@ -14,6 +14,8 @@
 package org.openmrs.module.emrapi;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.ConceptSource;
 import org.openmrs.GlobalProperty;
 import org.openmrs.LocationAttributeType;
@@ -36,6 +38,7 @@ import org.openmrs.module.BaseModuleActivator;
 import org.openmrs.module.DaemonToken;
 import org.openmrs.module.DaemonTokenAware;
 import org.openmrs.module.ModuleActivator;
+import org.openmrs.module.ModuleException;
 import org.openmrs.module.emrapi.account.AccountService;
 import org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler;
 import org.openmrs.module.emrapi.event.PatientViewedEventListener;
@@ -43,10 +46,14 @@ import org.openmrs.module.emrapi.printer.PrinterDatatype;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
 
+import java.io.File;
+
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
  */
 public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenAware {
+
+    protected final Log log = LogFactory.getLog(getClass());
 
     private EventListener eventListener;
 
@@ -106,6 +113,19 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         createConceptSource(conceptService);
         eventListener = new PatientViewedEventListener(daemonToken);
         Event.subscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, eventListener);
+
+        createPersonImageFolder();
+    }
+
+    private void createPersonImageFolder() {
+        EmrApiProperties emrProperties = Context.getRegisteredComponents(EmrApiProperties.class).get(0);
+        File personImageDirectory = emrProperties.getPersonImageDirectory();
+        try {
+            personImageDirectory.mkdirs();
+        } catch (Exception e) {
+            log.error("Could not create person images folder : " + personImageDirectory.getAbsolutePath(), e);
+            throw new ModuleException("Could not create person images folder : " + personImageDirectory.getAbsolutePath());
+        }
     }
 
     private void createGlobalProperties(AdministrationService administrationService) {
@@ -214,7 +234,7 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
                 unknownProviderUuid = new GlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
             }
             unknownProviderUuid.setPropertyValue("f9badd80-ab76-11e2-9e96-0800200c9a66");
-                  adminService.saveGlobalProperty(unknownProviderUuid);
+            adminService.saveGlobalProperty(unknownProviderUuid);
 
         }
 

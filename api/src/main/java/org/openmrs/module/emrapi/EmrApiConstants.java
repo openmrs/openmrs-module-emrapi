@@ -51,6 +51,8 @@ public class EmrApiConstants {
 
     public static final String GP_EXIT_FROM_INPATIENT_FORM = "emr.exitFromInpatientForm";
 
+    public static final String GP_PERSON_IMAGES_DIRECTORY = "emr.personImagesDirectory";
+
     public static final String LOCATION_TAG_SUPPORTS_VISITS = "Visit Location";
 
     public static final String LOCATION_TAG_SUPPORTS_LOGIN = "Login Location";
