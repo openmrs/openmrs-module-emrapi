@@ -8,12 +8,13 @@ import org.openmrs.Provider;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public class EncounterParameters {
 
     private Location location;
     private EncounterType encounterType;
-    private List<Provider> providers;
+    private Set<Provider> providers;
     private Date encounterDateTime;
     private Patient patient;
 
@@ -35,7 +36,7 @@ public class EncounterParameters {
         return this;
     }
 
-    public EncounterParameters setProviders(List<Provider> providers) {
+    public EncounterParameters setProviders(Set<Provider> providers) {
         this.providers = providers;
         return this;
     }
@@ -58,7 +59,7 @@ public class EncounterParameters {
         return encounterType;
     }
 
-    public List<Provider> getProviders() {
+    public Set<Provider> getProviders() {
         return providers;
     }
 

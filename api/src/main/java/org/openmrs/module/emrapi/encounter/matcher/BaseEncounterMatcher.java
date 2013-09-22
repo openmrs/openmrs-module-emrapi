@@ -8,7 +8,8 @@ import org.openmrs.module.emrapi.encounter.EncounterParameters;
 /**
  * Chooses a suitable encounter from a {@link org.openmrs.Visit} using various criteria.
  */
-public interface EncounterMatcher {
+public interface BaseEncounterMatcher {
 
     Encounter findEncounter(Visit visit, EncounterParameters encounterParameters);
+
 }

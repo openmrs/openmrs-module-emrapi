@@ -14,9 +14,9 @@
 
 package org.openmrs.module.emrapi.web.controller;
 
-import org.openmrs.module.emrapi.encounter.contract.EncounterTransactionResponse;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.EmrEncounterService;
-import org.openmrs.module.emrapi.encounter.contract.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

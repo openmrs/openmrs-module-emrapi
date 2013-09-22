@@ -1,16 +1,16 @@
-package org.openmrs.module.emrapi.encounter.contract;
+package org.openmrs.module.emrapi.encounter.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public class EncounterTransaction {
     private String locationUuid;
-    private List<String> providerUuid;
+    private Set<String> providerUuid;
     private String patientUuid;     // TODO: mandatory validation
     private String visitTypeUuid;  // TODO: mandatory validation
     private String encounterTypeUuid;   // TODO: mandatory validation
-    private String encounterMatcher;
     private Date encounterDateTime;
 
     private List<Observation> observations = new ArrayList<Observation>();
@@ -62,15 +62,6 @@ public class EncounterTransaction {
         return this;
     }
 
-    public String getEncounterMatcherName() {
-        return encounterMatcher;
-    }
-
-    public EncounterTransaction setEncounterMatcher(String encounterMatcher) {
-        this.encounterMatcher = encounterMatcher;
-        return this;
-    }
-
     public Date getEncounterDateTime() {
         return encounterDateTime == null ? new Date() : encounterDateTime;
     }
@@ -89,11 +80,11 @@ public class EncounterTransaction {
         return this;
     }
 
-    public List<String> getProviderUuids() {
+    public Set<String> getProviderUuids() {
         return providerUuid;
     }
 
-    public EncounterTransaction setProviderUuid(List<String> providerUuid) {
+    public EncounterTransaction setProviderUuid(Set<String> providerUuid) {
         this.providerUuid = providerUuid;
         return this;
     }

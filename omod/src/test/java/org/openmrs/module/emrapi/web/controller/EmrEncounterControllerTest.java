@@ -7,7 +7,7 @@ import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.Visit;
 import org.openmrs.api.VisitService;
-import org.openmrs.module.emrapi.encounter.contract.EncounterTransactionResponse;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 

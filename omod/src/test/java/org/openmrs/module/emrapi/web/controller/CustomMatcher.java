@@ -2,12 +2,12 @@ package org.openmrs.module.emrapi.web.controller;
 
 import org.openmrs.Encounter;
 import org.openmrs.Visit;
-import org.openmrs.module.emrapi.encounter.matcher.EncounterMatcher;
+import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.EncounterParameters;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomMatcher implements EncounterMatcher {
+public class CustomMatcher implements BaseEncounterMatcher {
 
     @Override
     public Encounter findEncounter(Visit visit, EncounterParameters encounterParameters) {

@@ -1,4 +1,4 @@
-package org.openmrs.module.emrapi.encounter.contract;
+package org.openmrs.module.emrapi.encounter.domain;
 
 import org.junit.Test;
 

@@ -5,7 +5,7 @@ import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.api.ConceptService;
-import org.openmrs.module.emrapi.encounter.contract.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
 
 import java.util.List;

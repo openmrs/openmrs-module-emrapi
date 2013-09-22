@@ -16,19 +16,19 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.emrapi.encounter.contract.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.contract.EncounterTransactionResponse;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
+import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
-import org.openmrs.module.emrapi.encounter.matcher.EncounterMatcher;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
@@ -44,7 +44,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private ProviderService providerService;
     private AdministrationService administrationService;
 
-    private Map<String, EncounterMatcher> encounterMatcherMap = new HashMap<String, EncounterMatcher>();
+    private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService, ConceptService conceptService, LocationService locationService, ProviderService providerService, AdministrationService administrationService) {
         this.patientService = patientService;
@@ -61,8 +61,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     public void onStartup() {
         try {
             super.onStartup();
-            List<EncounterMatcher> encounterMatchers = Context.getRegisteredComponents(EncounterMatcher.class);
-            for (EncounterMatcher encounterMatcher : encounterMatchers) {
+            List<BaseEncounterMatcher> encounterMatchers = Context.getRegisteredComponents(BaseEncounterMatcher.class);
+            for (BaseEncounterMatcher encounterMatcher : encounterMatchers) {
                 encounterMatcherMap.put(encounterMatcher.getClass().getCanonicalName(), encounterMatcher);
             }
         } catch (Exception e) {
@@ -88,7 +88,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Location location = locationService.getLocationByUuid(encounterTransaction.getLocationUuid());
 
         Date encounterDateTime = encounterTransaction.getEncounterDateTime();
-        List<Provider> providers = getProviders(encounterTransaction.getProviderUuids());
+        Set<Provider> providers = getProviders(encounterTransaction.getProviderUuids());
 
         EncounterParameters encounterParameters = EncounterParameters.instance()
                                                     .setLocation(location).setEncounterType(encounterType)
@@ -96,7 +96,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
                                                     .setPatient(patient);
 
         String matcherClass = administrationService.getGlobalProperty("emr.encounterMatcher");
-        EncounterMatcher encounterMatcher = isNotEmpty(matcherClass)? encounterMatcherMap.get(matcherClass) : new DefaultEncounterMatcher();
+        BaseEncounterMatcher encounterMatcher = isNotEmpty(matcherClass)? encounterMatcherMap.get(matcherClass) : new DefaultEncounterMatcher();
         if (encounterMatcher == null) {
             throw new EncounterMatcherNotFoundException();
         }
@@ -114,13 +114,13 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         return encounter;
     }
 
-    private List<Provider> getProviders(List<String> providerUuids) {
+    private Set<Provider> getProviders(Set<String> providerUuids) {
 
         if (providerUuids == null){
-            return Collections.EMPTY_LIST;
+            return Collections.EMPTY_SET;
         }
 
-        List<Provider> providers = new ArrayList<Provider>();
+        Set<Provider> providers = new HashSet<Provider>();
 
         for (String providerUuid : providerUuids) {
             Provider provider = providerService.getProviderByUuid(providerUuid);

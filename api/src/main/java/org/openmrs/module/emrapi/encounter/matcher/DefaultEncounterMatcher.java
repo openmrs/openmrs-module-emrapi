@@ -8,7 +8,7 @@ import org.openmrs.module.emrapi.encounter.EncounterParameters;
 /**
  * Find {@link org.openmrs.Encounter} from a {@link org.openmrs.Visit} by matching {@link org.openmrs.EncounterType}.
  */
-public class DefaultEncounterMatcher implements EncounterMatcher {
+public class DefaultEncounterMatcher implements BaseEncounterMatcher {
 
     @Override
     public Encounter findEncounter(Visit visit, EncounterParameters encounterParameters) {

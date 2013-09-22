@@ -10,7 +10,7 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
-import org.openmrs.module.emrapi.encounter.contract.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
 
 import java.text.ParseException;
