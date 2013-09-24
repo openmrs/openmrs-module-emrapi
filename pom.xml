@@ -35,7 +35,7 @@
     </modules>
 
     <properties>
-        <openmrsCoreVersion>1.9.4-SNAPSHOT</openmrsCoreVersion>
+        <openmrsCoreVersion>1.9.4</openmrsCoreVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <reportingModuleVersion>0.7.5</reportingModuleVersion>
         <serializationXstreamModuleVersion>0.2.7</serializationXstreamModuleVersion>
