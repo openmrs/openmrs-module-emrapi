@@ -1,5 +1,7 @@
 package org.openmrs.module.emrapi.diagnosis;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
@@ -20,6 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 public class DiagnosisServiceImpl extends BaseOpenmrsService implements DiagnosisService {
+
+    private static final Log log = LogFactory.getLog(DiagnosisService.class);
 
 	private EmrApiProperties emrApiProperties;
 
@@ -58,8 +62,21 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
             }
 
             Encounter encounter = nonCodedObs.getEncounter();
+            List<Diagnosis> primaryDiagnoses = getPrimaryDiagnoses(encounter);
+            boolean havePrimary =false;
+            if (primaryDiagnoses !=null && primaryDiagnoses.size() > 0 ){
+                // the encounter already has a primary diagnosis
+                havePrimary = true;
+            }
             DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
             for(Diagnosis diagnosis : diagnoses){
+                if (hasDiagnosis(encounter, diagnosis)){
+                    // if this encounter already has this diagnosis skip it
+                    continue;
+                }
+                if (havePrimary) {
+                    diagnosis.setOrder(Diagnosis.Order.SECONDARY);
+                }
                 Obs obs = diagnosisMetadata.buildDiagnosisObsGroup(diagnosis);
                 if (obs != null) {
                     newDiagnoses.add(obs);
@@ -72,7 +89,54 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
         return newDiagnoses;
     }
 
-	@Override
+    @Override
+    public List<Diagnosis> getPrimaryDiagnoses(Encounter encounter) {
+        List<Diagnosis> diagnoses = null;
+        if (encounter != null && !encounter.isVoided()){
+            DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+            diagnoses = new ArrayList<Diagnosis>();
+            for (Obs obs : encounter.getObsAtTopLevel(false) ){
+                if (diagnosisMetadata.isDiagnosis(obs)) {
+                    try {
+                        Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
+                        if (Diagnosis.Order.PRIMARY == diagnosis.getOrder()) {
+                            diagnoses.add(diagnosis);
+                        }
+                    } catch (Exception ex){
+                        log.warn("malformed diagnosis obs group with obsId " + obs.getObsId(), ex);
+                    }
+                }
+            }
+        }
+        return diagnoses;
+
+    }
+
+    @Override
+    public boolean hasDiagnosis(Encounter encounter, Diagnosis diagnosis) {
+        boolean hasDiagnosis = false;
+        if (encounter != null && !encounter.isVoided()){
+            DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+            for (Obs obs : encounter.getObsAtTopLevel(false) ){
+                if (diagnosisMetadata.isDiagnosis(obs)) {
+                    try {
+                        Diagnosis existing = diagnosisMetadata.toDiagnosis(obs);
+                        CodedOrFreeTextAnswer answer = existing.getDiagnosis();
+                        if (answer != null && answer.equals(diagnosis.getDiagnosis())){
+                            hasDiagnosis = true;
+                            break;
+                        }
+                    } catch (Exception ex){
+                        log.warn("malformed diagnosis obs group with obsId " + obs.getObsId(), ex);
+                    }
+                }
+            }
+        }
+        return hasDiagnosis;
+
+    }
+
+    @Override
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
 		List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
 
