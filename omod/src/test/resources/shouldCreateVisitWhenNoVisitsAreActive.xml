@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <visit_type visit_type_id="1" name="REG" uuid="b45ca846-c79a-11e2-b0c0-8e397087571c"/>
+    <encounter encounter_id="1" encounter_type="1" uuid="c56db957-c79a-11e2-b0c0-9f408198682d" encounter_datetime="2005-01-01 00:00:00.0" creator="1" date_created="2005-01-01 00:00:00.0" voided="false"/>
+    <encounter_type encounter_type_id="1" name="registration" description="registration" uuid="2b377dba-62c3-4e53-91ef-b51c68899890"/>
+    <location location_id="1" name="Test Location" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="f1771d8e-bf1f-4dc5-957f-0d40a5eebf08"/>
+    <person person_id="1" gender="M" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="a76e8d23-0c38-408c-b2a8-ea5540f01b51"/>
+    <person_name person_name_id="1" preferred="true" person_id="1" given_name="John" middle_name=" " family_name="Doe" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="84889c43-32cb-4625-8bd8-d1dd1c04a38c"/>
+    <patient patient_id="1" creator="1" date_created="2005-01-01 00:00:00.0" voided="false"/>
+    <patient_identifier patient_identifier_id="1" patient_id="2" identifier="1234" identifier_type="1" preferred="1" location_id="1" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="0b7cf2fa-b377-455c-8750-231cf34a21ac"/>
+</dataset>
