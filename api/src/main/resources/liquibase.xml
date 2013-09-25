@@ -1,0 +1,66 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="emrapi" id="100">
+        <createTable tableName="bed">
+            <column autoIncrement="true" name="bed_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="bed_number" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+        <createTable tableName="bed_patient_assignment">
+            <column autoIncrement="true" name="bed_patient_assignment_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="patient_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bed_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_started" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_stopped" type="datetime"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="bed_id_fk"
+                                 baseTableName="bed_patient_assignment" baseColumnNames="bed_id"
+                                 referencedTableName="bed" referencedColumnNames="bed_id"/>
+
+        <addForeignKeyConstraint constraintName="patient_fk"
+                                 baseTableName="bed_patient_assignment" baseColumnNames="patient_id"
+                                 referencedTableName="patient" referencedColumnNames="patient_id"/>
+
+
+        <createTable tableName="bed_location_mapping">
+            <column autoIncrement="true" name="bed_location_mapping_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="location_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="row_number" type="smallint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="column_number" type="smallint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bed_id" type="int"/>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="location_id_fk"
+                                 baseTableName="bed_location_mapping" baseColumnNames="location_id"
+                                 referencedTableName="location" referencedColumnNames="location_id"/>
+
+        <!--<addForeignKeyConstraint constraintName="bed_id_fk"-->
+                                 <!--baseTableName="bed_location_mapping" baseColumnNames="bed_id"-->
+                                 <!--referencedTableName="bed" referencedColumnNames="bed_id"/>-->
+
+    </changeSet>
+</databaseChangeLog>
