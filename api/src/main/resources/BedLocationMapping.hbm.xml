@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="org.openmrs.module.emrapi.bedmanagement.domain.BedLocationMapping" table="bed_location_mapping">
+
+        <id name="id" type="int" column="bed_location_mapping_id" unsaved-value="0" access="field">
+            <generator class="native"/>
+        </id>
+
+        <many-to-one name="location" class="org.openmrs.Location" not-null="true" column="location_id" access="field"/>
+        <many-to-one name="bed" class="org.openmrs.module.emrapi.bedmanagement.domain.Bed" not-null="false" column="bed_id" access="field"/>
+
+        <property name="row" type="java.lang.Integer" column="row_number" length="5" access="field"/>
+        <property name="column" type="java.lang.Integer" column="column_number" length="5" access="field"/>
+
+    </class>
+
+</hibernate-mapping>
+

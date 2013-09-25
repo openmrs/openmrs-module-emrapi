@@ -154,7 +154,7 @@
             <ref bean="transactionAttributeSource"/>
         </property>
     </bean>
-    
+
      <bean id="emrPatientService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -273,12 +273,42 @@
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.concept.EmrConceptService</value>
                 <ref local="emrConceptService"/>
-                <value>${project.parent.groupId}.${project.parent.artifactId}.patient.EmrPatientService</value>
-                <ref local="emrPatientService"/>
-                <value>${project.parent.groupId}.${project.parent.artifactId}.event.ApplicationEventService</value>
-                <ref local="applicationEventService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.person.image.EmrPersonImageService</value>
                 <ref local="emrPersonImageService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.event.ApplicationEventService</value>
+                <ref local="applicationEventService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.patient.EmrPatientService</value>
+                <ref local="emrPatientService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.BedManagementService</value>
+                <ref local="bedManagementService"/>
             </list>
         </property>
     </bean>
@@ -290,7 +320,36 @@
         </property>
     </bean>
 
+    <bean id="bedManagementDao" class="${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.HibernateBedManagementDAO">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
     <bean id="emrapiVisitDomainWrapperFactory" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory"/>
     <bean id="emrapiVisitDomainWrapperRepository" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperRepository"/>
+
+    <bean id="bedManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.bedmanagement.BedManagementServiceImpl">
+                <property name="bedManagementDao">
+                    <bean class="${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.HibernateBedManagementDAO">
+                        <property name="sessionFactory">
+                            <ref bean="sessionFactory"/>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
 
 </beans>

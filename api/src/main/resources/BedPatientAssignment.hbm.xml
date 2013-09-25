@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="org.openmrs.module.emrapi.bedmanagement.domain.BedPatientAssignment" table="bed_patient_assignment">
+
+        <id name="id" type="int" column="bed_patient_assignment_id" unsaved-value="0" access="field">
+            <generator class="native"/>
+        </id>
+
+        <many-to-one name="patient" class="org.openmrs.Patient" not-null="true" column="patient_id" access="field"/>
+        <many-to-one name="bed" class="org.openmrs.module.emrapi.bedmanagement.domain.Bed" not-null="true" column="bed_id" access="field"/>
+
+        <property name="startDateTime" type="java.util.Date" column="date_started" length="19" access="field"/>
+        <property name="endDateTime" type="java.util.Date" column="date_stopped" length="19" access="field"/>
+
+    </class>
+
+</hibernate-mapping>
+

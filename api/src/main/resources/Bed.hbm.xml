@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="org.openmrs.module.emrapi.bedmanagement.domain.Bed" table="bed">
+
+        <id name="id" type="int" column="bed_id" unsaved-value="0" access="field">
+            <generator class="native"/>
+        </id>
+
+        <property name="number" type="java.lang.String" column="bed_number" length="10" unique="true" access="field"/>
+
+    </class>
+
+</hibernate-mapping>
+
