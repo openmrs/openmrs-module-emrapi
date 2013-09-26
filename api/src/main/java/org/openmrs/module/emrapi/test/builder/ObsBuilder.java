@@ -53,6 +53,11 @@ public class ObsBuilder {
         return this;
     }
 
+    public ObsBuilder setComment(String comment) {
+        obs.setComment(comment);
+        return this;
+    }
+
     public ObsBuilder addMember(Concept question, Concept valueCoded) {
         Obs child = new Obs();
         child.setPerson(obs.getPerson());
