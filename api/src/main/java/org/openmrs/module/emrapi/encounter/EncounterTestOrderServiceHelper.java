@@ -17,9 +17,12 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
+import org.openmrs.OrderType;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
+import org.openmrs.module.emrapi.encounter.exception.OrderTypeNotFoundException;
 
 import java.util.List;
 
@@ -29,9 +32,11 @@ import java.util.List;
 public class EncounterTestOrderServiceHelper {
 
     private ConceptService conceptService;
+    private OrderService orderService;
 
-    public EncounterTestOrderServiceHelper(ConceptService conceptService) {
+    public EncounterTestOrderServiceHelper(ConceptService conceptService, OrderService orderService) {
         this.conceptService = conceptService;
+        this.orderService = orderService;
     }
 
     public void update(Encounter encounter, List<EncounterTransaction.TestOrder> testOrders) {
@@ -56,7 +61,15 @@ public class EncounterTestOrderServiceHelper {
             if (newConcept == null) {
                 throw new ConceptNotFoundException("Test order concept does not exist" + testOrder.getConceptUuid());
             }
+
+            String orderTypeUuid = testOrder.getOrderTypeUuid();
+            OrderType orderType = orderService.getOrderTypeByUuid(orderTypeUuid);
+            if(orderType == null) {
+                throw new OrderTypeNotFoundException(orderTypeUuid);
+            }
+
             order.setConcept(newConcept);
+            order.setOrderType(orderType);
             order.setInstructions(testOrder.getInstructions());
         }
     }

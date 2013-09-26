@@ -24,6 +24,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
+import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
@@ -59,7 +60,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
     private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
-    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService, ConceptService conceptService, LocationService locationService, ProviderService providerService, AdministrationService administrationService) {
+    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService, ConceptService conceptService, LocationService locationService, ProviderService providerService, AdministrationService administrationService, OrderService orderService) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
@@ -67,7 +68,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.providerService = providerService;
         this.administrationService = administrationService;
         this.encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService);
-        this.encounterTestOrderServiceHelper = new EncounterTestOrderServiceHelper(conceptService);
+        this.encounterTestOrderServiceHelper = new EncounterTestOrderServiceHelper(conceptService, orderService);
     }
 
     @Override

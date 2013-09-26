@@ -226,6 +226,7 @@
                 <constructor-arg ref="locationService"/>
                 <constructor-arg ref="providerService"/>
                 <constructor-arg ref="adminService"/>
+                <constructor-arg ref="orderService"/>
             </bean>
         </property>
         <property name="preInterceptors">

@@ -20,10 +20,13 @@ import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
+import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
+import org.openmrs.module.emrapi.encounter.exception.OrderTypeNotFoundException;
 
 import java.util.List;
 
@@ -37,24 +40,29 @@ public class EncounterTestOrderServiceHelperTest {
 
     public static final String TEXT_CONCEPT_UUID = "text-concept-uuid";
     public static final String NUMERIC_CONCEPT_UUID = "numeric-concept-uuid";
+    public static final String ORDER_TYPE_UUID = "order-type--uuid";
 
     @Mock
     private ConceptService conceptService;
+
+    @Mock
+    private OrderService orderService;
 
     EncounterTestOrderServiceHelper encounterTestOrderServiceHelper;
 
     @Before
     public void setUp() {
         initMocks(this);
-        encounterTestOrderServiceHelper = new EncounterTestOrderServiceHelper(conceptService);
+        encounterTestOrderServiceHelper = new EncounterTestOrderServiceHelper(conceptService, orderService);
     }
 
     @Test
     public void shouldAddNewOrder() {
         Concept orderConcept = newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
+        OrderType orderType = newOrderType(ORDER_TYPE_UUID);
 
         List<EncounterTransaction.TestOrder> testOrders = asList(
-            new EncounterTransaction.TestOrder().setConceptUuid(TEXT_CONCEPT_UUID).setInstructions("test should be done on empty stomach")
+            new EncounterTransaction.TestOrder().setConceptUuid(TEXT_CONCEPT_UUID).setInstructions("test should be done on empty stomach").setOrderTypeUuid(ORDER_TYPE_UUID)
         );
 
         Patient patient = new Patient();
@@ -67,9 +75,17 @@ public class EncounterTestOrderServiceHelperTest {
         assertEquals(1, encounter.getOrders().size());
         Order order = encounter.getOrders().iterator().next();
         assertEquals(orderConcept, order.getConcept());
+        assertEquals(orderType, order.getOrderType());
         assertEquals("test should be done on empty stomach", order.getInstructions());
         assertEquals(patient, order.getPatient());
         assertEquals(encounter, order.getEncounter());
+    }
+
+    private OrderType newOrderType(String uuid) {
+        OrderType orderType = new OrderType();
+        orderType.setUuid(uuid);
+        when(orderService.getOrderTypeByUuid(uuid)).thenReturn(orderType);
+        return orderType;
     }
 
     @Test(expected = ConceptNotFoundException.class)
@@ -78,6 +94,18 @@ public class EncounterTestOrderServiceHelperTest {
                 new EncounterTransaction.TestOrder().setUuid("o-uuid").setConceptUuid(NUMERIC_CONCEPT_UUID).setInstructions("don't do it")
         );
         Encounter encounter = new Encounter();
+
+        encounterTestOrderServiceHelper.update(encounter, testOrders);
+    }
+
+    @Test(expected = OrderTypeNotFoundException.class)
+    public void shouldReturnErrorWhenTestOrderTypeIsNotFound() throws Exception {
+        List<EncounterTransaction.TestOrder> testOrders = asList(
+                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConceptUuid(TEXT_CONCEPT_UUID).setOrderTypeUuid("non-existent-id")
+        );
+        when(conceptService.getConceptByUuid(TEXT_CONCEPT_UUID)).thenReturn(new Concept());
+        Encounter encounter = new Encounter();
+
         encounterTestOrderServiceHelper.update(encounter, testOrders);
     }
 
@@ -85,9 +113,10 @@ public class EncounterTestOrderServiceHelperTest {
     public void shouldUpdateExistingOrder() {
         Concept existingConcept = newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
         Concept newConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+        OrderType newOrderType = newOrderType(ORDER_TYPE_UUID);
 
         List<EncounterTransaction.TestOrder> testOrders = asList(
-                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConceptUuid(NUMERIC_CONCEPT_UUID).setInstructions("don't do it")
+                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConceptUuid(NUMERIC_CONCEPT_UUID).setInstructions("don't do it").setOrderTypeUuid(ORDER_TYPE_UUID)
         );
 
         Encounter encounter = new Encounter();
@@ -96,6 +125,7 @@ public class EncounterTestOrderServiceHelperTest {
         existingOrder.setUuid("o-uuid");
         existingOrder.setConcept(existingConcept);
         existingOrder.setInstructions("do it");
+        existingOrder.setOrderType(new OrderType());
         encounter.addOrder(existingOrder);
 
         encounterTestOrderServiceHelper.update(encounter, testOrders);
@@ -103,6 +133,7 @@ public class EncounterTestOrderServiceHelperTest {
         assertEquals(1, encounter.getOrders().size());
         Order newOrder = encounter.getOrders().iterator().next();
         assertEquals(newConcept, newOrder.getConcept());
+        assertEquals(newOrderType, newOrder.getOrderType());
         assertEquals("don't do it", newOrder.getInstructions());
     }
 

@@ -167,6 +167,7 @@ public class EncounterTransaction {
 
     public static class TestOrder {
         private String conceptUuid;     // TODO: mandatory validation
+        private String orderTypeUuid;
         private String instructions;
         private String uuid;
         private boolean voided;
@@ -214,6 +215,15 @@ public class EncounterTransaction {
 
         public TestOrder setVoidReason(String voidReason) {
             this.voidReason = voidReason;
+            return this;
+        }
+
+        public String getOrderTypeUuid() {
+            return orderTypeUuid;
+        }
+
+        public TestOrder setOrderTypeUuid(String orderTypeUuid) {
+            this.orderTypeUuid = orderTypeUuid;
             return this;
         }
     }

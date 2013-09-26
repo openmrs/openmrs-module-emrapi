@@ -146,7 +146,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                 "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                 "\"testOrders\":[" +
-                "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"instructions\":\"do it\" }]}";
+                "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"instructions\":\"do it\", \"orderTypeUuid\": \"1a61ef2a-250c-11e3-b832-0800271c1b75\" }]}";
 
         EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
 
@@ -158,6 +158,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("d102c80f-1yz9-4da3-bb88-8122ce8868dd", testOrder.getConcept().getUuid());
         assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", testOrder.getPatient().getUuid());
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", testOrder.getEncounter().getUuid());
+        assertEquals("1a61ef2a-250c-11e3-b832-0800271c1b75", testOrder.getOrderType().getUuid());
         assertEquals("do it", testOrder.getInstructions());
     }
 }
