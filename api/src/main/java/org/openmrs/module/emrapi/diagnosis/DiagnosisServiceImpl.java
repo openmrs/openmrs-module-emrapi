@@ -147,7 +147,17 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 				null, null, fromDate, null, false);
 
 		for (Obs obs : observations) {
-			Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
+			Diagnosis diagnosis;
+            try {
+                diagnosis = diagnosisMetadata.toDiagnosis(obs);
+            }
+            catch (Exception ex) {
+                log.warn("Error trying to interpret " + obs + " as a diagnosis");
+                if (log.isDebugEnabled()) {
+                    log.debug("Detailed error", ex);
+                }
+                continue;
+            }
 
 			Collection<Concept> nonDiagnosisConcepts = emrApiProperties.getSuppressedDiagnosisConcepts();
 			Collection<Concept> nonDiagnosisConceptSets = emrApiProperties.getNonDiagnosisConceptSets();
