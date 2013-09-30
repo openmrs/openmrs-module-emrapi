@@ -26,7 +26,7 @@ public class BedManagementDaoComponentTest extends BaseModuleContextSensitiveTes
     @Test
     public void getAllLocationsBy_gets_locations_for_a_tag() {
         List<AdmissionLocation> admissionLocationList = bedManagementDao.getAllLocationsBy(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
-        assertThat(admissionLocationList.size(), is(3));
+        assertThat(admissionLocationList.size(), is(2));
 
         AdmissionLocation cardioWard = getWard(admissionLocationList, "Cardio ward on first floor");
         Assert.assertEquals(10, cardioWard.getTotalBeds());

@@ -12,6 +12,11 @@
 
         <property name="number" type="java.lang.String" column="bed_number" length="10" unique="true" access="field"/>
 
+        <set name="bedPatientAssignment" cascade="none" access="field" inverse="true">
+            <key column="bed_id"  />
+            <one-to-many class="org.openmrs.module.emrapi.bedmanagement.domain.BedPatientAssignment"/>
+        </set>
+
     </class>
 
 </hibernate-mapping>
