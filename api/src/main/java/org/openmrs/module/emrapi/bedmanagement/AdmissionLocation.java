@@ -11,20 +11,21 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.bedmanagement.domain;
+package org.openmrs.module.emrapi.bedmanagement;
+
+import org.openmrs.Location;
 
 public class AdmissionLocation {
-    private String name;
-    private String description;
     private long totalBeds;
     private long occupiedBeds;
+    private Location ward;
 
-    public String getName() {
-        return name;
+    public Location getWard() {
+        return ward;
     }
 
-    public String getDescription() {
-        return description;
+    public void setWard(Location ward) {
+        this.ward = ward;
     }
 
     public long getTotalBeds() {
@@ -33,14 +34,6 @@ public class AdmissionLocation {
 
     public long getOccupiedBeds() {
         return occupiedBeds;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public void setTotalBeds(long totalBeds) {
@@ -54,10 +47,9 @@ public class AdmissionLocation {
     @Override
     public String toString() {
         return "AdmissionLocation{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", totalBeds=" + totalBeds +
+                "totalBeds=" + totalBeds +
                 ", occupiedBeds=" + occupiedBeds +
+                ", ward=" + ward +
                 '}';
     }
 }

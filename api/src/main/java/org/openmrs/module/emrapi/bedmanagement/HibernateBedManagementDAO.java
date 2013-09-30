@@ -16,8 +16,7 @@ package org.openmrs.module.emrapi.bedmanagement;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.StandardBasicTypes;
-import org.openmrs.module.emrapi.bedmanagement.domain.AdmissionLocation;
+import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
 
 import java.util.List;
 
@@ -31,15 +30,15 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
     @Override
     public List<AdmissionLocation> getAllLocationsBy(String locationTag) {
 
-        String hql = "select ward.name as name, ward.description as description, count(layout.bed) as totalBeds , count(assignment.id) as occupiedBeds" +
+        String hql = "select ward as ward, count(layout.bed) as totalBeds , count(assignment.id) as occupiedBeds" +
                 " from Location ward, BedLocationMapping layout" +
                 " left outer join ward.childLocations physicalSpace " +
                 "left outer join layout.bed.bedPatientAssignment as assignment" +
-                " where exists (from ward.tags tag where tag.name = '" + locationTag + "') " +
+                " where exists (from ward.tags tag where tag.name = :locationTag) " +
                 "and layout.location.locationId = physicalSpace.locationId" +
                 " group by ward.name";
 
-        Query query = sessionFactory.getCurrentSession().createQuery(hql).setResultTransformer(Transformers.aliasToBean(AdmissionLocation.class));
+        Query query = sessionFactory.getCurrentSession().createQuery(hql).setParameter("locationTag",locationTag).setResultTransformer(Transformers.aliasToBean(AdmissionLocation.class));
 
         return query.list();
     }

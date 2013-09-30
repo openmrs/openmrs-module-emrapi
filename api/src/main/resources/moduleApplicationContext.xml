@@ -265,12 +265,6 @@
         </property>
     </bean>
 
-    <bean id="bedManagementDao" class="${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.HibernateBedManagementDAO">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
-    </bean>
-
     <bean id="emrapiVisitDomainWrapperFactory" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory"/>
     <bean id="emrapiVisitDomainWrapperRepository" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperRepository"/>
 
@@ -280,7 +274,7 @@
         </property>
         <property name="target">
             <bean class="org.openmrs.module.emrapi.bedmanagement.BedManagementServiceImpl">
-                <property name="bedManagementDao">
+                <property name="dao">
                     <bean class="${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.HibernateBedManagementDAO">
                         <property name="sessionFactory">
                             <ref bean="sessionFactory"/>
