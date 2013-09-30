@@ -11,11 +11,11 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.web.controller;
+package org.openmrs.module.emrapi.rest.resource;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.bedmanagement.BedManagementService;
-import org.openmrs.module.emrapi.bedmanagement.domain.AdmissionLocation;
+import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;

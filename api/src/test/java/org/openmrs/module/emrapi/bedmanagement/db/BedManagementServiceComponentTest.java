@@ -5,7 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.bedmanagement.BedManagementDAO;
-import org.openmrs.module.emrapi.bedmanagement.domain.AdmissionLocation;
+import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
+import org.openmrs.module.emrapi.bedmanagement.BedManagementService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,9 +15,9 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class BedManagementDaoComponentTest extends BaseModuleContextSensitiveTest {
+public class BedManagementServiceComponentTest extends BaseModuleContextSensitiveTest {
     @Autowired
-    private BedManagementDAO bedManagementDao;
+    private BedManagementService bedManagementService;
 
     @Before
     public void beforeAllTests() throws Exception {
@@ -25,7 +26,7 @@ public class BedManagementDaoComponentTest extends BaseModuleContextSensitiveTes
 
     @Test
     public void getAllLocationsBy_gets_locations_for_a_tag() {
-        List<AdmissionLocation> admissionLocationList = bedManagementDao.getAllLocationsBy(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
+        List<AdmissionLocation> admissionLocationList = bedManagementService.getAllAdmissionLocations();
         assertThat(admissionLocationList.size(), is(2));
 
         AdmissionLocation cardioWard = getWard(admissionLocationList, "Cardio ward on first floor");
@@ -39,7 +40,7 @@ public class BedManagementDaoComponentTest extends BaseModuleContextSensitiveTes
 
     private AdmissionLocation getWard(List<AdmissionLocation> admissionLocationList, String wardName) {
         for (AdmissionLocation admissionLocation : admissionLocationList) {
-            if(admissionLocation.getName().equals(wardName))
+            if(admissionLocation.getWard().getName().equals(wardName))
                 return admissionLocation;
         }
         return null;

@@ -13,7 +13,7 @@
  */
 package org.openmrs.module.emrapi.bedmanagement;
 
-import org.openmrs.module.emrapi.bedmanagement.domain.AdmissionLocation;
+import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
 
 import java.util.List;
 
