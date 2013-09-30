@@ -16,8 +16,8 @@ package org.openmrs.module.emrapi.bedmanagement.domain;
 public class AdmissionLocation {
     private String name;
     private String description;
-    private int totalBeds;
-    private int occupiedBeds;
+    private long totalBeds;
+    private long occupiedBeds;
 
     public String getName() {
         return name;
@@ -27,11 +27,11 @@ public class AdmissionLocation {
         return description;
     }
 
-    public int getTotalBeds() {
+    public long getTotalBeds() {
         return totalBeds;
     }
 
-    public int getOccupiedBeds() {
+    public long getOccupiedBeds() {
         return occupiedBeds;
     }
 
@@ -43,11 +43,11 @@ public class AdmissionLocation {
         this.description = description;
     }
 
-    public void setTotalBeds(int totalBeds) {
+    public void setTotalBeds(long totalBeds) {
         this.totalBeds = totalBeds;
     }
 
-    public void setOccupiedBeds(int occupiedBeds) {
+    public void setOccupiedBeds(long occupiedBeds) {
         this.occupiedBeds = occupiedBeds;
     }
 
