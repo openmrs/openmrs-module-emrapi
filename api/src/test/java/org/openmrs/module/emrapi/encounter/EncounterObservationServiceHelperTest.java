@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
@@ -24,17 +25,23 @@ import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.diagnosis.Diagnosis;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterObservationServiceHelperTest {
@@ -45,13 +52,18 @@ public class EncounterObservationServiceHelperTest {
     private ConceptService conceptService;
     @Mock
     private ObsService obsService;
+    @Mock
+    private DiagnosisMetadata diagnosisMetadata;
+    @Mock
+    private EmrApiProperties emrApiProperties;
 
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService);
+        when(emrApiProperties.getDiagnosisMetadata()).thenReturn(diagnosisMetadata);
+        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties);
     }
 
     @Test
@@ -92,7 +104,6 @@ public class EncounterObservationServiceHelperTest {
                 new EncounterTransaction.Observation().setConceptUuid(NUMERIC_CONCEPT_UUID).setValue(35.0).setComment("overweight")
         );
 
-        Patient patient = new Patient();
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
         Obs obs = new Obs();
@@ -120,7 +131,6 @@ public class EncounterObservationServiceHelperTest {
                 new EncounterTransaction.Observation().setObservationUuid("o-uuid").setConceptUuid(NUMERIC_CONCEPT_UUID).setVoided(true).setVoidReason("closed")
         );
 
-        Patient patient = new Patient();
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
         Obs obs = new Obs();
@@ -146,6 +156,40 @@ public class EncounterObservationServiceHelperTest {
         );
         Encounter encounter = new Encounter();
         encounterObservationServiceHelper.update(encounter, observations, null);
+    }
+
+    @Test
+    public void shouldSaveDiagnosisAsAnObservation() {
+        String diagnosisConceptId = "123";
+        List<EncounterTransaction.DiagnosisRequest> diagnosisRequests = asList(
+                new EncounterTransaction.DiagnosisRequest().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptId)
+        );
+
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        Obs savedObservations = new Obs();
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        Concept conceptForDiagnosis = new Concept();
+
+        when(diagnosisMetadata.buildDiagnosisObsGroup(any(Diagnosis.class))).thenReturn(savedObservations);
+        when(conceptService.getConcept(Integer.valueOf(diagnosisConceptId))).thenReturn(conceptForDiagnosis);
+
+        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosisRequests, new Date());
+
+        Set<Obs> parentObservations = encounter.getObsAtTopLevel(false);
+        assertEquals(1, parentObservations.size());
+        Obs parent = parentObservations.iterator().next();
+        assertTrue(parent.isObsGrouping());
+        int children = parent.getGroupMembers().size();
+        assertEquals(3, children);
+        ArgumentCaptor<Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(Diagnosis.class);
+        verify(diagnosisMetadata, times(1)).buildDiagnosisObsGroup(diagnosisCaptor.capture());
+        Diagnosis diagnosis = diagnosisCaptor.getValue();
+        assertEquals(conceptForDiagnosis, diagnosis.getDiagnosis().getCodedAnswer());
+        assertEquals(Diagnosis.Certainty.CONFIRMED, diagnosis.getCertainty());
+        assertEquals(Diagnosis.Order.PRIMARY, diagnosis.getOrder());
     }
 
     private Concept newConcept(String hl7, String uuid) {

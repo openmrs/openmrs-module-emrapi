@@ -105,13 +105,13 @@
             <version>${providermanagementModuleVersion}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>metadatasharing-api</artifactId>
-			<version>${metadatasharingVersion}</version>
-			<scope>provided</scope>
-		</dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>metadatasharing-api</artifactId>
+            <version>${metadatasharingVersion}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.openmrs</groupId>
@@ -143,6 +143,19 @@
             <groupId>uk.co.modular-it</groupId>
             <artifactId>hamcrest-date</artifactId>
             <version>0.9.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.5.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.5.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- End other dependencies -->

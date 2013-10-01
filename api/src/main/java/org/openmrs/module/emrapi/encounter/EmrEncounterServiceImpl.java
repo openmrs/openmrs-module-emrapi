@@ -21,7 +21,6 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.OrderService;
@@ -35,7 +34,6 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
-
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -60,15 +58,17 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
     private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
-    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService, ConceptService conceptService, LocationService locationService, ProviderService providerService, AdministrationService administrationService, OrderService orderService) {
+    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
+                                   EncounterObservationServiceHelper encounterObservationServiceHelper, EncounterTestOrderServiceHelper encounterTestOrderServiceHelper,
+                                   LocationService locationService, ProviderService providerService, AdministrationService administrationService) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
+        this.encounterObservationServiceHelper = encounterObservationServiceHelper;
+        this.encounterTestOrderServiceHelper = encounterTestOrderServiceHelper;
         this.locationService = locationService;
         this.providerService = providerService;
         this.administrationService = administrationService;
-        this.encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService);
-        this.encounterTestOrderServiceHelper = new EncounterTestOrderServiceHelper(conceptService, orderService);
     }
 
     @Override
@@ -91,6 +91,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Encounter encounter = findOrCreateEncounter(encounterTransaction, patient, visit);
 
         encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations(), encounterTransaction.getEncounterDateTime());
+        encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses(), encounterTransaction.getEncounterDateTime());
         encounterTestOrderServiceHelper.update(encounter, encounterTransaction.getTestOrders());
 
         visitService.saveVisit(visit);

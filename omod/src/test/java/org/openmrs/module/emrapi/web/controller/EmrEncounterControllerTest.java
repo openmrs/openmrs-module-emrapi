@@ -13,26 +13,24 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.openmrs.ConceptDatatype;
-import org.openmrs.Encounter;
-import org.openmrs.Obs;
-import org.openmrs.Order;
-import org.openmrs.Visit;
+import org.openmrs.*;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-
+@org.springframework.test.context.ContextConfiguration(locations = {"classpath:moduleApplicationContext.xml"}, inheritLocations = true)
 public class EmrEncounterControllerTest extends BaseEmrControllerTest {
 
     @Autowired
@@ -160,5 +158,72 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", testOrder.getEncounter().getUuid());
         assertEquals("1a61ef2a-250c-11e3-b832-0800271c1b75", testOrder.getOrderType().getUuid());
         assertEquals("do it", testOrder.getInstructions());
+    }
+
+    @Ignore
+    @Test
+    public void shouldAddDiagnosesAdObservation() throws Exception {
+        executeDataSet("shouldAddDiagnosisAsObservation.xml");
+        String uuid = "1234-1234-1234-1234";
+        Obs certaintyObservation = new Obs();
+        Concept certaintyConcept = new Concept();
+        ConceptName certaintyConceptName = new ConceptName();
+        certaintyConceptName.setName("CONFIRMED");
+        certaintyConcept.addName(certaintyConceptName);
+        certaintyObservation.setConcept(certaintyConcept);
+
+        Obs orderObservation = new Obs();
+        Concept orderConcept = new Concept();
+        ConceptName orderConceptName = new ConceptName();
+        orderConceptName.setName("PRIMARY");
+        orderConcept.addName(orderConceptName);
+        orderObservation.setConcept(orderConcept);
+
+        Obs diagnosisObservation = new Obs();
+        Concept diagnosisConcept = new Concept();
+        diagnosisConcept.setUuid(uuid);
+        ConceptName diagnosisConceptName = new ConceptName();
+        diagnosisConceptName.setName("tuberculosis");
+        diagnosisConcept.addName(orderConceptName);
+        diagnosisObservation.setConcept(diagnosisConcept);
+
+        String postData = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
+                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                "{\"diagnoses\":[{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"concept\": \"Concept:" + uuid + "\"}]}";
+
+        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", postData)), EncounterTransactionResponse.class);
+
+        Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
+        Encounter encounter = visit.getEncounters().iterator().next();
+
+        Set<Obs> obsAtTopLevel = encounter.getObsAtTopLevel(false);
+        assertEquals(1, obsAtTopLevel.size());
+        Obs parentObservation = obsAtTopLevel.iterator().next();
+        assertTrue(parentObservation.isObsGrouping());
+        Set<Obs> diagnosisObservationGroupMembers = parentObservation.getGroupMembers();
+        assertEquals(3, diagnosisObservationGroupMembers.size());
+        assertTrue(diagnosisObservationGroupMembers.contains(matches(certaintyObservation)));
+        assertTrue(diagnosisObservationGroupMembers.contains(matches(orderObservation)));
+        assertTrue(diagnosisObservationGroupMembers.contains(matches(diagnosisObservation)));
+    }
+
+    public static Matcher matches(final Object expected){
+        return new BaseMatcher() {
+            protected Object theExpected = expected;
+            public boolean matches(Object o) {
+                Obs expectedObs = (Obs) theExpected;
+                Obs otherObs = (Obs) o;
+                return expectedObs.getConcept().getName().getName().equals(otherObs.getConcept().getName().getName()) &&
+                        expectedObs.hasGroupMembers() == otherObs.hasGroupMembers() &&
+                        expectedObs.getConcept().getUuid().equals(otherObs.getConcept().getUuid()) &&
+                        expectedObs.getConcept().getConceptClass().equals(otherObs.getConcept().getConceptClass());
+            }
+
+            public void describeTo(Description description) {
+                description.appendText(theExpected.toString());
+            }
+        };
     }
 }

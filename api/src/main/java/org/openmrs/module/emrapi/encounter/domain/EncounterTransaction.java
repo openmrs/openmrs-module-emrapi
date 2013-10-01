@@ -27,8 +27,8 @@ public class EncounterTransaction {
     private Date encounterDateTime;
 
     private List<Observation> observations = new ArrayList<Observation>();
-
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
+    private List<DiagnosisRequest> diagnoses = new ArrayList<DiagnosisRequest>();
 
     public String getPatientUuid() {
         return patientUuid;
@@ -100,6 +100,14 @@ public class EncounterTransaction {
     public EncounterTransaction setProviderUuid(Set<String> providerUuid) {
         this.providerUuid = providerUuid;
         return this;
+    }
+
+    public List<DiagnosisRequest> getDiagnoses() {
+        return diagnoses;
+    }
+
+    public void setDiagnoses(List<DiagnosisRequest> diagnoses) {
+        this.diagnoses = diagnoses;
     }
 
     public static class Observation {
@@ -224,6 +232,39 @@ public class EncounterTransaction {
 
         public TestOrder setOrderTypeUuid(String orderTypeUuid) {
             this.orderTypeUuid = orderTypeUuid;
+            return this;
+        }
+    }
+
+    public static class DiagnosisRequest {
+        private String order;
+        private String certainty;
+        private String diagnosis;
+
+        public String getOrder() {
+            return order;
+        }
+
+        public DiagnosisRequest setOrder(String order) {
+            this.order = order;
+            return this;
+        }
+
+        public String getCertainty() {
+            return certainty;
+        }
+
+        public DiagnosisRequest setCertainty(String certainty) {
+            this.certainty = certainty;
+            return this;
+        }
+
+        public String getDiagnosis() {
+            return diagnosis;
+        }
+
+        public DiagnosisRequest setDiagnosis(String diagnosis) {
+            this.diagnosis = diagnosis;
             return this;
         }
     }

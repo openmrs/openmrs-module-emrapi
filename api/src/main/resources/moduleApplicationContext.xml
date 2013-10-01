@@ -219,14 +219,14 @@
         </property>
         <property name="target">
             <bean class="org.openmrs.module.emrapi.encounter.EmrEncounterServiceImpl">
-                <constructor-arg ref="patientService"/>
-                <constructor-arg ref="visitService"/>
-                <constructor-arg ref="encounterService"/>
-                <constructor-arg ref="conceptService"/>
-                <constructor-arg ref="locationService"/>
-                <constructor-arg ref="providerService"/>
-                <constructor-arg ref="adminService"/>
-                <constructor-arg ref="orderService"/>
+                <constructor-arg  ref="patientService"/>
+                <constructor-arg  ref="visitService"/>
+                <constructor-arg  ref="encounterService"/>
+                <constructor-arg  ref="encounterObservationServiceHelper"/>
+                <constructor-arg  ref="encounterTestOrderServiceHelper"/>
+                <constructor-arg  ref="locationService"/>
+                <constructor-arg  ref="providerService"/>
+                <constructor-arg  ref="adminService"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -235,6 +235,16 @@
         <property name="transactionAttributeSource">
             <ref bean="transactionAttributeSource"/>
         </property>
+    </bean>
+
+    <bean id="encounterObservationServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterObservationServiceHelper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+        <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
+    </bean>
+
+    <bean id="encounterTestOrderServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterTestOrderServiceHelper">
+        <constructor-arg ref="conceptService"/>
+        <constructor-arg ref="orderService"/>
     </bean>
 
     <bean parent="serviceContext">
