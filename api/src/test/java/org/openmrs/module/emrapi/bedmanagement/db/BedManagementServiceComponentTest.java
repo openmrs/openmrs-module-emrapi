@@ -3,8 +3,6 @@ package org.openmrs.module.emrapi.bedmanagement.db;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.bedmanagement.BedManagementDAO;
 import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
 import org.openmrs.module.emrapi.bedmanagement.BedManagementService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -38,6 +37,13 @@ public class BedManagementServiceComponentTest extends BaseModuleContextSensitiv
         Assert.assertEquals(2, orthoWard.getOccupiedBeds());
     }
 
+    @Test
+    public void getBedsForWard_gets_all_bed_layouts_for_ward() {
+        AdmissionLocation admissionLocation = bedManagementService.getLayoutForWard("12347");
+
+        assertTrue(admissionLocation.getBedLayouts().size() == 6);
+    }
+
     private AdmissionLocation getWard(List<AdmissionLocation> admissionLocationList, String wardName) {
         for (AdmissionLocation admissionLocation : admissionLocationList) {
             if(admissionLocation.getWard().getName().equals(wardName))
@@ -45,5 +51,4 @@ public class BedManagementServiceComponentTest extends BaseModuleContextSensitiv
         }
         return null;
     }
-
 }

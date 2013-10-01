@@ -15,10 +15,13 @@ package org.openmrs.module.emrapi.bedmanagement;
 
 import org.openmrs.Location;
 
+import java.util.List;
+
 public class AdmissionLocation {
     private long totalBeds;
     private long occupiedBeds;
     private Location ward;
+    private List<BedLayout> bedLayouts;
 
     public Location getWard() {
         return ward;
@@ -42,6 +45,14 @@ public class AdmissionLocation {
 
     public void setOccupiedBeds(long occupiedBeds) {
         this.occupiedBeds = occupiedBeds;
+    }
+
+    public void setBedLayouts(List<BedLayout> bedLayouts) {
+        this.bedLayouts = bedLayouts;
+    }
+
+    public List<BedLayout> getBedLayouts() {
+        return bedLayouts;
     }
 
     @Override

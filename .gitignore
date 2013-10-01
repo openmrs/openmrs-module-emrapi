@@ -14,5 +14,7 @@
 
 /.idea
 *.iml
+*.ipr
+*.iws
 *.sass-cache
 *.DS_Store

@@ -19,6 +19,9 @@ import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
+import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
+import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
 import org.openmrs.module.webservices.rest.web.resource.impl.AlreadyPaged;
@@ -30,9 +33,6 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 import java.util.Arrays;
 import java.util.List;
 
-//@Controller
-//@RequestMapping(value = "/rest/emrapi/admissionLocations")
-//public class AdmissionLocationController extends BaseRestController {
 @Resource(name = RestConstants.VERSION_1 + "/admissionLocation", supportedClass = AdmissionLocation.class, supportedOpenmrsVersions = "1.9.*")
 public class AdmissionLocationResource extends DelegatingCrudResource<AdmissionLocation> {
 
@@ -50,17 +50,25 @@ public class AdmissionLocationResource extends DelegatingCrudResource<AdmissionL
 
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
-        DelegatingResourceDescription description = new DelegatingResourceDescription();
-        description.addProperty("name");
-        description.addProperty("description");
-        description.addProperty("totalBeds");
-        description.addProperty("occupiedBeds");
-        return description;
+        if ((rep instanceof DefaultRepresentation) || (rep instanceof RefRepresentation)) {
+            DelegatingResourceDescription description = new DelegatingResourceDescription();
+            description.addProperty("ward");
+            description.addProperty("totalBeds");
+            description.addProperty("occupiedBeds");
+            return description;
+        }
+        if ((rep instanceof FullRepresentation)) {
+            DelegatingResourceDescription description = new DelegatingResourceDescription();
+            description.addProperty("bedLayouts");
+            return description;
+        }
+        return null;
     }
 
     @Override
-    public AdmissionLocation getByUniqueId(String s) {
-        throw new ResourceDoesNotSupportOperationException("search of admission location not supported");
+    public AdmissionLocation getByUniqueId(String id) {
+        BedManagementService bedManagementService = (BedManagementService) Context.getModuleOpenmrsServices(BedManagementService.class.getName()).get(0);
+        return bedManagementService.getLayoutForWard(id);
     }
 
     @Override
