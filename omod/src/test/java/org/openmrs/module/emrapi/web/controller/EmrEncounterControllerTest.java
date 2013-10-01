@@ -16,16 +16,31 @@ package org.openmrs.module.emrapi.web.controller;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.ConceptDatatype;
+import org.openmrs.ConceptName;
+import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
+import org.openmrs.Obs;
+import org.openmrs.Order;
+import org.openmrs.TestOrder;
+import org.openmrs.Visit;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -225,5 +240,75 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 description.appendText(theExpected.toString());
             }
         };
+    }
+
+    @Test
+    public void shouldAddNewDrugOrder() throws Exception {
+        executeDataSet("shouldAddNewDrugOrder.xml");
+
+        String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
+                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                "\"testOrders\":[" +
+                "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", " +
+                "\"instructions\":\"do it\", \"orderTypeUuid\": \"1a61ef2a-250c-11e3-b832-0800271c1b75\" }]," +
+                "\"drugOrders\":[" +
+                "{\"uuid\": \"4d6fb6e0-4950-426c-9a9b-1f97e6037893\"," +
+                "\"conceptUuid\": \"29dc4a20-507f-40ed-9545-d47e932483fa\"," +
+                "\"notes\": \"Take as needed\"," +
+                "\"startDate\": \"2013-09-30T09:26:09.717Z\"," +
+                "\"endDate\": \"2013-10-02T09:26:09.717Z\"," +
+                "\"numberPerDosage\": 1," +
+                "\"dosageInstructionUuid\": \"632aa422-2696-11e3-895c-0800271c1b75\"," +
+                "\"dosageFrequencyUuid\": \"6302096d-2696-11e3-895c-0800271c1b75\"," +
+                "\"prn\": true}" +
+                "]}";
+
+        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+
+        Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
+        Encounter encounter = visit.getEncounters().iterator().next();
+        assertEquals(2, encounter.getOrders().size());
+
+        List<Order> orders = new ArrayList<Order>(encounter.getOrders());
+
+        List<DrugOrder> drugOrders = getOrdersOfType(orders, DrugOrder.class);
+        assertEquals(1, drugOrders.size());
+        DrugOrder drugOrder = drugOrders.get(0);
+        assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", drugOrder.getPatient().getUuid());
+        assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", drugOrder.getEncounter().getUuid());
+        assertEquals("29dc4a20-507f-40ed-9545-d47e932483fa", drugOrder.getConcept().getUuid());
+        assertEquals("1a61ef2a-250c-11e3-b832-9876541c1b75", drugOrder.getOrderType().getUuid());
+        assertEquals("Take as needed", drugOrder.getInstructions());
+        assertEquals(new DateTime("2013-09-30T09:26:09.717Z").toDate(), drugOrder.getStartDate());
+        assertEquals(new DateTime("2013-10-02T09:26:09.717Z").toDate(), drugOrder.getAutoExpireDate());
+        String frequencyConceptId = "4";
+        assertEquals(frequencyConceptId, drugOrder.getFrequency());
+        String instructionConceptId = "5";
+        assertEquals(instructionConceptId, drugOrder.getUnits());
+        assertEquals("test drug", drugOrder.getDrug().getDisplayName());
+        assertEquals(Double.valueOf(1), drugOrder.getDose());
+        assertEquals(true, drugOrder.getPrn());
+
+        List<TestOrder> testOrders = getOrdersOfType(orders, TestOrder.class);
+        assertEquals(1, testOrders.size());
+        TestOrder testOrder = testOrders.get(0);
+        assertEquals("d102c80f-1yz9-4da3-bb88-8122ce8868dd", testOrder.getConcept().getUuid());
+        assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", testOrder.getPatient().getUuid());
+        assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", testOrder.getEncounter().getUuid());
+        assertEquals("1a61ef2a-250c-11e3-b832-0800271c1b75", testOrder.getOrderType().getUuid());
+        assertEquals("do it", testOrder.getInstructions());
+
+    }
+
+    private <T> List<T> getOrdersOfType(List<Order> orders, Class<T> clazz) {
+        List<T> matchingOrders = new ArrayList<T>();
+        for (Order order : orders) {
+            if (order.getClass().equals(clazz)) {
+                matchingOrders.add((T) order);
+            }
+        }
+        return matchingOrders;
     }
 }

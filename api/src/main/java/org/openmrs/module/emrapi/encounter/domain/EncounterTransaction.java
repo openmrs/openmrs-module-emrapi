@@ -30,6 +30,8 @@ public class EncounterTransaction {
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
     private List<DiagnosisRequest> diagnoses = new ArrayList<DiagnosisRequest>();
 
+    private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
+
     public String getPatientUuid() {
         return patientUuid;
     }
@@ -70,9 +72,16 @@ public class EncounterTransaction {
         return testOrders;
     }
 
-    public EncounterTransaction setTestOrders(List<TestOrder> testOrders) {
+    public void setTestOrders(List<TestOrder> testOrders) {
         this.testOrders = testOrders;
-        return this;
+    }
+
+    public List<DrugOrder> getDrugOrders() {
+        return drugOrders;
+    }
+
+    public void setDrugOrders(List<DrugOrder> drugOrders) {
+        this.drugOrders = drugOrders;
     }
 
     public Date getEncounterDateTime() {
@@ -268,4 +277,90 @@ public class EncounterTransaction {
             return this;
         }
     }
+
+    public static class DrugOrder {
+        private String uuid;
+        private String conceptUuid;
+        private String notes;
+        private Date startDate;
+        private Date  endDate;
+        private Integer numberPerDosage;
+        private String dosageInstructionUuid;
+        private String dosageFrequencyUuid;
+        private boolean prn;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public String getConceptUuid() {
+            return conceptUuid;
+        }
+
+        public String getNotes() {
+            return notes;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public Integer getNumberPerDosage() {
+            return numberPerDosage;
+        }
+
+        public String getDosageInstructionUuid() {
+            return dosageInstructionUuid;
+        }
+
+        public String getDosageFrequencyUuid() {
+            return dosageFrequencyUuid;
+        }
+
+        public boolean isPrn() {
+            return prn;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public void setConceptUuid(String conceptUuid) {
+            this.conceptUuid = conceptUuid;
+        }
+
+        public void setNotes(String notes) {
+            this.notes = notes;
+        }
+
+        public void setStartDate(Date startDate) {
+            this.startDate = startDate;
+        }
+
+        public void setEndDate(Date endDate) {
+            this.endDate = endDate;
+        }
+
+        public void setNumberPerDosage(Integer numberPerDosage) {
+            this.numberPerDosage = numberPerDosage;
+        }
+
+        public void setDosageInstructionUuid(String dosageInstructionUuid) {
+            this.dosageInstructionUuid = dosageInstructionUuid;
+        }
+
+        public void setDosageFrequencyUuid(String dosageFrequencyUuid) {
+            this.dosageFrequencyUuid = dosageFrequencyUuid;
+        }
+
+        public void setPrn(boolean prn) {
+            this.prn = prn;
+        }
+    }
+
+
 }

@@ -13,20 +13,8 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
-import org.openmrs.Location;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
-import org.openmrs.Provider;
-import org.openmrs.Visit;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.EncounterService;
-import org.openmrs.api.LocationService;
-import org.openmrs.api.OrderService;
-import org.openmrs.api.PatientService;
-import org.openmrs.api.ProviderService;
-import org.openmrs.api.VisitService;
+import org.openmrs.*;
+import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -34,14 +22,8 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
@@ -52,6 +34,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private EncounterService encounterService;
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
     private EncounterTestOrderServiceHelper encounterTestOrderServiceHelper;
+    private EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper;
     private LocationService locationService;
     private ProviderService providerService;
     private AdministrationService administrationService;
@@ -60,7 +43,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
                                    EncounterObservationServiceHelper encounterObservationServiceHelper, EncounterTestOrderServiceHelper encounterTestOrderServiceHelper,
-                                   LocationService locationService, ProviderService providerService, AdministrationService administrationService) {
+                                   LocationService locationService, ProviderService providerService, AdministrationService administrationService, EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
@@ -69,6 +52,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.locationService = locationService;
         this.providerService = providerService;
         this.administrationService = administrationService;
+        this.encounterDrugOrderServiceHelper = encounterDrugOrderServiceHelper;
     }
 
     @Override
@@ -93,6 +77,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations(), encounterTransaction.getEncounterDateTime());
         encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses(), encounterTransaction.getEncounterDateTime());
         encounterTestOrderServiceHelper.update(encounter, encounterTransaction.getTestOrders());
+        encounterDrugOrderServiceHelper.update(encounter, encounterTransaction.getDrugOrders());
 
         visitService.saveVisit(visit);
         return new EncounterTransactionResponse(visit.getUuid(), encounter.getUuid());

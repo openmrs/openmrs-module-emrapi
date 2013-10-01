@@ -6,7 +6,18 @@
     <concept_name concept_id="1" name="Numeric Concept" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1439" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="d102c80f-1yz9-4da3-bb88-8122ce8868dd"/>
 
     <concept concept_id="2" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="e102c80f-1yz9-4da3-bb88-8122ce8868dd"/>
-    <concept_name concept_id="2" name="String Concept" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1439" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="e102c80f-1yz9-4da3-bb88-8122ce8868dd"/>
+    <concept_name concept_id="2" name="String Concept" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1440" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="e102c80f-1yz9-4da3-bb88-8122ce8868dd"/>
+
+    <concept concept_id="3" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="29dc4a20-507f-40ed-9545-d47e932483fa"/>
+    <concept_name concept_id="3" name="Paracetamol" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1441" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="29dc4a20-507f-40ed-9545-d47e932483fa"/>
+
+    <concept concept_id="4" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="6302096d-2696-11e3-895c-0800271c1b75"/>
+    <concept_name concept_id="4" name="dosage frequency" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1442" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="6302096d-2696-11e3-895c-0800271c1b75"/>
+
+    <concept concept_id="5" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="632aa422-2696-11e3-895c-0800271c1b75"/>
+    <concept_name concept_id="5" name="dosage instruction" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1443" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="632aa422-2696-11e3-895c-0800271c1b75"/>
+
+    <drug drug_id="6" concept_id="6" name="test drug" combination="0"  retired="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="4d6fb6e0-4950-426c-9a9b-1f97e6037893"/>
 
     <location location_id="1" name="Test Location" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="f1771d8e-bf1f-4dc5-957f-0d40a5eebf08"/>
 
@@ -22,4 +33,5 @@
     <encounter encounter_id="1" encounter_type="1" patient_id="1" visit_id="1" location_id="1" encounter_datetime="2005-01-01 00:00:00.0" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="f13d6fae-baa9-4553-955d-920098bec08f"/>
 
     <order_type order_type_id="1" uuid="1a61ef2a-250c-11e3-b832-0800271c1b75" name="Lab Order"/>
+    <order_type order_type_id="2" uuid="1a61ef2a-250c-11e3-b832-9876541c1b75" name="Drug Order"/>
 </dataset>
