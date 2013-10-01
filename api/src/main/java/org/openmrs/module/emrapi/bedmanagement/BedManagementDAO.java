@@ -19,4 +19,6 @@ import java.util.List;
 
 public interface BedManagementDAO {
     List<AdmissionLocation> getAllLocationsBy(String locationTagSupportsAdmission);
+
+    AdmissionLocation getLayoutForWard(String uuid);
 }

@@ -30,4 +30,9 @@ public class BedManagementServiceImpl extends BaseOpenmrsService implements BedM
     public List<AdmissionLocation> getAllAdmissionLocations() {
         return dao.getAllLocationsBy(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
     }
+
+    @Override
+    public AdmissionLocation getLayoutForWard(String id) {
+        return dao.getLayoutForWard(id);
+    }
 }

@@ -16,7 +16,7 @@ package org.openmrs.module.emrapi.bedmanagement;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.transform.Transformers;
-import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
+import org.openmrs.module.emrapi.EmrApiConstants;
 
 import java.util.List;
 
@@ -38,8 +38,30 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
                 "and layout.location.locationId = physicalSpace.locationId" +
                 " group by ward.name";
 
-        Query query = sessionFactory.getCurrentSession().createQuery(hql).setParameter("locationTag",locationTag).setResultTransformer(Transformers.aliasToBean(AdmissionLocation.class));
+        Query query = sessionFactory.getCurrentSession().createQuery(hql).setParameter("locationTag", locationTag).setResultTransformer(Transformers.aliasToBean(AdmissionLocation.class));
 
         return query.list();
+    }
+
+    @Override
+    public AdmissionLocation getLayoutForWard(String id) {
+        String hql = "select layout.bed.id as bedId, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
+                " from Location ward, BedLocationMapping layout" +
+                " left outer join ward.childLocations physicalSpace " +
+                " left outer join layout.bed.bedPatientAssignment as assignment" +
+                " where exists (from ward.tags tag where tag.name = :tagName) " +
+                " and layout.location.locationId = physicalSpace.locationId" +
+                " and ward.locationId = :wardId";
+
+        Query query = sessionFactory.getCurrentSession().createQuery(hql)
+                .setParameter("tagName", EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION)
+                .setInteger("wardId", Integer.parseInt(id))
+                .setResultTransformer(Transformers.aliasToBean(BedLayout.class));
+
+        List<BedLayout> bedLayouts = query.list();
+
+        AdmissionLocation admissionLocation = new AdmissionLocation();
+        admissionLocation.setBedLayouts(bedLayouts);
+        return admissionLocation;
     }
 }

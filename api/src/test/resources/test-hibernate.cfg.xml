@@ -5,6 +5,7 @@
 
 <hibernate-configuration>
     <session-factory>
+        <property name="hibernate.show_sql">true</property>
         <mapping resource="Provider.hbm.xml"/>
         <mapping resource="ProviderRole.hbm.xml"/>
         <mapping resource="Printer.hbm.xml"/>
