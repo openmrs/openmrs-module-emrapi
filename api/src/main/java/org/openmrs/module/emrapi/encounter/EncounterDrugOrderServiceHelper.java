@@ -14,15 +14,11 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Concept;
-import org.openmrs.Drug;
-import org.openmrs.DrugOrder;
-import org.openmrs.Encounter;
-import org.openmrs.Order;
-import org.openmrs.OrderType;
+import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.exception.InvalidDrugException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +42,12 @@ public class EncounterDrugOrderServiceHelper {
 
 
         for (final EncounterTransaction.DrugOrder drug : drugOrders) {
+            if (drug.getUuid() == null) {
+                throw new InvalidDrugException("Drug does not exist");
+            }
+
             Order order = getMatchingOrder(encounter, drug.getUuid());
-            if (order == null){
+            if (order == null) {
                 order = new DrugOrder();
                 order.setEncounter(encounter);
                 order.setPatient(encounter.getPatient());
@@ -63,21 +63,27 @@ public class EncounterDrugOrderServiceHelper {
             order.setOrderType(drugOrderType);
 
             if (order instanceof DrugOrder) {
-                DrugOrder drugOrder =  (DrugOrder) order;
+                DrugOrder drugOrder = (DrugOrder) order;
                 drugOrder.setDrug(findDrug(drug.getUuid()));
                 drugOrder.setDose(Double.valueOf(drug.getNumberPerDosage()));
+                drugOrder.setPrn(drug.isPrn());
 
                 if (!StringUtils.isBlank(drug.getDosageFrequencyUuid())) {
                     Concept frequencyConcept = findConcept(cachedConcepts, drug.getDosageFrequencyUuid());
-                    drugOrder.setFrequency(frequencyConcept.getConceptId().toString());
+                    if (frequencyConcept == null && !drug.isPrn()) {
+                        throw new InvalidDrugException("Dosage Frequency does not exist.");
+                    }
+                    if (frequencyConcept != null) {
+                        drugOrder.setFrequency(frequencyConcept.getConceptId().toString());
+                    }
                 }
 
                 if (!StringUtils.isBlank(drug.getDosageInstructionUuid())) {
                     Concept instructionConcept = findConcept(cachedConcepts, drug.getDosageInstructionUuid());
-                    drugOrder.setUnits(instructionConcept.getConceptId().toString());
+                    if (instructionConcept != null) {
+                        drugOrder.setUnits(instructionConcept.getConceptId().toString());
+                    }
                 }
-
-                drugOrder.setPrn(drug.isPrn());
                 drugOrder.setComplex(false);
             }
         }

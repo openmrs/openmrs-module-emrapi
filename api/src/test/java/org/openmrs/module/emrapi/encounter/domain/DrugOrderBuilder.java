@@ -32,4 +32,14 @@ public class DrugOrderBuilder {
         this.drugOrder.setNotes(notes);
         return this;
     }
+
+    public DrugOrderBuilder withPrn(boolean prn) {
+        this.drugOrder.setPrn(prn);
+        return this;
+    }
+
+    public DrugOrderBuilder withDosageFrequency(String frequencyUuid) {
+        this.drugOrder.setDosageFrequencyUuid(frequencyUuid);
+        return this;
+    }
 }
