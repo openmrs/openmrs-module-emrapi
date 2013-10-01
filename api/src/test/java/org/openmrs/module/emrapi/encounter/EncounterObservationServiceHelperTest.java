@@ -160,9 +160,9 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldSaveDiagnosisAsAnObservation() {
-        String diagnosisConceptUuid = "123";
+        String diagnosisConceptId = "123";
         List<EncounterTransaction.DiagnosisRequest> diagnosisRequests = asList(
-                new EncounterTransaction.DiagnosisRequest().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptUuid)
+                new EncounterTransaction.DiagnosisRequest().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptId)
         );
 
         Encounter encounter = new Encounter();
@@ -174,7 +174,7 @@ public class EncounterObservationServiceHelperTest {
         Concept conceptForDiagnosis = new Concept();
 
         when(diagnosisMetadata.buildDiagnosisObsGroup(any(Diagnosis.class))).thenReturn(savedObservations);
-        when(conceptService.getConceptByUuid(diagnosisConceptUuid)).thenReturn(conceptForDiagnosis);
+        when(conceptService.getConcept(Integer.valueOf(diagnosisConceptId))).thenReturn(conceptForDiagnosis);
 
         encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosisRequests, new Date());
 

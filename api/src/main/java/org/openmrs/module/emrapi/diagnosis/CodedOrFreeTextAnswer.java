@@ -51,8 +51,8 @@ public class CodedOrFreeTextAnswer {
             String conceptNameId = spec.substring(CONCEPT_NAME_PREFIX.length());
             setSpecificCodedAnswer(conceptService.getConceptName(Integer.valueOf(conceptNameId)));
         } else if (spec.startsWith(CONCEPT_PREFIX)) {
-            String conceptUuid = spec.substring(CONCEPT_PREFIX.length());
-            setCodedAnswer(conceptService.getConceptByUuid(conceptUuid));
+            String conceptId = spec.substring(CONCEPT_PREFIX.length());
+            setCodedAnswer(conceptService.getConcept(Integer.valueOf(conceptId)));
         } else if (spec.startsWith(NON_CODED_PREFIX)) {
             setNonCodedAnswer(spec.substring(NON_CODED_PREFIX.length()));
         } else {
