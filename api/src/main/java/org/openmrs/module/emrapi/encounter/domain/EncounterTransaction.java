@@ -25,12 +25,20 @@ public class EncounterTransaction {
     private String visitTypeUuid;  // TODO: mandatory validation
     private String encounterTypeUuid;   // TODO: mandatory validation
     private Date encounterDateTime;
-
+    private Disposition disposition;
     private List<Observation> observations = new ArrayList<Observation>();
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
 
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
+
+    public Disposition getDisposition() {
+        return disposition;
+    }
+
+    public void setDisposition(Disposition disposition) {
+        this.disposition = disposition;
+    }
 
     public String getPatientUuid() {
         return patientUuid;
@@ -181,6 +189,75 @@ public class EncounterTransaction {
             return this;
         }
     }
+
+    public static class Disposition{
+        private String code;
+        private String existingObs;
+        private boolean voided;
+        private String voidReason;
+        private List<Observation> additionalObs;
+
+        public List<Observation> getAdditionalObs() {
+            return additionalObs;
+        }
+
+        public void setAdditionalObs(List<Observation> additionalObs) {
+            this.additionalObs = additionalObs;
+        }
+
+        public Disposition() {
+        }
+
+        public Disposition(String code) {
+            this.code = code;
+        }
+
+        public String getExistingObs() {
+            return existingObs;
+        }
+
+        public boolean isVoided() {
+            return voided;
+        }
+
+        public Disposition setVoided(boolean voided) {
+            this.voided = voided;
+            return this;
+        }
+
+        public String getVoidReason() {
+            return voidReason;
+        }
+
+        public Disposition setVoidReason(String voidReason) {
+            this.voidReason = voidReason;
+            return this;
+        }
+
+        public Disposition setExistingObs(String existingObs) {
+            this.existingObs = existingObs;
+            return this;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public Disposition setCode(String code) {
+            this.code = code;
+            return this;
+        }
+
+      /*  public String getDispositionNote() {
+            return dispositionNote;
+        }
+
+        public Disposition setDispositionNote(String dispositionNote) {
+            this.dispositionNote = dispositionNote;
+            return this;
+        }*/
+    }
+
 
     public static class TestOrder {
         private String conceptUuid;     // TODO: mandatory validation

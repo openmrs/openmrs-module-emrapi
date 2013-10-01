@@ -222,12 +222,13 @@
                 <constructor-arg  ref="patientService"/>
                 <constructor-arg  ref="visitService"/>
                 <constructor-arg  ref="encounterService"/>
-                <constructor-arg  ref="encounterObservationServiceHelper"/>
-                <constructor-arg  ref="encounterTestOrderServiceHelper"/>
                 <constructor-arg  ref="locationService"/>
                 <constructor-arg  ref="providerService"/>
                 <constructor-arg  ref="adminService"/>
+                <constructor-arg  ref="encounterObservationServiceHelper"/>
+                <constructor-arg  ref="encounterTestOrderServiceHelper"/>
                 <constructor-arg  ref="encounterDrugOrderServiceHelper"/>
+                <constructor-arg  ref="encounterDispositionServiceHelper"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -252,6 +253,10 @@
     <bean id="encounterDrugOrderServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDrugOrderServiceHelper">
         <constructor-arg ref="conceptService"/>
         <constructor-arg ref="orderService"/>
+    </bean>
+
+    <bean id="encounterDispositionServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDispositionServiceHelper">
+        <constructor-arg ref="conceptService"/>
     </bean>
 
     <bean parent="serviceContext">

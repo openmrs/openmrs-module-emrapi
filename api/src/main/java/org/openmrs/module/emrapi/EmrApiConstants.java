@@ -159,6 +159,20 @@ public class EmrApiConstants {
 
     public static final int DEFAULT_LAST_VIEWED_PATIENT_SIZE_LIMIT = 50;
 
+    /*public static final String CONCEPT_CODE_DISPOSITION = "Disposition";
+
+    public static final String CONCEPTDISPOSITION_ANSWER_ADMIT = "Admit";
+
+    public static final String DISPOSITION_ANSWER_DISCHARGE = "Discharge";
+
+    public static final String DISPOSITION_ANSWER_TRANSFER = "Transfer";
+
+    public static final String DISPOSITION_ANSWER_REFER = "Refer";
+
+    public static final String DISPOSITION_NOTE_CONCEPT = "Disposition Note";
+*/
+
+
     // remember if we add more types here to also create them in the module activator
     public static final Map<String, String> LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER = new HashMap<String, String>() {{
         put("ID_CARD", "b48ef9a0-38d3-11e2-81c1-0800200c9a66");
@@ -166,4 +180,5 @@ public class EmrApiConstants {
     }};
 
 
+    public static final String CONCEPT_CODE_DISPOSITION_CONCEPT = "Disposition";
 }

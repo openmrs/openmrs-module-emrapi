@@ -44,6 +44,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private VisitService visitService;
     private EncounterService encounterService;
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
+    private EncounterDispositionServiceHelper encounterDispositionServiceHelper;
     private EncounterTestOrderServiceHelper encounterTestOrderServiceHelper;
     private EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper;
     private LocationService locationService;
@@ -53,8 +54,11 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
-                                   EncounterObservationServiceHelper encounterObservationServiceHelper, EncounterTestOrderServiceHelper encounterTestOrderServiceHelper,
-                                   LocationService locationService, ProviderService providerService, AdministrationService administrationService, EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper) {
+                                   LocationService locationService, ProviderService providerService, AdministrationService administrationService,
+                                   EncounterObservationServiceHelper encounterObservationServiceHelper,
+                                   EncounterTestOrderServiceHelper encounterTestOrderServiceHelper,
+                                   EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper,
+                                   EncounterDispositionServiceHelper encounterDispositionServiceHelper) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
@@ -64,6 +68,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.providerService = providerService;
         this.administrationService = administrationService;
         this.encounterDrugOrderServiceHelper = encounterDrugOrderServiceHelper;
+        this.encounterDispositionServiceHelper = encounterDispositionServiceHelper;
     }
 
     @Override
@@ -87,6 +92,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations(), encounterTransaction.getEncounterDateTime());
         encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses(), encounterTransaction.getEncounterDateTime());
+        encounterDispositionServiceHelper.update(encounter, encounterTransaction.getDisposition(), encounterTransaction.getEncounterDateTime());
         encounterTestOrderServiceHelper.update(encounter, encounterTransaction.getTestOrders());
         encounterDrugOrderServiceHelper.update(encounter, encounterTransaction.getDrugOrders());
 

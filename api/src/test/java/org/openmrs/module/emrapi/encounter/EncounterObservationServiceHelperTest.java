@@ -52,12 +52,17 @@ public class EncounterObservationServiceHelperTest {
     private EmrApiProperties emrApiProperties;
 
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
+    private String questionConceptUuid;
+    private String answerConceptUuid;
+    private String dispostionNoteConceptUuid;
+    private String dispostionNoteValue;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
         when(emrApiProperties.getDiagnosisMetadata()).thenReturn(diagnosisMetadata);
         encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties, obsService);
+
     }
 
     @Test
@@ -89,6 +94,9 @@ public class EncounterObservationServiceHelperTest {
 
         assertEquals(observationDateTime, textObservation.getObsDatetime());
     }
+
+
+
 
     @Test
     public void shouldUpdateExistingObservation() throws ParseException {
@@ -233,4 +241,5 @@ public class EncounterObservationServiceHelperTest {
         when(conceptService.getConceptByUuid(uuid)).thenReturn(concept);
         return concept;
     }
+
 }
