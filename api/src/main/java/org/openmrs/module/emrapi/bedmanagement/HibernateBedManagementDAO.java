@@ -44,18 +44,18 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
     }
 
     @Override
-    public AdmissionLocation getLayoutForWard(String id) {
+    public AdmissionLocation getLayoutForWard(String uuid) {
         String hql = "select layout.bed.id as bedId, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
                 " from Location ward, BedLocationMapping layout" +
                 " left outer join ward.childLocations physicalSpace " +
                 " left outer join layout.bed.bedPatientAssignment as assignment" +
                 " where exists (from ward.tags tag where tag.name = :tagName) " +
                 " and layout.location.locationId = physicalSpace.locationId" +
-                " and ward.locationId = :wardId";
+                " and ward.uuid = :wardUuid";
 
         Query query = sessionFactory.getCurrentSession().createQuery(hql)
                 .setParameter("tagName", EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION)
-                .setInteger("wardId", Integer.parseInt(id))
+                .setParameter("wardUuid", uuid)
                 .setResultTransformer(Transformers.aliasToBean(BedLayout.class));
 
         List<BedLayout> bedLayouts = query.list();

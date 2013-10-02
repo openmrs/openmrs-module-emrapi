@@ -66,9 +66,9 @@ public class AdmissionLocationResource extends DelegatingCrudResource<AdmissionL
     }
 
     @Override
-    public AdmissionLocation getByUniqueId(String id) {
+    public AdmissionLocation getByUniqueId(String uuid) {
         BedManagementService bedManagementService = (BedManagementService) Context.getModuleOpenmrsServices(BedManagementService.class.getName()).get(0);
-        return bedManagementService.getLayoutForWard(id);
+        return bedManagementService.getLayoutForWard(uuid);
     }
 
     @Override
