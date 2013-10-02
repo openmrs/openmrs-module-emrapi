@@ -39,7 +39,7 @@ public class BedManagementServiceComponentTest extends BaseModuleContextSensitiv
 
     @Test
     public void getBedsForWard_gets_all_bed_layouts_for_ward() {
-        AdmissionLocation admissionLocation = bedManagementService.getLayoutForWard("12347");
+        AdmissionLocation admissionLocation = bedManagementService.getLayoutForWard("19e023e8-20ee-4237-ade6-9e68f897b7a9");
 
         assertTrue(admissionLocation.getBedLayouts().size() == 6);
     }

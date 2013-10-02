@@ -32,7 +32,7 @@ public class BedManagementServiceImpl extends BaseOpenmrsService implements BedM
     }
 
     @Override
-    public AdmissionLocation getLayoutForWard(String id) {
-        return dao.getLayoutForWard(id);
+    public AdmissionLocation getLayoutForWard(String uuid) {
+        return dao.getLayoutForWard(uuid);
     }
 }
