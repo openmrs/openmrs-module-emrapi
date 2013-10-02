@@ -13,8 +13,19 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.openmrs.*;
-import org.openmrs.api.*;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.Location;
+import org.openmrs.Obs;
+import org.openmrs.Patient;
+import org.openmrs.Provider;
+import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.EncounterService;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
