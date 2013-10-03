@@ -3,7 +3,6 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-
     <class name="org.openmrs.module.emrapi.bedmanagement.Bed" table="emrapi_bed">
 
         <id name="id" type="int" column="bed_id" unsaved-value="0">
@@ -13,11 +12,9 @@
         <property name="number" type="java.lang.String" column="bed_number" length="10" unique="true"/>
 
         <set name="bedPatientAssignment" cascade="none" inverse="true">
-            <key column="bed_id"  />
+            <key column="bed_id"/>
             <one-to-many class="org.openmrs.module.emrapi.bedmanagement.BedPatientAssignment"/>
         </set>
-
     </class>
-
 </hibernate-mapping>
 

@@ -39,7 +39,7 @@ public class BedLayout {
     }
 
     public Boolean isAvailable() {
-        return this.bedPatientAssignmentId != null;
+        return this.bedId != null && this.bedPatientAssignmentId == null ;
     }
 
     @Override

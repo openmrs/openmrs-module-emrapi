@@ -21,4 +21,6 @@ public interface BedManagementService extends OpenmrsService {
     List<AdmissionLocation> getAllAdmissionLocations();
 
     AdmissionLocation getLayoutForWard(String uuid);
+
+    Bed assignPatientToBed(Integer patientId, Integer bedId);
 }

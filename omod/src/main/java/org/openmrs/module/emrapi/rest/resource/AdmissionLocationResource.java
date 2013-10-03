@@ -95,11 +95,4 @@ public class AdmissionLocationResource extends DelegatingCrudResource<AdmissionL
     public AdmissionLocation save(AdmissionLocation admissionLocation) {
         throw new ResourceDoesNotSupportOperationException("save of admission location not supported");
     }
-//
-//    @RequestMapping(method = RequestMethod.GET)
-//    @ResponseBody
-//    public List<AdmissionLocation> getAdmissionLocations() {
-//        return bedManagementService.getAllAdmissionLocations();
-//    }
-
 }

@@ -13,12 +13,13 @@
  */
 package org.openmrs.module.emrapi.bedmanagement;
 
-import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
-
 import java.util.List;
 
 public interface BedManagementDAO {
     List<AdmissionLocation> getAllLocationsBy(String locationTagSupportsAdmission);
 
     AdmissionLocation getLayoutForWard(String uuid);
+
+    Bed assignPatientToBed(Integer patientId, Integer bedId);
+
 }
