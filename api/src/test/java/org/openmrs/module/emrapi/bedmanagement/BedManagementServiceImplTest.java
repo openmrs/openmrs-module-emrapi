@@ -24,8 +24,16 @@ public class BedManagementServiceImplTest {
     @Test
     public void should_get_layouts_for_ward() {
         String wardId = "123";
+
         bedManagementService.getLayoutForWard(wardId);
 
         verify(bedManagementDAO).getLayoutForWard(wardId);
+    }
+
+    @Test
+    public void should_be_able_to_assign_patient_to_bed() {
+        bedManagementService.assignPatientToBed(123, 321);
+
+        verify(bedManagementDAO).assignPatientToBed(123, 321);
     }
 }

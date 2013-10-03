@@ -13,11 +13,15 @@
  */
 package org.openmrs.module.emrapi.bedmanagement;
 
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.classic.Session;
 import org.hibernate.transform.Transformers;
+import org.openmrs.Patient;
 import org.openmrs.module.emrapi.EmrApiConstants;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class HibernateBedManagementDAO implements BedManagementDAO {
@@ -48,7 +52,8 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
         String hql = "select layout.bed.id as bedId, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
                 " from Location ward, BedLocationMapping layout" +
                 " left outer join ward.childLocations physicalSpace " +
-                " left outer join layout.bed.bedPatientAssignment as assignment" +
+                " left outer join layout.bed bed" +
+                " left outer join bed.bedPatientAssignment as assignment with assignment.endDateTime IS null" +
                 " where exists (from ward.tags tag where tag.name = :tagName) " +
                 " and layout.location.locationId = physicalSpace.locationId" +
                 " and ward.uuid = :wardUuid";
@@ -63,5 +68,29 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
         AdmissionLocation admissionLocation = new AdmissionLocation();
         admissionLocation.setBedLayouts(bedLayouts);
         return admissionLocation;
+    }
+
+    @Override
+    public Bed assignPatientToBed(Integer patientId, Integer bedId) {
+
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+
+        Patient patient = (Patient) session.get(Patient.class, patientId);
+        Bed bed = (Bed) session.get(Bed.class, bedId);
+
+        Hibernate.initialize(bed.getBedPatientAssignment());
+
+        BedPatientAssignment bedPatientAssignment = new BedPatientAssignment();
+        bedPatientAssignment.setPatient(patient);
+        bedPatientAssignment.setBed(bed);
+        bedPatientAssignment.setStartDateTime(Calendar.getInstance().getTime());
+
+        session.saveOrUpdate(bedPatientAssignment);
+
+        session.getTransaction().commit();
+        session.close();
+
+        return bed;
     }
 }
