@@ -49,7 +49,7 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
 
     @Override
     public AdmissionLocation getLayoutForWard(String uuid) {
-        String hql = "select layout.bed.id as bedId, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
+        String hql = "select layout.bed.id as bedId, layout.bed.number as bedNumber, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
                 " from Location ward, BedLocationMapping layout" +
                 " left outer join ward.childLocations physicalSpace " +
                 " left outer join layout.bed bed" +

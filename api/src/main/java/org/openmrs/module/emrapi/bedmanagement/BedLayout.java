@@ -5,6 +5,7 @@ public class BedLayout {
     private Integer columnNumber;
     private Integer bedId;
     private Integer bedPatientAssignmentId;
+    private String bedNumber;
 
     public Integer getBedPatientAssignmentId() {
         return bedPatientAssignmentId;
@@ -42,6 +43,14 @@ public class BedLayout {
         return this.bedId != null && this.bedPatientAssignmentId == null ;
     }
 
+    public String getBedNumber() {
+        return bedNumber;
+    }
+
+    public void setBedNumber(String bedNumber) {
+        this.bedNumber = bedNumber;
+    }
+
     @Override
     public String toString() {
         return "BedLayout{" +
@@ -49,6 +58,7 @@ public class BedLayout {
                 ", columnNumber=" + columnNumber +
                 ", bedId=" + bedId +
                 ", bedPatientAssignmentId=" + bedPatientAssignmentId +
+                ", bedNumber='" + bedNumber + '\'' +
                 '}';
     }
 }
