@@ -75,8 +75,8 @@ public class EncounterDrugOrderServiceHelperTest {
         assertEquals(patient, order.getPatient());
         assertEquals(encounter, order.getEncounter());
         assertEquals("this is notes", order.getInstructions());
-        assertEquals(Integer.toString(instructionConceptId), order.getUnits());
-        assertEquals(Integer.toString(frequencyConceptId), order.getFrequency());
+        assertEquals("dosage-instruction-uuid", order.getUnits());
+        assertEquals("dosage-frequency-uuid", order.getFrequency());
         assertEquals(today, order.getStartDate());
         assertEquals(today, order.getAutoExpireDate());
         assertEquals(drug.getDisplayName(), order.getDrug().getDisplayName());

@@ -75,18 +75,18 @@ public class EncounterDrugOrderServiceHelper {
 
                 if (!StringUtils.isBlank(drug.getDosageFrequencyUuid())) {
                     Concept frequencyConcept = findConcept(cachedConcepts, drug.getDosageFrequencyUuid());
-                    if (frequencyConcept == null && !drug.isPrn()) {
+                    if (drug.getDosageFrequencyUuid() == null && !drug.isPrn()) {
                         throw new InvalidDrugException("Dosage Frequency does not exist.");
                     }
                     if (frequencyConcept != null) {
-                        drugOrder.setFrequency(frequencyConcept.getConceptId().toString());
+                        drugOrder.setFrequency(drug.getDosageFrequencyUuid());
                     }
                 }
 
                 if (!StringUtils.isBlank(drug.getDosageInstructionUuid())) {
                     Concept instructionConcept = findConcept(cachedConcepts, drug.getDosageInstructionUuid());
                     if (instructionConcept != null) {
-                        drugOrder.setUnits(instructionConcept.getConceptId().toString());
+                        drugOrder.setUnits(drug.getDosageInstructionUuid());
                     }
                 }
                 drugOrder.setComplex(false);

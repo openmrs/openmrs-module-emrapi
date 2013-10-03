@@ -283,10 +283,8 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("Take as needed", drugOrder.getInstructions());
         assertEquals(new DateTime("2013-09-30T09:26:09.717Z").toDate(), drugOrder.getStartDate());
         assertEquals(new DateTime("2013-10-02T09:26:09.717Z").toDate(), drugOrder.getAutoExpireDate());
-        String frequencyConceptId = "4";
-        assertEquals(frequencyConceptId, drugOrder.getFrequency());
-        String instructionConceptId = "5";
-        assertEquals(instructionConceptId, drugOrder.getUnits());
+        assertEquals("6302096d-2696-11e3-895c-0800271c1b75", drugOrder.getFrequency());
+        assertEquals("632aa422-2696-11e3-895c-0800271c1b75", drugOrder.getUnits());
         assertEquals("test drug", drugOrder.getDrug().getDisplayName());
         assertEquals(Double.valueOf(1), drugOrder.getDose());
         assertEquals(true, drugOrder.getPrn());
