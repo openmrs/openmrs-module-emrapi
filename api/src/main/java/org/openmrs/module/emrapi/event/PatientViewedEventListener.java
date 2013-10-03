@@ -107,8 +107,16 @@ public class PatientViewedEventListener implements EventListener {
 				Collections.reverse(patientIds);
 			}
 			
+			String property = StringUtils.join(patientIds, ",");
+			if (StringUtils.isNotBlank(property) && property.length() > 255) {
+				//exceeded the user property max size and hence needs trimming.
+				property = property.substring(0, 255);
+				//find the last comma before index 255 and cut off from there
+				property = property.substring(0, property.lastIndexOf(','));
+			}
+			
 			userService.setUserProperty(user, EmrApiConstants.USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS,
-			    StringUtils.join(patientIds, ","));
+				property);
 		}
 	}
 }
