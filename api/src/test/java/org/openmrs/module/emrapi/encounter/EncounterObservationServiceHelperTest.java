@@ -192,7 +192,7 @@ public class EncounterObservationServiceHelperTest {
     public void shouldSaveDiagnosisAsAnObservationWhenPassedTheUuidOfDiagnosisConcept() {
         String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
         List<EncounterTransaction.Diagnosis> diagnosises = asList(
-                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptUuid)
+                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("ConceptUuid:" + diagnosisConceptUuid)
         );
 
         Encounter encounter = new Encounter();

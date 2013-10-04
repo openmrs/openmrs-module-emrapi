@@ -34,6 +34,7 @@ import java.util.Locale;
 public class CodedOrFreeTextAnswer {
 
     public static final String CONCEPT_NAME_PREFIX = "ConceptName:";
+    public static final String CONCEPT_UUID_PREFIX = "ConceptUuid:";
     public static final String CONCEPT_PREFIX = "Concept:";
     public static final String NON_CODED_PREFIX = "Non-Coded:";
 
@@ -53,6 +54,9 @@ public class CodedOrFreeTextAnswer {
         } else if (spec.startsWith(CONCEPT_PREFIX)) {
             String conceptId = spec.substring(CONCEPT_PREFIX.length());
             setCodedAnswer(conceptService.getConcept(Integer.valueOf(conceptId)));
+        } else if (spec.startsWith(CONCEPT_UUID_PREFIX)){
+            String conceptUuid = spec.substring(CONCEPT_UUID_PREFIX .length());
+            setCodedAnswer(conceptService.getConceptByUuid(conceptUuid));
         } else if (spec.startsWith(NON_CODED_PREFIX)) {
             setNonCodedAnswer(spec.substring(NON_CODED_PREFIX.length()));
         } else {
