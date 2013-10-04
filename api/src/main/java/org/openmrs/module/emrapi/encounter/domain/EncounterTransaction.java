@@ -28,7 +28,7 @@ public class EncounterTransaction {
 
     private List<Observation> observations = new ArrayList<Observation>();
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
-    private List<DiagnosisRequest> diagnoses = new ArrayList<DiagnosisRequest>();
+    private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
 
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
 
@@ -111,11 +111,11 @@ public class EncounterTransaction {
         return this;
     }
 
-    public List<DiagnosisRequest> getDiagnoses() {
+    public List<Diagnosis> getDiagnoses() {
         return diagnoses;
     }
 
-    public void setDiagnoses(List<DiagnosisRequest> diagnoses) {
+    public void setDiagnoses(List<Diagnosis> diagnoses) {
         this.diagnoses = diagnoses;
     }
 
@@ -245,16 +245,17 @@ public class EncounterTransaction {
         }
     }
 
-    public static class DiagnosisRequest {
+    public static class Diagnosis {
         private String order;
         private String certainty;
         private String diagnosis;
+        private String existingObs;
 
         public String getOrder() {
             return order;
         }
 
-        public DiagnosisRequest setOrder(String order) {
+        public Diagnosis setOrder(String order) {
             this.order = order;
             return this;
         }
@@ -263,7 +264,7 @@ public class EncounterTransaction {
             return certainty;
         }
 
-        public DiagnosisRequest setCertainty(String certainty) {
+        public Diagnosis setCertainty(String certainty) {
             this.certainty = certainty;
             return this;
         }
@@ -272,8 +273,17 @@ public class EncounterTransaction {
             return diagnosis;
         }
 
-        public DiagnosisRequest setDiagnosis(String diagnosis) {
+        public Diagnosis setDiagnosis(String diagnosis) {
             this.diagnosis = diagnosis;
+            return this;
+        }
+
+        public String getExistingObs() {
+            return existingObs;
+        }
+
+        public Diagnosis setExistingObs(String existingObs) {
+            this.existingObs = existingObs;
             return this;
         }
     }

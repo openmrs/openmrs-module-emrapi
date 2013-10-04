@@ -17,17 +17,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.openmrs.Concept;
-import org.openmrs.ConceptDatatype;
-import org.openmrs.Encounter;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
+import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
 
 import java.text.ParseException;
@@ -39,7 +34,6 @@ import java.util.Set;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -63,7 +57,7 @@ public class EncounterObservationServiceHelperTest {
     public void setUp() throws Exception {
         initMocks(this);
         when(emrApiProperties.getDiagnosisMetadata()).thenReturn(diagnosisMetadata);
-        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties);
+        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties, obsService);
     }
 
     @Test
@@ -161,8 +155,8 @@ public class EncounterObservationServiceHelperTest {
     @Test
     public void shouldSaveDiagnosisAsAnObservation() {
         String diagnosisConceptId = "123";
-        List<EncounterTransaction.DiagnosisRequest> diagnosisRequests = asList(
-                new EncounterTransaction.DiagnosisRequest().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptId)
+        List<EncounterTransaction.Diagnosis> diagnosises = asList(
+                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptId)
         );
 
         Encounter encounter = new Encounter();
@@ -173,10 +167,10 @@ public class EncounterObservationServiceHelperTest {
         savedObservations.addGroupMember(new Obs());
         Concept conceptForDiagnosis = new Concept();
 
-        when(diagnosisMetadata.buildDiagnosisObsGroup(any(Diagnosis.class))).thenReturn(savedObservations);
+        when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class))).thenReturn(savedObservations);
         when(conceptService.getConcept(Integer.valueOf(diagnosisConceptId))).thenReturn(conceptForDiagnosis);
 
-        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosisRequests, new Date());
+        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosises, new Date());
 
         Set<Obs> parentObservations = encounter.getObsAtTopLevel(false);
         assertEquals(1, parentObservations.size());
@@ -184,12 +178,50 @@ public class EncounterObservationServiceHelperTest {
         assertTrue(parent.isObsGrouping());
         int children = parent.getGroupMembers().size();
         assertEquals(3, children);
-        ArgumentCaptor<Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(Diagnosis.class);
+        ArgumentCaptor<org.openmrs.module.emrapi.diagnosis.Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(org.openmrs.module.emrapi.diagnosis.Diagnosis.class);
         verify(diagnosisMetadata, times(1)).buildDiagnosisObsGroup(diagnosisCaptor.capture());
-        Diagnosis diagnosis = diagnosisCaptor.getValue();
+        org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = diagnosisCaptor.getValue();
         assertEquals(conceptForDiagnosis, diagnosis.getDiagnosis().getCodedAnswer());
-        assertEquals(Diagnosis.Certainty.CONFIRMED, diagnosis.getCertainty());
-        assertEquals(Diagnosis.Order.PRIMARY, diagnosis.getOrder());
+        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty.CONFIRMED, diagnosis.getCertainty());
+        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Order.PRIMARY, diagnosis.getOrder());
+        verify(conceptService).getConcept(Integer.valueOf(diagnosisConceptId));
+        verify(conceptService, never()).getConceptByUuid(anyString());
+    }
+
+    @Test
+    public void shouldSaveDiagnosisAsAnObservationWhenPassedTheUuidOfDiagnosisConcept() {
+        String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
+        List<EncounterTransaction.Diagnosis> diagnosises = asList(
+                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptUuid)
+        );
+
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        Obs savedObservations = new Obs();
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        Concept conceptForDiagnosis = new Concept();
+
+        when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class))).thenReturn(savedObservations);
+        when(conceptService.getConceptByUuid(diagnosisConceptUuid)).thenReturn(conceptForDiagnosis);
+
+        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosises, new Date());
+
+        Set<Obs> parentObservations = encounter.getObsAtTopLevel(false);
+        assertEquals(1, parentObservations.size());
+        Obs parent = parentObservations.iterator().next();
+        assertTrue(parent.isObsGrouping());
+        int children = parent.getGroupMembers().size();
+        assertEquals(3, children);
+        ArgumentCaptor<org.openmrs.module.emrapi.diagnosis.Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(org.openmrs.module.emrapi.diagnosis.Diagnosis.class);
+        verify(diagnosisMetadata, times(1)).buildDiagnosisObsGroup(diagnosisCaptor.capture());
+        org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = diagnosisCaptor.getValue();
+        assertEquals(conceptForDiagnosis, diagnosis.getDiagnosis().getCodedAnswer());
+        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty.CONFIRMED, diagnosis.getCertainty());
+        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Order.PRIMARY, diagnosis.getOrder());
+        verify(conceptService).getConceptByUuid(diagnosisConceptUuid);
+        verify(conceptService, never()).getConcept(anyInt());
     }
 
     private Concept newConcept(String hl7, String uuid) {
