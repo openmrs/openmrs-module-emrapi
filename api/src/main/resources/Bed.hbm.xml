@@ -9,7 +9,7 @@
             <generator class="native"/>
         </id>
 
-        <property name="number" type="java.lang.String" column="bed_number" length="10" unique="true"/>
+        <property name="number" type="java.lang.String" column="bed_number" length="10"/>
 
         <set name="bedPatientAssignment" cascade="none" inverse="true">
             <key column="bed_id"/>

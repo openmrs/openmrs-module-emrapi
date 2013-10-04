@@ -3,6 +3,9 @@ package org.openmrs.module.emrapi.bedmanagement.db;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Location;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
 import org.openmrs.module.emrapi.bedmanagement.BedManagementService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -39,7 +42,10 @@ public class BedManagementServiceComponentTest extends BaseModuleContextSensitiv
 
     @Test
     public void getBedsForWard_gets_all_bed_layouts_for_ward() {
-        AdmissionLocation admissionLocation = bedManagementService.getLayoutForWard("19e023e8-20ee-4237-ade6-9e68f897b7a9");
+        LocationService locationService = Context.getLocationService();
+
+        Location ward = locationService.getLocationByUuid("19e023e8-20ee-4237-ade6-9e68f897b7a9");
+        AdmissionLocation admissionLocation = bedManagementService.getLayoutForWard(ward);
 
         assertTrue(admissionLocation.getBedLayouts().size() == 6);
     }

@@ -14,7 +14,7 @@
             <column autoIncrement="true" name="bed_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="bed_number" type="varchar(10)">
+            <column name="bed_number" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -58,12 +58,12 @@
 
     <changeSet author="arathy" id="30092013_4">
         <preConditions onFail="MARK_RAN">
-            <not><foreignKeyConstraintExists foreignKeyName="patient_fk"/></not>
+            <not><foreignKeyConstraintExists foreignKeyName="emrapi_bed_patient_assignment_patient_fk"/></not>
         </preConditions>
         <comment>
             Added foreign key reference on patient_id in emrapi_bed_patient_assignment table
         </comment>
-        <addForeignKeyConstraint constraintName="patient_fk"
+        <addForeignKeyConstraint constraintName="emrapi_bed_patient_assignment_patient_fk"
                                  baseTableName="emrapi_bed_patient_assignment" baseColumnNames="patient_id"
                                  referencedTableName="patient" referencedColumnNames="patient_id"/>
         </changeSet>
@@ -94,12 +94,12 @@
 
     <changeSet author="arathy" id="30092013_6">
         <preConditions onFail="MARK_RAN">
-            <not><foreignKeyConstraintExists foreignKeyName="location_id_fk"/></not>
+            <not><foreignKeyConstraintExists foreignKeyName="emrapi_bed_location_mapping_location_fk"/></not>
         </preConditions>
         <comment>
             Added foreign key reference on location_id in emrapi_bed_location_mapping table
         </comment>
-        <addForeignKeyConstraint constraintName="location_id_fk"
+        <addForeignKeyConstraint constraintName="emrapi_bed_location_mapping_location_fk"
                                  baseTableName="emrapi_bed_location_mapping" baseColumnNames="location_id"
                                  referencedTableName="location" referencedColumnNames="location_id"/>
         </changeSet>

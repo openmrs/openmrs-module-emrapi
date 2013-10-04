@@ -17,6 +17,11 @@ import org.openmrs.Location;
 
 import java.util.List;
 
+/**
+ * Maps to resource for location table in openmrs database. Essentially
+ * a delegate for the AdmissionLocationResource
+ */
+
 public class AdmissionLocation {
     private long totalBeds;
     private long occupiedBeds;

@@ -43,7 +43,7 @@
 
     <patient patient_id="2" creator="1" date_created="2005-01-01 00:00:00.0" voided="false"/>
 
-    <emrapi_bed_patient_assignment bed_patient_assignment_id="1" patient_id="2" bed_id="1"/>
+    <emrapi_bed_patient_assignment bed_patient_assignment_id="1" patient_id="2" bed_id="1" date_started="2008-08-18 14:09:05.0"/>
 
     <!--second ward-->
     <location location_id="12347" name="Orthopaedic ward" description="This ward houses orthopaedic patients." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="19e023e8-20ee-4237-ade6-9e68f897b7a9"/>
@@ -67,8 +67,8 @@
     <person person_id="3" gender="F" dead="false" creator="1" date_created="2008-08-15 15:46:47.0" voided="false" uuid="2b597be0-83c7-4f1d-b3d2-1d61ab128762"/>
     <person person_id="4" gender="F" dead="false" creator="1" date_created="2008-08-15 15:46:47.0" voided="false" uuid="2b597be0-83c7-4f1d-b3d2-1d61ab128823"/>
 
-    <emrapi_bed_patient_assignment bed_patient_assignment_id="2" patient_id="3" bed_id="11"/>
-    <emrapi_bed_patient_assignment bed_patient_assignment_id="3" patient_id="4" bed_id="12"/>
+    <emrapi_bed_patient_assignment bed_patient_assignment_id="2" patient_id="3" bed_id="11" date_started="2008-08-18 14:09:05.0"/>
+    <emrapi_bed_patient_assignment bed_patient_assignment_id="3" patient_id="4" bed_id="12" date_started="2008-08-18 14:09:05.0"/>
 
     <!--additional wards-->
     <location location_id="12346" name="Cardio ward on third floor" description="This ward houses cardio patients. It is a special cardio ward." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="e26cea2c-1b9f-666e-6511-f3ef6c88af6f"/>

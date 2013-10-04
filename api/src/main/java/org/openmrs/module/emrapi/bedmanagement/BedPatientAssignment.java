@@ -9,8 +9,8 @@ public class BedPatientAssignment {
     private int id;
     private Bed bed;
     private Patient patient;
-    private Date startDateTime;
-    private Date endDateTime;
+    private Date startDatetime;
+    private Date endDatetime;
 
     public int getId() {
         return id;
@@ -36,19 +36,19 @@ public class BedPatientAssignment {
         this.patient = patient;
     }
 
-    public Date getStartDateTime() {
-        return startDateTime;
+    public Date getStartDatetime() {
+        return startDatetime;
     }
 
-    public void setStartDateTime(Date startDateTime) {
-        this.startDateTime = startDateTime;
+    public void setStartDatetime(Date startDatetime) {
+        this.startDatetime = startDatetime;
     }
 
-    public Date getEndDateTime() {
-        return endDateTime;
+    public Date getEndDatetime() {
+        return endDatetime;
     }
 
-    public void setEndDateTime(Date endDateTime) {
-        this.endDateTime = endDateTime;
+    public void setEndDatetime(Date endDatetime) {
+        this.endDatetime = endDatetime;
     }
 }

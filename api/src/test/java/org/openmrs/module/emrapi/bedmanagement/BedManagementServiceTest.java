@@ -3,7 +3,6 @@ package org.openmrs.module.emrapi.bedmanagement;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ public class BedManagementServiceTest {
         ArrayList<AdmissionLocation> expectedWards = new ArrayList<AdmissionLocation>();
 
         BedManagementDAO bedManagementDao = mock(BedManagementDAO.class);
-        when(bedManagementDao.getAllLocationsBy(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION)).thenReturn(expectedWards);
+        when(bedManagementDao.getAdmissionLocationsBy(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION)).thenReturn(expectedWards);
 
         BedManagementServiceImpl bedManagementService = new BedManagementServiceImpl();
         bedManagementService.setDao(bedManagementDao);
