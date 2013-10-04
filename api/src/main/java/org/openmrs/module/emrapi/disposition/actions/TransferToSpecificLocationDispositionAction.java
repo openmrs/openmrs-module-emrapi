@@ -71,7 +71,7 @@ public class TransferToSpecificLocationDispositionAction implements DispositionA
             log.warn("Unable to create transfer action, no transfer location specified in obsgroup " + dispositionObsGroupBeingCreated);
             return;
         }
-        // transfer the patient if a) they are not admitted (and therefore have no inpatient locatin) or b) the inpatient location is other than the transfer location
+        // transfer the patient if a) they are not admitted (and therefore have no inpatient location) or b) the inpatient location is other than the transfer location
         if (currentInpatientLocation == null || !currentInpatientLocation.equals(transferLocation)) {
             AdtAction transfer = new AdtAction(encounterDomainWrapper.getVisit(), transferLocation, encounterDomainWrapper.getProviders(), TRANSFER);
             transfer.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
