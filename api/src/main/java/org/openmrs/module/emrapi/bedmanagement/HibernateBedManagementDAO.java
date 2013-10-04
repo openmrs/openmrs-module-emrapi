@@ -20,6 +20,7 @@ import org.hibernate.classic.Session;
 import org.hibernate.transform.Transformers;
 import org.openmrs.Patient;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
@@ -49,7 +50,7 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
 
     @Override
     public AdmissionLocation getLayoutForWard(String uuid) {
-        String hql = "select layout.bed.id as bedId, layout.bed.number as bedNumber, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
+        String hql = "select bed.id as bedId, bed.number as bedNumber, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
                 " from Location ward, BedLocationMapping layout" +
                 " left outer join ward.childLocations physicalSpace " +
                 " left outer join layout.bed bed" +
@@ -71,15 +72,10 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
     }
 
     @Override
-    public Bed assignPatientToBed(Integer patientId, Integer bedId) {
+    @Transactional
+    public Bed assignPatientToBed(Patient patient, Bed bed) {
 
         Session session = sessionFactory.getCurrentSession();
-        session.beginTransaction();
-
-        Patient patient = (Patient) session.get(Patient.class, patientId);
-        Bed bed = (Bed) session.get(Bed.class, bedId);
-
-        Hibernate.initialize(bed.getBedPatientAssignment());
 
         BedPatientAssignment bedPatientAssignment = new BedPatientAssignment();
         bedPatientAssignment.setPatient(patient);
@@ -87,10 +83,13 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
         bedPatientAssignment.setStartDateTime(Calendar.getInstance().getTime());
 
         session.saveOrUpdate(bedPatientAssignment);
+        return bed;
+    }
 
-        session.getTransaction().commit();
-        session.close();
-
+    @Override
+    public Bed getBedById(int id) {
+        Bed bed = null;
+        bed = (Bed) sessionFactory.getCurrentSession().createQuery("from Bed b where b.id = :id").setInteger("id", id).uniqueResult();
         return bed;
     }
 }

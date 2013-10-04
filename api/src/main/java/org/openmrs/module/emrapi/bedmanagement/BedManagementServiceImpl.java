@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.bedmanagement;
 
+import org.openmrs.Patient;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 
@@ -37,7 +38,12 @@ public class BedManagementServiceImpl extends BaseOpenmrsService implements BedM
     }
 
     @Override
-    public Bed assignPatientToBed(Integer patientId, Integer bedId) {
-        return dao.assignPatientToBed(patientId, bedId);
+    public Bed assignPatientToBed(Patient patient, Bed bed) {
+        return dao.assignPatientToBed(patient, bed);
+    }
+
+    @Override
+    public Bed getBedById(int id) {
+        return dao.getBedById(id);
     }
 }

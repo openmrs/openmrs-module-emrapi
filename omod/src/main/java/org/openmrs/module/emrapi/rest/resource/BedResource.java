@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.rest.resource;
 
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.bedmanagement.Bed;
 import org.openmrs.module.emrapi.bedmanagement.BedManagementService;
@@ -78,8 +79,10 @@ public class BedResource extends DelegatingCrudResource<Bed> {
     @Override
     public Object update(String uuid, SimpleObject propertiesToUpdate, RequestContext context) throws ResponseException {
         BedManagementService bedManagementService = (BedManagementService) Context.getModuleOpenmrsServices(BedManagementService.class.getName()).get(0);
-        Bed bed = bedManagementService.assignPatientToBed((Integer) propertiesToUpdate.get("patientId"), Integer.parseInt(uuid));
-        SimpleObject ret = (SimpleObject) ConversionUtil.convertToRepresentation(bed, Representation.DEFAULT);
+        Patient patient = Context.getPatientService().getPatientByUuid((String) propertiesToUpdate.get("patientId"));
+        Bed bed = bedManagementService.getBedById( Integer.parseInt(uuid));
+        Bed bedRes = bedManagementService.assignPatientToBed(patient,bed);
+        SimpleObject ret = (SimpleObject) ConversionUtil.convertToRepresentation(bedRes, Representation.DEFAULT);
         return ret;
     }
 }
