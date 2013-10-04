@@ -111,7 +111,7 @@ public class PatientViewedEventListener implements EventListener {
 			if (StringUtils.isNotBlank(property) && property.length() > 255) {
 				//exceeded the user property max size and hence needs trimming.
 				//find the last comma before index 255 and cut off from there
-				property = property.substring(0, property.lastIndexOf(',', 255));
+				property = property.substring(property.indexOf(',', property.length() - 255));
 			}
 			
 			userService.setUserProperty(user, EmrApiConstants.USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS,
