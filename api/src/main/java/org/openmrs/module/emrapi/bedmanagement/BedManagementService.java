@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.bedmanagement;
 
+import org.openmrs.Patient;
 import org.openmrs.api.OpenmrsService;
 
 import java.util.List;
@@ -22,5 +23,7 @@ public interface BedManagementService extends OpenmrsService {
 
     AdmissionLocation getLayoutForWard(String uuid);
 
-    Bed assignPatientToBed(Integer patientId, Integer bedId);
+    Bed assignPatientToBed(Patient patient, Bed bed);
+
+    Bed getBedById(int id);
 }

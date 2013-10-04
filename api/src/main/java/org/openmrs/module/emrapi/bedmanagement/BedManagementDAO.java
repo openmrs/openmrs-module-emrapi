@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.emrapi.bedmanagement;
 
+import org.openmrs.Patient;
+
 import java.util.List;
 
 public interface BedManagementDAO {
@@ -20,6 +22,7 @@ public interface BedManagementDAO {
 
     AdmissionLocation getLayoutForWard(String uuid);
 
-    Bed assignPatientToBed(Integer patientId, Integer bedId);
+    Bed assignPatientToBed(Patient patient, Bed bed);
 
+    Bed getBedById(int id);
 }

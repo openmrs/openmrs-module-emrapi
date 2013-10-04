@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.Patient;
 
 import static org.mockito.Mockito.verify;
 
@@ -32,8 +33,10 @@ public class BedManagementServiceImplTest {
 
     @Test
     public void should_be_able_to_assign_patient_to_bed() {
-        bedManagementService.assignPatientToBed(123, 321);
+        Patient patient = new Patient();
+        Bed bed = new Bed();
+        bedManagementService.assignPatientToBed(patient, bed);
 
-        verify(bedManagementDAO).assignPatientToBed(123, 321);
+        verify(bedManagementDAO).assignPatientToBed(patient, bed);
     }
 }
