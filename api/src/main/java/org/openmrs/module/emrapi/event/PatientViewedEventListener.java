@@ -111,6 +111,8 @@ public class PatientViewedEventListener implements EventListener {
 			if (StringUtils.isNotBlank(property) && property.length() > 255) {
 				//exceeded the user property max size and hence needs trimming.
 				//find the last comma before index 255 and cut off from there
+				//RA-200 Wyclif says patients ids at the end of the string are the most recent
+				//so that is why we trim from begining instead of end.
 				property = property.substring(property.indexOf(',', property.length() - 255));
 			}
 			
