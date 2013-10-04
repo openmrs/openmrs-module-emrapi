@@ -18,6 +18,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.hibernate.transform.Transformers;
+import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
     }
 
     @Override
-    public List<AdmissionLocation> getAllLocationsBy(String locationTag) {
+    public List<AdmissionLocation> getAdmissionLocationsBy(String locationTagName) {
 
         String hql = "select ward as ward, count(layout.bed) as totalBeds , count(assignment.id) as occupiedBeds" +
                 " from Location ward, BedLocationMapping layout" +
@@ -43,25 +44,26 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
                 "and layout.location.locationId = physicalSpace.locationId" +
                 " group by ward.name";
 
-        Query query = sessionFactory.getCurrentSession().createQuery(hql).setParameter("locationTag", locationTag).setResultTransformer(Transformers.aliasToBean(AdmissionLocation.class));
+        Query query = sessionFactory.getCurrentSession().createQuery(hql)
+                .setParameter("locationTag", locationTagName).setResultTransformer(Transformers.aliasToBean(AdmissionLocation.class));
 
         return query.list();
     }
 
     @Override
-    public AdmissionLocation getLayoutForWard(String uuid) {
+    public AdmissionLocation getLayoutForWard(Location location) {
         String hql = "select bed.id as bedId, bed.number as bedNumber, layout.row as rowNumber, layout.column as columnNumber, assignment.id as bedPatientAssignmentId" +
                 " from Location ward, BedLocationMapping layout" +
                 " left outer join ward.childLocations physicalSpace " +
                 " left outer join layout.bed bed" +
-                " left outer join bed.bedPatientAssignment as assignment with assignment.endDateTime IS null" +
+                " left outer join bed.bedPatientAssignment as assignment with assignment.endDatetime IS null" +
                 " where exists (from ward.tags tag where tag.name = :tagName) " +
                 " and layout.location.locationId = physicalSpace.locationId" +
                 " and ward.uuid = :wardUuid";
 
         Query query = sessionFactory.getCurrentSession().createQuery(hql)
                 .setParameter("tagName", EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION)
-                .setParameter("wardUuid", uuid)
+                .setParameter("wardUuid", location.getUuid())
                 .setResultTransformer(Transformers.aliasToBean(BedLayout.class));
 
         List<BedLayout> bedLayouts = query.list();
@@ -80,7 +82,7 @@ public class HibernateBedManagementDAO implements BedManagementDAO {
         BedPatientAssignment bedPatientAssignment = new BedPatientAssignment();
         bedPatientAssignment.setPatient(patient);
         bedPatientAssignment.setBed(bed);
-        bedPatientAssignment.setStartDateTime(Calendar.getInstance().getTime());
+        bedPatientAssignment.setStartDatetime(Calendar.getInstance().getTime());
 
         session.saveOrUpdate(bedPatientAssignment);
         return bed;

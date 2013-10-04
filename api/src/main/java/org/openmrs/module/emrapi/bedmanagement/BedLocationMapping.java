@@ -2,6 +2,9 @@ package org.openmrs.module.emrapi.bedmanagement;
 
 import org.openmrs.Location;
 
+/**
+ * Maps to emrapi_bed_location_mapping table in openmrs database
+ */
 public class BedLocationMapping {
     private int id;
     private Location location;

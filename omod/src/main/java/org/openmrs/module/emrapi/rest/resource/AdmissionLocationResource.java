@@ -13,9 +13,10 @@
  */
 package org.openmrs.module.emrapi.rest.resource;
 
+import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.bedmanagement.BedManagementService;
 import org.openmrs.module.emrapi.bedmanagement.AdmissionLocation;
+import org.openmrs.module.emrapi.bedmanagement.BedManagementService;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
@@ -68,7 +69,8 @@ public class AdmissionLocationResource extends DelegatingCrudResource<AdmissionL
     @Override
     public AdmissionLocation getByUniqueId(String uuid) {
         BedManagementService bedManagementService = (BedManagementService) Context.getModuleOpenmrsServices(BedManagementService.class.getName()).get(0);
-        return bedManagementService.getLayoutForWard(uuid);
+        LocationService locationService = Context.getLocationService();
+        return bedManagementService.getLayoutForWard(locationService.getLocationByUuid(uuid));
     }
 
     @Override

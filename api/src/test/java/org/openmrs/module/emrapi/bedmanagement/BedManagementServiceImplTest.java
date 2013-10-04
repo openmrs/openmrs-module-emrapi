@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openmrs.Location;
 import org.openmrs.Patient;
 
 import static org.mockito.Mockito.verify;
@@ -26,9 +27,12 @@ public class BedManagementServiceImplTest {
     public void should_get_layouts_for_ward() {
         String wardId = "123";
 
-        bedManagementService.getLayoutForWard(wardId);
+        Location location = new Location();
+        location.setUuid(wardId);
 
-        verify(bedManagementDAO).getLayoutForWard(wardId);
+        bedManagementService.getLayoutForWard(location);
+
+        verify(bedManagementDAO).getLayoutForWard(location);
     }
 
     @Test

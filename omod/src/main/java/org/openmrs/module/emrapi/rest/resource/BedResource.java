@@ -79,7 +79,7 @@ public class BedResource extends DelegatingCrudResource<Bed> {
     @Override
     public Object update(String uuid, SimpleObject propertiesToUpdate, RequestContext context) throws ResponseException {
         BedManagementService bedManagementService = (BedManagementService) Context.getModuleOpenmrsServices(BedManagementService.class.getName()).get(0);
-        Patient patient = Context.getPatientService().getPatientByUuid((String) propertiesToUpdate.get("patientId"));
+        Patient patient = Context.getPatientService().getPatientByUuid((String) propertiesToUpdate.get("patientUuid"));
         Bed bed = bedManagementService.getBedById( Integer.parseInt(uuid));
         Bed bedRes = bedManagementService.assignPatientToBed(patient,bed);
         SimpleObject ret = (SimpleObject) ConversionUtil.convertToRepresentation(bedRes, Representation.DEFAULT);

@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.bedmanagement;
 
+import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
@@ -29,12 +30,12 @@ public class BedManagementServiceImpl extends BaseOpenmrsService implements BedM
 
     @Override
     public List<AdmissionLocation> getAllAdmissionLocations() {
-        return dao.getAllLocationsBy(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
+        return dao.getAdmissionLocationsBy(EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION);
     }
 
     @Override
-    public AdmissionLocation getLayoutForWard(String uuid) {
-        return dao.getLayoutForWard(uuid);
+    public AdmissionLocation getLayoutForWard(Location location) {
+        return dao.getLayoutForWard(location);
     }
 
     @Override
