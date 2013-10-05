@@ -54,12 +54,12 @@ public class EncounterDispositionServiceHelper {
         Obs dispositionAsObservation = constructDispositionObs(encounter, new Obs(), disposition.getCode(), observationDateTime);
         obs.addGroupMember(dispositionAsObservation);
         for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
-            obs.addGroupMember(createObsFromObservation(observation, encounter, observationDateTime));
+            if(observation.getValue() != null && !((String) observation.getValue()).isEmpty() ){
+                obs.addGroupMember(createObsFromObservation(observation, encounter, observationDateTime));
+            }
         }
         return obs;
     }
-
-
 
     private void editExistingObservations(EncounterTransaction.Disposition disposition,Encounter encounter,Date observationDateTime) throws ParseException {
         Set<Obs> allEncounterObs = encounter.getAllObs();
