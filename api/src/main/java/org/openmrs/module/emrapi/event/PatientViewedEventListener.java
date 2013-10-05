@@ -113,7 +113,7 @@ public class PatientViewedEventListener implements EventListener {
 				//find the last comma before index 255 and cut off from there
 				//RA-200 Wyclif says patients ids at the end of the string are the most recent
 				//so that is why we trim from begining instead of end.
-				property = property.substring(property.indexOf(',', property.length() - 255));
+				property = property.substring(property.indexOf(',', property.length() - 255) + 1);
 			}
 			
 			userService.setUserProperty(user, EmrApiConstants.USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS,
