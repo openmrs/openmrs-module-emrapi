@@ -53,9 +53,12 @@ public class EncounterDispositionServiceHelper {
         obs.setConcept(dispositionGroupConcept);
         Obs dispositionAsObservation = constructDispositionObs(encounter, new Obs(), disposition.getCode(), observationDateTime);
         obs.addGroupMember(dispositionAsObservation);
-        for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
-            if(observation.getValue() != null && !((String) observation.getValue()).isEmpty() ){
-                obs.addGroupMember(createObsFromObservation(observation, encounter, observationDateTime));
+
+        if(disposition.getAdditionalObs() != null){
+            for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
+                if(observation.getValue() != null && !((String) observation.getValue()).isEmpty() ){
+                    obs.addGroupMember(createObsFromObservation(observation, encounter, observationDateTime));
+                }
             }
         }
         return obs;
@@ -66,9 +69,11 @@ public class EncounterDispositionServiceHelper {
         Obs existingDispositionGroup = getMatchingObservation(allEncounterObs, dispositionGroupConcept.getUuid());
         Obs existingDisposition = getMatchingObservation(existingDispositionGroup.getGroupMembers(), dispositionConcept.getUuid());
         constructDispositionObs(encounter, existingDisposition, disposition.getCode(), observationDateTime);
-        for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
-            Obs matchingObservation = getMatchingObservation(existingDispositionGroup.getGroupMembers(), observation.getConceptUuid());
-            updateObsFromObservation(observation, matchingObservation,observationDateTime);
+        if(disposition.getAdditionalObs() != null){
+            for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
+                Obs matchingObservation = getMatchingObservation(existingDispositionGroup.getGroupMembers(), observation.getConceptUuid());
+                updateObsFromObservation(observation, matchingObservation,observationDateTime);
+            }
         }
     }
 
