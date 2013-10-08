@@ -154,7 +154,7 @@
             <ref bean="transactionAttributeSource"/>
         </property>
     </bean>
-    
+
      <bean id="emrPatientService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -283,6 +283,15 @@
         </property>
     </bean>
 
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.BedManagementService</value>
+                <ref local="bedManagementService"/>
+            </list>
+        </property>
+    </bean>
+
 
     <bean id="emrEncounterDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrEncounterDAO">
         <property name="sessionFactory">
@@ -292,5 +301,28 @@
 
     <bean id="emrapiVisitDomainWrapperFactory" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory"/>
     <bean id="emrapiVisitDomainWrapperRepository" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperRepository"/>
+
+    <bean id="bedManagementService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.bedmanagement.BedManagementServiceImpl">
+                <property name="dao">
+                    <bean class="${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.HibernateBedManagementDAO">
+                        <property name="sessionFactory">
+                            <ref bean="sessionFactory"/>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
 
 </beans>

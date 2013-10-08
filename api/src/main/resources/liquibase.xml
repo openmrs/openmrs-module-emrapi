@@ -1,0 +1,111 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet author="arathy" id="30092013_1">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="emrapi_bed"/></not>
+        </preConditions>
+        <comment>
+            Create emrapi_bed table
+        </comment>
+        <createTable tableName="emrapi_bed">
+            <column autoIncrement="true" name="bed_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="bed_number" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="arathy" id="30092013_2">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="emrapi_bed_patient_assignment"/></not>
+        </preConditions>
+        <comment>
+            Create emrapi_bed_patient_assignment table
+        </comment>
+        <createTable tableName="emrapi_bed_patient_assignment">
+            <column autoIncrement="true" name="bed_patient_assignment_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="patient_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bed_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_started" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_stopped" type="datetime"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="arathy" id="30092013_3">
+        <preConditions onFail="MARK_RAN">
+            <not><foreignKeyConstraintExists foreignKeyName="bed_id_fk"/></not>
+        </preConditions>
+        <comment>
+            Added foreign key reference on bed_id in emrapi_bed_patient_assignment table
+        </comment>
+        <addForeignKeyConstraint constraintName="bed_id_fk"
+                                 baseTableName="emrapi_bed_patient_assignment" baseColumnNames="bed_id"
+                                 referencedTableName="emrapi_bed" referencedColumnNames="bed_id"/>
+    </changeSet>
+
+    <changeSet author="arathy" id="30092013_4">
+        <preConditions onFail="MARK_RAN">
+            <not><foreignKeyConstraintExists foreignKeyName="emrapi_bed_patient_assignment_patient_fk"/></not>
+        </preConditions>
+        <comment>
+            Added foreign key reference on patient_id in emrapi_bed_patient_assignment table
+        </comment>
+        <addForeignKeyConstraint constraintName="emrapi_bed_patient_assignment_patient_fk"
+                                 baseTableName="emrapi_bed_patient_assignment" baseColumnNames="patient_id"
+                                 referencedTableName="patient" referencedColumnNames="patient_id"/>
+        </changeSet>
+
+    <changeSet author="arathy" id="30092013_5">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="emrapi_bed_location_mapping"/></not>
+        </preConditions>
+        <comment>
+            Create emrapi_bed_location_mapping table
+        </comment>
+        <createTable tableName="emrapi_bed_location_mapping">
+            <column autoIncrement="true" name="bed_location_mapping_id" type="int">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="location_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="row_number" type="smallint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="column_number" type="smallint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bed_id" type="int"/>
+        </createTable>
+        </changeSet>
+
+    <changeSet author="arathy" id="30092013_6">
+        <preConditions onFail="MARK_RAN">
+            <not><foreignKeyConstraintExists foreignKeyName="emrapi_bed_location_mapping_location_fk"/></not>
+        </preConditions>
+        <comment>
+            Added foreign key reference on location_id in emrapi_bed_location_mapping table
+        </comment>
+        <addForeignKeyConstraint constraintName="emrapi_bed_location_mapping_location_fk"
+                                 baseTableName="emrapi_bed_location_mapping" baseColumnNames="location_id"
+                                 referencedTableName="location" referencedColumnNames="location_id"/>
+        </changeSet>
+
+        <!--<addForeignKeyConstraint constraintName="bed_id_fk"-->
+                                 <!--baseTableName="bed_location_mapping" baseColumnNames="bed_id"-->
+                                 <!--referencedTableName="bed" referencedColumnNames="bed_id"/>-->
+
+</databaseChangeLog>

@@ -11,5 +11,8 @@
         <mapping resource="ExportedPackage.hbm.xml" />
         <mapping resource="ImportedPackage.hbm.xml" />
         <mapping resource="ImportedItem.hbm.xml" />
+        <mapping resource="Bed.hbm.xml"/>
+        <mapping resource="BedLocationMapping.hbm.xml"/>
+        <mapping resource="BedPatientAssignment.hbm.xml"/>
     </session-factory>
 </hibernate-configuration>

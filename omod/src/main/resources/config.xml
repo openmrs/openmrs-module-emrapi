@@ -34,6 +34,9 @@
     <!-- Maps hibernate files, if present -->
     <mappingFiles>
         Printer.hbm.xml
+        Bed.hbm.xml
+        BedLocationMapping.hbm.xml
+        BedPatientAssignment.hbm.xml
     </mappingFiles>
 
     <!-- Internationalization -->

@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- this creates admission locations for testing bed management dao. We also add few non admission locations. -->
+
+    <!--first ward-->
+    <location location_id="12345" name="Cardio ward on first floor" description="This ward houses cardio patients. It is a general cardio ward." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="7779d653-393b-4118-9c83-a3715b82d4ac"/>
+    <location location_id="123451" name="Physical Location for Cardio ward on first floor" description="This ward houses cardio patients. It is a general cardio ward." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="98bc9b32-9d1a-11e2-8137-0800271c1b75" parent_location="12345" />
+
+    <location_tag location_tag_id="12" name="Admission Location" creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="ad7311e1-1674-4740-8791-07563925336e" />
+
+    <location_tag_map location_id="12345" location_tag_id="12" />
+    <!--<location_tag_map location_id="123451" location_tag_id="12" />-->
+
+    <emrapi_bed bed_id="1" bed_number="304-a" />
+    <emrapi_bed bed_id="2" bed_number="304-b" />
+    <emrapi_bed bed_id="3" bed_number="304-c" />
+    <emrapi_bed bed_id="4" bed_number="304-d" />
+    <emrapi_bed bed_id="5" bed_number="305-a" />
+    <emrapi_bed bed_id="6" bed_number="305-b" />
+    <emrapi_bed bed_id="7" bed_number="305-c" />
+    <emrapi_bed bed_id="8" bed_number="305-d" />
+    <emrapi_bed bed_id="9" bed_number="306-a" />
+    <emrapi_bed bed_id="10" bed_number="306-b" />
+
+    <emrapi_bed_location_mapping bed_location_mapping_id="1" location_id="123451" row_number="1" column_number="1" bed_id="1"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="2" location_id="123451" row_number="1" column_number="2" bed_id="2"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="3" location_id="123451" row_number="1" column_number="3" bed_id="3"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="4" location_id="123451" row_number="1" column_number="4" bed_id="4"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="5" location_id="123451" row_number="2" column_number="1" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="6" location_id="123451" row_number="2" column_number="2" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="7" location_id="123451" row_number="2" column_number="3" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="8" location_id="123451" row_number="2" column_number="4" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="9" location_id="123451" row_number="3" column_number="1" bed_id="5"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="10" location_id="123451" row_number="3" column_number="2" bed_id="6"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="11" location_id="123451" row_number="3" column_number="3" bed_id="7"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="12" location_id="123451" row_number="3" column_number="4" bed_id="8"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="13" location_id="123451" row_number="1" column_number="5" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="14" location_id="123451" row_number="1" column_number="6" bed_id="9"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="15" location_id="123451" row_number="2" column_number="5" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="16" location_id="123451" row_number="2" column_number="6" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="17" location_id="123451" row_number="3" column_number="5" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="18" location_id="123451" row_number="3" column_number="6" bed_id="10"/>
+
+    <patient patient_id="2" creator="1" date_created="2005-01-01 00:00:00.0" voided="false"/>
+
+    <emrapi_bed_patient_assignment bed_patient_assignment_id="1" patient_id="2" bed_id="1" date_started="2008-08-18 14:09:05.0"/>
+
+    <!--second ward-->
+    <location location_id="12347" name="Orthopaedic ward" description="This ward houses orthopaedic patients." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="19e023e8-20ee-4237-ade6-9e68f897b7a9"/>
+    <location location_id="123452" name="Physical Location for Orthopaedic ward" description="This ward houses Orthopaedic ward." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="98bc9b32-9d1a-11e2-8137-0800271c1b56" parent_location="12347" />
+
+    <emrapi_bed bed_id="11" bed_number="307-a" />
+    <emrapi_bed bed_id="12" bed_number="307-b" />
+    <emrapi_bed bed_id="13" bed_number="307-c" />
+    <emrapi_bed bed_id="14" bed_number="307-d" />
+
+    <emrapi_bed_location_mapping bed_location_mapping_id="19" location_id="123452" row_number="1" column_number="1" bed_id="11"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="20" location_id="123452" row_number="1" column_number="2" bed_id="12"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="21" location_id="123452" row_number="1" column_number="3" bed_id="13"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="22" location_id="123452" row_number="1" column_number="4" bed_id="14"/>
+    <emrapi_bed_location_mapping bed_location_mapping_id="23" location_id="123452" row_number="2" column_number="1" />
+    <emrapi_bed_location_mapping bed_location_mapping_id="24" location_id="123452" row_number="2" column_number="2" />
+
+    <patient patient_id="3" creator="1" date_created="2005-01-01 00:00:00.0" voided="false"/>
+    <patient patient_id="4" creator="1" date_created="2005-01-01 00:00:00.0" voided="false"/>
+
+    <person person_id="3" gender="F" dead="false" creator="1" date_created="2008-08-15 15:46:47.0" voided="false" uuid="2b597be0-83c7-4f1d-b3d2-1d61ab128762"/>
+    <person person_id="4" gender="F" dead="false" creator="1" date_created="2008-08-15 15:46:47.0" voided="false" uuid="2b597be0-83c7-4f1d-b3d2-1d61ab128823"/>
+
+    <emrapi_bed_patient_assignment bed_patient_assignment_id="2" patient_id="3" bed_id="11" date_started="2008-08-18 14:09:05.0"/>
+    <emrapi_bed_patient_assignment bed_patient_assignment_id="3" patient_id="4" bed_id="12" date_started="2008-08-18 14:09:05.0"/>
+
+    <!--additional wards-->
+    <location location_id="12346" name="Cardio ward on third floor" description="This ward houses cardio patients. It is a special cardio ward." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="e26cea2c-1b9f-666e-6511-f3ef6c88af6f"/>
+    <location location_id="12348" name="Ganiyari" description="This is a small village in central India." creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="285e8574-9d21-11e2-8137-0800271c1b75"/>
+
+    <location_tag location_tag_id="13" name="Visit Location" creator="1" date_created="2008-08-18 14:09:05.0" retired="0" uuid="6f7e82dd-246d-46af-aaf1-04b00cac498b" />
+
+    <location_tag_map location_id="12348" location_tag_id="13" />
+    <location_tag_map location_id="12346" location_tag_id="12" />
+    <location_tag_map location_id="12347" location_tag_id="12" />
+
+</dataset>
+
+
+
