@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.rest.resource;
 
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.emrapi.person.image.EmrPersonImageService;
 import org.openmrs.module.emrapi.person.image.PersonImage;
 import org.openmrs.module.emrapi.rest.EmrModuleContext;
 import org.openmrs.module.emrapi.rest.exception.PersonNotFoundException;
@@ -11,11 +12,15 @@ import org.openmrs.module.webservices.rest.web.annotation.Resource;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
+import org.openmrs.module.webservices.rest.web.response.GenericRestException;
+import org.openmrs.module.webservices.rest.web.response.ObjectNotFoundException;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 import org.openmrs.util.OpenmrsUtil;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +53,7 @@ public class PersonImageResource extends DelegatingCrudResource<PersonImage> {
 
     @Override
     public PersonImage save(PersonImage personImage) {
-        return EmrModuleContext.getEmrPersonImageService().savePersonImage(personImage);
+        return Context.getService(EmrPersonImageService.class).savePersonImage(personImage);
     }
 
     @Override
@@ -57,20 +62,22 @@ public class PersonImageResource extends DelegatingCrudResource<PersonImage> {
         if (person == null) {
             throw new PersonNotFoundException(String.format("Person with UUID:%s not found.", personUuid));
         }
-        return EmrModuleContext.getEmrPersonImageService().getCurrentPersonImage(person);
+        return Context.getService(EmrPersonImageService.class).getCurrentPersonImage(person);
     }
 
     @Override
     public Object retrieve(String uuid, RequestContext context) throws ResponseException {
         PersonImage personImage = getByUniqueId(uuid);
         InputStream inputStream;
+
         try {
             inputStream = new FileInputStream(personImage.getSavedImage());
             OpenmrsUtil.copyFile(inputStream, context.getResponse().getOutputStream());
             context.getResponse().flushBuffer();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            throw new GenericRestException("Failure when loading the file for uuid: " + uuid, e.getCause());
         }
+
         return null;
     }
 
