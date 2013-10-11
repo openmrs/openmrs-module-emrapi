@@ -82,7 +82,7 @@ public class EncounterDomainWrapper {
         return encounter.getEncounterProviders();
     }
 
-
+    // TODO not sure we are ever going to get this working properly. might want to deprecate?
     public Provider getPrimaryProvider() {
         // TODO for now we just return the first non-voided provider as the primary provider; we should improve this
         for (EncounterProvider provider : encounter.getEncounterProviders()) {
