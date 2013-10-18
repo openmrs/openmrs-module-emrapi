@@ -92,8 +92,13 @@ public class VisitDomainWrapper {
         return null;
     }
 
-    public boolean isOpen() {
+    public boolean isActive() {
         return visit.getStopDatetime() == null;
+    }
+
+    @Deprecated  // renamed to is Active
+    public boolean isOpen() {
+        return isActive();
     }
 
     public Encounter getCheckInEncounter() {

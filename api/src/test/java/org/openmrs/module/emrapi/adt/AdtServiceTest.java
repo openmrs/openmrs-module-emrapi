@@ -16,12 +16,10 @@ package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openmrs.Encounter;
@@ -67,7 +65,13 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyCollection;
@@ -193,36 +197,6 @@ public class AdtServiceTest {
         this.service = service;
     }
 
-
-    @Test
-    public void testThatRecentVisitIsActive() throws Exception {
-        Visit visit = new Visit();
-        visit.setStartDatetime(new Date());
-
-        Assert.assertThat(service.isActive(visit), is(true));
-    }
-
-    @Test
-    public void testThatOldVisitIsNotActive() throws Exception {
-        Visit visit = new Visit();
-        visit.setStartDatetime(DateUtils.addDays(new Date(), -7));
-
-        Assert.assertThat(service.isActive(visit), is(false));
-    }
-
-    @Test
-    public void testThatOldVisitWithRecentEncounterIsActive() throws Exception {
-        Encounter encounter = new Encounter();
-        encounter.setEncounterType(checkInEncounterType);
-        encounter.setEncounterDatetime(new Date());
-
-        Visit visit = new Visit();
-        visit.setStartDatetime(DateUtils.addDays(new Date(), -7));
-        visit.addEncounter(encounter);
-
-        Assert.assertThat(service.isActive(visit), is(true));
-    }
-
     @Test
     public void testEnsureActiveVisitCreatesNewVisit() throws Exception {
         final Patient patient = new Patient();
@@ -265,28 +239,14 @@ public class AdtServiceTest {
 
         final Visit oldVisit = new Visit();
         oldVisit.setLocation(mirebalaisHospital);
-        oldVisit.setStartDatetime(DateUtils.addDays(new Date(), -7));
+        oldVisit.setStartDatetime(DateUtils.addDays(new Date(), -10));
+        oldVisit.setStopDatetime(DateUtils.addDays(new Date(), -9));
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Collections.singletonList(oldVisit));
 
         final Visit created = service.ensureActiveVisit(patient, outpatientDepartment);
         assertNotNull(created);
         assertNotSame(oldVisit, created);
-
-        // should be called once to save oldVisit (having stopped it)
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                if (actual == oldVisit) {
-                    // no encounters, so closed at the moment it started
-                    assertThat(actual.getStopDatetime(), is(oldVisit.getStartDatetime()));
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }));
 
         // should be called once to create a new visit
         verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
@@ -526,11 +486,6 @@ public class AdtServiceTest {
         visit2.setStartDatetime(DateUtils.addHours(new Date(), -1));
         visit2.setLocation(outpatientDepartment);
 
-        Visit visit3 = new Visit();
-        visit3.setStartDatetime(DateUtils.addDays(new Date(), -10));
-        visit3.setStopDatetime(DateUtils.addDays(new Date(), -8));
-        visit3.setLocation(mirebalaisHospital);
-
         Set<Location> expectedLocations = new HashSet<Location>();
         expectedLocations.add(mirebalaisHospital);
         expectedLocations.add(outpatientDepartment);
@@ -539,7 +494,7 @@ public class AdtServiceTest {
         when(
                 mockVisitService.getVisits(any(Collection.class), any(Collection.class), eq(expectedLocations),
                         any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
-                        any(Boolean.class), any(Boolean.class))).thenReturn(Arrays.asList(visit1, visit2, visit3));
+                        eq(false), eq(false))).thenReturn(Arrays.asList(visit1, visit2));
 
         List<VisitDomainWrapper> activeVisitSummaries = service.getActiveVisits(mirebalaisHospital);
 
@@ -562,9 +517,10 @@ public class AdtServiceTest {
         encounter2.setEncounterDatetime(stopDatetime);
         visit.addEncounter(encounter2);
 
-        when(mockVisitService.getVisitsByPatient(null)).thenReturn(Collections.singletonList(visit));
+        when(mockVisitService.getVisits(null, null, null, null, null, null, null, null, null, false, false))
+                .thenReturn(Collections.singletonList(visit));
 
-        service.getActiveVisit(null, null);
+        service.closeInactiveVisits();
 
         assertThat(visit.getStopDatetime(), is(stopDatetime));
     }
@@ -619,9 +575,10 @@ public class AdtServiceTest {
         Date startDatetime = DateUtils.addHours(new Date(), -14);
         visit.setStartDatetime(startDatetime);
 
-        when(mockVisitService.getVisitsByPatient(null)).thenReturn(Collections.singletonList(visit));
+        when(mockVisitService.getVisits(null, null, null, null, null, null, null, null, null, false, false))
+                .thenReturn(Collections.singletonList(visit));
 
-        service.getActiveVisit(null, null);
+        service.closeInactiveVisits();
 
         assertThat(visit.getStopDatetime(), is(startDatetime));
     }

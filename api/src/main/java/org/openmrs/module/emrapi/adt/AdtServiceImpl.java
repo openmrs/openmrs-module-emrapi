@@ -53,7 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -131,8 +130,24 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         this.patientMergeActions = patientMergeActions;
     }
 
+
     @Override
-    public boolean isActive(Visit visit) {
+    public void closeInactiveVisits() {
+        List<Visit> openVisits = visitService.getVisits(null, null, null, null, null, null, null, null, null, false, false);
+        for (Visit visit : openVisits) {
+            if (!shouldBeClosed(visit)) {
+                try {
+                    closeAndSaveVisit(visit);
+                } catch (Exception ex) {
+                    log.warn("Failed to close inactive visit " + visit, ex);
+                }
+            }
+        }
+
+    }
+
+
+    private boolean shouldBeClosed(Visit visit) {
         if (visit.getStopDatetime() != null) {
             return false;
         }
@@ -157,21 +172,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         return false;
-    }
-
-    @Override
-    public void closeInactiveVisits() {
-        List<Visit> openVisits = visitService.getVisits(null, null, null, null, null, null, null, null, null, false, false);
-        for (Visit visit : openVisits) {
-            if (!isActive(visit)) {
-                try {
-                    closeAndSaveVisit(visit);
-                } catch (Exception ex) {
-                    log.warn("Failed to close inactive visit " + visit, ex);
-                }
-            }
-        }
-
     }
 
     @Override
@@ -201,12 +201,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         List<Visit> candidates = visitService.getVisitsByPatient(patient);
         Visit ret = null;
         for (Visit candidate : candidates) {
-            if (!isActive(candidate)) {
-                if (candidate.getStopDatetime() == null) {
-                    closeAndSaveVisit(candidate);
-                }
-                continue;
-            }
             if (isSuitableVisit(candidate, department, now)) {
                 ret = candidate;
             }
@@ -457,7 +451,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         List<VisitDomainWrapper> active = new ArrayList<VisitDomainWrapper>();
         for (Visit candidate : candidates) {
-            if (isActive(candidate) && itBelongsToARealPatient(candidate)) {
+            if (itBelongsToARealPatient(candidate)) {
                 active.add(new VisitDomainWrapper(candidate, emrApiProperties));
             }
         }
@@ -478,7 +472,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         List<VisitDomainWrapper> inpatientVisits = new ArrayList<VisitDomainWrapper>();
         for (Visit candidate : candidates) {
             VisitDomainWrapper visitDomainWrapper = new VisitDomainWrapper(candidate, emrApiProperties);
-            if (isActive(candidate) && itBelongsToARealPatient(candidate)
+            if (itBelongsToARealPatient(candidate)
                     && visitDomainWrapper.isAdmitted()) {
                 if(ward!=null){
                     Encounter latestAdtEncounter = visitDomainWrapper.getLatestAdtEncounter();
