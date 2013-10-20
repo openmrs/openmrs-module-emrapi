@@ -27,7 +27,6 @@ import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * <pre>
@@ -46,7 +45,7 @@ import java.util.Set;
  * hierarchy until we find a location with this tag. (This allows you to configure the setup such that doing a check-in
  * at Outpatient Department creates a visit at its parent, with an Encounter at the location itself.)
  *
- * Admission encounters can only happen at locations tagged with the {@link org.openmrs.module.emrapi.EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION}
+ * Admission encounters can only happen at locations tagged with the {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
  * tag.
  * </pre>
  */
@@ -271,5 +270,11 @@ public interface AdtService extends OpenmrsService {
      */
     boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
 
+
+    /**
+     * @return all locations that are tagged to support admissions
+     * @see {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
+     */
+    List<Location> getInpatientLocations();
 
 }
