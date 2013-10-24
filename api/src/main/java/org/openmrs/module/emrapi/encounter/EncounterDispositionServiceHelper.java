@@ -110,11 +110,13 @@ public class EncounterDispositionServiceHelper {
 
 
     private Obs constructDispositionObs(Encounter encounter,Obs dispositionObs, String dispositionCode, Date observationDateTime) {
-        dispositionObs.setConcept(dispositionConcept);
-        dispositionObs.setValueCoded(getMatchingAnswer(dispositionConcept.getAnswers(), dispositionCode));
-        dispositionObs.setObsDatetime(observationDateTime);
-        dispositionObs.setPerson(encounter.getPatient());
-        dispositionObs.setEncounter(encounter);
+        if(dispositionObs != null){
+            dispositionObs.setConcept(dispositionConcept);
+            dispositionObs.setValueCoded(getMatchingAnswer(dispositionConcept.getAnswers(), dispositionCode));
+            dispositionObs.setObsDatetime(observationDateTime);
+            dispositionObs.setPerson(encounter.getPatient());
+            dispositionObs.setEncounter(encounter);
+        }
         return dispositionObs;
     }
 
