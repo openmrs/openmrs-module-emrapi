@@ -305,15 +305,6 @@
         </property>
     </bean>
 
-    <bean parent="serviceContext">
-        <property name="moduleService">
-            <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.bedmanagement.BedManagementService</value>
-                <ref local="bedManagementService"/>
-            </list>
-        </property>
-    </bean>
-
     <bean id="emrEncounterDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrEncounterDAO">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
