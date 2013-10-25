@@ -15,6 +15,7 @@ import org.openmrs.Visit;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 
@@ -33,18 +34,20 @@ import static org.mockito.Mockito.when;
 public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestHelper {
 
     private MarkPatientDeadDispositionAction action;
-    private EmrApiProperties emrApiProperties;
     private PatientService patientService;
+    private DispositionService dispositionService;
     private DispositionDescriptor dispositionDescriptor;
+    private EmrApiProperties emrApiProperties;
     private Concept dispositionObsGroupConcept = new Concept();
     private Concept dateOfDeathConcept = new Concept();
 
     @Before
     public void setUp() throws Exception {
-        emrApiProperties = mock(EmrApiProperties.class);
+        dispositionService = mock(DispositionService.class);
         dispositionDescriptor = mock(DispositionDescriptor.class);
+        emrApiProperties = mock(EmrApiProperties.class);
 
-        when(emrApiProperties.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
 
         patientService = mock(PatientService.class);
         when(patientService.savePatient(any(Patient.class))).thenAnswer(new Answer<Object>() {
@@ -57,6 +60,7 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
         action = new MarkPatientDeadDispositionAction();
         action.setEmrApiProperties(emrApiProperties);
         action.setPatientService(patientService);
+        action.setDispositionService(dispositionService);
     }
 
     @Test

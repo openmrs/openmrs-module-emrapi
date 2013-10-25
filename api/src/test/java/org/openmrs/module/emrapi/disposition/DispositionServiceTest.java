@@ -24,9 +24,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DispositionFactoryTest {
+public class DispositionServiceTest {
 
-    private DispositionFactory dispositionFactory;
+    private DispositionServiceImpl dispositionService;
 
     private ConceptService concertService;
 
@@ -43,12 +43,10 @@ public class DispositionFactoryTest {
         concertService = mock(ConceptService.class);
         emrApiProperties = mock(EmrApiProperties.class);
         MockMetadataTestUtil.setupMockConceptService(concertService, emrApiProperties);
-        MockMetadataTestUtil.setupDispositionDescriptor(emrApiProperties, concertService);
+        dispositionDescriptor = MockMetadataTestUtil.setupDispositionDescriptor(concertService);
 
-        dispositionFactory = new DispositionFactory();
-        dispositionFactory.setEmrConceptService(emrConceptService);
-        dispositionFactory.setConceptService(concertService);
-        dispositionFactory.setEmrApiProperties(emrApiProperties);
+        dispositionService = new DispositionServiceImpl(concertService, emrConceptService);
+        dispositionService.setDispositionDescriptor(dispositionDescriptor);
     }
 
     @Test
@@ -57,7 +55,7 @@ public class DispositionFactoryTest {
 
         Disposition homeDisposition = getHomeDisposition();
 
-        List<Disposition> dispositions = dispositionFactory.getDispositions();
+        List<Disposition> dispositions = dispositionService.getDispositions();
 
         assertEquals(dispositions.size(), 2);
 
@@ -69,7 +67,8 @@ public class DispositionFactoryTest {
 
     @Test
     public void shouldParseDispositionJsonFromSpecifiedConfig() throws IOException {
-        List<Disposition> dispositions = dispositionFactory.getDispositionsFrom("specifiedDispositionConfig.json");
+        dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
+        List<Disposition> dispositions = dispositionService.getDispositions();
 
         assertEquals(dispositions.size(), 3);
     }
@@ -84,7 +83,7 @@ public class DispositionFactoryTest {
 
         when(emrConceptService.getConcept("SNOMED CT:397709008")).thenReturn(deathDispositionConcept);
 
-        Disposition disposition = dispositionFactory.getDispositionFromObs(dispositionObs);
+        Disposition disposition = dispositionService.getDispositionFromObs(dispositionObs);
         assertThat(disposition, is(getDeathDisposition()));
     }
 
@@ -94,16 +93,16 @@ public class DispositionFactoryTest {
         Concept deathDispositionConcept = new Concept();
 
         Obs dispositionObs = new Obs();
-        dispositionObs.setConcept(emrApiProperties.getDispositionDescriptor().getDispositionConcept());
+        dispositionObs.setConcept(dispositionService.getDispositionDescriptor().getDispositionConcept());
         dispositionObs.setValueCoded(deathDispositionConcept);
 
         Obs dispositionObsGroup = new Obs();
-        dispositionObsGroup.setConcept(emrApiProperties.getDispositionDescriptor().getDispositionSetConcept());
+        dispositionObsGroup.setConcept(dispositionService.getDispositionDescriptor().getDispositionSetConcept());
         dispositionObsGroup.addGroupMember(dispositionObs);
 
         when(emrConceptService.getConcept("SNOMED CT:397709008")).thenReturn(deathDispositionConcept);
 
-        Disposition disposition = dispositionFactory.getDispositionFromObsGroup(dispositionObsGroup);
+        Disposition disposition = dispositionService.getDispositionFromObsGroup(dispositionObsGroup);
         assertThat(disposition, is(getDeathDisposition()));
     }
 
