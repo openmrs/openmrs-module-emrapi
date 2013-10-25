@@ -7,6 +7,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,15 @@ public class MarkPatientDeadDispositionAction implements DispositionAction {
     private PatientService patientService;
 
     @Autowired
+    private DispositionService dispositionService;
+
+    @Autowired
     private EmrApiProperties emrApiProperties;
 
     @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
 
-        Date deathDate = emrApiProperties.getDispositionDescriptor().getDateOfDeath(dispositionObsGroupBeingCreated);
+        Date deathDate = dispositionService.getDispositionDescriptor().getDateOfDeath(dispositionObsGroupBeingCreated);
 
         // TODO: support pulling cause of death from the disposition
         Concept causeOfDeath = emrApiProperties.getUnknownCauseOfDeathConcept();
@@ -48,6 +52,10 @@ public class MarkPatientDeadDispositionAction implements DispositionAction {
 
     public void setPatientService(PatientService patientService) {
         this.patientService = patientService;
+    }
+
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
     }
 
     public void setEmrApiProperties(EmrApiProperties emrApiProperties) {

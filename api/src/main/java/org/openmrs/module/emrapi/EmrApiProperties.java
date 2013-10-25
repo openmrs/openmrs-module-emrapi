@@ -29,7 +29,6 @@ import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
-import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.utils.ModuleProperties;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Component;
@@ -47,7 +46,7 @@ import java.util.List;
 @Component("emrApiProperties")
 public class EmrApiProperties extends ModuleProperties {
 
-	public Location getUnknownLocation() {
+    public Location getUnknownLocation() {
 		return getLocationByGlobalProperty(EmrApiConstants.GP_UNKNOWN_LOCATION);
 	}
 
@@ -164,10 +163,6 @@ public class EmrApiProperties extends ModuleProperties {
 
 	public DiagnosisMetadata getDiagnosisMetadata() {
 		return new DiagnosisMetadata(conceptService, getEmrApiConceptSource());
-	}
-
-	public DispositionDescriptor getDispositionDescriptor() {
-		return new DispositionDescriptor(conceptService);
 	}
 
 	public List<ConceptSource> getConceptSourcesForDiagnosisSearch() {

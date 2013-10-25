@@ -5,6 +5,15 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 
+/**
+ * Reflects a possible patient disposition such as "admit" or "discharge" that is generally collected on a consult note
+ * These dispositions are configurable via json; each disposition needs to be configured with the underlying concept
+ * that represents that disposition. Dispositions can also have additional observations that are associated with
+ * them (for instance, an "Admit" disposition may be configured to have an "Admit Location" obs associated with it).
+ * Certain actions can also be configured to happen automatically when a disposition is saved **but this currently
+ * only works in conjunction with the PIH EMR module, and may be going away in the future**
+ *
+ */
 public class Disposition {
 
     @JsonProperty

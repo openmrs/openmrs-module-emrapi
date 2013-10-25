@@ -11,6 +11,7 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 
 /**
@@ -24,7 +25,7 @@ public class ContextSensitiveMetadataTestUtils {
      * @param emrApiProperties
      * @return
      */
-    public static DispositionDescriptor setupDispositionDescriptor(ConceptService conceptService, EmrApiProperties emrApiProperties) {
+    public static DispositionDescriptor setupDispositionDescriptor(ConceptService conceptService, DispositionService dispositionService) {
         ConceptSource emrSource = new EmrApiActivator().createConceptSource(conceptService);
         ConceptMapType sameAs = conceptService.getConceptMapTypeByName("same-as");
 
@@ -79,7 +80,7 @@ public class ContextSensitiveMetadataTestUtils {
                 .addSetMembers(disposition, transferTo, admissionLocation, internalTransferLocation, dateOfDeath)
                 .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET).saveAndGet();
 
-        return emrApiProperties.getDispositionDescriptor();
+        return dispositionService.getDispositionDescriptor();
     }
 
     /**
