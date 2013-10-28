@@ -29,4 +29,6 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 public interface EmrEncounterService extends OpenmrsService {
 
     EncounterTransactionResponse save(EncounterTransaction encounterTransaction);
+
+    EncounterTransactionResponse find(String patientUuid, String encounterTypeUuid, String visitTypeUuid);
 }

@@ -14,6 +14,10 @@
 
 package org.openmrs.module.emrapi.web.controller;
 
+import org.openmrs.Patient;
+import org.openmrs.Visit;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.encounter.EmrEncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
@@ -23,7 +27,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/rest/emrapi/encounter")
@@ -37,4 +44,14 @@ public class EmrEncounterController extends BaseRestController {
     public EncounterTransactionResponse update(@RequestBody EncounterTransaction encounterTransaction) {
         return emrEncounterService.save(encounterTransaction);
     }
+
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public EncounterTransactionResponse get(@RequestParam String patientUuid, String encounterTypeUuid, String visitTypeUuid){
+        return emrEncounterService.find(patientUuid, encounterTypeUuid, visitTypeUuid);
+    }
+
 }
+
+
+
