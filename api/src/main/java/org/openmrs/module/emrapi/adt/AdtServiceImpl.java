@@ -152,7 +152,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             return false;
         }
 
-        if (new VisitDomainWrapper(visit, emrApiProperties).isAdmitted()) {
+        if (wrap(visit).isAdmitted()) {
             return true;
         }
 
@@ -215,7 +215,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         VisitDomainWrapper visitSummary = null;
         Visit activeVisit = getActiveVisitHelper(patient, location);
         if (activeVisit != null) {
-            visitSummary = new VisitDomainWrapper(activeVisit, emrApiProperties);
+            visitSummary = wrap(activeVisit);
         }
         return visitSummary;
     }
@@ -263,6 +263,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
         return visit;
     }
+
     private Date guessVisitStopDatetime(Visit visit) {
         if (visit.getEncounters() == null || visit.getEncounters().size() == 0) {
             return visit.getStartDatetime();
@@ -452,7 +453,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         List<VisitDomainWrapper> active = new ArrayList<VisitDomainWrapper>();
         for (Visit candidate : candidates) {
             if (itBelongsToARealPatient(candidate)) {
-                active.add(new VisitDomainWrapper(candidate, emrApiProperties));
+                active.add(wrap(candidate));
             }
         }
 
@@ -471,7 +472,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         List<VisitDomainWrapper> inpatientVisits = new ArrayList<VisitDomainWrapper>();
         for (Visit candidate : candidates) {
-            VisitDomainWrapper visitDomainWrapper = new VisitDomainWrapper(candidate, emrApiProperties);
+            VisitDomainWrapper visitDomainWrapper = wrap(candidate);
             if (itBelongsToARealPatient(candidate)
                     && visitDomainWrapper.isAdmitted()) {
                 if(ward!=null){
@@ -719,7 +720,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalArgumentException("Must provide a visit, location, and provider");
         }
 
-        VisitDomainWrapper visit = new VisitDomainWrapper(action.getVisit(), emrApiProperties);
+        VisitDomainWrapper visit = wrap(action.getVisit()) ;
 
         action.getType().checkVisitValid(visit);
 

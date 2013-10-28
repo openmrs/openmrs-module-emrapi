@@ -231,23 +231,6 @@
         </property>
     </bean>
 
-    <bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <bean class="org.openmrs.module.emrapi.visit.EmrVisitServiceImpl">
-                <constructor-arg  ref="emrApiProperties"/>
-            </bean>
-        </property>
-        <property name="preInterceptors">
-            <ref bean="serviceInterceptors"/>
-        </property>
-        <property name="transactionAttributeSource">
-            <ref bean="transactionAttributeSource"/>
-        </property>
-    </bean>
-
     <bean id="dispositionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -354,15 +337,6 @@
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.person.image.EmrPersonImageService</value>
                 <ref local="emrPersonImageService"/>
-            </list>
-        </property>
-    </bean>
-
-    <bean parent="serviceContext">
-        <property name="moduleService">
-            <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitService</value>
-                <ref local="emrVisitService"/>
             </list>
         </property>
     </bean>
