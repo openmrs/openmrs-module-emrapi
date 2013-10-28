@@ -26,11 +26,11 @@ import org.openmrs.Obs;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
@@ -53,7 +53,7 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
     private AdmitToSpecificLocationDispositionAction action;
     private AdtService adtService;
     private LocationService locationService;
-    private EmrApiProperties emrApiProperties;
+    private DispositionService dispositionService;
     private DispositionDescriptor dispositionDescriptor;
     private VisitDomainWrapper visitDomainWrapper;
     private Concept dispositionObsGroupConcept = new Concept();;
@@ -63,17 +63,17 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
     public void setUp() throws Exception {
         locationService = mock(LocationService.class);
         adtService = mock(AdtService.class);
-        emrApiProperties = mock(EmrApiProperties.class);
+        dispositionService = mock(DispositionService.class);
         dispositionDescriptor = mock(DispositionDescriptor.class);
         visitDomainWrapper = mock(VisitDomainWrapper.class);
 
-        when(emrApiProperties.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
         when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
 
         action = new AdmitToSpecificLocationDispositionAction();
         action.setLocationService(locationService);
         action.setAdtService(adtService);
-        action.setEmrApiProperties(emrApiProperties);
+        action.setDispositionService(dispositionService);
     }
 
     @Test

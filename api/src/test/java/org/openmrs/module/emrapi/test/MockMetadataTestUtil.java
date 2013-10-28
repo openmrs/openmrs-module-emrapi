@@ -54,7 +54,7 @@ public class MockMetadataTestUtil {
         return conceptDatatype;
     }
 
-    public static DispositionDescriptor setupDispositionDescriptor(EmrApiProperties emrApiProperties, ConceptService conceptService) {
+    public static DispositionDescriptor setupDispositionDescriptor(ConceptService conceptService) {
 
         ConceptDatatype naDatatype = conceptService.getConceptDatatypeByName("N/A");
         ConceptDatatype codedDatatype = conceptService.getConceptDatatypeByName("Coded");
@@ -90,7 +90,6 @@ public class MockMetadataTestUtil {
         dispositionDescriptor.setInternalTransferLocationConcept(internalTransferLocation);
         dispositionDescriptor.setDateOfDeathConcept(dateOfDeath);
 
-        when(emrApiProperties.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
         return dispositionDescriptor;
     }
 
