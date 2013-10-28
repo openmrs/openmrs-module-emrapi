@@ -275,8 +275,11 @@ public class EmrApiProperties extends ModuleProperties {
 
     public File getPersonImageDirectory() {
         String personImagesDir = getGlobalProperty(EmrApiConstants.GP_PERSON_IMAGES_DIRECTORY, false);
-        if (personImagesDir == null || personImagesDir.isEmpty())
-            personImagesDir = OpenmrsUtil.getApplicationDataDirectory() + "person_images";
+        if (personImagesDir == null || personImagesDir.isEmpty()) {
+            File appDataDirectory = new File(OpenmrsUtil.getApplicationDataDirectory());
+            personImagesDir =  appDataDirectory.getAbsolutePath() + "/person_images";
+        }
+        
         return new File(personImagesDir);
     }
 }
