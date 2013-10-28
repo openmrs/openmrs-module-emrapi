@@ -97,14 +97,16 @@ public class EncounterDispositionServiceHelper {
     }
 
     private Obs updateObsFromObservation(EncounterTransaction.Observation observation, Obs obs,Date observationDateTime) throws ParseException {
-        obs.setConcept(getConceptByUuid(observation.getConceptUuid()));
-        obs.setValueAsString((String) observation.getValue());
-        if(observation.isVoided()){
-            obs.setVoided(observation.isVoided());
-            obs.setVoidReason(observation.getVoidReason());
+        if(observation != null && obs != null) {
+            obs.setConcept(getConceptByUuid(observation.getConceptUuid()));
+            obs.setValueAsString((String) observation.getValue());
+            if(observation.isVoided()){
+                obs.setVoided(observation.isVoided());
+                obs.setVoidReason(observation.getVoidReason());
+            }
+            obs.setComment(observation.getComment());
+            obs.setObsDatetime(observationDateTime);
         }
-        obs.setComment(observation.getComment());
-        obs.setObsDatetime(observationDateTime);
         return obs;
     }
 
