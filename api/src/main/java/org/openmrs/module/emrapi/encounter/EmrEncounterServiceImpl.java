@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import org.openmrs.Concept;
+import org.openmrs.ConceptDatatype;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -20,6 +22,7 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
+import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
@@ -100,24 +103,61 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         return new EncounterTransactionResponse(visit.getUuid(), encounter.getUuid());
     }
 
+    @Override
+    public EncounterTransactionResponse find(String patientUuid, String encounterTypeUuid, String visitTypeUuid) {
+        Patient patient = patientService.getPatientByUuid(patientUuid);
+        EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTypeUuid);
+
+        EncounterParameters encounterParameters = EncounterParameters.instance().
+                            setPatient(patient).setEncounterType(encounterType);
+
+        Visit visit = getActiveVisit(patient);
+
+        if (visit == null) {
+            EncounterTransactionResponse encounterTransactionResponse = new EncounterTransactionResponse();
+            encounterTransactionResponse.setObservations(Collections.EMPTY_LIST);
+            return encounterTransactionResponse;
+        }
+
+        Encounter encounter = findEncounter(visit, encounterParameters);
+
+        EncounterTransactionResponse encounterTransactionResponse =
+                new EncounterTransactionResponse(encounter.getVisit().getUuid(), encounter.getUuid());
+
+        encounterTransactionResponse.setObservations(getObservationData(encounter));
+
+        return encounterTransactionResponse;
+    }
+
+    private List<ObservationData> getObservationData(Encounter encounter) {
+        List<ObservationData> observations = new ArrayList<ObservationData>();
+        for (Obs obs : encounter.getAllObs()) {
+            Concept concept = obs.getConcept();
+            ConceptDatatype datatype = concept.getDatatype();
+            Object value = datatype.isNumeric() ? obs.getValueNumeric() : obs.getValueAsString(Locale.getDefault());
+            observations.add(new ObservationData(concept.getUuid(), concept.getName().getName(), value));
+        }
+        return observations;
+    }
+
+    private Visit getActiveVisit(Patient patient) {
+        List<Visit> activeVisitsByPatient = visitService.getActiveVisitsByPatient(patient);
+        return activeVisitsByPatient != null && !activeVisitsByPatient.isEmpty() ? activeVisitsByPatient.get(0) : null;
+    }
+
     private Encounter findOrCreateEncounter(EncounterTransaction encounterTransaction, Patient patient, Visit visit) {
+
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTransaction.getEncounterTypeUuid());
         Location location = locationService.getLocationByUuid(encounterTransaction.getLocationUuid());
-
         Date encounterDateTime = encounterTransaction.getEncounterDateTime();
         Set<Provider> providers = getProviders(encounterTransaction.getProviderUuids());
 
         EncounterParameters encounterParameters = EncounterParameters.instance()
-                                                    .setLocation(location).setEncounterType(encounterType)
-                                                    .setProviders(providers).setEncounterDateTime(encounterDateTime)
-                                                    .setPatient(patient);
+                .setLocation(location).setEncounterType(encounterType)
+                .setProviders(providers).setEncounterDateTime(encounterTransaction.getEncounterDateTime())
+                .setPatient(patient);
 
-        String matcherClass = administrationService.getGlobalProperty("emr.encounterMatcher");
-        BaseEncounterMatcher encounterMatcher = isNotEmpty(matcherClass)? encounterMatcherMap.get(matcherClass) : new DefaultEncounterMatcher();
-        if (encounterMatcher == null) {
-            throw new EncounterMatcherNotFoundException();
-        }
-        Encounter encounter = encounterMatcher.findEncounter(visit, encounterParameters);
+        Encounter encounter = findEncounter(visit, encounterParameters);
 
         if (encounter == null) {
             encounter = new Encounter();
@@ -129,6 +169,16 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             visit.addEncounter(encounter);
         }
         return encounter;
+    }
+
+    private Encounter findEncounter(Visit visit, EncounterParameters encounterParameters) {
+
+        String matcherClass = administrationService.getGlobalProperty("emr.encounterMatcher");
+        BaseEncounterMatcher encounterMatcher = isNotEmpty(matcherClass)? encounterMatcherMap.get(matcherClass) : new DefaultEncounterMatcher();
+        if (encounterMatcher == null) {
+            throw new EncounterMatcherNotFoundException();
+        }
+        return encounterMatcher.findEncounter(visit, encounterParameters);
     }
 
     private Set<Provider> getProviders(Set<String> providerUuids) {
@@ -147,10 +197,10 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     private Visit findOrCreateVisit(EncounterTransaction encounterTransaction, Patient patient) {
-        List<Visit> activeVisitsByPatient = visitService.getActiveVisitsByPatient(patient);
+        Visit activeVisit = getActiveVisit(patient);
 
-        if (!activeVisitsByPatient.isEmpty()) {
-            return activeVisitsByPatient.get(0);
+        if (activeVisit != null){
+            return activeVisit;
         }
 
         Visit visit = new Visit();

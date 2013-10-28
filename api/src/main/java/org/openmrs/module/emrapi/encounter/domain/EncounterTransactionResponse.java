@@ -13,12 +13,17 @@
  */
 package org.openmrs.module.emrapi.encounter.domain;
 
+import org.openmrs.module.emrapi.encounter.ObservationData;
+
+import java.util.List;
+
 public class EncounterTransactionResponse {
 
     private String visitUuid;
     private String encounterUuid;
     private String status;
     private String errorMessage;
+    private List<ObservationData> observations;
 
     public EncounterTransactionResponse() {
     }
@@ -59,4 +64,14 @@ public class EncounterTransactionResponse {
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
+
+    public void setObservations(List<ObservationData> observations) {
+        this.observations = observations;
+    }
+
+    public List<ObservationData> getObservations() {
+        return observations;
+    }
+
+
 }
