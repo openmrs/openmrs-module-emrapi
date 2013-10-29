@@ -53,7 +53,7 @@ public class DispositionServiceTest {
     public void shouldParseDispositionJsonFromDefaultConfig() throws IOException {
         Disposition deathDisposition = getDeathDisposition();
 
-        Disposition homeDisposition = getHomeDisposition();
+        Disposition homeDisposition = getAdmitDisposition();
 
         List<Disposition> dispositions = dispositionService.getDispositions();
 
@@ -81,7 +81,7 @@ public class DispositionServiceTest {
         Obs dispositionObs = new Obs();
         dispositionObs.setValueCoded(deathDispositionConcept);
 
-        when(emrConceptService.getConcept("SNOMED CT:397709008")).thenReturn(deathDispositionConcept);
+        when(emrConceptService.getConcept("org.openmrs.module.emrapi: Death")).thenReturn(deathDispositionConcept);
 
         Disposition disposition = dispositionService.getDispositionFromObs(dispositionObs);
         assertThat(disposition, is(getDeathDisposition()));
@@ -100,18 +100,18 @@ public class DispositionServiceTest {
         dispositionObsGroup.setConcept(dispositionService.getDispositionDescriptor().getDispositionSetConcept());
         dispositionObsGroup.addGroupMember(dispositionObs);
 
-        when(emrConceptService.getConcept("SNOMED CT:397709008")).thenReturn(deathDispositionConcept);
+        when(emrConceptService.getConcept("org.openmrs.module.emrapi: Death")).thenReturn(deathDispositionConcept);
 
         Disposition disposition = dispositionService.getDispositionFromObsGroup(dispositionObsGroup);
         assertThat(disposition, is(getDeathDisposition()));
     }
 
-    private Disposition getHomeDisposition() {
-        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.home", "SNOMED CT:3780001", Collections.<String>emptyList(), Collections.<DispositionObs>emptyList());
+    private Disposition getAdmitDisposition() {
+        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.admit", "org.openmrs.module.emrapi: Admit to hospital", Collections.<String>emptyList(), Collections.<DispositionObs>emptyList());
     }
 
     private Disposition getDeathDisposition() {
-        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "SNOMED CT:397709008", getActions(), getAdditionalObs());
+        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "org.openmrs.module.emrapi: Death", getActions(), getAdditionalObs());
     }
 
     private List<String> getActions() {

@@ -47,6 +47,7 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -101,6 +102,7 @@ public class AdtServiceTest {
     EncounterService mockEncounterService;
     ProviderService mockProviderService;
     PatientService mockPatientService;
+    DispositionService mockDispositionService;
     EmrApiProperties emrApiProperties;
 
     private Person personForCurrentUser;
@@ -141,6 +143,7 @@ public class AdtServiceTest {
         mockVisitService = mock(VisitService.class);
         mockEncounterService = mock(EncounterService.class);
         mockPatientService = mock(PatientService.class);
+        mockDispositionService = mock(DispositionService.class);
 
         checkInClerkEncounterRole = new EncounterRole();
         checkInEncounterType = new EncounterType();
@@ -194,6 +197,7 @@ public class AdtServiceTest {
         service.setEncounterService(mockEncounterService);
         service.setProviderService(mockProviderService);
         service.setEmrApiProperties(emrApiProperties);
+        service.setDispositionService(mockDispositionService);
         this.service = service;
     }
 
@@ -502,7 +506,7 @@ public class AdtServiceTest {
     }
 
     @Test
-    public void shouldCloseInactiveVisitWithLastEncounterDate() {
+    public void shouldCloseInactiveVisitWithLastEncounterDateAfterVisitExpireTime() {
         Visit visit = new Visit();
         visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
 
@@ -610,6 +614,7 @@ public class AdtServiceTest {
         assertNotNull(old1.getStopDatetime());
         assertNotNull(old2.getStopDatetime());
     }
+
 
     @Test
     public void testOverlappingVisits() throws Exception {

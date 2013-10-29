@@ -25,6 +25,9 @@ public class Disposition {
     @JsonProperty
     private String conceptCode;
 
+    @JsonProperty
+    private Boolean keepsVisitOpen;   // if this is the most recent disposition in a visit, visit will not be automatically closed (see closeInactiveVisits and shouldBeClosed methods in AdtService)
+
     /**
      * These should be the names of existing Spring beans
      */
@@ -93,6 +96,14 @@ public class Disposition {
 
     public void setConceptCode(String conceptCode) {
         this.conceptCode = conceptCode;
+    }
+
+    public Boolean getKeepsVisitOpen() {
+        return keepsVisitOpen;
+    }
+
+    public void setKeepsVisitOpen(Boolean keepsVisitOpen) {
+        this.keepsVisitOpen = keepsVisitOpen;
     }
 
     public List<DispositionObs> getAdditionalObs() {

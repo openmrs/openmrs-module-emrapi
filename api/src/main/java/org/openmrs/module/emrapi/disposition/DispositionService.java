@@ -29,7 +29,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
-    List<Disposition> getDispositions() throws IOException;
+    List<Disposition> getDispositions();
 
     /**
      * Fetches a disposition referenced by it's unique id
@@ -38,7 +38,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
-    Disposition getDispositionByUniqueId(String uniqueId) throws IOException;
+    Disposition getDispositionByUniqueId(String uniqueId);
 
 
     /**
@@ -48,7 +48,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
-    Disposition getDispositionFromObs(Obs obs) throws IOException;
+    Disposition getDispositionFromObs(Obs obs);
 
 
     /**
@@ -58,6 +58,6 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
-    Disposition getDispositionFromObsGroup(Obs obsGroup) throws IOException;
+    Disposition getDispositionFromObsGroup(Obs obsGroup);
 
 }

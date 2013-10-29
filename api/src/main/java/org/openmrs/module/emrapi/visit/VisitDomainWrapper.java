@@ -26,6 +26,9 @@ import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 
@@ -48,6 +51,8 @@ public class VisitDomainWrapper {
 
     private EmrApiProperties emrApiProperties;
 
+    private DispositionService dispositionService;
+
     private Visit visit;
 
     @Deprecated
@@ -55,10 +60,18 @@ public class VisitDomainWrapper {
         this.visit = visit;
     }
 
+    @Deprecated
     public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties) {
-        this(visit);
+        this.visit = visit;
         this.emrApiProperties = emrApiProperties;
     }
+
+    public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties, DispositionService dispositionService) {
+        this.visit = visit;
+        this.emrApiProperties = emrApiProperties;
+        this.dispositionService = dispositionService;
+    }
+
 
     /**
      * @return the visit
@@ -143,23 +156,21 @@ public class VisitDomainWrapper {
 
     // note that the disposition must be on the top level for this to pick it up
     // (seemed like this made sense to do for performance reasons)
-   /** public Disposition getMostRecentDisposition() {
+    // also, if encounter has multiple disposition (is this possible?) it just returns the first one it finds
+    public Disposition getMostRecentDisposition() {
 
-        DispositionDescriptor dispositionDescriptor = new DispositionDescriptor(conceptService);
+        DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
 
         for (Encounter encounter : getSortedEncounters()) {
-
-            for (Obs obs : encounter.getObsAtTopLevel(false))
-
-            if (dispositionDescriptor.isDisposition(obs)) {
-               // return dispositionDescriptor.ge
+            for (Obs obs : encounter.getObsAtTopLevel(false)) {
+                if (dispositionDescriptor.isDisposition(obs)) {
+                    return dispositionService.getDispositionFromObsGroup(obs);
+                }
             }
-
         }
 
         return null;
-
-    } **/
+    }
 
     public List<Diagnosis> getPrimaryDiagnoses() {
         List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();

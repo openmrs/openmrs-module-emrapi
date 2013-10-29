@@ -42,6 +42,8 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
@@ -86,6 +88,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
 	private DiagnosisService diagnosisService;
 
+    private DispositionService dispositionService;
+
     @Autowired(required = false)
     private List<PatientMergeAction> patientMergeActions;
 
@@ -126,7 +130,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 		this.diagnosisService = diagnosisService;
 	}
 
-	public void setPatientMergeActions(List<PatientMergeAction> patientMergeActions) {
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
+    }
+
+    public void setPatientMergeActions(List<PatientMergeAction> patientMergeActions) {
         this.patientMergeActions = patientMergeActions;
     }
 
@@ -135,7 +143,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     public void closeInactiveVisits() {
         List<Visit> openVisits = visitService.getVisits(null, null, null, null, null, null, null, null, null, false, false);
         for (Visit visit : openVisits) {
-            if (!shouldBeClosed(visit)) {
+            if (shouldBeClosed(visit)) {
                 try {
                     closeAndSaveVisit(visit);
                 } catch (Exception ex) {
@@ -148,30 +156,38 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
 
     private boolean shouldBeClosed(Visit visit) {
+
         if (visit.getStopDatetime() != null) {
-            return false;
+            return false;  // already closed
         }
 
-        if (wrap(visit).isAdmitted()) {
-            return true;
+        VisitDomainWrapper visitDomainWrapper = wrap(visit);
+
+        if (visitDomainWrapper.isAdmitted()) {
+            return false;  // don't close the visit if patient is admitted
+        }
+
+        Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();
+        if (mostRecentDisposition != null && mostRecentDisposition.getKeepsVisitOpen() != null && mostRecentDisposition.getKeepsVisitOpen()) {
+            return false; // don't close the visit if the most recent disposition is one that keeps visit opens
         }
 
         Date now = new Date();
         Date mustHaveSomethingAfter = DateUtils.addHours(now, -emrApiProperties.getVisitExpireHours());
 
         if (OpenmrsUtil.compare(visit.getStartDatetime(), mustHaveSomethingAfter) >= 0) {
-            return true;
+            return false;
         }
 
         if (visit.getEncounters() != null) {
             for (Encounter candidate : visit.getEncounters()) {
                 if (OpenmrsUtil.compare(candidate.getEncounterDatetime(), mustHaveSomethingAfter) >= 0) {
-                    return true;
+                    return false;
                 }
             }
         }
 
-        return false;
+        return true;
     }
 
     @Override
@@ -740,7 +756,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     public VisitDomainWrapper wrap(Visit visit) {
-        return new VisitDomainWrapper(visit, emrApiProperties);
+        return new VisitDomainWrapper(visit, emrApiProperties, dispositionService);
     }
 
     @Override

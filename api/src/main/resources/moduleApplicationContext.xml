@@ -78,6 +78,7 @@
                 <property name="providerService" ref="providerService"/>
                 <property name="patientService" ref="patientService"/>
 				<property name="diagnosisService" ref="diagnosisService"/>
+                <property name="dispositionService" ref="dispositionService"/>
             </bean>
         </property>
         <property name="preInterceptors">

@@ -47,6 +47,12 @@ public class ContextSensitiveMetadataTestUtils {
                 .addMapping(sameAs, emrSource, "Discharged")    // not a real code, just for testing
                 .saveAndGet();
 
+        Concept death = new ConceptBuilder(conceptService, naDatatype, misc)
+                .addName("Death")
+                .addMapping(sameAs, emrSource, "Death")    // not a real code, just for testing
+                .saveAndGet();
+
+
         Concept transferOut = new ConceptBuilder(conceptService, naDatatype, misc)
                 .addName("Transfer out of hospital")
                 .addMapping(sameAs, emrSource, "Transfer out of hospital")    // not a real code, just for testing

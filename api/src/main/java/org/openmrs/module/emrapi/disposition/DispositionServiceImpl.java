@@ -42,13 +42,13 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
     }
 
     @Override
-    public List<Disposition> getDispositions() throws IOException {
+    public List<Disposition> getDispositions() {
         return getDispositionsFrom(dispositionConfig);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Disposition getDispositionByUniqueId(String uniqueId) throws IOException {
+    public Disposition getDispositionByUniqueId(String uniqueId) {
         for (Disposition candidate : getDispositions()) {
             if (candidate.getUuid().equals(uniqueId)) {
                 return candidate;
@@ -59,7 +59,7 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     @Override
     @Transactional(readOnly = true)
-    public Disposition getDispositionFromObs(Obs obs) throws IOException {
+    public Disposition getDispositionFromObs(Obs obs)  {
         for (Disposition candidate : getDispositions()) {
             if (emrConceptService.getConcept(candidate.getConceptCode()).equals(obs.getValueCoded())) {
                 return candidate;
@@ -70,7 +70,7 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     @Override
     @Transactional(readOnly = true)
-    public Disposition getDispositionFromObsGroup(Obs obsGroup) throws IOException {
+    public Disposition getDispositionFromObsGroup(Obs obsGroup)  {
         Obs dispositionObs = getDispositionDescriptor().getDispositionObs(obsGroup);
 
         if (dispositionObs != null) {
@@ -84,12 +84,19 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
         this.dispositionConfig = dispositionConfig;
     }
 
-    private List<Disposition> getDispositionsFrom(String configFile) throws IOException {
-        Resource[] dispositionDefinitions = resourceResolver.getResources("classpath*:/" + configFile);
-        for (Resource dispositionDefinition : dispositionDefinitions) {
-            return objectMapper.readValue(dispositionDefinition.getInputStream(), new TypeReference<List<Disposition>>() {});
+    private List<Disposition> getDispositionsFrom(String configFile)  {
+
+        try {
+            Resource[] dispositionDefinitions = resourceResolver.getResources("classpath*:/" + configFile);
+            for (Resource dispositionDefinition : dispositionDefinitions) {
+                return objectMapper.readValue(dispositionDefinition.getInputStream(), new TypeReference<List<Disposition>>() {});
+            }
+            return null;
         }
-        return null;
+        catch (IOException e) {
+            throw new RuntimeException ("Unable to read disposition file " + configFile, e);
+        }
+
     }
 
     protected void setDispositionDescriptor(DispositionDescriptor dispositionDescriptor) {

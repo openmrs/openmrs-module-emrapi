@@ -6,11 +6,17 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
+import org.openmrs.Obs;
 import org.openmrs.Visit;
+import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -33,6 +39,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 import static uk.co.it.modular.hamcrest.date.DateMatchers.within;
 
 @PrepareForTest(Calendar.class)
@@ -41,11 +48,16 @@ public class VisitDomainWrapperTest {
 
     private VisitDomainWrapper visitDomainWrapper;
     private Visit visit;
+    private EmrApiProperties emrApiProperties;
+    private DispositionService dispositionService;
+
 
     @Before
     public void setUp(){
         visit = mock(Visit.class);
-        visitDomainWrapper = new VisitDomainWrapper(visit);
+        emrApiProperties = mock(EmrApiProperties.class);
+        dispositionService = mock(DispositionService.class);
+        visitDomainWrapper = new VisitDomainWrapper(visit, emrApiProperties, dispositionService);
     }
 
     // this test was merged in when VisitSummary was merged into VisitDomainWrapper
@@ -525,6 +537,49 @@ public class VisitDomainWrapperTest {
         visit.setStartDatetime(startDate);
 
         new VisitDomainWrapper(visit).closeOnLastEncounterDatetime();
+    }
+
+    @Test
+    public void shouldReturnDispositionFromObs() throws Exception {
+
+        ConceptService conceptService = mock(ConceptService.class);
+        MockMetadataTestUtil.setupMockConceptService(conceptService, emrApiProperties);
+
+        DispositionDescriptor dispositionDescriptor = MockMetadataTestUtil.setupDispositionDescriptor(conceptService);
+        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+
+        Encounter mostRecentEncounter = new Encounter();
+        mostRecentEncounter.setEncounterDatetime(new DateTime(2012,12,12,12,12).toDate());
+
+        Encounter secondMostRecentEncounter = new Encounter();
+        secondMostRecentEncounter.setEncounterDatetime(new DateTime(2012,11,11,11,11).toDate());
+
+        Encounter thirdMostRecentEncounter = new Encounter();
+        thirdMostRecentEncounter.setEncounterDatetime(new DateTime(2012, 10, 10, 10,10).toDate());
+
+        Obs mostRecentDispositionGroup = new Obs();
+        mostRecentDispositionGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        Obs mostRecentOtherObsGroup = new Obs();
+        mostRecentOtherObsGroup.setConcept(new Concept());
+        mostRecentEncounter.addObs(mostRecentDispositionGroup);
+        mostRecentEncounter.addObs(mostRecentOtherObsGroup);
+
+        Obs secondMostRecentDispositionGroup = new Obs();
+        secondMostRecentDispositionGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        secondMostRecentEncounter.addObs(secondMostRecentDispositionGroup);
+
+        Obs thirdMostRecentDispositionObsGroup = new Obs();
+        thirdMostRecentDispositionObsGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        thirdMostRecentEncounter.addObs(thirdMostRecentDispositionObsGroup);
+
+        Set<Encounter> encounters = new HashSet<Encounter>();
+        encounters.add(secondMostRecentEncounter);
+        encounters.add(mostRecentEncounter);
+        encounters.add(thirdMostRecentEncounter);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        visitDomainWrapper.getMostRecentDisposition();
+        verify(dispositionService).getDispositionFromObsGroup(mostRecentDispositionGroup);
     }
 
 }
