@@ -33,7 +33,7 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
     @Override
     public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
         DelegatingResourceDescription description = new DelegatingResourceDescription();
-        description.addProperty("patient", Representation.DEFAULT);
+        description.addProperty("patient", Representation.FULL);
         description.addProperty("image");
         return description;
     }
@@ -62,7 +62,7 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
 
         setConvertedProperties(delegate, propertiesToCreate, getCreatableProperties(), true);
         delegate = save(delegate);
-        return ConversionUtil.convertToRepresentation(delegate, Representation.DEFAULT);
+        return ConversionUtil.convertToRepresentation(delegate, Representation.FULL);
 
     }
 
