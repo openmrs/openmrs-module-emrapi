@@ -123,7 +123,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                         "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                         "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                         "\"observations\":[" +
-                            "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"value\":20 }, " +
+                            "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"conceptName\":\"Should be Ignored\", \"value\":20 }, " +
                             "{\"conceptUuid\":\"e102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"value\":\"text value\", \"comment\":\"overweight\"}]}";
 
         EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);

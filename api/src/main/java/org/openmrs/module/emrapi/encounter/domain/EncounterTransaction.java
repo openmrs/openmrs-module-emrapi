@@ -13,11 +13,14 @@
  */
 package org.openmrs.module.emrapi.encounter.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EncounterTransaction {
     private String locationUuid;
     private Set<String> providerUuid;
@@ -127,6 +130,7 @@ public class EncounterTransaction {
         this.diagnoses = diagnoses;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observation {
         private String observationUuid;
         private String conceptUuid;     // TODO: mandatory validation
@@ -190,6 +194,7 @@ public class EncounterTransaction {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Disposition{
         private String code;
         private String existingObs;
@@ -259,6 +264,7 @@ public class EncounterTransaction {
     }
 
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TestOrder {
         private String conceptUuid;     // TODO: mandatory validation
         private String orderTypeUuid;
@@ -322,6 +328,7 @@ public class EncounterTransaction {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Diagnosis {
         private String order;
         private String certainty;
@@ -365,6 +372,7 @@ public class EncounterTransaction {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DrugOrder {
         private String uuid;
         private String conceptUuid;
