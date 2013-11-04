@@ -96,8 +96,6 @@ public class EncounterObservationServiceHelperTest {
     }
 
 
-
-
     @Test
     public void shouldUpdateExistingObservation() throws ParseException {
         Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
@@ -123,6 +121,28 @@ public class EncounterObservationServiceHelperTest {
         assertEquals("overweight", textObservation.getComment());
 
         assertEquals(observationDateTime, textObservation.getObsDatetime());
+    }
+
+    @Test
+    public void shouldHandleNullValueObservationWhileSaving() throws Exception {
+        newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
+
+        List<EncounterTransaction.Observation> observations = asList(
+                new EncounterTransaction.Observation().setConceptUuid(TEXT_CONCEPT_UUID).setValue(null).setComment("overweight")
+        );
+
+        Patient patient = new Patient();
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        encounter.setPatient(patient);
+
+        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+
+        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+
+        assertEquals(1, encounter.getObs().size());
+        Obs textObservation = encounter.getObs().iterator().next();
+        assertEquals(null, textObservation.getValueText());
     }
 
     @Test

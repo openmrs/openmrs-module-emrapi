@@ -76,7 +76,9 @@ public class EncounterObservationServiceHelper {
             encounter.addObs(observation);
         }
         observation.setComment(observationData.getComment());
-        observation.setValueAsString(observationData.getValue().toString());
+        if(observationData.getValue() != null) {
+            observation.setValueAsString(observationData.getValue().toString());
+        }
         observation.setObsDatetime(observationDateTime);
     }
 
