@@ -3,17 +3,17 @@ package org.openmrs.module.emrapi.encounter;
 public class ObservationData{
 
     private final String conceptName;
-    private final String conceptUUID;
+    private final String conceptUuid;
     private final Object value;
 
-    public ObservationData(String conceptUUID, String name, Object value) {
-        this.conceptUUID = conceptUUID;
+    public ObservationData(String conceptUuid, String name, Object value) {
+        this.conceptUuid = conceptUuid;
         this.conceptName = name;
         this.value = value;
     }
 
-    public String getConceptUUID() {
-        return conceptUUID;
+    public String getConceptUuid() {
+        return conceptUuid;
     }
 
     public String getConceptName() {
