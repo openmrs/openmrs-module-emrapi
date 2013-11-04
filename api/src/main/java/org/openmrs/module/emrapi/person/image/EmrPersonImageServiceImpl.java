@@ -39,6 +39,9 @@ public class EmrPersonImageServiceImpl extends BaseOpenmrsService implements Emr
     public PersonImage savePersonImage(PersonImage personImage) {
         Person person = personImage.getPerson();
         String base64EncodedImage = personImage.getBase64EncodedImage();
+
+        if (base64EncodedImage == null || base64EncodedImage.isEmpty()) return personImage;
+
         try {
             File imageFile = new File(String.format("%s/%s.%s", emrApiProperties.getPersonImageDirectory().getAbsolutePath(), person.getUuid(), imageFormat));
 
