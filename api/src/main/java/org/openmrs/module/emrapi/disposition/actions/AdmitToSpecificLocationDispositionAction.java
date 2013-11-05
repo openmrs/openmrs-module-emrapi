@@ -19,11 +19,11 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -61,7 +61,12 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
      */
     @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
-        if (adtService.wrap(encounterDomainWrapper.getVisit()).isAdmitted(encounterDomainWrapper.getEncounterDatetime())) {
+
+        VisitDomainWrapper visitDomainWrapper = adtService.wrap(encounterDomainWrapper.getVisit());
+
+        // TODO note that we really want to only test if the patient is admitted at the encounter datetime; we also test against visitDomainWrapper.isAdmitted()
+        // TODO for now because the "createAdtEncounterFor" method will throw an exception if isAdmitted() returns true; see https://minglehosting.thoughtworks.com/unicef/projects/pih_mirebalais/cards/938
+        if (visitDomainWrapper.isAdmitted(encounterDomainWrapper.getEncounterDatetime()) || visitDomainWrapper.isAdmitted()) {
             // consider doing a transfer-within-hospital here
             return;
         }

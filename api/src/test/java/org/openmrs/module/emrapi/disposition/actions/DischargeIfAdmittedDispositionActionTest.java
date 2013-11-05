@@ -72,7 +72,10 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
         final Obs dispositionObsGroup = new Obs();
         dispositionObsGroup.setConcept(dispositionObsGroupConcept);
 
-        when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(true);
+        // TODO note that we really want to only test if the patient is admitted at the encounter datetime, but we have to test against visitDomainWrapper.isAdmitted()
+        // TODO for now because the "createAdtEncounterFor" method will throw an exception if isAdmitted() returns false; see https://minglehosting.thoughtworks.com/unicef/projects/pih_mirebalais/cards/938
+        when(visitDomainWrapper.isAdmitted()).thenReturn(true);
+        //when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(true);
 
         action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
         verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
