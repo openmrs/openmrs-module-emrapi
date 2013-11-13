@@ -42,6 +42,8 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
@@ -53,7 +55,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -86,6 +87,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     private LocationService locationService;
 
 	private DiagnosisService diagnosisService;
+
+    private DispositionService dispositionService;
 
     @Autowired(required = false)
     private List<PatientMergeAction> patientMergeActions;
@@ -127,43 +130,20 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 		this.diagnosisService = diagnosisService;
 	}
 
-	public void setPatientMergeActions(List<PatientMergeAction> patientMergeActions) {
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
+    }
+
+    public void setPatientMergeActions(List<PatientMergeAction> patientMergeActions) {
         this.patientMergeActions = patientMergeActions;
     }
 
-    @Override
-    public boolean isActive(Visit visit) {
-        if (visit.getStopDatetime() != null) {
-            return false;
-        }
-
-        if (new VisitDomainWrapper(visit, emrApiProperties).isAdmitted()) {
-            return true;
-        }
-
-        Date now = new Date();
-        Date mustHaveSomethingAfter = DateUtils.addHours(now, -emrApiProperties.getVisitExpireHours());
-
-        if (OpenmrsUtil.compare(visit.getStartDatetime(), mustHaveSomethingAfter) >= 0) {
-            return true;
-        }
-
-        if (visit.getEncounters() != null) {
-            for (Encounter candidate : visit.getEncounters()) {
-                if (OpenmrsUtil.compare(candidate.getEncounterDatetime(), mustHaveSomethingAfter) >= 0) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
 
     @Override
     public void closeInactiveVisits() {
         List<Visit> openVisits = visitService.getVisits(null, null, null, null, null, null, null, null, null, false, false);
         for (Visit visit : openVisits) {
-            if (!isActive(visit)) {
+            if (shouldBeClosed(visit)) {
                 try {
                     closeAndSaveVisit(visit);
                 } catch (Exception ex) {
@@ -172,6 +152,42 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
         }
 
+    }
+
+
+    private boolean shouldBeClosed(Visit visit) {
+
+        if (visit.getStopDatetime() != null) {
+            return false;  // already closed
+        }
+
+        VisitDomainWrapper visitDomainWrapper = wrap(visit);
+
+        if (visitDomainWrapper.isAdmitted()) {
+            return false;  // don't close the visit if patient is admitted
+        }
+
+        Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();
+        if (mostRecentDisposition != null && mostRecentDisposition.getKeepsVisitOpen() != null && mostRecentDisposition.getKeepsVisitOpen()) {
+            return false; // don't close the visit if the most recent disposition is one that keeps visit opens
+        }
+
+        Date now = new Date();
+        Date mustHaveSomethingAfter = DateUtils.addHours(now, -emrApiProperties.getVisitExpireHours());
+
+        if (OpenmrsUtil.compare(visit.getStartDatetime(), mustHaveSomethingAfter) >= 0) {
+            return false;
+        }
+
+        if (visit.getEncounters() != null) {
+            for (Encounter candidate : visit.getEncounters()) {
+                if (OpenmrsUtil.compare(candidate.getEncounterDatetime(), mustHaveSomethingAfter) >= 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -201,12 +217,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         List<Visit> candidates = visitService.getVisitsByPatient(patient);
         Visit ret = null;
         for (Visit candidate : candidates) {
-            if (!isActive(candidate)) {
-                if (candidate.getStopDatetime() == null) {
-                    closeAndSaveVisit(candidate);
-                }
-                continue;
-            }
             if (isSuitableVisit(candidate, department, now)) {
                 ret = candidate;
             }
@@ -221,7 +231,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         VisitDomainWrapper visitSummary = null;
         Visit activeVisit = getActiveVisitHelper(patient, location);
         if (activeVisit != null) {
-            visitSummary = new VisitDomainWrapper(activeVisit, emrApiProperties);
+            visitSummary = wrap(activeVisit);
         }
         return visitSummary;
     }
@@ -269,6 +279,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
         return visit;
     }
+
     private Date guessVisitStopDatetime(Visit visit) {
         if (visit.getEncounters() == null || visit.getEncounters().size() == 0) {
             return visit.getStartDatetime();
@@ -457,8 +468,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         List<VisitDomainWrapper> active = new ArrayList<VisitDomainWrapper>();
         for (Visit candidate : candidates) {
-            if (isActive(candidate) && itBelongsToARealPatient(candidate)) {
-                active.add(new VisitDomainWrapper(candidate, emrApiProperties));
+            if (itBelongsToARealPatient(candidate)) {
+                active.add(wrap(candidate));
             }
         }
 
@@ -477,8 +488,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         List<VisitDomainWrapper> inpatientVisits = new ArrayList<VisitDomainWrapper>();
         for (Visit candidate : candidates) {
-            VisitDomainWrapper visitDomainWrapper = new VisitDomainWrapper(candidate, emrApiProperties);
-            if (isActive(candidate) && itBelongsToARealPatient(candidate)
+            VisitDomainWrapper visitDomainWrapper = wrap(candidate);
+            if (itBelongsToARealPatient(candidate)
                     && visitDomainWrapper.isAdmitted()) {
                 if(ward!=null){
                     Encounter latestAdtEncounter = visitDomainWrapper.getLatestAdtEncounter();
@@ -493,10 +504,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         return inpatientVisits;
-    }
-
-    private boolean isInpatient(Visit candidate) {
-        return false;
     }
 
     private boolean itBelongsToARealPatient(Visit candidate) {
@@ -725,7 +732,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalArgumentException("Must provide a visit, location, and provider");
         }
 
-        VisitDomainWrapper visit = new VisitDomainWrapper(action.getVisit(), emrApiProperties);
+        VisitDomainWrapper visit = wrap(action.getVisit()) ;
 
         action.getType().checkVisitValid(visit);
 
@@ -749,7 +756,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     public VisitDomainWrapper wrap(Visit visit) {
-        return new VisitDomainWrapper(visit, emrApiProperties);
+        return new VisitDomainWrapper(visit, emrApiProperties, dispositionService);
     }
 
     @Override
@@ -800,4 +807,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         List<VisitDomainWrapper> visits = getVisits(patient, location, startDatetime, stopDatetime);
         return visits == null || visits.size() == 0 ? false : true;
     }
+
+    @Override
+    public List<Location> getInpatientLocations() {
+        return locationService.getLocationsByTag(emrApiProperties.getSupportsAdmissionLocationTag());
+    }
+
 }

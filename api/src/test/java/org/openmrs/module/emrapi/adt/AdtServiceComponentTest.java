@@ -16,18 +16,20 @@ package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
@@ -35,6 +37,9 @@ import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.concept.EmrConceptService;
+import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +62,7 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
@@ -88,6 +94,18 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     VisitService visitService;
+
+    @Autowired
+    ConceptService conceptService;
+
+    @Autowired
+    DispositionService dispositionService;
+
+    @Autowired
+    EncounterService encounterService;
+
+    @Autowired
+    EmrConceptService emrConceptService;
 
     @Before
     public void setUp() throws Exception {
@@ -370,4 +388,48 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertThat(CollectionUtils.select(encounters, NON_VOIDED).size(), is(2));
     }
 
+
+    @Test
+    public void test_shouldNotCloseVisitIfMostRecentDispositionKeepsVisitOpen() throws Exception {
+
+        ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
+
+        Patient patient = patientService.getPatient(7);    // patient already has one visit in test dataset
+        Location location = locationService.getLocation(2);
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
+        visit.setPatient(patient);
+        visit.setLocation(location);
+        visit.setVisitType(emrApiProperties.getAtFacilityVisitType());;
+
+        // create an encounter with a disposition obs
+        Encounter encounter = new Encounter();
+        encounter.setPatient(patient);
+        encounter.setEncounterType(encounterService.getEncounterType(1));
+        encounter.setEncounterDatetime(visit.getStartDatetime());
+
+        Obs dispositionObsGroup = new Obs();
+        dispositionObsGroup.setConcept(dispositionService.getDispositionDescriptor().getDispositionSetConcept());
+        Obs dispositionObs = new Obs();
+        dispositionObs.setConcept(dispositionService.getDispositionDescriptor().getDispositionConcept());
+        dispositionObs.setValueCoded(emrConceptService.getConcept(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME + ":Admit to hospital"));  // this fake code is set in ContextSensitiveMetadataTestUtils
+        dispositionObsGroup.addGroupMember(dispositionObs);
+
+        encounter.addObs(dispositionObsGroup);
+        encounterService.saveEncounter(encounter);
+
+        visit.addEncounter(encounter);
+        visitService.saveVisit(visit);
+
+        VisitDomainWrapper activeVisit = service.getActiveVisit(patient, location);
+
+        // sanity check
+        assertNotNull(activeVisit);
+
+        service.closeInactiveVisits();
+
+        activeVisit = service.getActiveVisit(patient, location);
+        assertNotNull(activeVisit);
+    }
 }

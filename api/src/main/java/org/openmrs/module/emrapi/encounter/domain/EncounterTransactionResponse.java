@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.encounter.domain;
 
 import org.openmrs.module.emrapi.encounter.ObservationData;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EncounterTransactionResponse {
@@ -23,7 +24,7 @@ public class EncounterTransactionResponse {
     private String encounterUuid;
     private String status;
     private String errorMessage;
-    private List<ObservationData> observations;
+    private List<ObservationData> observations = new ArrayList<ObservationData>();
 
     public EncounterTransactionResponse() {
     }

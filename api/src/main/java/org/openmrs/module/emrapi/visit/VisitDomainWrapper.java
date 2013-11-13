@@ -26,10 +26,11 @@ import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,20 +49,29 @@ import static org.apache.commons.collections.CollectionUtils.select;
 public class VisitDomainWrapper {
     private static final Log log = LogFactory.getLog(VisitDomainWrapper.class);
 
-    @Autowired
-    @Qualifier("emrApiProperties")
-    EmrApiProperties emrApiProperties;
+    private EmrApiProperties emrApiProperties;
+
+    private DispositionService dispositionService;
 
     private Visit visit;
 
+    @Deprecated
     public VisitDomainWrapper(Visit visit) {
         this.visit = visit;
     }
 
+    @Deprecated
     public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties) {
-        this(visit);
+        this.visit = visit;
         this.emrApiProperties = emrApiProperties;
     }
+
+    public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties, DispositionService dispositionService) {
+        this.visit = visit;
+        this.emrApiProperties = emrApiProperties;
+        this.dispositionService = dispositionService;
+    }
+
 
     /**
      * @return the visit
@@ -92,8 +102,13 @@ public class VisitDomainWrapper {
         return null;
     }
 
-    public boolean isOpen() {
+    public boolean isActive() {
         return visit.getStopDatetime() == null;
+    }
+
+    @Deprecated  // renamed to is Active
+    public boolean isOpen() {
+        return isActive();
     }
 
     public Encounter getCheckInEncounter() {
@@ -119,6 +134,7 @@ public class VisitDomainWrapper {
         return null;
     }
 
+    // note that this returns the most recent encounter first
     public List<Encounter> getSortedEncounters() {
         if (visit.getEncounters() != null) {
             List<Encounter> nonVoidedEncounters = (List<Encounter>) select(visit.getEncounters(), EncounterDomainWrapper.NON_VOIDED_PREDICATE);
@@ -136,6 +152,24 @@ public class VisitDomainWrapper {
         int millisecondsInADay = 1000 * 60 * 60 * 24;
 
         return (int) ((today.getTime() - startDateVisit.getTimeInMillis()) / millisecondsInADay);
+    }
+
+    // note that the disposition must be on the top level for this to pick it up
+    // (seemed like this made sense to do for performance reasons)
+    // also, if encounter has multiple disposition (is this possible?) it just returns the first one it finds
+    public Disposition getMostRecentDisposition() {
+
+        DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
+
+        for (Encounter encounter : getSortedEncounters()) {
+            for (Obs obs : encounter.getObsAtTopLevel(false)) {
+                if (dispositionDescriptor.isDisposition(obs)) {
+                    return dispositionService.getDispositionFromObsGroup(obs);
+                }
+            }
+        }
+
+        return null;
     }
 
     public List<Diagnosis> getPrimaryDiagnoses() {

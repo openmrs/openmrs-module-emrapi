@@ -29,7 +29,6 @@ import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
-import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.utils.ModuleProperties;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Component;
@@ -47,7 +46,7 @@ import java.util.List;
 @Component("emrApiProperties")
 public class EmrApiProperties extends ModuleProperties {
 
-	public Location getUnknownLocation() {
+    public Location getUnknownLocation() {
 		return getLocationByGlobalProperty(EmrApiConstants.GP_UNKNOWN_LOCATION);
 	}
 
@@ -166,10 +165,6 @@ public class EmrApiProperties extends ModuleProperties {
 		return new DiagnosisMetadata(conceptService, getEmrApiConceptSource());
 	}
 
-	public DispositionDescriptor getDispositionDescriptor() {
-		return new DispositionDescriptor(conceptService);
-	}
-
 	public List<ConceptSource> getConceptSourcesForDiagnosisSearch() {
 		ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10-WHO");
 		if (icd10 != null) {
@@ -275,8 +270,11 @@ public class EmrApiProperties extends ModuleProperties {
 
     public File getPersonImageDirectory() {
         String personImagesDir = getGlobalProperty(EmrApiConstants.GP_PERSON_IMAGES_DIRECTORY, false);
-        if (personImagesDir == null || personImagesDir.isEmpty())
-            personImagesDir = OpenmrsUtil.getApplicationDataDirectory() + "person_images";
+        if (personImagesDir == null || personImagesDir.isEmpty()) {
+            File appDataDirectory = new File(OpenmrsUtil.getApplicationDataDirectory());
+            personImagesDir =  appDataDirectory.getAbsolutePath() + "/person_images";
+        }
+        
         return new File(personImagesDir);
     }
 }

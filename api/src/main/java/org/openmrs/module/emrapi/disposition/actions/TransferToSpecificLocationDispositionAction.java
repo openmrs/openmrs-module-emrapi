@@ -6,8 +6,9 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.adt.AdtAction;
+import org.openmrs.module.emrapi.adt.AdtService;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.TRANSFER;
 
 /**
@@ -33,7 +33,7 @@ public class TransferToSpecificLocationDispositionAction implements DispositionA
     private AdtService adtService;
 
     @Autowired
-    private EmrApiProperties emrApiProperties;
+    private DispositionService dispositionService;
 
     /**
      * For unit testing
@@ -43,17 +43,6 @@ public class TransferToSpecificLocationDispositionAction implements DispositionA
         this.locationService = locationService;
     }
 
-    /**
-     * For unit testing
-     * @param adtService
-     */
-    public void setAdtService(AdtService adtService) {
-        this.adtService = adtService;
-    }
-
-    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
-        this.emrApiProperties = emrApiProperties;
-    }
 
     /**
      * @param encounterDomainWrapper encounter that is being created (has not had dispositionObsGroupBeingCreated added yet)
@@ -64,20 +53,32 @@ public class TransferToSpecificLocationDispositionAction implements DispositionA
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
 
         VisitDomainWrapper visitDomainWrapper  = adtService.wrap(encounterDomainWrapper.getVisit());
-        Location transferLocation = emrApiProperties.getDispositionDescriptor().getInternalTransferLocation(dispositionObsGroupBeingCreated, locationService);
+        Location transferLocation = dispositionService.getDispositionDescriptor().getInternalTransferLocation(dispositionObsGroupBeingCreated, locationService);
         Location currentInpatientLocation = visitDomainWrapper.getInpatientLocation(encounterDomainWrapper.getEncounterDatetime());
 
         if (transferLocation == null) {
             log.warn("Unable to create transfer action, no transfer location specified in obsgroup " + dispositionObsGroupBeingCreated);
             return;
         }
-        // transfer the patient if a) they are not admitted (and therefore have no inpatient locatin) or b) the inpatient location is other than the transfer location
+        // transfer the patient if a) they are not admitted (and therefore have no inpatient location) or b) the inpatient location is other than the transfer location
         if (currentInpatientLocation == null || !currentInpatientLocation.equals(transferLocation)) {
             AdtAction transfer = new AdtAction(encounterDomainWrapper.getVisit(), transferLocation, encounterDomainWrapper.getProviders(), TRANSFER);
             transfer.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
             adtService.createAdtEncounterFor(transfer);
         }
 
+    }
+
+    /**
+     * For unit testing
+     * @param adtService
+     */
+    public void setAdtService(AdtService adtService) {
+        this.adtService = adtService;
+    }
+
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
     }
 
 }

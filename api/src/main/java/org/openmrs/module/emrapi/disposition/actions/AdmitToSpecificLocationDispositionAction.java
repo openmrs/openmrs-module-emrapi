@@ -19,11 +19,11 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
-import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,27 +52,7 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
     private AdtService adtService;
 
     @Autowired
-    private EmrApiProperties emrApiProperties;
-
-    /**
-     * For unit testing
-     * @param locationService
-     */
-    public void setLocationService(LocationService locationService) {
-        this.locationService = locationService;
-    }
-
-    /**
-     * For unit testing
-     * @param adtService
-     */
-    public void setAdtService(AdtService adtService) {
-        this.adtService = adtService;
-    }
-
-    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
-        this.emrApiProperties = emrApiProperties;
-    }
+    private DispositionService dispositionService;
 
     /**
      * @param encounterDomainWrapper encounter that is being created (has not had dispositionObsGroupBeingCreated added yet)
@@ -81,12 +61,17 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
      */
     @Override
     public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated, Map<String, String[]> requestParameters) {
-        if (adtService.wrap(encounterDomainWrapper.getVisit()).isAdmitted(encounterDomainWrapper.getEncounterDatetime())) {
+
+        VisitDomainWrapper visitDomainWrapper = adtService.wrap(encounterDomainWrapper.getVisit());
+
+        // TODO note that we really want to only test if the patient is admitted at the encounter datetime; we also test against visitDomainWrapper.isAdmitted()
+        // TODO for now because the "createAdtEncounterFor" method will throw an exception if isAdmitted() returns true; see https://minglehosting.thoughtworks.com/unicef/projects/pih_mirebalais/cards/938
+        if (visitDomainWrapper.isAdmitted(encounterDomainWrapper.getEncounterDatetime()) || visitDomainWrapper.isAdmitted()) {
             // consider doing a transfer-within-hospital here
             return;
         }
         else {
-            Location admissionLocation = emrApiProperties.getDispositionDescriptor().getAdmissionLocation(dispositionObsGroupBeingCreated, locationService);
+            Location admissionLocation = dispositionService.getDispositionDescriptor().getAdmissionLocation(dispositionObsGroupBeingCreated, locationService);
             if (admissionLocation != null) {
                 AdtAction admission = new AdtAction(encounterDomainWrapper.getVisit(), admissionLocation, encounterDomainWrapper.getProviders(), ADMISSION);
                 admission.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
@@ -98,4 +83,22 @@ public class AdmitToSpecificLocationDispositionAction implements DispositionActi
         }
     }
 
+    /**
+     * For unit testing
+     * @param locationService
+     */
+    public void setLocationService(LocationService locationService) {
+        this.locationService = locationService;
+    }
+    /**
+     * For unit testing
+     * @param adtService
+     */
+    public void setAdtService(AdtService adtService) {
+        this.adtService = adtService;
+    }
+
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
+    }
 }

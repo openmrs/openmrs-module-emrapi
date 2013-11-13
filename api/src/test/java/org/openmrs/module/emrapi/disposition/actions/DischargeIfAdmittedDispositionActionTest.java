@@ -15,6 +15,7 @@ import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
@@ -37,17 +38,20 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
     private AdtService adtService;
     private EmrApiProperties emrApiProperties;
     private DispositionDescriptor dispositionDescriptor;
+    private DispositionService dispositionService;
     private VisitDomainWrapper visitDomainWrapper;
     private Concept dispositionObsGroupConcept = new Concept();;
 
     @Before
     public void setUp() throws Exception {
         adtService = mock(AdtService.class);
+
         emrApiProperties = mock(EmrApiProperties.class);
+        dispositionService = mock(DispositionService.class);
         dispositionDescriptor = mock(DispositionDescriptor.class);
         visitDomainWrapper = mock(VisitDomainWrapper.class);
 
-        when(emrApiProperties.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
         when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
 
         action = new DischargeIfAdmittedDispositionAction();
@@ -68,7 +72,10 @@ public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserT
         final Obs dispositionObsGroup = new Obs();
         dispositionObsGroup.setConcept(dispositionObsGroupConcept);
 
-        when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(true);
+        // TODO note that we really want to only test if the patient is admitted at the encounter datetime, but we have to test against visitDomainWrapper.isAdmitted()
+        // TODO for now because the "createAdtEncounterFor" method will throw an exception if isAdmitted() returns false; see https://minglehosting.thoughtworks.com/unicef/projects/pih_mirebalais/cards/938
+        when(visitDomainWrapper.isAdmitted()).thenReturn(true);
+        //when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(true);
 
         action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
         verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {

@@ -24,9 +24,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class DispositionFactoryTest {
+public class DispositionServiceTest {
 
-    private DispositionFactory dispositionFactory;
+    private DispositionServiceImpl dispositionService;
 
     private ConceptService concertService;
 
@@ -43,21 +43,19 @@ public class DispositionFactoryTest {
         concertService = mock(ConceptService.class);
         emrApiProperties = mock(EmrApiProperties.class);
         MockMetadataTestUtil.setupMockConceptService(concertService, emrApiProperties);
-        MockMetadataTestUtil.setupDispositionDescriptor(emrApiProperties, concertService);
+        dispositionDescriptor = MockMetadataTestUtil.setupDispositionDescriptor(concertService);
 
-        dispositionFactory = new DispositionFactory();
-        dispositionFactory.setEmrConceptService(emrConceptService);
-        dispositionFactory.setConceptService(concertService);
-        dispositionFactory.setEmrApiProperties(emrApiProperties);
+        dispositionService = new DispositionServiceImpl(concertService, emrConceptService);
+        dispositionService.setDispositionDescriptor(dispositionDescriptor);
     }
 
     @Test
     public void shouldParseDispositionJsonFromDefaultConfig() throws IOException {
         Disposition deathDisposition = getDeathDisposition();
 
-        Disposition homeDisposition = getHomeDisposition();
+        Disposition homeDisposition = getAdmitDisposition();
 
-        List<Disposition> dispositions = dispositionFactory.getDispositions();
+        List<Disposition> dispositions = dispositionService.getDispositions();
 
         assertEquals(dispositions.size(), 2);
 
@@ -69,7 +67,8 @@ public class DispositionFactoryTest {
 
     @Test
     public void shouldParseDispositionJsonFromSpecifiedConfig() throws IOException {
-        List<Disposition> dispositions = dispositionFactory.getDispositionsFrom("specifiedDispositionConfig.json");
+        dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
+        List<Disposition> dispositions = dispositionService.getDispositions();
 
         assertEquals(dispositions.size(), 3);
     }
@@ -82,9 +81,9 @@ public class DispositionFactoryTest {
         Obs dispositionObs = new Obs();
         dispositionObs.setValueCoded(deathDispositionConcept);
 
-        when(emrConceptService.getConcept("SNOMED CT:397709008")).thenReturn(deathDispositionConcept);
+        when(emrConceptService.getConcept("org.openmrs.module.emrapi: Death")).thenReturn(deathDispositionConcept);
 
-        Disposition disposition = dispositionFactory.getDispositionFromObs(dispositionObs);
+        Disposition disposition = dispositionService.getDispositionFromObs(dispositionObs);
         assertThat(disposition, is(getDeathDisposition()));
     }
 
@@ -94,25 +93,25 @@ public class DispositionFactoryTest {
         Concept deathDispositionConcept = new Concept();
 
         Obs dispositionObs = new Obs();
-        dispositionObs.setConcept(emrApiProperties.getDispositionDescriptor().getDispositionConcept());
+        dispositionObs.setConcept(dispositionService.getDispositionDescriptor().getDispositionConcept());
         dispositionObs.setValueCoded(deathDispositionConcept);
 
         Obs dispositionObsGroup = new Obs();
-        dispositionObsGroup.setConcept(emrApiProperties.getDispositionDescriptor().getDispositionSetConcept());
+        dispositionObsGroup.setConcept(dispositionService.getDispositionDescriptor().getDispositionSetConcept());
         dispositionObsGroup.addGroupMember(dispositionObs);
 
-        when(emrConceptService.getConcept("SNOMED CT:397709008")).thenReturn(deathDispositionConcept);
+        when(emrConceptService.getConcept("org.openmrs.module.emrapi: Death")).thenReturn(deathDispositionConcept);
 
-        Disposition disposition = dispositionFactory.getDispositionFromObsGroup(dispositionObsGroup);
+        Disposition disposition = dispositionService.getDispositionFromObsGroup(dispositionObsGroup);
         assertThat(disposition, is(getDeathDisposition()));
     }
 
-    private Disposition getHomeDisposition() {
-        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.home", "SNOMED CT:3780001", Collections.<String>emptyList(), Collections.<DispositionObs>emptyList());
+    private Disposition getAdmitDisposition() {
+        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.admit", "org.openmrs.module.emrapi: Admit to hospital", Collections.<String>emptyList(), Collections.<DispositionObs>emptyList());
     }
 
     private Disposition getDeathDisposition() {
-        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "SNOMED CT:397709008", getActions(), getAdditionalObs());
+        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "org.openmrs.module.emrapi: Death", getActions(), getAdditionalObs());
     }
 
     private List<String> getActions() {

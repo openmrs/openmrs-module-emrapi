@@ -88,9 +88,11 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
             else {
                 ConceptReferenceTerm referenceTerm = conceptService.getConceptReferenceTermByCode(code, source);
                 // TODO ensure we return a SAME-AS mapping if one exists
-                List<Concept> concepts = getConceptsSameOrNarrowerThan(referenceTerm);
-                if (concepts.size() > 0) {
-                    return concepts.get(0);
+                if (referenceTerm != null) {
+                    List<Concept> concepts = getConceptsSameOrNarrowerThan(referenceTerm);
+                    if (concepts.size() > 0) {
+                        return concepts.get(0);
+                    }
                 }
             }
         }

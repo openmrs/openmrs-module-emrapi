@@ -78,6 +78,7 @@
                 <property name="providerService" ref="providerService"/>
                 <property name="patientService" ref="patientService"/>
 				<property name="diagnosisService" ref="diagnosisService"/>
+                <property name="dispositionService" ref="dispositionService"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -213,6 +214,42 @@
         </property>
     </bean>
 
+    <bean id="emrPatientProfileService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.patient.EmrPatientProfileServiceImpl">
+                <property name="patientService" ref="patientService"/>
+                <property name="emrPersonImageService" ref="emrPersonImageService"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean id="dispositionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.disposition.DispositionServiceImpl">
+                <constructor-arg ref="emrConceptService"/>
+                <constructor-arg ref="conceptService"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
     <bean id="emrEncounterService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -291,7 +328,6 @@
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.event.ApplicationEventService</value>
                 <ref local="applicationEventService"/>
-
             </list>
         </property>
     </bean>
@@ -305,13 +341,19 @@
         </property>
     </bean>
 
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.disposition.DispositionService</value>
+                <ref local="dispositionService"/>
+            </list>
+        </property>
+    </bean>
+
     <bean id="emrEncounterDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrEncounterDAO">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
     </bean>
-
-    <bean id="emrapiVisitDomainWrapperFactory" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory"/>
-    <bean id="emrapiVisitDomainWrapperRepository" class="org.openmrs.module.emrapi.visit.VisitDomainWrapperRepository"/>
 
 </beans>

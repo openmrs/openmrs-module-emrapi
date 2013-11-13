@@ -27,17 +27,13 @@ import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * <pre>
  * API methods related to Check-In, Admission, Discharge, and Transfer
  *
  * Since patients frequently leave the facility without having any formal electronic check-out process, we ensure that
- * old stale visits are automatically closed, even if they are never intentionally stopped. Our business logic is built
- * on the idea of <em>active</em> visits, per #isActive(Visit, Date). A visit with stopDatetime==null is not necessarily
- * active from our perspective. Non-active visits are liable to be stopped at any time, unless the visit is marked as
- * inpatient.
+ * old stale visits are automatically closed, even if they are never intentionally stopped.
  *
  * A patient may be Admitted to inpatient care, which flags their visit as inpatient (by creating an Admission
  * encounter). Any visit flagged as inpatient will not be auto-closed. A patient may be discharged (which means generally
@@ -49,15 +45,14 @@ import java.util.Set;
  * hierarchy until we find a location with this tag. (This allows you to configure the setup such that doing a check-in
  * at Outpatient Department creates a visit at its parent, with an Encounter at the location itself.)
  *
- * Admission encounters can only happen at locations tagged with the {@link org.openmrs.module.emrapi.EmrApiConstants.LOCATION_TAG_SUPPORTS_ADMISSION}
+ * Admission encounters can only happen at locations tagged with the {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
  * tag.
  * </pre>
  */
 public interface AdtService extends OpenmrsService {
 
     /**
-     * Gets the patient's <em>active</em> visit at the given location, or null, if none exists.
-     * If the patient has any non-stopped visits that are not active, they are stopped as a side-effect.
+     * Gets the patient's <em>active</em> visit at the given location, or null, if none exists..
      *
      *
      * @param patient
@@ -95,14 +90,6 @@ public interface AdtService extends OpenmrsService {
      * @return
      */
     Visit ensureVisit(Patient patient, Date visitTime, Location department);
-
-    /**
-     * Our business logic is that a visit has ended if it has no recent encounter.
-     *
-     * @return whether we think this visit has ended, according to our business logic
-     * @see org.openmrs.module.emrapi.EmrApiProperties#getVisitExpireHours()
-     */
-    boolean isActive(Visit visit);
 
     /**
      * Creates a "check-in" encounter for the given patient, at the location where, and adds it to the active visit.
@@ -144,7 +131,7 @@ public interface AdtService extends OpenmrsService {
     boolean isSuitableVisit(Visit visit, Location location, Date when);
 
     /**
-     * Gets all currently-active visits (per our business logic) at the given location or any of its children
+     * Gets all currently-active visits at the given location or any of its children
      *
      *
      * @param location
@@ -283,5 +270,11 @@ public interface AdtService extends OpenmrsService {
      */
     boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
 
+
+    /**
+     * @return all locations that are tagged to support admissions
+     * @see {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
+     */
+    List<Location> getInpatientLocations();
 
 }

@@ -40,7 +40,10 @@ public class DischargeIfAdmittedDispositionAction implements DispositionAction {
         Visit visit = encounterDomainWrapper.getVisit();
         VisitDomainWrapper visitDomainWrapper = adtService.wrap(visit);
 
-        if (visitDomainWrapper.isAdmitted(encounterDomainWrapper.getEncounter().getEncounterDatetime())) {
+        // TODO note that we really want to only test if the patient is admitted at the encounter datetime, but we have to test against visitDomainWrapper.isAdmitted()
+        // TODO for now because the "createAdtEncounterFor" method will throw an exception if isAdmitted() returns false; see https://minglehosting.thoughtworks.com/unicef/projects/pih_mirebalais/cards/938
+        if (visitDomainWrapper.isAdmitted()) {
+        //if (visitDomainWrapper.isAdmitted(encounterDomainWrapper.getEncounter().getEncounterDatetime())) {
             AdtAction discharge = new AdtAction(visit, encounterDomainWrapper.getLocation(), encounterDomainWrapper.getProviders(), DISCHARGE);
             discharge.setActionDatetime(encounterDomainWrapper.getEncounter().getEncounterDatetime());
             adtService.createAdtEncounterFor(discharge);
