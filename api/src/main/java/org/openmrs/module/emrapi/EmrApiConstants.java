@@ -97,6 +97,8 @@ public class EmrApiConstants {
 
     public static final String PRIMARY_IDENTIFIER_TYPE = "emr.primaryIdentifierType";
 
+    public static final String DOSSIER_NUMBER_UUID = "e66645eb-03a8-4991-b4ce-e87318e37566";
+
     public static final String GP_EXTRA_PATIENT_IDENTIFIER_TYPES = "emr.extraPatientIdentifierTypes";
 
     public static final String SAME_AS_CONCEPT_MAP_TYPE_UUID = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
