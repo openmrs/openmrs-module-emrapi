@@ -41,6 +41,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class EncounterObservationServiceHelperTest {
 
     public static final String TEXT_CONCEPT_UUID = "text-concept-uuid";
+    public static final String CODED_CONCEPT_UUID = "coded-concept-uuid";
     public static final String NUMERIC_CONCEPT_UUID = "numeric-concept-uuid";
     @Mock
     private ConceptService conceptService;
@@ -68,7 +69,6 @@ public class EncounterObservationServiceHelperTest {
     @Test
     public void shouldAddNewObservation() throws ParseException {
         newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
-
         List<EncounterTransaction.Observation> observations = asList(
             new EncounterTransaction.Observation().setConceptUuid(TEXT_CONCEPT_UUID).setValue("text value").setComment("overweight")
         );
@@ -93,6 +93,28 @@ public class EncounterObservationServiceHelperTest {
         assertEquals("overweight", textObservation.getComment());
 
         assertEquals(observationDateTime, textObservation.getObsDatetime());
+    }
+
+    @Test
+    public void shouldAddCodedObservation() throws ParseException {
+        newConcept(ConceptDatatype.CODED, CODED_CONCEPT_UUID);
+        Concept answerConcept = newConcept(ConceptDatatype.TEXT, "answer-uuid");
+        List<EncounterTransaction.Observation> observations = asList(
+                new EncounterTransaction.Observation().setConceptUuid(CODED_CONCEPT_UUID).setValue("answer-uuid")
+        );
+
+        Patient patient = new Patient();
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        encounter.setPatient(patient);
+
+        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+
+        assertEquals(1, encounter.getObs().size());
+        Obs codedObservation = encounter.getObs().iterator().next();
+        assertEquals(answerConcept, codedObservation.getValueCoded());
+        assertEquals("e-uuid", codedObservation.getEncounter().getUuid());
     }
 
 
@@ -254,9 +276,9 @@ public class EncounterObservationServiceHelperTest {
 
     private Concept newConcept(String hl7, String uuid) {
         Concept concept = new Concept();
-        ConceptDatatype textDataType = new ConceptDatatype();
-        textDataType.setHl7Abbreviation(hl7);
-        concept.setDatatype(textDataType);
+        ConceptDatatype conceptDataType = new ConceptDatatype();
+        conceptDataType.setHl7Abbreviation(hl7);
+        concept.setDatatype(conceptDataType);
         concept.setUuid(uuid);
         when(conceptService.getConceptByUuid(uuid)).thenReturn(concept);
         return concept;

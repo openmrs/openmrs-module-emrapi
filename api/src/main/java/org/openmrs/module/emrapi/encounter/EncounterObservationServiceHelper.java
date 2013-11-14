@@ -76,8 +76,12 @@ public class EncounterObservationServiceHelper {
             encounter.addObs(observation);
         }
         observation.setComment(observationData.getComment());
-        if(observationData.getValue() != null) {
-            observation.setValueAsString(observationData.getValue().toString());
+        if (observationData.getValue() != null) {
+            if (observation.getConcept().getDatatype().getHl7Abbreviation().equals("CWE")) {
+                observation.setValueCoded(conceptService.getConceptByUuid((String) observationData.getValue()));
+            } else {
+                observation.setValueAsString(observationData.getValue().toString());
+            }
         }
         observation.setObsDatetime(observationDateTime);
     }
