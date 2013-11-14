@@ -16,7 +16,7 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceD
 import org.openmrs.module.webservices.rest.web.response.ConversionException;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
-import org.openmrs.module.webservices.rest.web.v1_0.resource.openmrs1_8.PatientResource1_8;
+import org.openmrs.module.webservices.rest.web.v1_0.resource.openmrs1_9.PatientResource1_9;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,6 +47,14 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
     }
 
     @Override
+    public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
+        DelegatingResourceDescription description = new DelegatingResourceDescription();
+        description.addProperty("patient", Representation.DEFAULT);
+        description.addProperty("image", Representation.DEFAULT);
+        return description;
+    }
+
+    @Override
     public Object create(SimpleObject propertiesToCreate, RequestContext context) throws ResponseException {
         final Object patientProperty = propertiesToCreate.get("patient");
         if (propertiesToCreate.get("patient") == null || !(propertiesToCreate.get("patient") instanceof Map)) {
@@ -54,8 +62,8 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
         }
 
         PatientProfile delegate = new PatientProfile();
-        PatientResource1_8 patientResource1_8 = (PatientResource1_8) Context.getService(RestService.class).getResourceBySupportedClass(Patient.class);
-        delegate.setPatient(patientResource1_8.getPatient(new SimpleObject() {{
+        PatientResource1_9 patientResource1_9 = (PatientResource1_9) Context.getService(RestService.class).getResourceBySupportedClass(Patient.class);
+        delegate.setPatient(patientResource1_9.getPatient(new SimpleObject() {{
             putAll((Map<String, Object>) patientProperty);
         }}));
         propertiesToCreate.removeProperty("patient");
@@ -63,9 +71,25 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
         setConvertedProperties(delegate, propertiesToCreate, getCreatableProperties(), true);
         delegate = save(delegate);
         return ConversionUtil.convertToRepresentation(delegate, Representation.FULL);
-
     }
 
+    @Override
+    public Object update(String uuid, SimpleObject propertiesToUpdate, RequestContext context) throws ResponseException {
+        if (propertiesToUpdate.get("patient") == null || !(propertiesToUpdate.get("patient") instanceof Map)) {
+            throw new ConversionException("The patient property is missing");
+        }
+
+        PatientProfile delegate = new PatientProfile();
+        PatientResource1_9 patientResource1_9 = (PatientResource1_9) Context.getService(RestService.class).getResourceBySupportedClass(Patient.class);
+        Patient patient = patientResource1_9.getPatientForUpdate(uuid, (Map<String, Object>) propertiesToUpdate.get("patient"));
+        delegate.setPatient(patient);
+
+        propertiesToUpdate.removeProperty("patient");
+        setConvertedProperties(delegate, propertiesToUpdate, getCreatableProperties(), true);
+        delegate = save(delegate);
+        return ConversionUtil.convertToRepresentation(delegate, Representation.FULL);
+    }
+   
     @Override
     public PatientProfile newDelegate() {
         return new PatientProfile();

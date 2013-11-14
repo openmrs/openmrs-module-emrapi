@@ -20,13 +20,12 @@ import java.util.Map;
 
 public class PatientProfileResourceTest extends BaseModuleWebContextSensitiveTest {
 
-    private SimpleObject patientProfileSimpleObject = new SimpleObject();
+    
 
     private PatientProfileResource resource;
 
     @Before
     public void beforeEachTests() throws Exception {
-        patientProfileSimpleObject.putAll(new ObjectMapper().readValue(getClass().getClassLoader().getResourceAsStream("create_patient_profile.json"), HashMap.class));
         resource = (PatientProfileResource) Context.getService(RestService.class).getResourceBySupportedClass(PatientProfile.class);
         File personImageDirectory = new File(OpenmrsUtil.getApplicationDataDirectory() + "/person_images");
         personImageDirectory.mkdirs();
@@ -34,8 +33,18 @@ public class PatientProfileResourceTest extends BaseModuleWebContextSensitiveTes
 
     @Test
     public void shouldCreatePatient() throws Exception {
-        SimpleObject created = (SimpleObject) resource.create(patientProfileSimpleObject, new RequestContext());
+        SimpleObject patientProfileCreateObject = new SimpleObject();
+        patientProfileCreateObject.putAll(new ObjectMapper().readValue(getClass().getClassLoader().getResourceAsStream("create_patient_profile.json"), HashMap.class));
+        SimpleObject created = (SimpleObject) resource.create(patientProfileCreateObject, new RequestContext());
         Assert.assertEquals("id-B - Ram Kabir", ((Map) created.get("patient")).get("display"));
+    }
+
+    @Test
+    public void shouldUpdatePatient() throws Exception {
+        SimpleObject patientProfileUpdateObject = new SimpleObject();
+        patientProfileUpdateObject.putAll(new ObjectMapper().readValue(getClass().getClassLoader().getResourceAsStream("update_patient_profile.json"), HashMap.class));
+        SimpleObject created = (SimpleObject) resource.update("da7f524f-27ce-4bb2-86d6-6d1d05312bd5", patientProfileUpdateObject, new RequestContext());
+        Assert.assertEquals("101-6 - dull skull", ((Map) created.get("patient")).get("display"));
     }
 
 }
