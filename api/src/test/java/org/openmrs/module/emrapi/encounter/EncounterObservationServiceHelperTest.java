@@ -53,11 +53,7 @@ public class EncounterObservationServiceHelperTest {
     private EmrApiProperties emrApiProperties;
 
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
-    private String questionConceptUuid;
-    private String answerConceptUuid;
-    private String dispostionNoteConceptUuid;
-    private String dispostionNoteValue;
-
+    
     @Before
     public void setUp() throws Exception {
         initMocks(this);
@@ -117,13 +113,12 @@ public class EncounterObservationServiceHelperTest {
         assertEquals("e-uuid", codedObservation.getEncounter().getUuid());
     }
 
-
     @Test
     public void shouldUpdateExistingObservation() throws ParseException {
         Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setConceptUuid(NUMERIC_CONCEPT_UUID).setValue(35.0).setComment("overweight")
+                new EncounterTransaction.Observation().setObservationUuid("o-uuid").setValue(35.0).setComment("overweight")
         );
 
         Encounter encounter = new Encounter();

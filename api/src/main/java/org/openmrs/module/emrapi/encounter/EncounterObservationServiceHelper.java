@@ -48,7 +48,7 @@ public class EncounterObservationServiceHelper {
 
     public void update(Encounter encounter, List<EncounterTransaction.Observation> observations, Date observationDateTime) {
         try {
-            Set<Obs> existingObservations = encounter.getAllObs();
+            Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
             for (EncounterTransaction.Observation observationData : observations) {
                 updateObservation(encounter, observationDateTime, existingObservations, observationData);
             }
@@ -58,23 +58,38 @@ public class EncounterObservationServiceHelper {
     }
 
     private void updateObservation(Encounter encounter, Date observationDateTime, Set<Obs> existingObservations, EncounterTransaction.Observation observationData) throws ParseException {
-        Obs observation = getMatchingObservation(existingObservations, observationData.getConceptUuid());
+        Obs observation = getMatchingObservation(existingObservations, observationData.getObservationUuid());
         if (observationData.isVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());
             return;
         }
         if (observation == null) {
-            observation = new Obs();
-            Concept concept = conceptService.getConceptByUuid(observationData.getConceptUuid());
-            if (concept == null) {
-                throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
-            }
-            observation.setPerson(encounter.getPatient());
-            observation.setEncounter(encounter);
-            observation.setConcept(concept);
+            observation = newObservation(encounter, observationData);
             encounter.addObs(observation);
         }
+        mapObservationProperties(observationDateTime, observationData, observation);
+
+        for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
+            updateObservationGroupMember(encounter, observation, observationDateTime, member);
+        }
+    }
+
+    private void updateObservationGroupMember(Encounter encounter, Obs observation, Date observationDateTime, EncounterTransaction.Observation observationData) throws ParseException {
+        Obs groupMember = getMatchingObservation(observation.getGroupMembers(), observationData.getObservationUuid());
+        if (observationData.isVoided()) {
+            observation.setVoided(true);
+            observation.setVoidReason(observationData.getVoidReason());
+            return;
+        }
+        if (groupMember == null) {
+            groupMember = newObservation(encounter, observationData);
+            observation.addGroupMember(groupMember);
+        }
+        mapObservationProperties(observationDateTime, observationData, groupMember);
+    }
+
+    private void mapObservationProperties(Date observationDateTime, EncounterTransaction.Observation observationData, Obs observation) throws ParseException {
         observation.setComment(observationData.getComment());
         if (observationData.getValue() != null) {
             if (observation.getConcept().getDatatype().getHl7Abbreviation().equals("CWE")) {
@@ -86,9 +101,23 @@ public class EncounterObservationServiceHelper {
         observation.setObsDatetime(observationDateTime);
     }
 
-    private Obs getMatchingObservation(Set<Obs> existingObservations, String conceptUUID) {
+    private Obs newObservation(Encounter encounter, EncounterTransaction.Observation observationData) {
+        Obs observation;
+        observation = new Obs();
+        Concept concept = conceptService.getConceptByUuid(observationData.getConceptUuid());
+        if (concept == null) {
+            throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
+        }
+        observation.setPerson(encounter.getPatient());
+        observation.setEncounter(encounter);
+        observation.setConcept(concept);
+        return observation;
+    }
+
+    private Obs getMatchingObservation(Set<Obs> existingObservations, String observationUuid) {
+        if (existingObservations == null) return null;
         for (Obs obs : existingObservations) {
-            if (StringUtils.equals(obs.getConcept().getUuid(), conceptUUID)) return obs;
+            if (StringUtils.equals(obs.getUuid(), observationUuid)) return obs;
         }
         return null;
     }

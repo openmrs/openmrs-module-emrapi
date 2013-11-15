@@ -151,6 +151,74 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
     }
 
     @Test
+    public void shouldAddNewObservationGroup() throws Exception {
+        executeDataSet("shouldAddNewObservation.xml");
+
+        String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
+                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                "\"observations\":[" +
+                "{\"conceptUuid\":\"e102c80f-1yz9-4da3-bb88-8122ce8868dd\", " +
+                " \"groupMembers\" : [{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"value\":20, \"comment\":\"overweight\" }] }" +
+                "]}";
+
+        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+
+        Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
+        Encounter encounter = (Encounter) visit.getEncounters().toArray()[0];
+
+        assertEquals(1, encounter.getObs().size());
+        Obs obs = (Obs) encounter.getAllObs().toArray()[0];
+        assertEquals("e102c80f-1yz9-4da3-bb88-8122ce8868dd", obs.getConcept().getUuid());
+        
+        assertEquals(1, obs.getGroupMembers().size());
+        Obs member = obs.getGroupMembers().iterator().next();
+        assertEquals("d102c80f-1yz9-4da3-bb88-8122ce8868dd", member.getConcept().getUuid());
+        assertEquals(new Double(20.0), member.getValueNumeric());
+        assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", member.getPerson().getUuid());
+        assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", member.getEncounter().getUuid());
+        assertEquals("overweight", member.getComment());
+        assertEquals(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000"), member.getObsDatetime());
+    }
+
+    @Test
+    public void shouldUpdateObservations() throws Exception {
+        executeDataSet("shouldUpdateObservations.xml");
+
+        String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\"," +
+                "\"encounterDateTime\" : \"2013-01-01T00:00:00.000+0000\", " +
+                "\"observations\":[" +
+                "{\"observationUuid\":\"z9fb7f47-e80a-4056-9285-bd798be13c63\", " +
+                " \"groupMembers\" : [{\"observationUuid\":\"ze48cdcb-6a76-47e3-9f2e-2635032f3a9a\", \"value\":20, \"comment\":\"new gc\" }] }, " +
+                "{\"observationUuid\":\"zf616900-5e7c-4667-9a7f-dcb260abf1de\", \"comment\" : \"new c\", \"value\":100 }" +
+                "]}";
+
+        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+
+        Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
+        Encounter encounter = (Encounter) visit.getEncounters().toArray()[0];
+
+        assertEquals(2, encounter.getObsAtTopLevel(false).size());
+        Iterator<Obs> iterator = encounter.getObsAtTopLevel(false).iterator();
+        
+        Obs obs1 = iterator.next();
+        assertEquals("zf616900-5e7c-4667-9a7f-dcb260abf1de", obs1.getUuid());
+        assertEquals(new Double(100), obs1.getValueNumeric());
+        assertEquals("new c", obs1.getComment());
+        
+        Obs obs2 = iterator.next();
+        assertEquals("z9fb7f47-e80a-4056-9285-bd798be13c63", obs2.getUuid());
+        assertEquals(1, obs2.getGroupMembers().size());
+        Obs member = obs2.getGroupMembers().iterator().next();
+        assertEquals(new Double(20), member.getValueNumeric());
+        assertEquals("new gc", member.getComment());
+    }
+
+
+    @Test
     public void shouldAddNewTestOrder() throws Exception {
         executeDataSet("shouldAddNewTestOrder.xml");
 

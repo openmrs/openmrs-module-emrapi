@@ -24,16 +24,15 @@ import java.util.Set;
 public class EncounterTransaction {
     private String locationUuid;
     private Set<String> providerUuid;
-    private String patientUuid;     // TODO: mandatory validation
-    private String visitTypeUuid;  // TODO: mandatory validation
-    private String encounterTypeUuid;   // TODO: mandatory validation
+    private String patientUuid;
+    private String visitTypeUuid;
+    private String encounterTypeUuid;
     private Date encounterDateTime;
     private Disposition disposition;
     private List<Observation> observations = new ArrayList<Observation>();
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
-    private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
-
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
+    private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
 
     public Disposition getDisposition() {
         return disposition;
@@ -133,11 +132,12 @@ public class EncounterTransaction {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observation {
         private String observationUuid;
-        private String conceptUuid;     // TODO: mandatory validation
+        private String conceptUuid;
         private Object value;
         private String comment;
         private boolean voided;
         private String voidReason;
+        private List<Observation> groupMembers = new ArrayList<Observation>();
 
         public String getObservationUuid() {
             return observationUuid;
@@ -191,6 +191,14 @@ public class EncounterTransaction {
         public Observation setVoidReason(String voidReason) {
             this.voidReason = voidReason;
             return this;
+        }
+
+        public List<Observation> getGroupMembers() {
+            return groupMembers;
+        }
+
+        public void setGroupMembers(List<Observation> groupMembers) {
+            this.groupMembers = groupMembers;
         }
     }
 
