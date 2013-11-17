@@ -50,14 +50,14 @@ public class EncounterObservationServiceHelper {
         try {
             Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
             for (EncounterTransaction.Observation observationData : observations) {
-                updateObservation(encounter, observationDateTime, existingObservations, observationData);
+                updateObservation(encounter, null, existingObservations, observationDateTime, observationData);
             }
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private void updateObservation(Encounter encounter, Date observationDateTime, Set<Obs> existingObservations, EncounterTransaction.Observation observationData) throws ParseException {
+    private void updateObservation(Encounter encounter, Obs parentObs, Set<Obs> existingObservations, Date observationDateTime, EncounterTransaction.Observation observationData) throws ParseException {
         Obs observation = getMatchingObservation(existingObservations, observationData.getObservationUuid());
         if (observationData.isVoided()) {
             observation.setVoided(true);
@@ -66,27 +66,15 @@ public class EncounterObservationServiceHelper {
         }
         if (observation == null) {
             observation = newObservation(encounter, observationData);
-            encounter.addObs(observation);
+            if (parentObs == null)
+                encounter.addObs(observation);
+            else parentObs.addGroupMember(observation);
         }
         mapObservationProperties(observationDateTime, observationData, observation);
 
         for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
-            updateObservationGroupMember(encounter, observation, observationDateTime, member);
+            updateObservation(encounter, observation, observation.getGroupMembers(), observationDateTime, member);
         }
-    }
-
-    private void updateObservationGroupMember(Encounter encounter, Obs observation, Date observationDateTime, EncounterTransaction.Observation observationData) throws ParseException {
-        Obs groupMember = getMatchingObservation(observation.getGroupMembers(), observationData.getObservationUuid());
-        if (observationData.isVoided()) {
-            observation.setVoided(true);
-            observation.setVoidReason(observationData.getVoidReason());
-            return;
-        }
-        if (groupMember == null) {
-            groupMember = newObservation(encounter, observationData);
-            observation.addGroupMember(groupMember);
-        }
-        mapObservationProperties(observationDateTime, observationData, groupMember);
     }
 
     private void mapObservationProperties(Date observationDateTime, EncounterTransaction.Observation observationData, Obs observation) throws ParseException {
