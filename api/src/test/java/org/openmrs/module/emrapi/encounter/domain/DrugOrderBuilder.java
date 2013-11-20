@@ -17,7 +17,7 @@ public class DrugOrderBuilder {
                                             String dosageInstructionUuid,
                                             String dosageFrequencyUuId){
         this.drugOrder.setUuid(uuid);
-        this.drugOrder.setConceptUuid(conceptUuId);
+        this.drugOrder.setConcept(new EncounterTransaction.Concept(conceptUuId));
         this.drugOrder.setStartDate(startDate);
         this.drugOrder.setEndDate(endDate);
         this.drugOrder.setNumberPerDosage(numberPerDosage);

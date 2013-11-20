@@ -14,9 +14,11 @@
 
 package org.openmrs.module.emrapi.web.controller;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.emrapi.encounter.EmrEncounterService;
+import org.openmrs.module.emrapi.encounter.EncounterSearchParameters;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
+import org.openmrs.module.emrapi.web.exception.InvalidInputException;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/rest/emrapi/encounter")
@@ -35,16 +41,37 @@ public class EmrEncounterController extends BaseRestController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    public EncounterTransactionResponse update(@RequestBody EncounterTransaction encounterTransaction) {
+    public EncounterTransaction update(@RequestBody EncounterTransaction encounterTransaction) {
         return emrEncounterService.save(encounterTransaction);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/active")
+    @ResponseBody
+    public EncounterTransaction getActiveEncounter(@RequestParam String patientUuid, String encounterTypeUuid, String visitTypeUuid) {
+        return emrEncounterService.getActiveEncounter(patientUuid, encounterTypeUuid, visitTypeUuid);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public EncounterTransactionResponse get(@RequestParam String patientUuid, String encounterTypeUuid, String visitTypeUuid){
-        return emrEncounterService.find(patientUuid, encounterTypeUuid, visitTypeUuid);
+    public List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters) {
+        checkForValidInput(encounterSearchParameters);
+        return emrEncounterService.find(encounterSearchParameters);
     }
 
+    private void checkForValidInput(EncounterSearchParameters encounterSearchParameters) {
+        String visitUuid = encounterSearchParameters.getVisitUuid();
+        if (StringUtils.isBlank(visitUuid))
+            throw new InvalidInputException("Visit UUID cannot be empty.");
+
+        String encounterDate = encounterSearchParameters.getEncounterDate();
+        if (StringUtils.isBlank(encounterDate))
+            throw new InvalidInputException("Encounter Date cannot be empty.");
+        try {
+            new SimpleDateFormat("yyyy-MM-dd").parse(encounterDate);
+        } catch (ParseException e) {
+            throw new InvalidInputException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + encounterDate + ".", e);
+        }
+    }
 }
 
 

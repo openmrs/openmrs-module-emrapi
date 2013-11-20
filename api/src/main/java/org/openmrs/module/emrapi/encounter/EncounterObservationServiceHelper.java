@@ -127,7 +127,7 @@ public class EncounterObservationServiceHelper {
     }
 
     private org.openmrs.module.emrapi.diagnosis.Diagnosis createDiagnosis(EncounterTransaction.Diagnosis diagnosisRequest) {
-        CodedOrFreeTextAnswer codedOrFreeTextAnswer = new CodedOrFreeTextAnswer(diagnosisRequest.getDiagnosis(), conceptService);
+        CodedOrFreeTextAnswer codedOrFreeTextAnswer = getCodedOrFreeTextAnswer(diagnosisRequest);
         org.openmrs.module.emrapi.diagnosis.Diagnosis.Order order = org.openmrs.module.emrapi.diagnosis.Diagnosis.Order.valueOf(diagnosisRequest.getOrder());
         org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty certainty = org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty.valueOf(diagnosisRequest.getCertainty());
         Obs existingObs = obsService.getObsByUuid(diagnosisRequest.getExistingObs());
@@ -135,5 +135,20 @@ public class EncounterObservationServiceHelper {
         diagnosis.setCertainty(certainty);
         diagnosis.setExistingObs(existingObs);
         return diagnosis;
+    }
+
+    private CodedOrFreeTextAnswer getCodedOrFreeTextAnswer(EncounterTransaction.Diagnosis diagnosisRequest) {
+        if (StringUtils.isNotBlank(diagnosisRequest.getFreeTextAnswer())) {
+            return new CodedOrFreeTextAnswer(diagnosisRequest.getFreeTextAnswer());
+        }
+        EncounterTransaction.Concept codedAnswer = diagnosisRequest.getCodedAnswer();
+        if(codedAnswer != null) {
+            Concept concept = conceptService.getConceptByUuid(codedAnswer.getUuid());
+            if (concept == null) {
+                throw new ConceptNotFoundException("Coded answer concept does not exist" + codedAnswer.getUuid());
+            }
+            return new CodedOrFreeTextAnswer(concept);
+        }
+        throw new RuntimeException("Diagnosis should have either free text or coded answer");
     }
 }

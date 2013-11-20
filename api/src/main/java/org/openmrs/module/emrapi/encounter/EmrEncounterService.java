@@ -15,7 +15,9 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * <pre>
@@ -28,7 +30,9 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
  */
 public interface EmrEncounterService extends OpenmrsService {
 
-    EncounterTransactionResponse save(EncounterTransaction encounterTransaction);
+    EncounterTransaction save(EncounterTransaction encounterTransaction);
 
-    EncounterTransactionResponse find(String patientUuid, String encounterTypeUuid, String visitTypeUuid);
+    EncounterTransaction getActiveEncounter(String patientUuid, String encounterTypeUuid, String visitTypeUuid);
+
+    List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters);
 }

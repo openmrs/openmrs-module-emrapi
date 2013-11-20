@@ -13,7 +13,11 @@
  */
 package org.openmrs.module.emrapi.encounter.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
+import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +26,8 @@ import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EncounterTransaction {
+    private String visitUuid;
+    private String encounterUuid;
     private String locationUuid;
     private Set<String> providerUuid;
     private String patientUuid;
@@ -33,6 +39,14 @@ public class EncounterTransaction {
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
+
+    public EncounterTransaction() {
+    }
+
+    public EncounterTransaction(String visitUuid, String encounterUuid) {
+        this.visitUuid = visitUuid;
+        this.encounterUuid = encounterUuid;
+    }
 
     public Disposition getDisposition() {
         return disposition;
@@ -94,6 +108,7 @@ public class EncounterTransaction {
         this.drugOrders = drugOrders;
     }
 
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
     public Date getEncounterDateTime() {
         return encounterDateTime == null ? new Date() : encounterDateTime;
     }
@@ -129,14 +144,80 @@ public class EncounterTransaction {
         this.diagnoses = diagnoses;
     }
 
+    public String getVisitUuid() {
+        return visitUuid;
+    }
+
+    public void setVisitUuid(String visitUuid) {
+        this.visitUuid = visitUuid;
+    }
+
+    public String getEncounterUuid() {
+        return encounterUuid;
+    }
+
+    public void setEncounterUuid(String encounterUuid) {
+        this.encounterUuid = encounterUuid;
+    }
+
+    public void addObservation(Observation observation) {
+        observations.add(observation);
+    }
+
+    public void addTestOrder(TestOrder testOrder) {
+        testOrders.add(testOrder);
+    }
+
+    public void addDrugOrder(DrugOrder drugOrder) {
+        drugOrders.add(drugOrder);
+    }
+
+    public void addDiagnosis(Diagnosis diagnosis) {
+        diagnoses.add(diagnosis);
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Concept {
+        private String uuid;
+        private String name;
+
+        public Concept(String uuid, String name) {
+            this.uuid = uuid;
+            this.name = name;
+        }
+
+        public Concept(String uuid) {
+            this(uuid, null);
+        }
+
+        public Concept() {
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observation {
         private String observationUuid;
-        private String conceptUuid;
         private Object value;
         private String comment;
         private boolean voided;
         private String voidReason;
+        private Concept concept;
         private List<Observation> groupMembers = new ArrayList<Observation>();
 
         public String getObservationUuid() {
@@ -148,12 +229,17 @@ public class EncounterTransaction {
             return this;
         }
 
+        @JsonIgnore
         public String getConceptUuid() {
-            return conceptUuid;
+            return concept.getUuid();
         }
 
-        public Observation setConceptUuid(String conceptUuid) {
-            this.conceptUuid = conceptUuid;
+        public Concept getConcept() {
+            return concept;
+        }
+
+        public Observation setConcept(Concept concept) {
+            this.concept = concept;
             return this;
         }
 
@@ -199,6 +285,10 @@ public class EncounterTransaction {
 
         public void setGroupMembers(List<Observation> groupMembers) {
             this.groupMembers = groupMembers;
+        }
+
+        public void addGroupMember(Observation observation) {
+            groupMembers.add(observation);
         }
     }
 
@@ -274,19 +364,24 @@ public class EncounterTransaction {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TestOrder {
-        private String conceptUuid;     // TODO: mandatory validation
+        private Concept concept;
         private String orderTypeUuid;
         private String instructions;
         private String uuid;
         private boolean voided;
         private String voidReason;
 
+        @JsonIgnore
         public String getConceptUuid() {
-            return conceptUuid;
+            return concept.getUuid();
         }
 
-        public TestOrder setConceptUuid(String conceptUuid) {
-            this.conceptUuid = conceptUuid;
+        public Concept getConcept() {
+            return concept;
+        }
+
+        public TestOrder setConcept(Concept concept) {
+            this.concept = concept;
             return this;
         }
 
@@ -298,6 +393,7 @@ public class EncounterTransaction {
             this.instructions = instructions;
             return this;
         }
+
 
         public String getUuid() {
             return uuid;
@@ -336,11 +432,14 @@ public class EncounterTransaction {
         }
     }
 
+
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Diagnosis {
         private String order;
         private String certainty;
-        private String diagnosis;
+        private String freeTextAnswer;
+        private Concept codedAnswer;
         private String existingObs;
 
         public String getOrder() {
@@ -361,13 +460,12 @@ public class EncounterTransaction {
             return this;
         }
 
-        public String getDiagnosis() {
-            return diagnosis;
+        public String getFreeTextAnswer() {
+            return freeTextAnswer;
         }
 
-        public Diagnosis setDiagnosis(String diagnosis) {
-            this.diagnosis = diagnosis;
-            return this;
+        public Concept getCodedAnswer() {
+            return codedAnswer;
         }
 
         public String getExistingObs() {
@@ -378,12 +476,22 @@ public class EncounterTransaction {
             this.existingObs = existingObs;
             return this;
         }
+
+        public Diagnosis setFreeTextAnswer(String freeTextAnswer) {
+            this.freeTextAnswer = freeTextAnswer;
+            return this;
+        }
+
+        public Diagnosis setCodedAnswer(Concept codedAnswer) {
+            this.codedAnswer = codedAnswer;
+            return this;
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DrugOrder {
         private String uuid;
-        private String conceptUuid;
+        private Concept concept;
         private String notes;
         private Date startDate;
         private Date  endDate;
@@ -396,18 +504,25 @@ public class EncounterTransaction {
             return uuid;
         }
 
+        @JsonIgnore
         public String getConceptUuid() {
-            return conceptUuid;
+            return concept.getUuid();
+        }
+
+        public Concept getConcept() {
+            return concept;
         }
 
         public String getNotes() {
             return notes;
         }
 
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getStartDate() {
             return startDate;
         }
 
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getEndDate() {
             return endDate;
         }
@@ -432,8 +547,9 @@ public class EncounterTransaction {
             this.uuid = uuid;
         }
 
-        public void setConceptUuid(String conceptUuid) {
-            this.conceptUuid = conceptUuid;
+        public DrugOrder setConcept(Concept concept) {
+            this.concept = concept;
+            return this;
         }
 
         public void setNotes(String notes) {
@@ -464,6 +580,4 @@ public class EncounterTransaction {
             this.prn = prn;
         }
     }
-
-
 }

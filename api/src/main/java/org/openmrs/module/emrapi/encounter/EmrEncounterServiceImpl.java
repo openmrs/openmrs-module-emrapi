@@ -13,8 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.openmrs.Concept;
-import org.openmrs.ConceptDatatype;
+import org.apache.commons.lang.time.DateUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -22,7 +21,6 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
-import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
@@ -32,17 +30,18 @@ import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEncounterService {
 
+    private final EncounterTransactionMapper encounterTransactionMapper;
     private PatientService patientService;
     private VisitService visitService;
     private EncounterService encounterService;
@@ -61,7 +60,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
                                    EncounterObservationServiceHelper encounterObservationServiceHelper,
                                    EncounterTestOrderServiceHelper encounterTestOrderServiceHelper,
                                    EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper,
-                                   EncounterDispositionServiceHelper encounterDispositionServiceHelper) {
+                                   EncounterDispositionServiceHelper encounterDispositionServiceHelper,
+                                   EncounterTransactionMapper encounterTransactionMapper) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
@@ -72,6 +72,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.administrationService = administrationService;
         this.encounterDrugOrderServiceHelper = encounterDrugOrderServiceHelper;
         this.encounterDispositionServiceHelper = encounterDispositionServiceHelper;
+        this.encounterTransactionMapper = encounterTransactionMapper;
     }
 
     @Override
@@ -88,7 +89,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     @Override
-    public EncounterTransactionResponse save(EncounterTransaction encounterTransaction) {
+    public EncounterTransaction save(EncounterTransaction encounterTransaction) {
         Patient patient = patientService.getPatientByUuid(encounterTransaction.getPatientUuid());
         Visit visit = findOrCreateVisit(encounterTransaction, patient);
         Encounter encounter = findOrCreateEncounter(encounterTransaction, patient, visit);
@@ -100,11 +101,12 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         encounterDrugOrderServiceHelper.update(encounter, encounterTransaction.getDrugOrders());
 
         visitService.saveVisit(visit);
-        return new EncounterTransactionResponse(visit.getUuid(), encounter.getUuid());
+
+        return new EncounterTransaction(visit.getUuid(), encounter.getUuid());
     }
 
     @Override
-    public EncounterTransactionResponse find(String patientUuid, String encounterTypeUuid, String visitTypeUuid) {
+    public EncounterTransaction getActiveEncounter(String patientUuid, String encounterTypeUuid, String visitTypeUuid) {
         Patient patient = patientService.getPatientByUuid(patientUuid);
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTypeUuid);
 
@@ -114,32 +116,42 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Visit visit = getActiveVisit(patient);
 
         if (visit == null) {
-            return new EncounterTransactionResponse();
+            return new EncounterTransaction();
         }
 
         Encounter encounter = findEncounter(visit, encounterParameters);
 
         if (encounter == null){
-            return new EncounterTransactionResponse(visit.getUuid(), null);
+            return new EncounterTransaction(visit.getUuid(), null);
         }
 
-        EncounterTransactionResponse encounterTransactionResponse =
-                new EncounterTransactionResponse(encounter.getVisit().getUuid(), encounter.getUuid());
-
-        encounterTransactionResponse.setObservations(getObservationData(encounter));
-
-        return encounterTransactionResponse;
+        return encounterTransactionMapper.map(encounter);
     }
 
-    private List<ObservationData> getObservationData(Encounter encounter) {
-        List<ObservationData> observations = new ArrayList<ObservationData>();
-        for (Obs obs : encounter.getAllObs()) {
-            Concept concept = obs.getConcept();
-            ConceptDatatype datatype = concept.getDatatype();
-            Object value = datatype.isNumeric() ? obs.getValueNumeric() : obs.getValueAsString(Locale.getDefault());
-            observations.add(new ObservationData(concept.getUuid(), concept.getName().getName(), value));
+    @Override
+    public List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters) {
+        Visit visit = visitService.getVisitByUuid(encounterSearchParameters.getVisitUuid());
+        if (visit == null) return new ArrayList<EncounterTransaction>();
+
+        return getEncounterTransactions(getEncountersForDate(encounterSearchParameters.getEncounterDateAsDate(), visit));
+    }
+
+    private List<EncounterTransaction> getEncounterTransactions(List<Encounter> encounters) {
+        List<EncounterTransaction> encounterTransactions = new ArrayList<EncounterTransaction>();
+        for (Encounter encounter : encounters) {
+            encounterTransactions.add(encounterTransactionMapper.map(encounter));
         }
-        return observations;
+        return encounterTransactions;
+    }
+
+    private ArrayList<Encounter> getEncountersForDate(Date encounterDate, Visit visit) {
+        ArrayList<Encounter> encounters = new ArrayList<Encounter>();
+        for (Encounter encounter : visit.getEncounters()) {
+            if (DateUtils.isSameDay(encounter.getEncounterDatetime(), encounterDate)) {
+                encounters.add(encounter);
+            }
+        }
+        return encounters;
     }
 
     private Visit getActiveVisit(Patient patient) {
