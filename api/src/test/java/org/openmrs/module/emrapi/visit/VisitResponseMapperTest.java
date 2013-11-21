@@ -25,23 +25,29 @@ import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class VisitResponseMapperTest {
-
     @Mock
     private EncounterTransactionMapper encounterTransactionMapper;
+    private VisitResponseMapper visitResponseMapper;
 
     @Before
     public void setUp(){
         initMocks(this);
+        visitResponseMapper = new VisitResponseMapper(encounterTransactionMapper);
     }
 
     @Test
-    public void testMap() throws Exception {
+    public void testMapsVisit() throws Exception {
         Visit visit = new Visit();
         visit.addEncounter(new Encounter());
 
-        VisitResponse visitResponse = new VisitResponseMapper(encounterTransactionMapper).map(visit);
+        VisitResponse visitResponse = visitResponseMapper.map(visit);
 
         Assert.assertEquals(visit.getUuid(), visitResponse.getVisitUuid());
         Assert.assertEquals(visit.getEncounters().size(), visitResponse.getEncounters().size());
+    }
+
+    @Test
+    public void testMapsNullVisitToNull() throws Exception {
+        Assert.assertNull(visitResponseMapper.map(null));
     }
 }

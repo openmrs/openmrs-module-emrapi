@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Visit;
 import org.openmrs.api.VisitService;
+import org.openmrs.module.emrapi.encounter.exception.VisitNotFoundException;
 import org.openmrs.module.emrapi.visit.contract.VisitRequest;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 
@@ -56,4 +57,11 @@ public class EmrVisitServiceImplTest {
         verify(visitService).getVisitByUuid(visitRequest.getVisitUuid());
     }
 
+    @Test(expected = VisitNotFoundException.class)
+    public void shouldRaiseExceptionForNonExistingVisit() throws Exception {
+        VisitRequest visitRequest = new VisitRequest(UUID.randomUUID().toString());
+        when(visitService.getVisitByUuid(visitRequest.getVisitUuid())).thenReturn(null);
+
+        emrVisitService.find(visitRequest);
+    }
 }

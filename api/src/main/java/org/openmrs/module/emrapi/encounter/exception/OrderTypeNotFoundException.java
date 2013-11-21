@@ -14,7 +14,9 @@
 
 package org.openmrs.module.emrapi.encounter.exception;
 
-public class OrderTypeNotFoundException extends RuntimeException {
+import org.openmrs.api.APIException;
+
+public class OrderTypeNotFoundException extends APIException {
     public OrderTypeNotFoundException(String uuid) {
         super("Order type not found for uuid : " + uuid);
     }

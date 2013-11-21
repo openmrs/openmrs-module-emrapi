@@ -13,7 +13,9 @@
  */
 package org.openmrs.module.emrapi.encounter.exception;
 
-public class ConceptNotFoundException extends RuntimeException {
+import org.openmrs.api.APIException;
+
+public class ConceptNotFoundException extends APIException {
 
     public ConceptNotFoundException(String message) {
         super(message);

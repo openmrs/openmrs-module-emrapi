@@ -30,6 +30,11 @@ public class ObservationMapper {
         EncounterTransaction.Observation observation = new EncounterTransaction.Observation();
         observation.setConcept(conceptMapper.map(concept));
         observation.setValue(value);
+        if(obs.getGroupMembers() != null) {
+            for (Obs obsGroupMember : obs.getGroupMembers()) {
+                observation.addGroupMember(map(obsGroupMember));
+            }
+        }
         return observation;
     }
 }

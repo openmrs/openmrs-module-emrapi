@@ -27,6 +27,7 @@ public class VisitResponseMapper {
     }
 
     public VisitResponse map(Visit visit) {
+        if(visit == null) return null;
         VisitResponse visitResponse = new VisitResponse(visit.getUuid());
         for (Encounter encounter : visit.getEncounters()) {
             visitResponse.addEncounter(encounterTransactionMapper.map(encounter));

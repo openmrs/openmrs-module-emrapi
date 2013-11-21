@@ -31,6 +31,7 @@ public class EncounterTransactionMapper {
         encounterTransaction.setEncounterTypeUuid(encounter.getEncounterType().getUuid());
         encounterTransaction.setLocationUuid(encounter.getLocation() != null ? encounter.getLocation().getUuid() : null);
         encounterTransaction.setVisitTypeUuid(encounter.getVisit().getVisitType().getUuid());
+        encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());
         encounterObservationsMapper.update(encounterTransaction, encounter.getObsAtTopLevel(true));
         encounterOrdersMapper.update(encounterTransaction, encounter.getOrders());
         return encounterTransaction;

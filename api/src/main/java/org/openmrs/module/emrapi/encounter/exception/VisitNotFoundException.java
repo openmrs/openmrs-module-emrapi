@@ -11,13 +11,13 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.encounter;
+package org.openmrs.module.emrapi.encounter.exception;
 
-import org.openmrs.Concept;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.api.APIException;
 
-public class ConceptMapper {
-    EncounterTransaction.Concept map(Concept concept) {
-        return concept == null ? null : new EncounterTransaction.Concept(concept.getUuid(), concept.getName().getName());
+public class VisitNotFoundException extends APIException {
+
+    public VisitNotFoundException(String message) {
+        super(message);
     }
 }

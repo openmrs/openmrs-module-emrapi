@@ -14,6 +14,7 @@
 package org.openmrs.module.emrapi.web.controller;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -140,5 +141,17 @@ public class BaseEmrControllerTest extends BaseModuleWebContextSensitiveTest {
      */
     public <T> T deserialize(MockHttpServletResponse response, Class<T> type) throws Exception {
         return objectMapper.readValue(response.getContentAsString(), type);
+    }
+
+    /**
+     * Deserializes the JSON response.
+     *
+     * @param response
+     * @param typeReference
+     * @return
+     * @throws Exception
+     */
+    public <T> T deserialize(MockHttpServletResponse response, final TypeReference<T> typeReference) throws Exception {
+        return objectMapper.readValue(response.getContentAsString(), typeReference);
     }
 }

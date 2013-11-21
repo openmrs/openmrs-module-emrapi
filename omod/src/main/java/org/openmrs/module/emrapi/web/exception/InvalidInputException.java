@@ -13,11 +13,12 @@
  */
 package org.openmrs.module.emrapi.web.exception;
 
+import org.openmrs.api.APIException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Incorrect or incomplete data passed.")
-public class InvalidInputException extends RuntimeException {
+public class InvalidInputException extends APIException {
 
     public InvalidInputException(String message) {
         super(message);

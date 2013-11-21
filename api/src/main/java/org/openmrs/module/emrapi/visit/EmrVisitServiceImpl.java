@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.visit;
 import org.openmrs.Visit;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.encounter.exception.VisitNotFoundException;
 import org.openmrs.module.emrapi.visit.contract.VisitRequest;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 
@@ -31,6 +32,8 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
     @Override
     public VisitResponse find(VisitRequest visitRequest) {
         Visit visit = visitService.getVisitByUuid(visitRequest.getVisitUuid());
+        if(visit == null)
+            throw new VisitNotFoundException("Visit by uuid "+ visitRequest.getVisitUuid() + " does not exist");
         return visitResponseMapper.map(visit);
     }
 }
