@@ -62,7 +62,7 @@ public class EncounterTestOrderServiceHelperTest {
         OrderType orderType = newOrderType(ORDER_TYPE_UUID);
 
         List<EncounterTransaction.TestOrder> testOrders = asList(
-            new EncounterTransaction.TestOrder().setConceptUuid(TEXT_CONCEPT_UUID).setInstructions("test should be done on empty stomach").setOrderTypeUuid(ORDER_TYPE_UUID)
+            new EncounterTransaction.TestOrder().setConcept(new EncounterTransaction.Concept(TEXT_CONCEPT_UUID)).setInstructions("test should be done on empty stomach").setOrderTypeUuid(ORDER_TYPE_UUID)
         );
 
         Patient patient = new Patient();
@@ -91,7 +91,7 @@ public class EncounterTestOrderServiceHelperTest {
     @Test(expected = ConceptNotFoundException.class)
     public void shouldReturnErrorWhenTestOrderConceptIsNotFound() throws Exception {
         List<EncounterTransaction.TestOrder> testOrders = asList(
-                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConceptUuid(NUMERIC_CONCEPT_UUID).setInstructions("don't do it")
+                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConcept(new EncounterTransaction.Concept(NUMERIC_CONCEPT_UUID)).setInstructions("don't do it")
         );
         Encounter encounter = new Encounter();
 
@@ -101,7 +101,7 @@ public class EncounterTestOrderServiceHelperTest {
     @Test(expected = OrderTypeNotFoundException.class)
     public void shouldReturnErrorWhenTestOrderTypeIsNotFound() throws Exception {
         List<EncounterTransaction.TestOrder> testOrders = asList(
-                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConceptUuid(TEXT_CONCEPT_UUID).setOrderTypeUuid("non-existent-id")
+                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConcept(new EncounterTransaction.Concept(TEXT_CONCEPT_UUID)).setOrderTypeUuid("non-existent-id")
         );
         when(conceptService.getConceptByUuid(TEXT_CONCEPT_UUID)).thenReturn(new Concept());
         Encounter encounter = new Encounter();
@@ -116,7 +116,7 @@ public class EncounterTestOrderServiceHelperTest {
         OrderType newOrderType = newOrderType(ORDER_TYPE_UUID);
 
         List<EncounterTransaction.TestOrder> testOrders = asList(
-                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConceptUuid(NUMERIC_CONCEPT_UUID).setInstructions("don't do it").setOrderTypeUuid(ORDER_TYPE_UUID)
+                new EncounterTransaction.TestOrder().setUuid("o-uuid").setConcept(new EncounterTransaction.Concept(NUMERIC_CONCEPT_UUID)).setInstructions("don't do it").setOrderTypeUuid(ORDER_TYPE_UUID)
         );
 
         Encounter encounter = new Encounter();

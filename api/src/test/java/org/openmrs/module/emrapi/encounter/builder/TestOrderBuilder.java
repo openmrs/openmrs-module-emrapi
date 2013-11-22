@@ -11,13 +11,26 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
+package org.openmrs.module.emrapi.encounter.builder;
 
-package org.openmrs.module.emrapi.encounter.exception;
+import org.openmrs.TestOrder;
 
-import org.openmrs.api.APIException;
+import java.util.UUID;
 
-public class OrderTypeNotFoundException extends APIException {
-    public OrderTypeNotFoundException(String uuid) {
-        super("Order type not found for uuid : " + uuid);
+public class TestOrderBuilder {
+    private TestOrder order;
+
+    public TestOrderBuilder() {
+        this.order = new TestOrder();
+        this.order.setUuid(UUID.randomUUID().toString());
+    }
+
+    public TestOrderBuilder withUuid(UUID uuid) {
+        order.setUuid(String.valueOf(uuid));
+        return this;
+    }
+
+    public TestOrder build() {
+        return order;
     }
 }

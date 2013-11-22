@@ -11,13 +11,13 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-
 package org.openmrs.module.emrapi.encounter.exception;
 
 import org.openmrs.api.APIException;
 
-public class OrderTypeNotFoundException extends APIException {
-    public OrderTypeNotFoundException(String uuid) {
-        super("Order type not found for uuid : " + uuid);
+public class VisitNotFoundException extends APIException {
+
+    public VisitNotFoundException(String message) {
+        super(message);
     }
 }

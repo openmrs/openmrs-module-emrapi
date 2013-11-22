@@ -11,13 +11,20 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-
-package org.openmrs.module.emrapi.encounter.exception;
+package org.openmrs.module.emrapi.web.exception;
 
 import org.openmrs.api.APIException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class OrderTypeNotFoundException extends APIException {
-    public OrderTypeNotFoundException(String uuid) {
-        super("Order type not found for uuid : " + uuid);
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Incorrect or incomplete data passed.")
+public class InvalidInputException extends APIException {
+
+    public InvalidInputException(String message) {
+        super(message);
+    }
+
+    public InvalidInputException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }

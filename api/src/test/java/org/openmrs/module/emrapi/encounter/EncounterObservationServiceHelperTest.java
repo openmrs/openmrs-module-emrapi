@@ -53,7 +53,7 @@ public class EncounterObservationServiceHelperTest {
     private EmrApiProperties emrApiProperties;
 
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
-    
+
     @Before
     public void setUp() throws Exception {
         initMocks(this);
@@ -66,7 +66,7 @@ public class EncounterObservationServiceHelperTest {
     public void shouldAddNewObservation() throws ParseException {
         newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
         List<EncounterTransaction.Observation> observations = asList(
-            new EncounterTransaction.Observation().setConceptUuid(TEXT_CONCEPT_UUID).setValue("text value").setComment("overweight")
+            new EncounterTransaction.Observation().setConcept(getConcept(TEXT_CONCEPT_UUID)).setValue("text value").setComment("overweight")
         );
 
         Patient patient = new Patient();
@@ -96,7 +96,7 @@ public class EncounterObservationServiceHelperTest {
         newConcept(ConceptDatatype.CODED, CODED_CONCEPT_UUID);
         Concept answerConcept = newConcept(ConceptDatatype.TEXT, "answer-uuid");
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setConceptUuid(CODED_CONCEPT_UUID).setValue("answer-uuid")
+                new EncounterTransaction.Observation().setConcept(getConcept(CODED_CONCEPT_UUID)).setValue("answer-uuid")
         );
 
         Patient patient = new Patient();
@@ -145,7 +145,7 @@ public class EncounterObservationServiceHelperTest {
         newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setConceptUuid(TEXT_CONCEPT_UUID).setValue(null).setComment("overweight")
+                new EncounterTransaction.Observation().setConcept(getConcept(TEXT_CONCEPT_UUID)).setValue(null).setComment("overweight")
         );
 
         Patient patient = new Patient();
@@ -167,7 +167,7 @@ public class EncounterObservationServiceHelperTest {
         Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setObservationUuid("o-uuid").setConceptUuid(NUMERIC_CONCEPT_UUID).setVoided(true).setVoidReason("closed")
+                new EncounterTransaction.Observation().setObservationUuid("o-uuid").setConcept(getConcept(NUMERIC_CONCEPT_UUID)).setVoided(true).setVoidReason("closed")
         );
 
         Encounter encounter = new Encounter();
@@ -191,53 +191,17 @@ public class EncounterObservationServiceHelperTest {
     @Test(expected = ConceptNotFoundException.class)
     public void shouldReturnErrorWhenObservationConceptIsNotFound() throws Exception {
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setConceptUuid("non-existent")
+                new EncounterTransaction.Observation().setConcept(getConcept("non-existent"))
         );
         Encounter encounter = new Encounter();
         encounterObservationServiceHelper.update(encounter, observations, null);
     }
 
     @Test
-    public void shouldSaveDiagnosisAsAnObservation() {
-        String diagnosisConceptId = "123";
-        List<EncounterTransaction.Diagnosis> diagnosises = asList(
-                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("Concept:" + diagnosisConceptId)
-        );
-
-        Encounter encounter = new Encounter();
-        encounter.setUuid("e-uuid");
-        Obs savedObservations = new Obs();
-        savedObservations.addGroupMember(new Obs());
-        savedObservations.addGroupMember(new Obs());
-        savedObservations.addGroupMember(new Obs());
-        Concept conceptForDiagnosis = new Concept();
-
-        when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class))).thenReturn(savedObservations);
-        when(conceptService.getConcept(Integer.valueOf(diagnosisConceptId))).thenReturn(conceptForDiagnosis);
-
-        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosises, new Date());
-
-        Set<Obs> parentObservations = encounter.getObsAtTopLevel(false);
-        assertEquals(1, parentObservations.size());
-        Obs parent = parentObservations.iterator().next();
-        assertTrue(parent.isObsGrouping());
-        int children = parent.getGroupMembers().size();
-        assertEquals(3, children);
-        ArgumentCaptor<org.openmrs.module.emrapi.diagnosis.Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(org.openmrs.module.emrapi.diagnosis.Diagnosis.class);
-        verify(diagnosisMetadata, times(1)).buildDiagnosisObsGroup(diagnosisCaptor.capture());
-        org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = diagnosisCaptor.getValue();
-        assertEquals(conceptForDiagnosis, diagnosis.getDiagnosis().getCodedAnswer());
-        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty.CONFIRMED, diagnosis.getCertainty());
-        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Order.PRIMARY, diagnosis.getOrder());
-        verify(conceptService).getConcept(Integer.valueOf(diagnosisConceptId));
-        verify(conceptService, never()).getConceptByUuid(anyString());
-    }
-
-    @Test
     public void shouldSaveDiagnosisAsAnObservationWhenPassedTheUuidOfDiagnosisConcept() {
         String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
         List<EncounterTransaction.Diagnosis> diagnosises = asList(
-                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setDiagnosis("ConceptUuid:" + diagnosisConceptUuid)
+                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setCodedAnswer(new EncounterTransaction.Concept(diagnosisConceptUuid, "conceptName"))
         );
 
         Encounter encounter = new Encounter();
@@ -277,6 +241,10 @@ public class EncounterObservationServiceHelperTest {
         concept.setUuid(uuid);
         when(conceptService.getConceptByUuid(uuid)).thenReturn(concept);
         return concept;
+    }
+
+    private EncounterTransaction.Concept getConcept(String conceptUuid) {
+        return new EncounterTransaction.Concept(conceptUuid, "concept_name");
     }
 
 }

@@ -11,13 +11,17 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
+package org.openmrs.module.emrapi.visit;
 
-package org.openmrs.module.emrapi.encounter.exception;
+import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.emrapi.visit.contract.VisitRequest;
+import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 
-import org.openmrs.api.APIException;
-
-public class OrderTypeNotFoundException extends APIException {
-    public OrderTypeNotFoundException(String uuid) {
-        super("Order type not found for uuid : " + uuid);
-    }
+/**
+ * <pre>
+ * Handy service to find a {@link org.openmrs.Visit}.
+ * </pre>
+ */
+public interface EmrVisitService extends OpenmrsService {
+    VisitResponse find(VisitRequest visitRequest);
 }

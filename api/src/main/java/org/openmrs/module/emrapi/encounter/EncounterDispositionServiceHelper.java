@@ -33,7 +33,7 @@ public class EncounterDispositionServiceHelper {
         try {
             if(disposition != null){
                 dispositionGroupConcept = getDispositionGroupConcept();
-                dispositionConcept = geDispositionConcept();
+                dispositionConcept = getDispositionConcept();
 
                 if(!hasDisposition(encounter)){
                     Obs obs = createObsGroupForDisposition(disposition,encounter,observationDateTime);
@@ -122,7 +122,7 @@ public class EncounterDispositionServiceHelper {
         return dispositionObs;
     }
 
-    private Concept geDispositionConcept() {
+    private Concept getDispositionConcept() {
         Concept concept = conceptService.getConceptByMapping(EmrApiConstants.CONCEPT_CODE_DISPOSITION, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
         if (concept == null) {
             throw new ConceptNotFoundException("Disposition concept does not exist. Code : " + EmrApiConstants.CONCEPT_CODE_DISPOSITION);

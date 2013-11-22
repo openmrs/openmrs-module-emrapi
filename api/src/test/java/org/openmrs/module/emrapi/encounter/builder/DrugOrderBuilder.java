@@ -11,14 +11,27 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.encounter.exception;
+package org.openmrs.module.emrapi.encounter.builder;
 
-import org.openmrs.api.APIException;
+import org.openmrs.DrugOrder;
+import org.openmrs.module.emrapi.encounter.EncounterTransactionMapperTest;
 
-public class ConceptNotFoundException extends APIException {
+import java.util.UUID;
 
-    public ConceptNotFoundException(String message) {
-        super(message);
+public class DrugOrderBuilder {
+    private DrugOrder order;
+
+    public DrugOrderBuilder() {
+        this.order = new DrugOrder();
+        this.order.setUuid(UUID.randomUUID().toString());
     }
 
+    public DrugOrderBuilder withUuid(UUID uuid) {
+        order.setUuid(String.valueOf(uuid));
+        return this;
+    }
+
+    public DrugOrder build() {
+        return order;
+    }
 }

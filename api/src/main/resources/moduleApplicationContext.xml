@@ -266,6 +266,7 @@
                 <constructor-arg  ref="encounterTestOrderServiceHelper"/>
                 <constructor-arg  ref="encounterDrugOrderServiceHelper"/>
                 <constructor-arg  ref="encounterDispositionServiceHelper"/>
+                <constructor-arg  ref="encounterTransactionMapper"/>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -294,6 +295,61 @@
 
     <bean id="encounterDispositionServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDispositionServiceHelper">
         <constructor-arg ref="conceptService"/>
+    </bean>
+
+    <bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.visit.EmrVisitServiceImpl">
+                <constructor-arg  ref="visitService"/>
+                <constructor-arg  ref="visitResponseMapper"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean id="visitResponseMapper" class="org.openmrs.module.emrapi.visit.VisitResponseMapper">
+        <constructor-arg name="encounterTransactionMapper" ref="encounterTransactionMapper"/>
+    </bean>
+
+    <bean id="encounterTransactionMapper" class="org.openmrs.module.emrapi.encounter.EncounterTransactionMapper">
+        <constructor-arg name="encounterObservationsMapper" ref="encounterObservationsMapper"/>
+        <constructor-arg name="encounterOrdersMapper" ref="encounterOrdersMapper"/>
+    </bean>
+
+    <bean id="encounterObservationsMapper" class="org.openmrs.module.emrapi.encounter.EncounterObservationsMapper">
+        <constructor-arg name="observationMapper" ref="observationMapper"/>
+        <constructor-arg name="diagnosisMapper" ref="diagnosisMapper"/>
+        <constructor-arg name="dispositionMapper" ref="dispositionMapper"/>
+        <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
+    </bean>
+
+    <bean id="observationMapper" class="org.openmrs.module.emrapi.encounter.ObservationMapper">
+    </bean>
+
+    <bean id="diagnosisMapper" class="org.openmrs.module.emrapi.encounter.DiagnosisMapper">
+    </bean>
+
+    <bean id="dispositionMapper" class="org.openmrs.module.emrapi.encounter.DispositionMapper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+    </bean>
+
+    <bean id="encounterOrdersMapper" class="org.openmrs.module.emrapi.encounter.EncounterOrdersMapper">
+        <constructor-arg name="testOrderMapper" ref="testOrderMapper"/>
+        <constructor-arg name="drugOrderMapper" ref="drugOrderMapper"/>
+    </bean>
+
+    <bean id="testOrderMapper" class="org.openmrs.module.emrapi.encounter.TestOrderMapper">
+    </bean>
+
+    <bean id="drugOrderMapper" class="org.openmrs.module.emrapi.encounter.DrugOrderMapper">
     </bean>
 
     <bean parent="serviceContext">

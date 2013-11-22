@@ -13,15 +13,10 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
+import org.codehaus.jackson.type.TypeReference;
 import org.joda.time.DateTime;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
-import org.openmrs.ConceptName;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
@@ -29,9 +24,10 @@ import org.openmrs.Order;
 import org.openmrs.TestOrder;
 import org.openmrs.Visit;
 import org.openmrs.api.VisitService;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransactionResponse;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +39,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @org.springframework.test.context.ContextConfiguration(locations = {"classpath:moduleApplicationContext.xml"}, inheritLocations = true)
@@ -58,7 +56,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", \"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\"," +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\" }";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", visit.getPatient().getUuid());
@@ -77,7 +75,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterDateTime\" : \"" + encounterDateTimeString + "\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\" }";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
         assertEquals("1e5d5d48-6b78-11e0-93c3-18a905e044dc", response.getVisitUuid());
 
@@ -98,7 +96,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\" }";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08g", response.getEncounterUuid());
     }
@@ -123,10 +121,12 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                         "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                         "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                         "\"observations\":[" +
-                            "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"conceptName\":\"Should be Ignored\", \"value\":20 }, " +
-                            "{\"conceptUuid\":\"e102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"value\":\"text value\", \"comment\":\"overweight\"}]}";
+                            "{\"concept\": {\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"conceptName\":\"Should be Ignored\", \"value\":20 }, " +
+                            "{\"concept\": {\"uuid\": \"e102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":\"text value\", \"comment\":\"overweight\"}]}";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+        MockHttpServletResponse response1 = handle(newPostRequest("/rest/emrapi/encounter", json));
+
+        EncounterTransaction response = deserialize(response1, EncounterTransaction.class);
 
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = visit.getEncounters().iterator().next();
@@ -159,11 +159,11 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                 "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                 "\"observations\":[" +
-                "{\"conceptUuid\":\"e102c80f-1yz9-4da3-bb88-8122ce8868dd\", " +
-                " \"groupMembers\" : [{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"value\":20, \"comment\":\"overweight\" }] }" +
+                "{\"concept\":{\"uuid\": \"e102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, " +
+                " \"groupMembers\" : [{\"concept\":{\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":20, \"comment\":\"overweight\" }] }" +
                 "]}";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = (Encounter) visit.getEncounters().toArray()[0];
@@ -196,7 +196,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "{\"observationUuid\":\"zf616900-5e7c-4667-9a7f-dcb260abf1de\", \"comment\" : \"new c\", \"value\":100 }" +
                 "]}";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = (Encounter) visit.getEncounters().toArray()[0];
@@ -217,6 +217,95 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("new gc", member.getComment());
     }
 
+    @Test
+    public void shouldGetEncounterTransactionByDate() throws Exception {
+        executeDataSet("baseMetaData.xml");
+        executeDataSet("dispositionMetaData.xml");
+        executeDataSet("diagnosisMetaData.xml");
+        executeDataSet("shouldGetEncounterTransactionByDate.xml");
+        String encounter1PostData = "{" +
+                    "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                    "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                    "\"encounterTypeUuid\": \"4f3c2244-9d6a-439e-b88a-6e8873489ea7\", " +
+                    "\"encounterDateTime\" : \"2004-01-01T10:00:00.000+0000\" " +
+                "}";
+        EncounterTransaction encounter1Response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", encounter1PostData)), EncounterTransaction.class);
+        String cancerDiagnosisUuid = "d102c80f-1yz9-4da3-bb88-8122ce8868dh";
+        String malariaDiagnosisUuid = "604dcce9-bcd9-48a8-b2f5-112743cf1db8";
+        String visitUuid = encounter1Response.getVisitUuid();
+        String encounter2PostData = "{" +
+                "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"visitUuid\": \"" + visitUuid + "\", " +
+                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899891\", " +
+                "\"encounterDateTime\" : \"2005-01-01T10:00:00.000+0000\", " +
+                "\"observations\":[" +
+                    "{\"" +
+                        "concept\":{\"uuid\": \"82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0\"}, " +
+                        "\"groupMembers\" : [{\"concept\":{\"uuid\": \"4f3c2244-9d6a-439e-b88a-6e8873489ea7\"}, \"value\":20, \"comment\":\"overweight\" }] " +
+                    "}" +
+                "]," +
+                "\"diagnoses\":[" +
+                    "{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"codedAnswer\": { \"uuid\": \"" + cancerDiagnosisUuid + "\"} }," +
+                    "{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"codedAnswer\": { \"uuid\": \"" + malariaDiagnosisUuid + "\"} }" +
+                "], " +
+                "\"disposition\": {" +
+                "    \"code\": \"ADMIT\"," +
+                "    \"additionalObs\": [" +
+                "        {" +
+                "            \"value\": \"Admit him to ICU.\"," +
+                "            \"concept\": {" +
+                "                \"uuid\": \"9169366f-3c7f-11e3-8f4c-005056823ee5\"," +
+                "                \"name\": \"Disposition Note\"" +
+                "            }" +
+                "        }" +
+                "    ]" +
+                "}" +
+                "}";
+        EncounterTransaction encounter2Response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", encounter2PostData)), EncounterTransaction.class);
+        assertEquals(encounter1Response.getVisitUuid(), encounter2Response.getVisitUuid());
+        assertNotEquals(encounter1Response.getEncounterUuid(), encounter2Response.getEncounterUuid());
+
+        List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter", new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("encounterDate", "2005-01-01")})), new TypeReference<List<EncounterTransaction>>() {});
+
+
+        assertEquals(1, encounterTransactions.size());
+        EncounterTransaction fetchedEncounterTransaction = encounterTransactions.get(0);
+        assertEquals(visitUuid, fetchedEncounterTransaction.getVisitUuid());
+        assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", fetchedEncounterTransaction.getPatientUuid());
+        assertEquals("b45ca846-c79a-11e2-b0c0-8e397087571c", fetchedEncounterTransaction.getVisitTypeUuid());
+        assertEquals("2b377dba-62c3-4e53-91ef-b51c68899891", fetchedEncounterTransaction.getEncounterTypeUuid());
+        assertEquals("2005-01-01", new SimpleDateFormat("yyyy-MM-dd").format(fetchedEncounterTransaction.getEncounterDateTime()));
+        //Assert Observations
+        assertEquals(1, fetchedEncounterTransaction.getObservations().size());
+        assertEquals("82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0", fetchedEncounterTransaction.getObservations().get(0).getConcept().getUuid());
+        assertEquals(1, fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().size());
+        assertEquals("4f3c2244-9d6a-439e-b88a-6e8873489ea7", fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().get(0).getConcept().getUuid());
+        assertEquals("20", fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().get(0).getValue());
+        //Assert Diagnosis data
+        assertEquals(2, fetchedEncounterTransaction.getDiagnoses().size());
+        EncounterTransaction.Diagnosis cancerDiagnosis = getDiagnosisByUuid(fetchedEncounterTransaction.getDiagnoses(), cancerDiagnosisUuid);
+        assertNotNull(cancerDiagnosis);
+        assertEquals("PRIMARY", cancerDiagnosis.getOrder());
+        assertEquals("CONFIRMED", cancerDiagnosis.getCertainty());
+        assertEquals(cancerDiagnosisUuid, cancerDiagnosis.getCodedAnswer().getUuid());
+        assertNotNull(getDiagnosisByUuid(fetchedEncounterTransaction.getDiagnoses(), malariaDiagnosisUuid));
+        //Assert Disposition data
+        EncounterTransaction.Disposition fetchedDisposition = fetchedEncounterTransaction.getDisposition();
+        assertEquals("ADMIT", fetchedDisposition.getCode());
+        assertNotNull(fetchedDisposition.getExistingObs());
+        assertEquals(1, fetchedDisposition.getAdditionalObs().size());
+        assertEquals("Admit him to ICU.", fetchedDisposition.getAdditionalObs().get(0).getValue());
+        assertEquals("Disposition Note", fetchedDisposition.getAdditionalObs().get(0).getConcept().getName());
+    }
+
+    private EncounterTransaction.Diagnosis getDiagnosisByUuid(List<EncounterTransaction.Diagnosis> diagnoses, String diagnosisUuid) {
+        for (EncounterTransaction.Diagnosis diagnose : diagnoses) {
+            if(diagnose.getCodedAnswer().getUuid().equals(diagnosisUuid))
+                return diagnose;
+        }
+        return null;
+    }
 
     @Test
     public void shouldAddNewTestOrder() throws Exception {
@@ -227,9 +316,10 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                 "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                 "\"testOrders\":[" +
-                "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", \"instructions\":\"do it\", \"orderTypeUuid\": \"1a61ef2a-250c-11e3-b832-0800271c1b75\" }]}";
+                "{\"concept\": {\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"instructions\":\"do it\", \"orderTypeUuid\": \"1a61ef2a-250c-11e3-b832-0800271c1b75\" }]}";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = visit.getEncounters().iterator().next();
@@ -243,40 +333,25 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("do it", testOrder.getInstructions());
     }
 
-    @Ignore
     @Test
     public void shouldAddDiagnosesAdObservation() throws Exception {
+        executeDataSet("baseMetaData.xml");
+        executeDataSet("diagnosisMetaData.xml");
         executeDataSet("shouldAddDiagnosisAsObservation.xml");
-        String uuid = "1234-1234-1234-1234";
-        Obs certaintyObservation = new Obs();
-        Concept certaintyConcept = new Concept();
-        ConceptName certaintyConceptName = new ConceptName();
-        certaintyConceptName.setName("CONFIRMED");
-        certaintyConcept.addName(certaintyConceptName);
-        certaintyObservation.setConcept(certaintyConcept);
 
-        Obs orderObservation = new Obs();
-        Concept orderConcept = new Concept();
-        ConceptName orderConceptName = new ConceptName();
-        orderConceptName.setName("PRIMARY");
-        orderConcept.addName(orderConceptName);
-        orderObservation.setConcept(orderConcept);
+        String cancerDiagnosisUuid = "d102c80f-1yz9-4da3-bb88-8122ce8868dh";
 
-        Obs diagnosisObservation = new Obs();
-        Concept diagnosisConcept = new Concept();
-        diagnosisConcept.setUuid(uuid);
-        ConceptName diagnosisConceptName = new ConceptName();
-        diagnosisConceptName.setName("tuberculosis");
-        diagnosisConcept.addName(orderConceptName);
-        diagnosisObservation.setConcept(diagnosisConcept);
+        String postData = "{" +
+                                "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899891\", " +
+                                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                                "\"diagnoses\":[" +
+                                    "{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"codedAnswer\": { \"uuid\": \"" + cancerDiagnosisUuid + "\"} }" +
+                                "]" +
+                           "}";
 
-        String postData = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
-                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
-                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
-                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
-                "{\"diagnoses\":[{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"concept\": \"Concept:" + uuid + "\"}]}";
-
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", postData)), EncounterTransactionResponse.class);
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", postData)), EncounterTransaction.class);
 
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = visit.getEncounters().iterator().next();
@@ -287,27 +362,18 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertTrue(parentObservation.isObsGrouping());
         Set<Obs> diagnosisObservationGroupMembers = parentObservation.getGroupMembers();
         assertEquals(3, diagnosisObservationGroupMembers.size());
-        assertTrue(diagnosisObservationGroupMembers.contains(matches(certaintyObservation)));
-        assertTrue(diagnosisObservationGroupMembers.contains(matches(orderObservation)));
-        assertTrue(diagnosisObservationGroupMembers.contains(matches(diagnosisObservation)));
+        ArrayList<String> valueCodedNames = getValuCodedNames(diagnosisObservationGroupMembers);
+        assertTrue(valueCodedNames.contains("Confirmed"));
+        assertTrue(valueCodedNames.contains("Primary"));
+        assertTrue(valueCodedNames.contains("Cancer"));
     }
 
-    public static Matcher matches(final Object expected){
-        return new BaseMatcher() {
-            protected Object theExpected = expected;
-            public boolean matches(Object o) {
-                Obs expectedObs = (Obs) theExpected;
-                Obs otherObs = (Obs) o;
-                return expectedObs.getConcept().getName().getName().equals(otherObs.getConcept().getName().getName()) &&
-                        expectedObs.hasGroupMembers() == otherObs.hasGroupMembers() &&
-                        expectedObs.getConcept().getUuid().equals(otherObs.getConcept().getUuid()) &&
-                        expectedObs.getConcept().getConceptClass().equals(otherObs.getConcept().getConceptClass());
-            }
-
-            public void describeTo(Description description) {
-                description.appendText(theExpected.toString());
-            }
-        };
+    private ArrayList<String> getValuCodedNames(Set<Obs> diagnosisObservationGroupMembers) {
+        ArrayList<String> valueCodedNames = new ArrayList<String>();
+        for (Obs diagnosisObservationGroupMember : diagnosisObservationGroupMembers) {
+            valueCodedNames.add(diagnosisObservationGroupMember.getValueCoded().getName().getName());
+        }
+        return valueCodedNames;
     }
 
     @Test
@@ -319,11 +385,11 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                 "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                 "\"testOrders\":[" +
-                "{\"conceptUuid\":\"d102c80f-1yz9-4da3-bb88-8122ce8868dd\", " +
+                "{\"concept\":{ \"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, " +
                 "\"instructions\":\"do it\", \"orderTypeUuid\": \"1a61ef2a-250c-11e3-b832-0800271c1b75\" }]," +
                 "\"drugOrders\":[" +
                 "{\"uuid\": \"4d6fb6e0-4950-426c-9a9b-1f97e6037893\"," +
-                "\"conceptUuid\": \"29dc4a20-507f-40ed-9545-d47e932483fa\"," +
+                "\"concept\": {\"uuid\": \"29dc4a20-507f-40ed-9545-d47e932483fa\"}," +
                 "\"notes\": \"Take as needed\"," +
                 "\"startDate\": \"2013-09-30T09:26:09.717Z\"," +
                 "\"endDate\": \"2013-10-02T09:26:09.717Z\"," +
@@ -333,7 +399,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"prn\": true}" +
                 "]}";
 
-        EncounterTransactionResponse response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransactionResponse.class);
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = visit.getEncounters().iterator().next();

@@ -54,13 +54,17 @@ public class EncounterDispositionServiceHelperTest {
         encounter.setUuid("e-uuid");
 
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
-        disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConceptUuid(noteConceptUuid).setValue(dispositionNoteValue)));
+        disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
 
         encounterDispositionServiceHelper.update(encounter, disposition, new Date());
 
         assertDispositionValues(noteConceptUuid, dispositionNoteValue, code, encounter);
 
 
+    }
+
+    private EncounterTransaction.Concept getConcept(String conceptUuid) {
+        return new EncounterTransaction.Concept(conceptUuid, "concept_name");
     }
 
     private void assertDispositionValues(String noteConceptUuid, String dispositionNoteValue, String code, Encounter encounter) {
@@ -108,14 +112,14 @@ public class EncounterDispositionServiceHelperTest {
         encounter.setUuid("e-uuid");
 
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
-        disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConceptUuid(noteConceptUuid).setValue(dispositionNoteValue)));
+        disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
 
         encounterDispositionServiceHelper.update(encounter, disposition, new Date());
 
         code = "DISCHARGE";
         dispositionNoteValue = dispositionNoteValue+" addendum";
         disposition = new EncounterTransaction.Disposition();
-        disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConceptUuid(noteConceptUuid).setValue(dispositionNoteValue)));
+        disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
         newConceptByMapping(code,null);
 
         encounterDispositionServiceHelper.update(encounter, disposition, new Date());

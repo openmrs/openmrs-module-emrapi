@@ -13,7 +13,9 @@
  */
 package org.openmrs.module.emrapi.encounter.exception;
 
-public class InvalidDrugException extends RuntimeException {
+import org.openmrs.api.APIException;
+
+public class InvalidDrugException extends APIException {
 
     public InvalidDrugException(String message) {
         super(message);
