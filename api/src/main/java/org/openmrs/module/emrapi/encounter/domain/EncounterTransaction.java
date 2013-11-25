@@ -16,7 +16,6 @@ package org.openmrs.module.emrapi.encounter.domain;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
@@ -212,7 +211,7 @@ public class EncounterTransaction {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observation {
-        private String observationUuid;
+        private String uuid;
         private Object value;
         private String comment;
         private boolean voided;
@@ -220,12 +219,12 @@ public class EncounterTransaction {
         private Concept concept;
         private List<Observation> groupMembers = new ArrayList<Observation>();
 
-        public String getObservationUuid() {
-            return observationUuid;
+        public String getUuid() {
+            return uuid;
         }
 
-        public Observation setObservationUuid(String observationUuid) {
-            this.observationUuid = observationUuid;
+        public Observation setUuid(String uuid) {
+            this.uuid = uuid;
             return this;
         }
 

@@ -58,7 +58,7 @@ public class EncounterObservationServiceHelper {
     }
 
     private void updateObservation(Encounter encounter, Obs parentObs, Set<Obs> existingObservations, Date observationDateTime, EncounterTransaction.Observation observationData) throws ParseException {
-        Obs observation = getMatchingObservation(existingObservations, observationData.getObservationUuid());
+        Obs observation = getMatchingObservation(existingObservations, observationData.getUuid());
         if (observationData.isVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());

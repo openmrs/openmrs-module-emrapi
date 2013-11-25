@@ -118,7 +118,7 @@ public class EncounterObservationServiceHelperTest {
         Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setObservationUuid("o-uuid").setValue(35.0).setComment("overweight")
+                new EncounterTransaction.Observation().setUuid("o-uuid").setValue(35.0).setComment("overweight")
         );
 
         Encounter encounter = new Encounter();
@@ -167,7 +167,7 @@ public class EncounterObservationServiceHelperTest {
         Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setObservationUuid("o-uuid").setConcept(getConcept(NUMERIC_CONCEPT_UUID)).setVoided(true).setVoidReason("closed")
+                new EncounterTransaction.Observation().setUuid("o-uuid").setConcept(getConcept(NUMERIC_CONCEPT_UUID)).setVoided(true).setVoidReason("closed")
         );
 
         Encounter encounter = new Encounter();

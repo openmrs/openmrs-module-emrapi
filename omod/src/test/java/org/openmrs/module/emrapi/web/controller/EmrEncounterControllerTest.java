@@ -191,9 +191,9 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\"," +
                 "\"encounterDateTime\" : \"2013-01-01T00:00:00.000+0000\", " +
                 "\"observations\":[" +
-                "{\"observationUuid\":\"z9fb7f47-e80a-4056-9285-bd798be13c63\", " +
-                " \"groupMembers\" : [{\"observationUuid\":\"ze48cdcb-6a76-47e3-9f2e-2635032f3a9a\", \"value\":20, \"comment\":\"new gc\" }] }, " +
-                "{\"observationUuid\":\"zf616900-5e7c-4667-9a7f-dcb260abf1de\", \"comment\" : \"new c\", \"value\":100 }" +
+                "{\"uuid\":\"z9fb7f47-e80a-4056-9285-bd798be13c63\", " +
+                " \"groupMembers\" : [{\"uuid\":\"ze48cdcb-6a76-47e3-9f2e-2635032f3a9a\", \"value\":20, \"comment\":\"new gc\" }] }, " +
+                "{\"uuid\":\"zf616900-5e7c-4667-9a7f-dcb260abf1de\", \"comment\" : \"new c\", \"value\":100 }" +
                 "]}";
 
         EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);

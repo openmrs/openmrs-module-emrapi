@@ -14,20 +14,18 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Concept;
-import org.openmrs.ConceptDatatype;
 import org.openmrs.Obs;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-
-import java.util.Locale;
 
 public class ObservationMapper {
     private final ConceptMapper conceptMapper = new ConceptMapper();
 
     public EncounterTransaction.Observation map(Obs obs) {
         Concept concept = obs.getConcept();
-        ConceptDatatype dataType = concept.getDatatype();
-        Object value = dataType.isNumeric() ? obs.getValueNumeric() : obs.getValueAsString(Locale.getDefault());
+        Object value = concept.isNumeric() ? obs.getValueNumeric() : obs.getValueAsString(Context.getLocale());
         EncounterTransaction.Observation observation = new EncounterTransaction.Observation();
+        observation.setUuid(obs.getUuid());
         observation.setConcept(conceptMapper.map(concept));
         observation.setValue(value);
         if(obs.getGroupMembers() != null) {

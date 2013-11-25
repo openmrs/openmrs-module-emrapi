@@ -28,6 +28,11 @@ public class ObsBuilder {
 
     Obs obs = new Obs();
 
+    public ObsBuilder setUuid(String uuid) {
+        obs.setUuid(uuid);
+        return this;
+    }
+
     public ObsBuilder setPerson(Person person) {
         obs.setPerson(person);
         return this;
@@ -45,6 +50,11 @@ public class ObsBuilder {
 
     public ObsBuilder setValue(String valueText) {
         obs.setValueText(valueText);
+        return this;
+    }
+
+    public ObsBuilder setValue(Double value) {
+        obs.setValueNumeric(value);
         return this;
     }
 

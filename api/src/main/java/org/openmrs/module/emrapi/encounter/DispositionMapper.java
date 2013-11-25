@@ -51,7 +51,7 @@ public class DispositionMapper {
                 observation.setVoidReason(groupMember.getVoidReason());
                 observation.setVoided(groupMember.getVoided());
                 observation.setComment(groupMember.getComment());
-                observation.setObservationUuid(groupMember.getUuid());
+                observation.setUuid(groupMember.getUuid());
                 additionalObservations.add(observation);
             }
         }
