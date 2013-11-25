@@ -28,7 +28,7 @@ public class EncounterTransaction {
     private String visitUuid;
     private String encounterUuid;
     private String locationUuid;
-    private Set<String> providerUuid;
+    private Set<Provider> providers;
     private String patientUuid;
     private String visitTypeUuid;
     private String encounterTypeUuid;
@@ -126,15 +126,6 @@ public class EncounterTransaction {
         return this;
     }
 
-    public Set<String> getProviderUuids() {
-        return providerUuid;
-    }
-
-    public EncounterTransaction setProviderUuid(Set<String> providerUuid) {
-        this.providerUuid = providerUuid;
-        return this;
-    }
-
     public List<Diagnosis> getDiagnoses() {
         return diagnoses;
     }
@@ -173,6 +164,14 @@ public class EncounterTransaction {
 
     public void addDiagnosis(Diagnosis diagnosis) {
         diagnoses.add(diagnosis);
+    }
+
+    public Set<Provider> getProviders() {
+        return providers;
+    }
+
+    public void setProviders(Set<Provider> providers) {
+        this.providers = providers;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -587,6 +586,28 @@ public class EncounterTransaction {
 
         public void setPrn(boolean prn) {
             this.prn = prn;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Provider {
+        private String uuid;
+        private String name;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 }

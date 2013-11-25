@@ -19,10 +19,12 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 public class EncounterTransactionMapper {
     private final EncounterObservationsMapper encounterObservationsMapper;
     private final EncounterOrdersMapper encounterOrdersMapper;
+    private final EncounterProviderMapper encounterProviderMapper;
 
-    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterOrdersMapper encounterOrdersMapper) {
+    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterOrdersMapper encounterOrdersMapper, EncounterProviderMapper encounterProviderMapper) {
         this.encounterObservationsMapper = encounterObservationsMapper;
         this.encounterOrdersMapper = encounterOrdersMapper;
+        this.encounterProviderMapper = encounterProviderMapper;
     }
 
     public EncounterTransaction map(Encounter encounter) {
@@ -32,7 +34,7 @@ public class EncounterTransactionMapper {
         encounterTransaction.setLocationUuid(encounter.getLocation() != null ? encounter.getLocation().getUuid() : null);
         encounterTransaction.setVisitTypeUuid(encounter.getVisit().getVisitType().getUuid());
         encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());
-        encounterObservationsMapper.update(encounterTransaction, encounter.getObsAtTopLevel(true));
+        encounterProviderMapper.update(encounterTransaction, encounter.getEncounterProviders());
         encounterOrdersMapper.update(encounterTransaction, encounter.getOrders());
         return encounterTransaction;
     }

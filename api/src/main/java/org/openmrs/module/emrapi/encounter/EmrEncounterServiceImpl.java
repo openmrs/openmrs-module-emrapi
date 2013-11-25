@@ -171,7 +171,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTransaction.getEncounterTypeUuid());
         Location location = locationService.getLocationByUuid(encounterTransaction.getLocationUuid());
         Date encounterDateTime = encounterTransaction.getEncounterDateTime();
-        Set<Provider> providers = getProviders(encounterTransaction.getProviderUuids());
+        Set<Provider> providers = getProviders(encounterTransaction.getProviders());
 
         EncounterParameters encounterParameters = EncounterParameters.instance()
                 .setLocation(location).setEncounterType(encounterType)
@@ -202,16 +202,16 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         return encounterMatcher.findEncounter(visit, encounterParameters);
     }
 
-    private Set<Provider> getProviders(Set<String> providerUuids) {
+    private Set<Provider> getProviders(Set<EncounterTransaction.Provider> encounteProviders) {
 
-        if (providerUuids == null){
+        if (encounteProviders == null){
             return Collections.EMPTY_SET;
         }
 
         Set<Provider> providers = new HashSet<Provider>();
 
-        for (String providerUuid : providerUuids) {
-            Provider provider = providerService.getProviderByUuid(providerUuid);
+        for (EncounterTransaction.Provider encounterProvider : encounteProviders) {
+            Provider provider = providerService.getProviderByUuid(encounterProvider.getUuid());
             providers.add(provider);
         }
         return providers;
