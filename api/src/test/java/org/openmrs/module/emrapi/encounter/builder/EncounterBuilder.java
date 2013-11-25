@@ -1,12 +1,18 @@
 package org.openmrs.module.emrapi.encounter.builder;
 
 import org.openmrs.Encounter;
+import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Patient;
+import org.openmrs.Person;
+import org.openmrs.PersonName;
+import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class EncounterBuilder {
@@ -30,6 +36,22 @@ public class EncounterBuilder {
         Location location = new Location();
         location.setUuid(UUID.randomUUID().toString());
         encounter.setLocation(location);
+        EncounterProvider encounterprovider = new EncounterProvider();
+        Provider provider = new Provider(1234);
+
+        Person person = new Person(2345);
+        Set<PersonName> personNames = new HashSet<PersonName>();
+        PersonName name = new PersonName("Yogesh", "", "Jain");
+        name.setPreferred(true);
+        personNames.add(name);
+
+        person.setNames(personNames);
+
+        provider.setPerson(person);
+        encounterprovider.setProvider(provider);
+        Set<EncounterProvider> encounterProviders = new HashSet<EncounterProvider>();
+        encounterProviders.add(encounterprovider);
+        encounter.setEncounterProviders(encounterProviders);
     }
 
     public Encounter build() {
