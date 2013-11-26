@@ -47,7 +47,7 @@ public class EncounterTestOrderServiceHelper {
             if (testOrder.isVoided()) {
                 order.setVoided(true);
                 order.setVoidReason(testOrder.getVoidReason());
-                return;
+                continue;
             }
 
             if (order == null) {
