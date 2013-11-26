@@ -241,8 +241,8 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterDateTime\" : \"2005-01-01T10:00:00.000+0000\", " +
                 "\"observations\":[" +
                     "{\"" +
-                        "concept\":{\"uuid\": \"82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0\"}, " +
-                        "\"groupMembers\" : [{\"concept\":{\"uuid\": \"4f3c2244-9d6a-439e-b88a-6e8873489ea7\"}, \"value\":20, \"comment\":\"overweight\" }] " +
+                        "concept\":{\"uuid\": \"4f3c2244-9d6a-439e-b88a-6e8873489ea7\"}, " +
+                        "\"groupMembers\" : [{\"concept\":{\"uuid\": \"82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0\"}, \"value\":20, \"comment\":\"overweight\" }] " +
                     "}" +
                 "]," +
                 "\"diagnoses\":[" +
@@ -278,10 +278,10 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("2005-01-01", new SimpleDateFormat("yyyy-MM-dd").format(fetchedEncounterTransaction.getEncounterDateTime()));
         //Assert Observations
         assertEquals(1, fetchedEncounterTransaction.getObservations().size());
-        assertEquals("82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0", fetchedEncounterTransaction.getObservations().get(0).getConcept().getUuid());
+        assertEquals("4f3c2244-9d6a-439e-b88a-6e8873489ea7", fetchedEncounterTransaction.getObservations().get(0).getConcept().getUuid());
         assertEquals(1, fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().size());
-        assertEquals("4f3c2244-9d6a-439e-b88a-6e8873489ea7", fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().get(0).getConcept().getUuid());
-        assertEquals("20", fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().get(0).getValue());
+        assertEquals("82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0", fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().get(0).getConcept().getUuid());
+        assertEquals(20.0, fetchedEncounterTransaction.getObservations().get(0).getGroupMembers().get(0).getValue());
         //Assert Diagnosis data
         assertEquals(2, fetchedEncounterTransaction.getDiagnoses().size());
         EncounterTransaction.Diagnosis cancerDiagnosis = getDiagnosisByUuid(fetchedEncounterTransaction.getDiagnoses(), cancerDiagnosisUuid);

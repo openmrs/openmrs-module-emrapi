@@ -23,7 +23,7 @@ public class ObservationMapper {
 
     public EncounterTransaction.Observation map(Obs obs) {
         Concept concept = obs.getConcept();
-        Object value = concept.isNumeric() ? obs.getValueNumeric() : obs.getValueAsString(Context.getLocale());
+        Object value = concept.getDatatype().isNumeric() ? obs.getValueNumeric() : obs.getValueAsString(Context.getLocale());
         EncounterTransaction.Observation observation = new EncounterTransaction.Observation();
         observation.setUuid(obs.getUuid());
         observation.setConcept(conceptMapper.map(concept));

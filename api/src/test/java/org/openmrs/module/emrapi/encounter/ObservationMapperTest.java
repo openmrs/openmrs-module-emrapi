@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Concept;
+import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptName;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -32,21 +33,24 @@ public class ObservationMapperTest {
 
     @Mock
     private Concept concept;
+    @Mock
+    private ConceptDatatype conceptDatatype;
     private ObservationMapper observationMapper;
 
     @Before
     public void setUp(){
         initMocks(this);
         when(concept.getName()).thenReturn(new ConceptName());
+        when(concept.getDatatype()).thenReturn(conceptDatatype);
         observationMapper = new ObservationMapper();
     }
 
     @Test
-    public void shouldMapObservation(){
+    public void shouldMapObservationWithNumericValue(){
         ObsBuilder obsBuilder = new ObsBuilder();
         String uuid = UUID.randomUUID().toString();
         obsBuilder.setUuid(uuid).setValue(100.0).setConcept(concept);
-        when(concept.isNumeric()).thenReturn(true);
+        when(conceptDatatype.isNumeric()).thenReturn(true);
         Obs obs = obsBuilder.get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
