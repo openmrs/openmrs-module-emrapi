@@ -18,11 +18,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Encounter;
-import org.openmrs.EncounterProvider;
 import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-
-import java.util.Set;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -33,6 +30,7 @@ public class EncounterTransactionMapperTest {
     @Mock
     private EncounterOrdersMapper encounterOrdersMapper;
 
+    @Mock
     private EncounterProviderMapper encounterProviderMapper;
 
     @Before
