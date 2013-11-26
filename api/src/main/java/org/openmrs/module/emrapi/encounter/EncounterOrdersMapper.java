@@ -38,4 +38,15 @@ public class EncounterOrdersMapper {
             }
         }
     }
+
+ public static class EmptyEncounterOrdersMapper extends EncounterOrdersMapper {
+
+     public EmptyEncounterOrdersMapper(TestOrderMapper testOrderMapper, DrugOrderMapper drugOrderMapper) {
+         super(testOrderMapper, drugOrderMapper);
+     }
+
+     void update(EncounterTransaction encounterTransactionResponse, Set<Order> orders) {
+        //do Nothing
+    }
+}
 }

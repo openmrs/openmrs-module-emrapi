@@ -21,11 +21,12 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import java.util.Set;
 
 public class EncounterObservationsMapper {
-    private final ObservationMapper observationMapper;
-    private final DiagnosisMapper diagnosisMapper;
-    private final DispositionMapper dispositionMapper;
+    private  ObservationMapper observationMapper;
+    private  DiagnosisMapper diagnosisMapper;
+    private  DispositionMapper dispositionMapper;
     private EmrApiProperties emrApiProperties;
     private DiagnosisMetadata diagnosisMetadata;
+
 
     public EncounterObservationsMapper(ObservationMapper observationMapper, DiagnosisMapper diagnosisMapper, DispositionMapper dispositionMapper, EmrApiProperties emrApiProperties) {
         this.observationMapper = observationMapper;
@@ -34,7 +35,7 @@ public class EncounterObservationsMapper {
         this.emrApiProperties = emrApiProperties;
     }
 
-    void update(EncounterTransaction encounterTransaction, Set<Obs> allObs) {
+    public void update(EncounterTransaction encounterTransaction, Set<Obs> allObs) {
         for (Obs obs : allObs) {
             if (getDiagnosisMetadata().isDiagnosis(obs)) {
                 encounterTransaction.addDiagnosis(diagnosisMapper.map(obs, getDiagnosisMetadata()));

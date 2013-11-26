@@ -27,15 +27,23 @@ public class EncounterBuilder {
         visit.setUuid(UUID.randomUUID().toString());
         encounter.setVisit(visit);
         encounter.setUuid(UUID.randomUUID().toString());
+
         Patient patient = new Patient();
         patient.setUuid(UUID.randomUUID().toString());
         encounter.setPatient(patient);
+
         EncounterType encounterType = new EncounterType();
         encounterType.setUuid(UUID.randomUUID().toString());
         encounter.setEncounterType(encounterType);
+
         Location location = new Location();
         location.setUuid(UUID.randomUUID().toString());
         encounter.setLocation(location);
+
+        encounter.setEncounterProviders(createEncounterProviders());
+    }
+
+    private Set<EncounterProvider> createEncounterProviders() {
         EncounterProvider encounterprovider = new EncounterProvider();
         Provider provider = new Provider(1234);
 
@@ -44,14 +52,13 @@ public class EncounterBuilder {
         PersonName name = new PersonName("Yogesh", "", "Jain");
         name.setPreferred(true);
         personNames.add(name);
-
         person.setNames(personNames);
 
         provider.setPerson(person);
         encounterprovider.setProvider(provider);
         Set<EncounterProvider> encounterProviders = new HashSet<EncounterProvider>();
         encounterProviders.add(encounterprovider);
-        encounter.setEncounterProviders(encounterProviders);
+        return encounterProviders;
     }
 
     public Encounter build() {

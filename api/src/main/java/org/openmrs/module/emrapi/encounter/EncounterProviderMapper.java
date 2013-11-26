@@ -17,4 +17,12 @@ public class EncounterProviderMapper {
         }
         encounterTransaction.setProviders(providers);
     }
+
+    public static class EmptyEncounterProviderMapper extends EncounterProviderMapper {
+
+        public void update(EncounterTransaction encounterTransaction, Set<EncounterProvider> encounterProviders) {
+            //do Nothing
+        }
+    }
+
 }
