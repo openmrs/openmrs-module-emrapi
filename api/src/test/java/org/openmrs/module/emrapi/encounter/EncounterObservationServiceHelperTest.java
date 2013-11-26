@@ -17,9 +17,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.ConceptDatatype;
+import org.openmrs.Encounter;
+import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
+import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -35,7 +40,11 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterObservationServiceHelperTest {
@@ -52,13 +61,16 @@ public class EncounterObservationServiceHelperTest {
     @Mock
     private EmrApiProperties emrApiProperties;
 
+    @Mock
+    private OrderService orderService;
+
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
         when(emrApiProperties.getDiagnosisMetadata()).thenReturn(diagnosisMetadata);
-        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties, obsService);
+        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties, obsService, orderService);
 
     }
 

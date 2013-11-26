@@ -218,6 +218,7 @@ public class EncounterTransaction {
         private String voidReason;
         private Concept concept;
         private List<Observation> groupMembers = new ArrayList<Observation>();
+        private String orderUuid;
 
         public String getUuid() {
             return uuid;
@@ -289,6 +290,15 @@ public class EncounterTransaction {
         public void addGroupMember(Observation observation) {
             groupMembers.add(observation);
         }
+
+        public String getOrderUuid() {
+            return orderUuid;
+        }
+
+        public void setOrderUuid(String orderUuid) {
+            this.orderUuid = orderUuid;
+        }
+
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

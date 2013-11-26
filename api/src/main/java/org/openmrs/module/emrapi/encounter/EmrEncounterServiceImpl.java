@@ -34,8 +34,15 @@ import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundExc
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
@@ -211,8 +218,13 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     private Visit findOrCreateVisit(EncounterTransaction encounterTransaction, Patient patient) {
-        Visit activeVisit = getActiveVisit(patient);
 
+        // return the visit that was explicitly asked for in the EncounterTransaction Object
+        if(encounterTransaction.getVisitUuid() != null && !encounterTransaction.getVisitUuid().isEmpty()){
+            return visitService.getVisitByUuid(encounterTransaction.getVisitUuid());
+        }
+
+        Visit activeVisit = getActiveVisit(patient);
         if (activeVisit != null){
             return activeVisit;
         }

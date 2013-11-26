@@ -17,8 +17,10 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.Order;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
+import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
@@ -39,11 +41,14 @@ public class EncounterObservationServiceHelper {
     private EmrApiProperties emrApiProperties;
     private DiagnosisMetadata diagnosisMetadata;
     private ObsService obsService;
+    private OrderService orderService;
 
-    public EncounterObservationServiceHelper(ConceptService conceptService, EmrApiProperties emrApiProperties, ObsService obsService) {
+
+    public EncounterObservationServiceHelper(ConceptService conceptService, EmrApiProperties emrApiProperties, ObsService obsService, OrderService orderService) {
         this.conceptService = conceptService;
         this.emrApiProperties = emrApiProperties;
         this.obsService = obsService;
+        this.orderService = orderService;
     }
 
     public void update(Encounter encounter, List<EncounterTransaction.Observation> observations, Date observationDateTime) {
@@ -59,16 +64,17 @@ public class EncounterObservationServiceHelper {
 
     private void updateObservation(Encounter encounter, Obs parentObs, Set<Obs> existingObservations, Date observationDateTime, EncounterTransaction.Observation observationData) throws ParseException {
         Obs observation = getMatchingObservation(existingObservations, observationData.getUuid());
+        if (observation == null) {
+            observation = newObservation(encounter, observationData);
+            if (parentObs == null) {
+                encounter.addObs(observation);
+            }
+            else parentObs.addGroupMember(observation);
+        }
         if (observationData.isVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());
             return;
-        }
-        if (observation == null) {
-            observation = newObservation(encounter, observationData);
-            if (parentObs == null)
-                encounter.addObs(observation);
-            else parentObs.addGroupMember(observation);
         }
         mapObservationProperties(observationDateTime, observationData, observation);
 
@@ -86,7 +92,14 @@ public class EncounterObservationServiceHelper {
                 observation.setValueAsString(observationData.getValue().toString());
             }
         }
+        if(observationData.getOrderUuid() != null && !observationData.getOrderUuid().isEmpty()){
+            observation.setOrder(getOrderByUuid(observationData.getOrderUuid()));
+        }
         observation.setObsDatetime(observationDateTime);
+    }
+
+    private Order getOrderByUuid(String orderUuid){
+        return orderService.getOrderByUuid(orderUuid);
     }
 
     private Obs newObservation(Encounter encounter, EncounterTransaction.Observation observationData) {

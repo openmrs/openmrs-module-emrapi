@@ -281,6 +281,7 @@
         <constructor-arg name="conceptService" ref="conceptService"/>
         <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
         <constructor-arg name="obsService" ref="obsService"/>
+        <constructor-arg name="orderService" ref="orderService"/>
     </bean>
 
     <bean id="encounterTestOrderServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterTestOrderServiceHelper">
