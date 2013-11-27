@@ -31,9 +31,11 @@ public class DefaultEncounterMatcher implements BaseEncounterMatcher {
             throw new IllegalArgumentException("Encounter Type not found");
         }
 
-        for (Encounter encounter : visit.getEncounters()) {
-            if (encounterType.equals(encounter.getEncounterType())) {
-                return encounter;
+        if(visit.getEncounters()!=null){
+            for (Encounter encounter : visit.getEncounters()) {
+                if (encounterType.equals(encounter.getEncounterType())) {
+                    return encounter;
+                }
             }
         }
         return null;

@@ -294,8 +294,9 @@ public class EncounterTransaction {
             return orderUuid;
         }
 
-        public void setOrderUuid(String orderUuid) {
+        public Observation setOrderUuid(String orderUuid) {
             this.orderUuid = orderUuid;
+            return this;
         }
 
     }

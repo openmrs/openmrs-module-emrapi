@@ -21,6 +21,7 @@ import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.Order;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
@@ -38,6 +39,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.anyInt;
@@ -245,6 +247,58 @@ public class EncounterObservationServiceHelperTest {
         verify(conceptService, never()).getConcept(anyInt());
     }
 
+    @Test
+    public void shouldLinkOrderWithObservation() throws ParseException {
+        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+        Order obsOrder = fetchOrder("order-uuid");
+
+        EncounterTransaction.Concept encConcept = new EncounterTransaction.Concept(numericConcept.getUuid());
+        List<EncounterTransaction.Observation> observations = asList(
+                new EncounterTransaction.Observation().setUuid("o-uuid").setValue(35.0).setComment("overweight").setOrderUuid("order-uuid").setConcept(encConcept)
+        );
+
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+
+        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+
+        assertEquals(1, encounter.getObs().size());
+        Obs textObservation = encounter.getObs().iterator().next();
+
+        assertEquals(new Double(35.0), textObservation.getValueNumeric());
+        assertEquals("overweight", textObservation.getComment());
+        assertEquals(observationDateTime, textObservation.getObsDatetime());
+
+        assertEquals("order-uuid",textObservation.getOrder().getUuid());
+    }
+
+
+    @Test
+    public void shouldIgnoreNullOrdersInObservation() throws ParseException {
+        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+
+        EncounterTransaction.Concept encConcept = new EncounterTransaction.Concept(numericConcept.getUuid());
+        List<EncounterTransaction.Observation> observations = asList(
+                new EncounterTransaction.Observation().setUuid("o-uuid").setValue(35.0).setComment("overweight").setOrderUuid(null).setConcept(encConcept)
+        );
+
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+
+        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+
+        assertEquals(1, encounter.getObs().size());
+        Obs textObservation = encounter.getObs().iterator().next();
+
+        assertEquals(new Double(35.0), textObservation.getValueNumeric());
+        assertEquals("overweight", textObservation.getComment());
+        assertEquals(observationDateTime, textObservation.getObsDatetime());
+
+        assertNull(textObservation.getOrder());
+    }
+
     private Concept newConcept(String hl7, String uuid) {
         Concept concept = new Concept();
         ConceptDatatype conceptDataType = new ConceptDatatype();
@@ -253,6 +307,13 @@ public class EncounterObservationServiceHelperTest {
         concept.setUuid(uuid);
         when(conceptService.getConceptByUuid(uuid)).thenReturn(concept);
         return concept;
+    }
+
+    private Order fetchOrder(String orderUuid){
+        Order order = new Order(1);
+        order.setUuid("order-uuid");
+        when(orderService.getOrderByUuid(orderUuid)).thenReturn(order);
+        return order;
     }
 
     private EncounterTransaction.Concept getConcept(String conceptUuid) {
