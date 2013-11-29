@@ -14,7 +14,6 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
@@ -35,6 +34,7 @@ public class DiagnosisMapper {
             encounterDiagnosis.setCodedAnswer(conceptMapper.map(codedOrFreeTextAnswer.getCodedAnswer()));
         }
         encounterDiagnosis.setOrder(String.valueOf(diagnosis.getOrder()));
+        encounterDiagnosis.setDiagnosisDate(obs.getObsDatetime());
         encounterDiagnosis.setExistingObs(diagnosis.getExistingObs() != null ? diagnosis.getExistingObs().getUuid() : null);
         return encounterDiagnosis;
     }

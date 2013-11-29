@@ -308,6 +308,7 @@ public class EncounterTransaction {
         private boolean voided;
         private String voidReason;
         private List<Observation> additionalObs;
+        private Date dispositionDate;
 
         public List<Observation> getAdditionalObs() {
             return additionalObs;
@@ -358,6 +359,15 @@ public class EncounterTransaction {
         public Disposition setCode(String code) {
             this.code = code;
             return this;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDispositionDate() {
+            return dispositionDate == null ? new Date() : dispositionDate;
+        }
+
+        public void setDispositionDate(Date date) {
+            this.dispositionDate = date;
         }
 
       /*  public String getDispositionNote() {
@@ -450,6 +460,7 @@ public class EncounterTransaction {
         private String freeTextAnswer;
         private Concept codedAnswer;
         private String existingObs;
+        private Date diagnosisDate;
 
         public String getOrder() {
             return order;
@@ -494,6 +505,15 @@ public class EncounterTransaction {
         public Diagnosis setCodedAnswer(Concept codedAnswer) {
             this.codedAnswer = codedAnswer;
             return this;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDiagnosisDate() {
+            return diagnosisDate == null ? new Date() : diagnosisDate;
+        }
+
+        public void setDiagnosisDate(Date date) {
+            this.diagnosisDate = date;
         }
     }
 
