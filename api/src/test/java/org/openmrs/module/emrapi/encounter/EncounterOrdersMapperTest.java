@@ -22,13 +22,14 @@ import org.openmrs.Order;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.builder.TestOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-public class EncounterOrdersMapperTest {
+public class EncounterOrdersMapperTest extends BaseModuleContextSensitiveTest {
     private EncounterOrdersMapper encounterOrdersMapper;
 
     @Before

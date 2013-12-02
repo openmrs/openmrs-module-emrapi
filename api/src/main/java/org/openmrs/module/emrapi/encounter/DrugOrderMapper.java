@@ -13,6 +13,8 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import org.openmrs.Concept;
+import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
@@ -30,6 +32,11 @@ public class DrugOrderMapper {
         emrDrugOrder.setPrn(drugOrder.getPrn());
         emrDrugOrder.setNumberPerDosage(drugOrder.getDose() == null ? 0 : drugOrder.getDose().intValue());
         emrDrugOrder.setStartDate(drugOrder.getStartDate());
+        Drug drug = drugOrder.getDrug();
+        emrDrugOrder.setDoseStrength(drug.getDoseStrength());
+        emrDrugOrder.setDosageForm(drug.getDosageForm().getName().getName());
+        emrDrugOrder.setDrugName(drug.getName());
+        emrDrugOrder.setDrugUnits(drug.getUnits());
         return emrDrugOrder;
     }
 }

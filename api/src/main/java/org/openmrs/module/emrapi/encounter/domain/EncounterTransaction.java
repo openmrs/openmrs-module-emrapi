@@ -527,6 +527,10 @@ public class EncounterTransaction {
         private String dosageInstructionUuid;
         private String dosageFrequencyUuid;
         private boolean prn;
+        private Double doseStrength;
+        private String dosageForm;
+        private String drugName;
+        private String drugUnits;
 
         public String getUuid() {
             return uuid;
@@ -606,6 +610,39 @@ public class EncounterTransaction {
 
         public void setPrn(boolean prn) {
             this.prn = prn;
+        }
+
+        public void setDoseStrength(Double doseStrength) {
+            this.doseStrength = doseStrength;
+        }
+
+        public Double getDoseStrength() {
+            return doseStrength;
+        }
+
+        public void setDosageForm(String dosageForm) {
+            this.dosageForm = dosageForm;
+        }
+
+        public String getDosageForm() {
+            return dosageForm;
+        }
+
+
+        public void setDrugName(String drugName) {
+            this.drugName = drugName;
+        }
+
+        public String getDrugName() {
+            return drugName;
+        }
+
+        public void setDrugUnits(String drugUnits) {
+            this.drugUnits = drugUnits;
+        }
+
+        public String getDrugUnits() {
+            return drugUnits;
         }
     }
 

@@ -13,9 +13,12 @@
  */
 package org.openmrs.module.emrapi.encounter.builder;
 
+import org.openmrs.Concept;
+import org.openmrs.ConceptName;
+import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
-import org.openmrs.module.emrapi.encounter.EncounterTransactionMapperTest;
 
+import java.util.Locale;
 import java.util.UUID;
 
 public class DrugOrderBuilder {
@@ -24,6 +27,26 @@ public class DrugOrderBuilder {
     public DrugOrderBuilder() {
         this.order = new DrugOrder();
         this.order.setUuid(UUID.randomUUID().toString());
+        Drug drug = getDrug();
+        this.order.setDrug(drug);
+    }
+
+    private Drug getDrug() {
+        Drug drug = new Drug();
+        drug.setName("Calpol");
+        drug.setDoseStrength(125.0);
+        drug.setUnits("ml");
+        drug.setDosageForm(getConcept("Syrup"));
+        return drug;
+    }
+
+    private Concept getConcept(String name) {
+        Concept concept = new Concept();
+        ConceptName conceptName = new ConceptName();
+        conceptName.setName(name);
+        conceptName.setLocale(Locale.ENGLISH);
+        concept.setFullySpecifiedName(conceptName);
+        return concept;
     }
 
     public DrugOrderBuilder withUuid(UUID uuid) {
