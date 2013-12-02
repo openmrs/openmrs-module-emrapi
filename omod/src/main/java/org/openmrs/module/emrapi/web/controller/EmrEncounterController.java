@@ -47,8 +47,9 @@ public class EmrEncounterController extends BaseRestController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/active")
     @ResponseBody
-    public EncounterTransaction getActiveEncounter(@RequestParam String patientUuid, String encounterTypeUuid, String visitTypeUuid) {
-        return emrEncounterService.getActiveEncounter(patientUuid, encounterTypeUuid, visitTypeUuid);
+    public EncounterTransaction getActiveEncounter(@RequestParam String patientUuid, String encounterTypeUuid,
+                                                   String visitTypeUuid, Boolean includeAll) {
+        return emrEncounterService.getActiveEncounter(patientUuid, encounterTypeUuid, visitTypeUuid, includeAll);
     }
 
     @RequestMapping(method = RequestMethod.GET)

@@ -113,7 +113,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     @Override
-    public EncounterTransaction getActiveEncounter(String patientUuid, String encounterTypeUuid, String visitTypeUuid) {
+    public EncounterTransaction getActiveEncounter(String patientUuid, String encounterTypeUuid, String visitTypeUuid, Boolean includeAll) {
         Patient patient = patientService.getPatientByUuid(patientUuid);
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTypeUuid);
 
@@ -132,7 +132,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             return new EncounterTransaction(visit.getUuid(), null);
         }
 
-        return encounterTransactionMapper.map(encounter);
+        return encounterTransactionMapper.map(encounter, includeAll);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private List<EncounterTransaction> getEncounterTransactions(List<Encounter> encounters) {
         List<EncounterTransaction> encounterTransactions = new ArrayList<EncounterTransaction>();
         for (Encounter encounter : encounters) {
-            encounterTransactions.add(encounterTransactionMapper.map(encounter));
+            encounterTransactions.add(encounterTransactionMapper.map(encounter, true));
         }
         return encounterTransactions;
     }

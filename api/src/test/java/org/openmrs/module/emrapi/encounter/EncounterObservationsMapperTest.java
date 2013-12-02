@@ -18,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Obs;
-import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;

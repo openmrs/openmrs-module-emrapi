@@ -96,4 +96,14 @@ public class ObsBuilder {
     public Obs get() {
         return obs;
     }
+
+    public ObsBuilder setVoided(boolean voided) {
+        obs.setVoided(voided);
+        return this;
+    }
+
+    public ObsBuilder setVoidedReason(String reason) {
+        obs.setVoidReason(reason);
+        return this;
+    }
 }

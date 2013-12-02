@@ -71,9 +71,10 @@ public class EncounterObservationServiceHelper {
             }
             else parentObs.addGroupMember(observation);
         }
-        if (observationData.isVoided()) {
+        if (observationData.getVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());
+            observation.setObsDatetime(observationDateTime);
             return;
         }
         mapObservationProperties(observationDateTime, observationData, observation);

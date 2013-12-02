@@ -42,8 +42,9 @@ public class EncounterTransactionMapperTest {
     @Test
     public void shouldMap() throws Exception {
         Encounter encounter = new EncounterBuilder().build();
+        boolean includeAll = false;
 
-        EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter);
+        EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
 
         Assert.assertEquals(encounter.getUuid(), encounterTransaction.getEncounterUuid());
         Assert.assertEquals(encounter.getVisit().getUuid(), encounterTransaction.getVisitUuid());

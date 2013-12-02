@@ -265,7 +265,7 @@ public class EncounterTransaction {
             return this;
         }
 
-        public boolean isVoided() {
+        public boolean getVoided() {
             return voided;
         }
 
@@ -298,7 +298,6 @@ public class EncounterTransaction {
             this.orderUuid = orderUuid;
             return this;
         }
-
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

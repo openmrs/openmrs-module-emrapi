@@ -58,4 +58,20 @@ public class ObservationMapperTest {
         assertEquals(uuid, observation.getUuid());
         assertEquals(100.0, observation.getValue());
     }
+
+    @Test
+    public void shouldMapVoidedObservation(){
+        ObsBuilder obsBuilder = new ObsBuilder();
+        String uuid = UUID.randomUUID().toString();
+        obsBuilder.setUuid(uuid).setValue(100.0).setConcept(concept).setVoided(true).setVoidedReason("reason");
+        when(conceptDatatype.isNumeric()).thenReturn(true);
+        Obs obs = obsBuilder.get();
+
+        EncounterTransaction.Observation observation = observationMapper.map(obs);
+
+        assertEquals(uuid, observation.getUuid());
+        assertEquals(100.0, observation.getValue());
+        assertEquals(obs.getVoided(), observation.getVoided());
+        assertEquals(obs.getVoidReason(), observation.getVoidReason());
+    }
 }

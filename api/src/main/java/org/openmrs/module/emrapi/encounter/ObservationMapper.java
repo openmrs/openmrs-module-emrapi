@@ -28,6 +28,8 @@ public class ObservationMapper {
         observation.setUuid(obs.getUuid());
         observation.setConcept(conceptMapper.map(concept));
         observation.setValue(value);
+        observation.setVoided(obs.getVoided());
+        observation.setVoidReason(obs.getVoidReason());
         if(obs.getGroupMembers() != null) {
             for (Obs obsGroupMember : obs.getGroupMembers()) {
                 observation.addGroupMember(map(obsGroupMember));

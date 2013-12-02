@@ -299,6 +299,38 @@ public class EncounterObservationServiceHelperTest {
         assertNull(textObservation.getOrder());
     }
 
+    @Test
+    public void shouldHandleVoidedObservations() throws ParseException {
+        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+
+        EncounterTransaction.Concept obsConcept = new EncounterTransaction.Concept(numericConcept.getUuid());
+        double value = 35.0;
+        String obsUuid = "o-uuid";
+        List<EncounterTransaction.Observation> observations = asList(
+                new EncounterTransaction.Observation().setUuid(obsUuid).setValue(value).setVoided(true).setConcept(obsConcept)
+        );
+
+        Encounter encounter = new Encounter();
+        Obs existingObs = new Obs();
+        existingObs.setUuid(obsUuid);
+        existingObs.setConcept(numericConcept);
+        existingObs.setValueNumeric(value);
+        encounter.addObs(existingObs);
+        encounter.setUuid("e-uuid");
+
+        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+
+        Set<Obs> obsSet = encounter.getObsAtTopLevel(true);
+        assertEquals(1, obsSet.size());
+        Obs textObservation = obsSet.iterator().next();
+
+        assertEquals(new Double(value), textObservation.getValueNumeric());
+        assertEquals(observationDateTime, textObservation.getObsDatetime());
+        assertTrue(textObservation.getVoided());
+    }
+
+
     private Concept newConcept(String hl7, String uuid) {
         Concept concept = new Concept();
         ConceptDatatype conceptDataType = new ConceptDatatype();

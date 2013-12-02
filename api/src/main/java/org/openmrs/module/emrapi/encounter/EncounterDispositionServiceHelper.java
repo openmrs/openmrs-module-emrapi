@@ -100,8 +100,8 @@ public class EncounterDispositionServiceHelper {
         if(observation != null && obs != null) {
             obs.setConcept(getConceptByUuid(observation.getConceptUuid()));
             obs.setValueAsString((String) observation.getValue());
-            if(observation.isVoided()){
-                obs.setVoided(observation.isVoided());
+            if(observation.getVoided()){
+                obs.setVoided(observation.getVoided());
                 obs.setVoidReason(observation.getVoidReason());
             }
             obs.setComment(observation.getComment());

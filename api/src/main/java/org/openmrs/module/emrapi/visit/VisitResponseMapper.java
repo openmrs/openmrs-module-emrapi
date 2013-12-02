@@ -16,7 +16,6 @@ package org.openmrs.module.emrapi.visit;
 import org.openmrs.Encounter;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.encounter.EncounterTransactionMapper;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 
 public class VisitResponseMapper {
@@ -30,7 +29,7 @@ public class VisitResponseMapper {
         if(visit == null) return null;
         VisitResponse visitResponse = new VisitResponse(visit.getUuid());
         for (Encounter encounter : visit.getEncounters()) {
-            visitResponse.addEncounter(encounterTransactionMapper.map(encounter));
+            visitResponse.addEncounter(encounterTransactionMapper.map(encounter, true));
         }
         return visitResponse;
     }
