@@ -16,7 +16,7 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceD
 import org.openmrs.module.webservices.rest.web.response.ConversionException;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
-import org.openmrs.module.webservices.rest.web.v1_0.resource.openmrs1_9.PatientResource1_9;
+import org.openmrs.module.webservices.rest.web.v1_0.resource.openmrs1_8.PatientResource1_8;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +62,7 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
         }
 
         PatientProfile delegate = new PatientProfile();
-        PatientResource1_9 patientResource1_9 = (PatientResource1_9) Context.getService(RestService.class).getResourceBySupportedClass(Patient.class);
+        PatientResource1_8 patientResource1_9 = (PatientResource1_8) Context.getService(RestService.class).getResourceBySupportedClass(Patient.class);
         delegate.setPatient(patientResource1_9.getPatient(new SimpleObject() {{
             putAll((Map<String, Object>) patientProperty);
         }}));
@@ -80,7 +80,7 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
         }
 
         PatientProfile delegate = new PatientProfile();
-        PatientResource1_9 patientResource1_9 = (PatientResource1_9) Context.getService(RestService.class).getResourceBySupportedClass(Patient.class);
+        PatientResource1_8 patientResource1_9 = (PatientResource1_8) Context.getService(RestService.class).getResourceBySupportedClass(Patient.class);
         Patient patient = patientResource1_9.getPatientForUpdate(uuid, (Map<String, Object>) propertiesToUpdate.get("patient"));
         delegate.setPatient(patient);
 
