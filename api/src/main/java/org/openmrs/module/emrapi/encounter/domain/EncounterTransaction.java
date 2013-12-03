@@ -20,6 +20,7 @@ import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +29,6 @@ public class EncounterTransaction {
     private String visitUuid;
     private String encounterUuid;
     private String locationUuid;
-    private Set<Provider> providers;
     private String patientUuid;
     private String visitTypeUuid;
     private String encounterTypeUuid;
@@ -38,6 +38,7 @@ public class EncounterTransaction {
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
+    private Set<Provider> providers = new HashSet<Provider>();
 
     public EncounterTransaction() {
     }
@@ -524,8 +525,8 @@ public class EncounterTransaction {
         private Date startDate;
         private Date  endDate;
         private Integer numberPerDosage;
-        private String dosageInstructionUuid;
-        private String dosageFrequencyUuid;
+        private Concept dosageInstruction;
+        private Concept dosageFrequency;
         private boolean prn;
         private Double doseStrength;
         private String dosageForm;
@@ -534,6 +535,22 @@ public class EncounterTransaction {
 
         public String getUuid() {
             return uuid;
+        }
+
+        public Concept getDosageInstruction() {
+            return dosageInstruction;
+        }
+
+        public void setDosageInstruction(Concept dosageInstruction) {
+            this.dosageInstruction = dosageInstruction;
+        }
+
+        public Concept getDosageFrequency() {
+            return dosageFrequency;
+        }
+
+        public void setDosageFrequency(Concept dosageFrequency) {
+            this.dosageFrequency = dosageFrequency;
         }
 
         @JsonIgnore
@@ -563,12 +580,14 @@ public class EncounterTransaction {
             return numberPerDosage;
         }
 
+        @JsonIgnore
         public String getDosageInstructionUuid() {
-            return dosageInstructionUuid;
+            return dosageInstruction == null ? null : dosageInstruction.getUuid();
         }
 
+        @JsonIgnore
         public String getDosageFrequencyUuid() {
-            return dosageFrequencyUuid;
+            return dosageFrequency == null ?  null : dosageFrequency.getUuid();
         }
 
         public boolean isPrn() {
@@ -598,14 +617,6 @@ public class EncounterTransaction {
 
         public void setNumberPerDosage(Integer numberPerDosage) {
             this.numberPerDosage = numberPerDosage;
-        }
-
-        public void setDosageInstructionUuid(String dosageInstructionUuid) {
-            this.dosageInstructionUuid = dosageInstructionUuid;
-        }
-
-        public void setDosageFrequencyUuid(String dosageFrequencyUuid) {
-            this.dosageFrequencyUuid = dosageFrequencyUuid;
         }
 
         public void setPrn(boolean prn) {

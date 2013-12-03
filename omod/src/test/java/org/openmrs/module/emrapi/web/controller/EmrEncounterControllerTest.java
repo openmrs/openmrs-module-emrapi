@@ -394,8 +394,8 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"startDate\": \"2013-09-30T09:26:09.717Z\"," +
                 "\"endDate\": \"2013-10-02T09:26:09.717Z\"," +
                 "\"numberPerDosage\": 1," +
-                "\"dosageInstructionUuid\": \"632aa422-2696-11e3-895c-0800271c1b75\"," +
-                "\"dosageFrequencyUuid\": \"6302096d-2696-11e3-895c-0800271c1b75\"," +
+                "\"dosageInstruction\": {\"uuid\": \"632aa422-2696-11e3-895c-0800271c1b75\"}," +
+                "\"dosageFrequency\": {\"uuid\": \"6302096d-2696-11e3-895c-0800271c1b75\"}," +
                 "\"prn\": true}" +
                 "]}";
 

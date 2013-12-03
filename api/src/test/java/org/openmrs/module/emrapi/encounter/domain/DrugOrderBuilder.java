@@ -21,8 +21,8 @@ public class DrugOrderBuilder {
         this.drugOrder.setStartDate(startDate);
         this.drugOrder.setEndDate(endDate);
         this.drugOrder.setNumberPerDosage(numberPerDosage);
-        this.drugOrder.setDosageInstructionUuid(dosageInstructionUuid);
-        this.drugOrder.setDosageFrequencyUuid(dosageFrequencyUuId);
+        this.drugOrder.setDosageInstruction(new EncounterTransaction.Concept(dosageInstructionUuid));
+        this.drugOrder.setDosageFrequency(new EncounterTransaction.Concept(dosageFrequencyUuId));
         this.drugOrder.setPrn(false);
         return this;
     }
@@ -39,7 +39,7 @@ public class DrugOrderBuilder {
     }
 
     public DrugOrderBuilder withDosageFrequency(String frequencyUuid) {
-        this.drugOrder.setDosageFrequencyUuid(frequencyUuid);
+        this.drugOrder.setDosageFrequency(new EncounterTransaction.Concept(frequencyUuid));
         return this;
     }
 }

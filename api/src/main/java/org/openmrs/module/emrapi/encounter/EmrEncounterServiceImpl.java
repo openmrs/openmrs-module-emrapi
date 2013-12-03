@@ -56,6 +56,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private EncounterDispositionServiceHelper encounterDispositionServiceHelper;
     private EncounterTestOrderServiceHelper encounterTestOrderServiceHelper;
     private EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper;
+    private EncounterProviderServiceHelper encounterProviderServiceHelper;
     private LocationService locationService;
     private ProviderService providerService;
     private AdministrationService administrationService;
@@ -68,7 +69,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
                                    EncounterTestOrderServiceHelper encounterTestOrderServiceHelper,
                                    EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper,
                                    EncounterDispositionServiceHelper encounterDispositionServiceHelper,
-                                   EncounterTransactionMapper encounterTransactionMapper) {
+                                   EncounterTransactionMapper encounterTransactionMapper, EncounterProviderServiceHelper encounterProviderServiceHelper) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
@@ -80,6 +81,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.encounterDrugOrderServiceHelper = encounterDrugOrderServiceHelper;
         this.encounterDispositionServiceHelper = encounterDispositionServiceHelper;
         this.encounterTransactionMapper = encounterTransactionMapper;
+        this.encounterProviderServiceHelper = encounterProviderServiceHelper;
     }
 
     @Override
@@ -106,6 +108,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         encounterDispositionServiceHelper.update(encounter, encounterTransaction.getDisposition(), encounterTransaction.getEncounterDateTime());
         encounterTestOrderServiceHelper.update(encounter, encounterTransaction.getTestOrders());
         encounterDrugOrderServiceHelper.update(encounter, encounterTransaction.getDrugOrders());
+        encounterProviderServiceHelper.update(encounter, encounterTransaction.getProviders());
 
         visitService.saveVisit(visit);
 

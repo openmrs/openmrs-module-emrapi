@@ -14,19 +14,33 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.openmrs.DrugOrder;
+import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
+import static org.mockito.MockitoAnnotations.initMocks;
+
 public class DrugOrderMapperTest {
+    @Mock
+    private ConceptService conceptService;
+    private DrugOrderMapper drugOrderMapper;
+
+    @Before
+    public void setUp(){
+        initMocks(this);
+        drugOrderMapper = new DrugOrderMapper(conceptService);
+    }
 
     @Test
     public void shouldNotFailWhenDosageFormIsNull() {
         DrugOrder drugOrder = new DrugOrderBuilder().build();
         drugOrder.getDrug().setDosageForm(null);
 
-        EncounterTransaction.DrugOrder encounterTransactionDrugOrder = new DrugOrderMapper().map(drugOrder);
+        EncounterTransaction.DrugOrder encounterTransactionDrugOrder = drugOrderMapper.map(drugOrder);
 
         Assert.assertNotNull(encounterTransactionDrugOrder);
     }

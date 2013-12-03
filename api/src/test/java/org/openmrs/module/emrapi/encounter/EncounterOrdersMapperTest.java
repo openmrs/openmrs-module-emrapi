@@ -17,11 +17,15 @@ import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Order;
+import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.builder.TestOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.ArrayList;
@@ -29,12 +33,23 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 public class EncounterOrdersMapperTest extends BaseModuleContextSensitiveTest {
     private EncounterOrdersMapper encounterOrdersMapper;
+    @Mock
+    private TestOrderMapper testOrderMapper;
+    @Mock
+    private DrugOrderMapper drugOrderMapper;
 
     @Before
     public void setUp() {
-        encounterOrdersMapper = new EncounterOrdersMapper(new TestOrderMapper(), new DrugOrderMapper());
+        initMocks(this);
+        encounterOrdersMapper = new EncounterOrdersMapper(testOrderMapper, drugOrderMapper);
     }
 
     @Test
@@ -48,25 +63,12 @@ public class EncounterOrdersMapperTest extends BaseModuleContextSensitiveTest {
 
         encounterOrdersMapper.update(encounterTransaction, orders);
 
-        Assert.assertThat(Arrays.asList(testOrder1.getUuid(), testOrder2.getUuid()),
-                IsIterableContainingInAnyOrder.containsInAnyOrder(getUuidsForTestOrders(encounterTransaction.getTestOrders()).toArray()));
-        Assert.assertThat(Arrays.asList(drugOrder1.getUuid(), drugOrder2.getUuid()),
-                IsIterableContainingInAnyOrder.containsInAnyOrder(getUuidsForDrugOrders(encounterTransaction.getDrugOrders()).toArray()));
+        Assert.assertEquals(2, encounterTransaction.getTestOrders().size());
+        Assert.assertEquals(2, encounterTransaction.getDrugOrders().size());
+        verify(testOrderMapper).map(testOrder1);
+        verify(testOrderMapper).map(testOrder2);
+        verify(drugOrderMapper).map(drugOrder1);
+        verify(drugOrderMapper).map(drugOrder2);
     }
 
-    private List<String> getUuidsForDrugOrders(List<EncounterTransaction.DrugOrder> drugOrders) {
-        ArrayList<String> uuids = new ArrayList<String>();
-        for(EncounterTransaction.DrugOrder order: drugOrders) {
-            uuids.add(order.getUuid());
-        }
-        return uuids;
-    }
-
-    private List<String> getUuidsForTestOrders(List<EncounterTransaction.TestOrder> orders) {
-        ArrayList<String> uuids = new ArrayList<String>();
-        for(EncounterTransaction.TestOrder order: orders) {
-            uuids.add(order.getUuid());
-        }
-        return uuids;
-    }
 }

@@ -46,6 +46,8 @@ public class EmrEncounterServiceTest {
 
     @Mock
     private EncounterTransactionMapper encounterTransactionMapper;
+    @Mock
+    private EncounterProviderServiceHelper encounterProviderServiceHelper;
 
     private EmrEncounterService emrEncounterService;
 
@@ -54,7 +56,7 @@ public class EmrEncounterServiceTest {
         initMocks(this);
         emrEncounterService = new EmrEncounterServiceImpl(patientService,visitService,encounterService,locationService,providerService,
                 administrationService,encounterObservationServiceHelper,encounterTestOrderServiceHelper,encounterDrugOrderServiceHelper,
-                encounterDispositionServiceHelper,encounterTransactionMapper);
+                encounterDispositionServiceHelper,encounterTransactionMapper, encounterProviderServiceHelper);
 
         Patient patient = new Patient(1);
         patient.setUuid("patient-uuid");

@@ -14,19 +14,26 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Concept;
+import org.openmrs.ConceptName;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
+import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 public class DrugOrderMapper {
     private final ConceptMapper conceptMapper = new ConceptMapper();
+    private ConceptService conceptService;
 
-    EncounterTransaction.DrugOrder map(DrugOrder drugOrder) {
+    public DrugOrderMapper(ConceptService conceptService) {
+        this.conceptService = conceptService;
+    }
+
+    public EncounterTransaction.DrugOrder map(DrugOrder drugOrder) {
         EncounterTransaction.DrugOrder emrDrugOrder = new EncounterTransaction.DrugOrder();
         emrDrugOrder.setUuid(drugOrder.getUuid());
         emrDrugOrder.setConcept(conceptMapper.map(drugOrder.getConcept()));
-        emrDrugOrder.setDosageFrequencyUuid(drugOrder.getFrequency());
-        emrDrugOrder.setDosageInstructionUuid(drugOrder.getUnits());
+        emrDrugOrder.setDosageFrequency(conceptMapper.map(conceptService.getConceptByUuid(drugOrder.getFrequency())));
+        emrDrugOrder.setDosageInstruction(conceptMapper.map(conceptService.getConceptByUuid(drugOrder.getUnits())));
         emrDrugOrder.setEndDate(drugOrder.getAutoExpireDate());
         emrDrugOrder.setNotes(drugOrder.getInstructions());
         emrDrugOrder.setPrn(drugOrder.getPrn());

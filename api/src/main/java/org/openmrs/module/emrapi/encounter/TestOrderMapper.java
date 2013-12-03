@@ -19,7 +19,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 public class TestOrderMapper {
     private final ConceptMapper conceptMapper = new ConceptMapper();
 
-    EncounterTransaction.TestOrder map(Order order) {
+    public EncounterTransaction.TestOrder map(Order order) {
         EncounterTransaction.TestOrder emrTestOrder = new EncounterTransaction.TestOrder();
         emrTestOrder.setUuid(order.getUuid());
         emrTestOrder.setConcept(conceptMapper.map(order.getConcept()));
