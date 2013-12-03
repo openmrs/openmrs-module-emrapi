@@ -34,7 +34,10 @@ public class DrugOrderMapper {
         emrDrugOrder.setStartDate(drugOrder.getStartDate());
         Drug drug = drugOrder.getDrug();
         emrDrugOrder.setDoseStrength(drug.getDoseStrength());
-        emrDrugOrder.setDosageForm(drug.getDosageForm().getName().getName());
+        Concept dosageForm = drug.getDosageForm();
+        if (dosageForm != null) {
+            emrDrugOrder.setDosageForm(dosageForm.getName().getName());
+        }
         emrDrugOrder.setDrugName(drug.getName());
         emrDrugOrder.setDrugUnits(drug.getUnits());
         return emrDrugOrder;
