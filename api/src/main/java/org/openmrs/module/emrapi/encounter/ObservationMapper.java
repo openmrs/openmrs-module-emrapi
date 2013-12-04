@@ -30,6 +30,7 @@ public class ObservationMapper {
         observation.setValue(value);
         observation.setVoided(obs.getVoided());
         observation.setVoidReason(obs.getVoidReason());
+        observation.setObservationDateTime(obs.getObsDatetime());
         if(obs.getGroupMembers() != null) {
             for (Obs obsGroupMember : obs.getGroupMembers()) {
                 observation.addGroupMember(map(obsGroupMember));

@@ -56,7 +56,7 @@ public class DispositionMapper {
             }
         }
         disposition.setAdditionalObs(additionalObservations);
-        disposition.setDispositionDate(obs.getObsDatetime());
+        disposition.setDispositionDateTime(obs.getObsDatetime());
         return disposition;
     }
 

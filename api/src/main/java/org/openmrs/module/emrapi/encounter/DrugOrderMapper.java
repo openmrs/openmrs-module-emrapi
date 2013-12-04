@@ -39,6 +39,8 @@ public class DrugOrderMapper {
         emrDrugOrder.setPrn(drugOrder.getPrn());
         emrDrugOrder.setNumberPerDosage(drugOrder.getDose() == null ? 0 : drugOrder.getDose().intValue());
         emrDrugOrder.setStartDate(drugOrder.getStartDate());
+        emrDrugOrder.setDateCreated(drugOrder.getDateCreated());
+        emrDrugOrder.setDateChanged(drugOrder.getDateChanged());
         Drug drug = drugOrder.getDrug();
         emrDrugOrder.setDoseStrength(drug.getDoseStrength());
         Concept dosageForm = drug.getDosageForm();

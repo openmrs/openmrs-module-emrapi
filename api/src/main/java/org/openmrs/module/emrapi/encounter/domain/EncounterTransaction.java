@@ -219,6 +219,7 @@ public class EncounterTransaction {
         private Concept concept;
         private List<Observation> groupMembers = new ArrayList<Observation>();
         private String orderUuid;
+        private Date observationDateTime;
 
         public String getUuid() {
             return uuid;
@@ -299,6 +300,15 @@ public class EncounterTransaction {
             this.orderUuid = orderUuid;
             return this;
         }
+
+        public void setObservationDateTime(Date observationDateTime) {
+            this.observationDateTime = observationDateTime;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getObservationDateTime() {
+            return observationDateTime;
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -308,7 +318,7 @@ public class EncounterTransaction {
         private boolean voided;
         private String voidReason;
         private List<Observation> additionalObs;
-        private Date dispositionDate;
+        private Date dispositionDateTime;
 
         public List<Observation> getAdditionalObs() {
             return additionalObs;
@@ -362,12 +372,12 @@ public class EncounterTransaction {
         }
 
         @JsonSerialize(using = CustomJsonDateSerializer.class)
-        public Date getDispositionDate() {
-            return dispositionDate == null ? new Date() : dispositionDate;
+        public Date getDispositionDateTime() {
+            return dispositionDateTime == null ? new Date() : dispositionDateTime;
         }
 
-        public void setDispositionDate(Date date) {
-            this.dispositionDate = date;
+        public void setDispositionDateTime(Date date) {
+            this.dispositionDateTime = date;
         }
 
       /*  public String getDispositionNote() {
@@ -460,7 +470,7 @@ public class EncounterTransaction {
         private String freeTextAnswer;
         private Concept codedAnswer;
         private String existingObs;
-        private Date diagnosisDate;
+        private Date diagnosisDateTime;
 
         public String getOrder() {
             return order;
@@ -508,12 +518,12 @@ public class EncounterTransaction {
         }
 
         @JsonSerialize(using = CustomJsonDateSerializer.class)
-        public Date getDiagnosisDate() {
-            return diagnosisDate == null ? new Date() : diagnosisDate;
+        public Date getDiagnosisDateTime() {
+            return diagnosisDateTime == null ? new Date() : diagnosisDateTime;
         }
 
-        public void setDiagnosisDate(Date date) {
-            this.diagnosisDate = date;
+        public void setDiagnosisDateTime(Date date) {
+            this.diagnosisDateTime = date;
         }
     }
 
@@ -532,6 +542,8 @@ public class EncounterTransaction {
         private String dosageForm;
         private String drugName;
         private String drugUnits;
+        private Date dateCreated;
+        private Date dateChanged;
 
         public String getUuid() {
             return uuid;
@@ -654,6 +666,24 @@ public class EncounterTransaction {
 
         public String getDrugUnits() {
             return drugUnits;
+        }
+
+        public void setDateCreated(Date dateCreated) {
+            this.dateCreated = dateCreated;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateCreated() {
+            return dateCreated;
+        }
+
+        public void setDateChanged(Date dateChanged) {
+            this.dateChanged = dateChanged;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateChanged() {
+            return dateChanged;
         }
     }
 
