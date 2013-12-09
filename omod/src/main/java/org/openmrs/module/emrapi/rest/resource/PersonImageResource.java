@@ -74,10 +74,11 @@ public class PersonImageResource extends DelegatingCrudResource<PersonImage> {
             inputStream = new FileInputStream(personImage.getSavedImage());
             OpenmrsUtil.copyFile(inputStream, context.getResponse().getOutputStream());
             context.getResponse().flushBuffer();
+        } catch (FileNotFoundException e) {
+            throw new ObjectNotFoundException();
         } catch (IOException e) {
             throw new GenericRestException("Failure when loading the file for uuid: " + uuid, e.getCause());
         }
-
         return null;
     }
 
