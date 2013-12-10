@@ -44,9 +44,10 @@ public class DispositionMapper {
                 disposition.setVoided(groupMember.getVoided());
                 disposition.setVoidReason(groupMember.getVoidReason());
                 disposition.setExistingObs(groupMember.getUuid());
+                disposition.setConceptName(groupMember.getValueCoded().getName().getName());
             } else {
                 EncounterTransaction.Observation observation = new EncounterTransaction.Observation();
-                observation.setConcept(new EncounterTransaction.Concept(groupMember.getConcept().getUuid(), groupMember.getConcept().getName().getName()));
+                observation.setConcept(new EncounterTransaction.Concept(groupMember.getConcept().getUuid(), groupMember.getConcept().getName().getName(),groupMember.getConcept().isSet()));
                 observation.setValue(groupMember.getValueAsString(Context.getLocale()));
                 observation.setVoidReason(groupMember.getVoidReason());
                 observation.setVoided(groupMember.getVoided());

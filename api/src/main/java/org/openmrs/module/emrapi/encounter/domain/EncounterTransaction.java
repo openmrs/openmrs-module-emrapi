@@ -179,6 +179,13 @@ public class EncounterTransaction {
     public static class Concept {
         private String uuid;
         private String name;
+        private boolean isSet;
+
+        public Concept(String uuid, String name,boolean isSet) {
+            this.uuid = uuid;
+            this.name = name;
+            this.isSet = isSet;
+        }
 
         public Concept(String uuid, String name) {
             this.uuid = uuid;
@@ -186,7 +193,7 @@ public class EncounterTransaction {
         }
 
         public Concept(String uuid) {
-            this(uuid, null);
+            this(uuid, null,false);
         }
 
         public Concept() {
@@ -206,6 +213,14 @@ public class EncounterTransaction {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public boolean isSet() {
+            return isSet;
+        }
+
+        public void setSet(boolean set) {
+            isSet = set;
         }
     }
 
@@ -314,6 +329,7 @@ public class EncounterTransaction {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Disposition{
         private String code;
+        private String conceptName;
         private String existingObs;
         private boolean voided;
         private String voidReason;
@@ -388,6 +404,14 @@ public class EncounterTransaction {
             this.dispositionNote = dispositionNote;
             return this;
         }*/
+
+        public String getConceptName() {
+            return conceptName;
+        }
+
+        public void setConceptName(String conceptName) {
+            this.conceptName = conceptName;
+        }
     }
 
 
