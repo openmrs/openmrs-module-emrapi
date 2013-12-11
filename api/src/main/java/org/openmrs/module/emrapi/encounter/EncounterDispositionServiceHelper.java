@@ -31,7 +31,7 @@ public class EncounterDispositionServiceHelper {
 
     public void update(Encounter encounter, EncounterTransaction.Disposition disposition, Date observationDateTime) {
         try {
-            if(disposition != null){
+            if(isValid(disposition)){
                 dispositionGroupConcept = getDispositionGroupConcept();
                 dispositionConcept = getDispositionConcept();
 
@@ -163,4 +163,13 @@ public class EncounterDispositionServiceHelper {
         }
         throw  new IllegalArgumentException("Concept with code "+dispositionCode+" does not belong to this observation group");
     }
+
+    private boolean isValid(EncounterTransaction.Disposition disposition){
+        if(disposition == null || StringUtils.isEmpty(disposition.getCode()) ) {
+            return false;
+        }
+        return true;
+    }
+
+
 }
