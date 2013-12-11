@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
+import org.openmrs.ConceptDatatype;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Order;
@@ -89,7 +90,8 @@ public class EncounterObservationServiceHelper {
         if (observationData.getValue() != null) {
             if (observation.getConcept().getDatatype().getHl7Abbreviation().equals("CWE")) {
                 observation.setValueCoded(conceptService.getConceptByUuid((String) observationData.getValue()));
-            } else {
+            }
+            else if(!observation.getConcept().getDatatype().getUuid().equals(ConceptDatatype.N_A_UUID)) {
                 observation.setValueAsString(observationData.getValue().toString());
             }
         }
