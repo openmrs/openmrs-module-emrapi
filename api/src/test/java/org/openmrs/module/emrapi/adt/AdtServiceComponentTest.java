@@ -17,6 +17,9 @@ package org.openmrs.module.emrapi.adt;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.time.DateUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,7 +69,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
-import static org.openmrs.module.emrapi.TestUtils.isJustNow;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 
@@ -114,6 +116,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void integrationTest_ADT_workflow() {
+        Date startOfTest = new Date();
 
         Provider provider = Context.getProviderService().getProvider(1);
 
@@ -151,9 +154,9 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         assertThat(checkInEncounter.getVisit(), notNullValue());
         assertThat(checkInEncounter.getPatient(), is(patient));
-        assertThat(checkInEncounter.getEncounterDatetime(), isJustNow());
+        assertThat(checkInEncounter.getEncounterDatetime(), onOrAfter(startOfTest));
         assertThat(checkInEncounter.getVisit().getPatient(), is(patient));
-        assertThat(checkInEncounter.getVisit().getStartDatetime(), isJustNow());
+        assertThat(checkInEncounter.getVisit().getStartDatetime(), onOrAfter(startOfTest));
         assertThat(checkInEncounter.getAllObs().size(), is(0));
 
         Map<EncounterRole,Set<Provider>> providers = new HashMap<EncounterRole, Set<Provider>>();
@@ -182,13 +185,13 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         assertThat(dischargeEncounter.getPatient(), is(patient));
         assertThat(dischargeEncounter.getVisit(), is(checkInEncounter.getVisit()));
-        assertThat(dischargeEncounter.getEncounterDatetime(), isJustNow());
+        assertThat(dischargeEncounter.getEncounterDatetime(), onOrAfter(startOfTest));
         assertThat(dischargeEncounter.getLocation(), is(inpatientWard));
         assertThat(dischargeEncounter, hasProviders(providers));
         assertFalse(new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
     }
 
-	@Test
+    @Test
 	public void integrationTest_ADT_workflow_duplicate_visits() throws Exception {
 		final Integer numberOfThreads = 5;
 		final CyclicBarrier threadsBarrier = new CyclicBarrier(numberOfThreads);
@@ -432,4 +435,26 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         activeVisit = service.getActiveVisit(patient, location);
         assertNotNull(activeVisit);
     }
+
+
+    /**
+     * I'm sure there's a standard matcher for this, but sometimes we run into bugs comparing a Date to a java.sql.Timestamp
+     * @param expected
+     * @return a matcher that checks whether a given date is on or after 'expected'
+     */
+    private Matcher<? super Date> onOrAfter(final Date expected) {
+        return new BaseMatcher<Date>() {
+            @Override
+            public boolean matches(Object item) {
+                Date actual = (Date) item;
+                return actual.getTime() >= expected.getTime();
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("on or after " + expected);
+            }
+        };
+    }
+
 }
