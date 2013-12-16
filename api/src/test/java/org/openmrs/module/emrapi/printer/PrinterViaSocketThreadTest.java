@@ -97,7 +97,7 @@ public class PrinterViaSocketThreadTest {
         Thread thread1 = new Thread(printViaSocketThread1);
         thread1.start();
 
-        PrintViaSocketThread printViaSocketThread2 = new PrintViaSocketThread(testData2, printer, "UTF-8");
+        PrintViaSocketThread printViaSocketThread2 = new PrintViaSocketThread(testData2, printer, "UTF-8", 1000);
         printViaSocketThread2.setSocket(mockedSocket);
         Thread thread2 = new Thread(printViaSocketThread2);
         thread2.start();
@@ -105,7 +105,7 @@ public class PrinterViaSocketThreadTest {
         // wait for the second thread to finish
         thread2.join();
 
-        // if the synchronization is not working right, thread2 will terminate before thread1 since thread1 has a ten-second delay
+        // if the synchronization is not working right, thread2 will terminate before thread1 since thread1 has a ten-second delay and thread 2 only has a 1 second delay
         assertThat(thread1.getState(), is(Thread.State.TERMINATED));
 
         verify(mockedSocket, times(2)).connect(argThat(new IsExpectedSocketAddress("127.0.0.1", "9100")), eq(1000));
