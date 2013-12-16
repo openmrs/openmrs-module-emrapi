@@ -14,7 +14,6 @@
 
 package org.openmrs.module.emrapi.printer;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Location;
@@ -26,11 +25,7 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.printer.db.PrinterDAO;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.List;
 
 public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterService {
@@ -148,37 +143,14 @@ public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterSer
     @Override
     public void printViaSocket(String data, Printer printer, String encoding)
             throws UnableToPrintViaSocketException {
+        printViaSocket(data, printer, encoding, null);
+    }
 
-        Socket socket = null;
-        // Create a socket with a timeout
-        try {
-            InetAddress addr = InetAddress.getByName(printer.getIpAddress());
-            SocketAddress sockaddr = new InetSocketAddress(addr, Integer.valueOf(printer.getPort()));
 
-            // Create an unbound socket
-            socket = createSocket();
-
-            // This method will block no more than timeoutMs.
-            // If the timeout occurs, SocketTimeoutException is thrown.
-            int timeoutMs = 1000;   // 1s
-            socket.connect(sockaddr, timeoutMs);
-
-            if (encoding.equals("Windows-1252")) {
-                IOUtils.write(data.toString().getBytes("Windows-1252"), socket.getOutputStream());
-            } else {
-                IOUtils.write(data.toString(), socket.getOutputStream(), encoding);
-            }
-        } catch (Exception e) {
-            throw new UnableToPrintViaSocketException("Unable to print to printer " + printer.getName(), e);
-        } finally {
-            try {
-                if (socket != null) {
-                    socket.close();
-                }
-            } catch (IOException e) {
-                log.error("failed to close the socket to printer " + printer.getName(), e);
-            }
-        }
+    @Override
+    public void printViaSocket(String data, Printer printer, String encoding, Integer wait)
+            throws UnableToPrintViaSocketException {
+        new Thread(new PrintViaSocketThread(data, printer, encoding, wait)).start();
     }
 
     // do this is separate method so that we can override it for test purposes

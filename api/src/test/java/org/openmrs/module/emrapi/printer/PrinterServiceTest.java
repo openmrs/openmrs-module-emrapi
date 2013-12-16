@@ -14,44 +14,20 @@
 
 package org.openmrs.module.emrapi.printer;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.openmrs.Location;
 import org.openmrs.LocationAttributeType;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.emrapi.printer.Printer;
-import org.openmrs.module.emrapi.printer.PrinterService;
-import org.openmrs.module.emrapi.printer.PrinterServiceImpl;
-import org.openmrs.module.emrapi.printer.UnableToPrintViaSocketException;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(IOUtils.class)
 public class PrinterServiceTest {
 
     private PrinterService printerService;
@@ -62,13 +38,11 @@ public class PrinterServiceTest {
 
     private LocationAttributeType defaultIdCardPrinterAttributeType;
 
-    private Socket mockedSocket;
-
     @Before
     public void setup() {
-        mockedSocket = mock(Socket.class);
 
-        printerService = new PrinterServiceStub();
+
+        printerService = new PrinterServiceImpl();
 
         defaultLabelPrinterAttributeType = new LocationAttributeType();
         defaultIdCardPrinterAttributeType = new LocationAttributeType();
@@ -171,102 +145,6 @@ public class PrinterServiceTest {
         assertNull(printerService.getDefaultPrinter(location, Printer.Type.LABEL));
     }
 
-    @Test
-    public void shouldPrintToSocket() throws IOException, UnableToPrintViaSocketException {
-
-        mockStatic(IOUtils.class);
-
-        Printer printer = new Printer();
-        printer.setIpAddress("127.0.0.1") ;
-        printer.setPort("9100");
-
-        String testData = "test data";
-
-        printerService.printViaSocket(testData, printer, "UTF-8");
-        verify(mockedSocket).connect(argThat(new IsExpectedSocketAddress("127.0.0.1", "9100")), eq(1000));
-        verify(mockedSocket).getOutputStream();
-
-        verifyStatic();
-        IOUtils.write(eq(testData), any(OutputStream.class), eq("UTF-8"));
-    }
-
-    @Test
-    public void shouldPrintToSocketUsingWindowsEncoding() throws IOException, UnableToPrintViaSocketException {
-
-        mockStatic(IOUtils.class);
-
-        Printer printer = new Printer();
-        printer.setIpAddress("127.0.0.1") ;
-        printer.setPort("9100");
-
-        String testData = "test data";
-
-        printerService.printViaSocket(testData, printer, "Windows-1252");
-        verify(mockedSocket).connect(argThat(new IsExpectedSocketAddress("127.0.0.1", "9100")), eq(1000));
-        verify(mockedSocket).getOutputStream();
-
-        verifyStatic();
-        IOUtils.write(eq(testData.getBytes("Windows-1252")), any(OutputStream.class));
-    }
-
-    @Test(expected = UnableToPrintViaSocketException.class)
-    public void shouldFailIfInvalidIpAddress() throws UnableToPrintViaSocketException {
-
-        mockStatic(IOUtils.class);
-
-        Printer printer = new Printer();
-        printer.setIpAddress("999.999.999.999") ;
-        printer.setPort("9100");
-
-        String testData = "test data";
-
-        printerService.printViaSocket(testData, printer, "UTF-8");
-    }
-
-    @Test(expected = UnableToPrintViaSocketException.class)
-    public void shouldFailIfInvalidPort() throws UnableToPrintViaSocketException {
-
-        mockStatic(IOUtils.class);
-
-        Printer printer = new Printer();
-        printer.setIpAddress("127.0.0.1") ;
-        printer.setPort("bad_port");
-
-        String testData = "test data";
-
-        printerService.printViaSocket(testData, printer, "UTF-8");
-    }
-
-
-    public class PrinterServiceStub extends PrinterServiceImpl {
-
-        // mock the socket
-        @Override
-        protected Socket createSocket() {
-            return mockedSocket;
-        }
-
-    }
-
-    private class IsExpectedSocketAddress extends ArgumentMatcher<SocketAddress> {
-
-        private InetSocketAddress expectedSocketAddress;
-
-        public IsExpectedSocketAddress(String ipAddress, String port) throws UnknownHostException {
-            InetAddress addr = InetAddress.getByName(ipAddress);
-            expectedSocketAddress = new InetSocketAddress(addr, Integer.valueOf(port));
-        }
-
-        @Override
-        public boolean matches(Object o) {
-            InetSocketAddress actualSocketAddress = (InetSocketAddress) o;
-
-            assertThat(actualSocketAddress.getAddress(), is(expectedSocketAddress.getAddress()));
-            assertThat(actualSocketAddress.getPort(), is(expectedSocketAddress.getPort()));
-
-            return true;
-        }
-    }
 
 }
 
