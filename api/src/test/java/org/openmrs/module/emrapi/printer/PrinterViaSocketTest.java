@@ -28,7 +28,7 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(IOUtils.class)
-public class PrinterViaSocketThreadTest {
+public class PrinterViaSocketTest {
 
     private Socket mockedSocket;
 
@@ -38,8 +38,9 @@ public class PrinterViaSocketThreadTest {
         mockedSocket = mock(Socket.class);
     }
 
+
     @Test
-    public void shouldPrintToSocket() throws Exception {
+    public void shouldPrintToSocketDirectly() throws Exception {
 
         Printer printer = new Printer();
         printer.setIpAddress("127.0.0.1") ;
@@ -47,9 +48,57 @@ public class PrinterViaSocketThreadTest {
 
         String testData = "test data";
 
-        PrintViaSocketThread printViaSocketThread = new PrintViaSocketThread(testData, printer, "UTF-8");
-        printViaSocketThread.setSocket(mockedSocket);
-        Thread thread = new Thread(printViaSocketThread);
+        PrintViaSocket printViaSocket = new PrintViaSocket(testData, printer, "UTF-8");
+        printViaSocket.setSocket(mockedSocket);
+        printViaSocket.printViaSocket();
+
+        verify(mockedSocket).connect(argThat(new IsExpectedSocketAddress("127.0.0.1", "9100")), eq(1000));
+        verify(mockedSocket).getOutputStream();
+
+        verifyStatic();
+        IOUtils.write(eq(testData), any(OutputStream.class), eq("UTF-8"));
+    }
+
+    @Test(expected = UnableToPrintViaSocketException.class)
+    public void shouldPrintToSocketDirectlyShouldFailIfInvalidPort() throws Exception {
+
+        Printer printer = new Printer();
+        printer.setIpAddress("127.0.0.1") ;
+        printer.setPort("badPort");
+
+        String testData = "test data";
+
+        PrintViaSocket printViaSocket = new PrintViaSocket(testData, printer, "UTF-8");
+        printViaSocket.setSocket(mockedSocket);
+        printViaSocket.printViaSocket();
+    }
+
+    @Test(expected = UnableToPrintViaSocketException.class)
+    public void shouldPrintToSocketDirectlyShouldFailIfInvalidIp() throws Exception {
+
+        Printer printer = new Printer();
+        printer.setIpAddress("999.999.999.999") ;
+        printer.setPort("9100");
+
+        String testData = "test data";
+
+        PrintViaSocket printViaSocket = new PrintViaSocket(testData, printer, "UTF-8");
+        printViaSocket.setSocket(mockedSocket);
+        printViaSocket.printViaSocket();
+    }
+
+    @Test
+    public void shouldPrintToSocketViaThread() throws Exception {
+
+        Printer printer = new Printer();
+        printer.setIpAddress("127.0.0.1") ;
+        printer.setPort("9100");
+
+        String testData = "test data";
+
+        PrintViaSocket printViaSocket = new PrintViaSocket(testData, printer, "UTF-8");
+        printViaSocket.setSocket(mockedSocket);
+        Thread thread = new Thread(printViaSocket);
         thread.start();
         thread.join();
 
@@ -61,7 +110,7 @@ public class PrinterViaSocketThreadTest {
     }
 
     @Test
-    public void shouldPrintToSocketUsingWindowsEncoding() throws Exception {
+    public void shouldPrintToSocketUsingWindowsEncodingViaThread() throws Exception {
 
         Printer printer = new Printer();
         printer.setIpAddress("127.0.0.1") ;
@@ -69,9 +118,9 @@ public class PrinterViaSocketThreadTest {
 
         String testData = "test data";
 
-        PrintViaSocketThread printViaSocketThread = new PrintViaSocketThread(testData, printer, "Windows-1252");
-        printViaSocketThread.setSocket(mockedSocket);
-        Thread thread = new Thread(printViaSocketThread);
+        PrintViaSocket printViaSocket = new PrintViaSocket(testData, printer, "Windows-1252");
+        printViaSocket.setSocket(mockedSocket);
+        Thread thread = new Thread(printViaSocket);
         thread.start();
         thread.join();
 
@@ -83,7 +132,7 @@ public class PrinterViaSocketThreadTest {
     }
 
     @Test
-    public void shouldPrintToMultipleSocketsAndBlock() throws Exception {
+    public void shouldPrintToMultipleSocketsAndBlockViaThread() throws Exception {
 
         Printer printer = new Printer();
         printer.setIpAddress("127.0.0.1") ;
@@ -92,14 +141,14 @@ public class PrinterViaSocketThreadTest {
         String testData1 = "first test data";
         String testData2 = "second test data";
 
-        PrintViaSocketThread printViaSocketThread1 = new PrintViaSocketThread(testData1, printer, "UTF-8", 10000);
-        printViaSocketThread1.setSocket(mockedSocket);
-        Thread thread1 = new Thread(printViaSocketThread1);
+        PrintViaSocket printViaSocket1 = new PrintViaSocket(testData1, printer, "UTF-8", 10000);
+        printViaSocket1.setSocket(mockedSocket);
+        Thread thread1 = new Thread(printViaSocket1);
         thread1.start();
 
-        PrintViaSocketThread printViaSocketThread2 = new PrintViaSocketThread(testData2, printer, "UTF-8", 1000);
-        printViaSocketThread2.setSocket(mockedSocket);
-        Thread thread2 = new Thread(printViaSocketThread2);
+        PrintViaSocket printViaSocket2 = new PrintViaSocket(testData2, printer, "UTF-8", 1000);
+        printViaSocket2.setSocket(mockedSocket);
+        Thread thread2 = new Thread(printViaSocket2);
         thread2.start();
 
         // wait for the second thread to finish

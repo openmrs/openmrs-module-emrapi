@@ -25,7 +25,6 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.printer.db.PrinterDAO;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.Socket;
 import java.util.List;
 
 public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterService {
@@ -143,19 +142,28 @@ public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterSer
     @Override
     public void printViaSocket(String data, Printer printer, String encoding)
             throws UnableToPrintViaSocketException {
-        printViaSocket(data, printer, encoding, null);
+        printViaSocket(data, printer, encoding, false, null);
     }
 
 
     @Override
-    public void printViaSocket(String data, Printer printer, String encoding, Integer wait)
-            throws UnableToPrintViaSocketException {
-        new Thread(new PrintViaSocketThread(data, printer, encoding, wait)).start();
+    public void printViaSocket(String data, Printer printer, String encoding, Boolean printInSeparateThread) throws UnableToPrintViaSocketException {
+        printViaSocket(data, printer, encoding, printInSeparateThread, null);
     }
 
-    // do this is separate method so that we can override it for test purposes
-    protected Socket createSocket() {
-        return new Socket();
+    @Override
+    public void printViaSocket(String data, Printer printer, String encoding, Boolean printInSeparateThread, Integer wait)
+            throws UnableToPrintViaSocketException {
+
+        PrintViaSocket printViaSocket = new PrintViaSocket(data, printer, encoding, wait);
+
+        if (printInSeparateThread) {
+            new Thread(printViaSocket).start();
+        }
+        else {
+            printViaSocket.printViaSocket();
+        }
+
     }
 
 
