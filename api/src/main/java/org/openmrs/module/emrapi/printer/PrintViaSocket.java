@@ -25,20 +25,16 @@ public class PrintViaSocket implements Runnable {
 
     private String encoding;
 
+    private Object printerLock;
+
     private Socket socket;
 
-    public PrintViaSocket(String data, Printer printer, String encoding) {
-        this.printer = printer;
-        this.data = data;
-        this.encoding = encoding;
-    }
-
-
-    public PrintViaSocket(String data, Printer printer, String encoding, Integer wait) {
+    public PrintViaSocket(String data, Printer printer, String encoding, Integer wait, Object printerLock) {
         this.printer = printer;
         this.data = data;
         this.encoding = encoding;
         this.wait = wait;
+        this.printerLock = printerLock  ;
     }
 
     @Override
@@ -56,7 +52,7 @@ public class PrintViaSocket implements Runnable {
     public void printViaSocket() throws UnableToPrintViaSocketException {
 
         // only allow one call to a printer at time
-        synchronized(printer) {
+        synchronized(printerLock) {
 
             // Create a socket with a timeout
             try {

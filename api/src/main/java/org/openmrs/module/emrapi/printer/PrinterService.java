@@ -123,6 +123,20 @@ public interface PrinterService extends OpenmrsService {
     void printViaSocket(String data, Printer.Type type, Location location, String encoding)
             throws UnableToPrintViaSocketException;
 
+
+    /**
+     * Prints the string data to the default printer of the specified type
+     * at the specific location via socket
+     *
+     * @param data
+     * @param location
+     * @param printInSeparateThread true/false whether to print a separate thread (will not catch errors)
+     * @param wait time in ms to wait after printing before allowing another job to be sent to same printer
+     */
+    @Authorized(EmrApiConstants.PRIVILEGE_PRINTERS_ACCESS_PRINTERS)
+    void printViaSocket(String data, Printer.Type type, Location location, String encoding, Boolean printInSeparateThread, Integer wait)
+            throws UnableToPrintViaSocketException;
+
     /**
      * Prints the string data to the specified printer (without using a separate thread, and with no wait-time)
      *
@@ -132,18 +146,6 @@ public interface PrinterService extends OpenmrsService {
      */
     @Authorized(EmrApiConstants.PRIVILEGE_PRINTERS_ACCESS_PRINTERS)
     void printViaSocket(String data, Printer printer, String encoding)
-            throws UnableToPrintViaSocketException;
-
-    /**
-     * Prints the string data to the specified printer (with any wait time)
-     *
-     * @param data the data to print
-     * @param printer the printer to print to
-     * @param encoding the encoding to use
-     * @param printInSeparateThread true/false whether to print a separate thread (will not catch errors)
-     */
-    @Authorized(EmrApiConstants.PRIVILEGE_PRINTERS_ACCESS_PRINTERS)
-    void printViaSocket(String data, Printer printer, String encoding, Boolean printInSeparateThread)
             throws UnableToPrintViaSocketException;
 
     /**

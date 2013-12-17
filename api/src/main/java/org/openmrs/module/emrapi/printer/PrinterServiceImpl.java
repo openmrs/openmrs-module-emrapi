@@ -26,6 +26,7 @@ import org.openmrs.module.emrapi.printer.db.PrinterDAO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterService {
 
@@ -34,6 +35,14 @@ public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterSer
     private PrinterDAO printerDAO;
 
     private LocationService locationService;
+
+
+    /**
+     * A map from the id of an identifier source, to an object we can lock on for that identifier source
+     * (Idea stolen from IDGen module... )
+     */
+    private ConcurrentHashMap<Integer, Object> printerLocks = new ConcurrentHashMap<Integer, Object>();
+
 
     public void setPrinterDAO(PrinterDAO printerDAO) {
         this.printerDAO = printerDAO;
@@ -128,15 +137,21 @@ public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterSer
     }
 
     @Override
-    public void printViaSocket(String data, Printer.Type type, Location location, String encoding)
+    public void printViaSocket(String data, Printer.Type type, Location location, String encoding) throws UnableToPrintViaSocketException {
+        printViaSocket(data, type, location, encoding, false, null);
+    }
+
+    @Override
+    public void printViaSocket(String data, Printer.Type type, Location location, String encoding, Boolean printInSeparateThread, Integer wait)
             throws UnableToPrintViaSocketException {
+
         Printer printer = getDefaultPrinter(location, type);
 
         if (printer == null) {
             throw new IllegalStateException("No default printer assigned for " + location.getDisplayString() + ". Please contact your system administrator");
         }
 
-        printViaSocket(data, printer, encoding);
+        printViaSocket(data, printer, encoding, printInSeparateThread, wait);
     }
 
     @Override
@@ -145,17 +160,11 @@ public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterSer
         printViaSocket(data, printer, encoding, false, null);
     }
 
-
-    @Override
-    public void printViaSocket(String data, Printer printer, String encoding, Boolean printInSeparateThread) throws UnableToPrintViaSocketException {
-        printViaSocket(data, printer, encoding, printInSeparateThread, null);
-    }
-
     @Override
     public void printViaSocket(String data, Printer printer, String encoding, Boolean printInSeparateThread, Integer wait)
             throws UnableToPrintViaSocketException {
 
-        PrintViaSocket printViaSocket = new PrintViaSocket(data, printer, encoding, wait);
+        PrintViaSocket printViaSocket = new PrintViaSocket(data, printer, encoding, wait, getPrinterLock(printer.getPrinterId()));
 
         if (printInSeparateThread) {
             new Thread(printViaSocket).start();
@@ -164,6 +173,12 @@ public class PrinterServiceImpl extends BaseOpenmrsService implements PrinterSer
             printViaSocket.printViaSocket();
         }
 
+    }
+
+    private Object getPrinterLock(Integer printerId) {
+        // this method does not need to be synchronized, because putIfAbsent is atomic
+        printerLocks.putIfAbsent(printerId, new Object());
+        return printerLocks.get(printerId);
     }
 
 
