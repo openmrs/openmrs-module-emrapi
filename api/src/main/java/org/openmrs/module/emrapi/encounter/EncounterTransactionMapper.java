@@ -19,13 +19,14 @@ import org.openmrs.Order;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class EncounterTransactionMapper {
     protected EncounterObservationsMapper encounterObservationsMapper;
-    protected  EncounterOrdersMapper encounterOrdersMapper;
-    protected  EncounterProviderMapper encounterProviderMapper;
+    protected EncounterOrdersMapper encounterOrdersMapper;
+    protected EncounterProviderMapper encounterProviderMapper;
 
     public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterOrdersMapper encounterOrdersMapper, EncounterProviderMapper encounterProviderMapper) {
         this.encounterObservationsMapper = encounterObservationsMapper;
@@ -53,8 +54,11 @@ public class EncounterTransactionMapper {
         TreeSet<Order> sortedOrders = new TreeSet<Order>(new Comparator<Order>() {
             @Override
             public int compare(Order o1, Order o2) {
-                if (o2.getDateCreated().equals(o1.getDateCreated()))
+                if (shouldNotCompareOnCreatedDates(o2.getDateCreated(), o1.getDateCreated())) {
+                    if (shouldNotCompareOnIds(o1.getId(), o2.getId()))
+                        return 0;
                     return o2.getId().compareTo(o1.getId());
+                }
                 return o2.getDateCreated().compareTo(o1.getDateCreated());
             }
         });
@@ -68,8 +72,11 @@ public class EncounterTransactionMapper {
         TreeSet<Obs> sortedObservations = new TreeSet<Obs>(new Comparator<Obs>() {
             @Override
             public int compare(Obs o1, Obs o2) {
-                if (o2.getDateCreated().equals(o1.getDateCreated()))
+                if (shouldNotCompareOnCreatedDates(o2.getDateCreated(), o1.getDateCreated())) {
+                    if (shouldNotCompareOnIds(o1.getId(), o2.getId()))
+                        return 0;
                     return o2.getId().compareTo(o1.getId());
+                }
                 return o2.getDateCreated().compareTo(o1.getDateCreated());
             }
         });
@@ -77,6 +84,14 @@ public class EncounterTransactionMapper {
         Set<Obs> observations = encounter.getObsAtTopLevel(includeAll);
         sortedObservations.addAll(observations);
         return sortedObservations;
+    }
+
+    private boolean shouldNotCompareOnIds(Integer firstId, Integer secondId) {
+        return firstId == null || secondId == null;
+    }
+
+    private boolean shouldNotCompareOnCreatedDates(Date secondDate, Date firstDate) {
+        return firstDate == null || secondDate == null || secondDate.equals(firstDate);
     }
 
 }
