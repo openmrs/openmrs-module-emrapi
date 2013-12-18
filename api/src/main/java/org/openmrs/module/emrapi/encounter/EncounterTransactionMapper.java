@@ -18,7 +18,11 @@ import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -50,25 +54,27 @@ public class EncounterTransactionMapper {
     }
 
     private Set<Order> getSortedOrders(Encounter encounter) {
-        TreeSet<Order> sortedOrders = new TreeSet<Order>(new Comparator<Order>() {
+        Comparator<Order> comparator = new Comparator<Order>() {
             @Override
             public int compare(Order o1, Order o2) {
                 return o2.getDateCreated().compareTo(o1.getDateCreated());
             }
-        });
-        sortedOrders.addAll(encounter.getOrders());
-        return sortedOrders;
+        };
+        ArrayList<Order> list = new ArrayList<Order>(encounter.getOrders());
+        Collections.sort(list, comparator);
+        return new LinkedHashSet<Order>(list);
     }
 
     private Set<Obs> getSortedTopLevelObservations(Encounter encounter, Boolean includeAll) {
-        TreeSet<Obs> sortedObservationsAtTopLevel = new TreeSet<Obs>(new Comparator<Obs>() {
+        Comparator<Obs> comparator = new Comparator<Obs>() {
             @Override
             public int compare(Obs o1, Obs o2) {
                 return o2.getObsDatetime().compareTo(o1.getObsDatetime());
             }
-        });
-        sortedObservationsAtTopLevel.addAll(encounter.getObsAtTopLevel(includeAll));
-        return sortedObservationsAtTopLevel;
+        };
+        ArrayList<Obs> list = new ArrayList<Obs>(encounter.getObsAtTopLevel(includeAll));
+        Collections.sort(list, comparator);
+        return new LinkedHashSet<Obs>(list);
     }
 
 }
