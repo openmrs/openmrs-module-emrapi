@@ -14,7 +14,13 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Encounter;
+import org.openmrs.Obs;
+import org.openmrs.Order;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+
+import java.util.Comparator;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class EncounterTransactionMapper {
     protected EncounterObservationsMapper encounterObservationsMapper;
@@ -35,10 +41,34 @@ public class EncounterTransactionMapper {
         encounterTransaction.setLocationUuid(encounter.getLocation() != null ? encounter.getLocation().getUuid() : null);
         encounterTransaction.setVisitTypeUuid(encounter.getVisit().getVisitType().getUuid());
         encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());
-        encounterObservationsMapper.update(encounterTransaction, encounter.getObsAtTopLevel(includeAll));
+
         encounterProviderMapper.update(encounterTransaction, encounter.getEncounterProviders());
-        encounterOrdersMapper.update(encounterTransaction, encounter.getOrders());
+
+        encounterObservationsMapper.update(encounterTransaction, getSortedTopLevelObservations(encounter, includeAll));
+        encounterOrdersMapper.update(encounterTransaction, getSortedOrders(encounter));
         return encounterTransaction;
+    }
+
+    private Set<Order> getSortedOrders(Encounter encounter) {
+        TreeSet<Order> sortedOrders = new TreeSet<Order>(new Comparator<Order>() {
+            @Override
+            public int compare(Order o1, Order o2) {
+                return o2.getDateCreated().compareTo(o1.getDateCreated());
+            }
+        });
+        sortedOrders.addAll(encounter.getOrders());
+        return sortedOrders;
+    }
+
+    private Set<Obs> getSortedTopLevelObservations(Encounter encounter, Boolean includeAll) {
+        TreeSet<Obs> sortedObservationsAtTopLevel = new TreeSet<Obs>(new Comparator<Obs>() {
+            @Override
+            public int compare(Obs o1, Obs o2) {
+                return o2.getObsDatetime().compareTo(o1.getObsDatetime());
+            }
+        });
+        sortedObservationsAtTopLevel.addAll(encounter.getObsAtTopLevel(includeAll));
+        return sortedObservationsAtTopLevel;
     }
 
 }
