@@ -18,11 +18,7 @@ import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -54,27 +50,33 @@ public class EncounterTransactionMapper {
     }
 
     private Set<Order> getSortedOrders(Encounter encounter) {
-        Comparator<Order> comparator = new Comparator<Order>() {
+        TreeSet<Order> sortedOrders = new TreeSet<Order>(new Comparator<Order>() {
             @Override
             public int compare(Order o1, Order o2) {
+                if (o2.getDateCreated().equals(o1.getDateCreated()))
+                    return o2.getId().compareTo(o1.getId());
                 return o2.getDateCreated().compareTo(o1.getDateCreated());
             }
-        };
-        ArrayList<Order> list = new ArrayList<Order>(encounter.getOrders());
-        Collections.sort(list, comparator);
-        return new LinkedHashSet<Order>(list);
+        });
+
+        Set<Order> orders = encounter.getOrders();
+        sortedOrders.addAll(orders);
+        return sortedOrders;
     }
 
     private Set<Obs> getSortedTopLevelObservations(Encounter encounter, Boolean includeAll) {
-        Comparator<Obs> comparator = new Comparator<Obs>() {
+        TreeSet<Obs> sortedObservations = new TreeSet<Obs>(new Comparator<Obs>() {
             @Override
             public int compare(Obs o1, Obs o2) {
-                return o2.getObsDatetime().compareTo(o1.getObsDatetime());
+                if (o2.getDateCreated().equals(o1.getDateCreated()))
+                    return o2.getId().compareTo(o1.getId());
+                return o2.getDateCreated().compareTo(o1.getDateCreated());
             }
-        };
-        ArrayList<Obs> list = new ArrayList<Obs>(encounter.getObsAtTopLevel(includeAll));
-        Collections.sort(list, comparator);
-        return new LinkedHashSet<Obs>(list);
+        });
+
+        Set<Obs> observations = encounter.getObsAtTopLevel(includeAll);
+        sortedObservations.addAll(observations);
+        return sortedObservations;
     }
 
 }
