@@ -19,7 +19,6 @@ import java.util.Map;
 /**
  * Sets the death and deathDate fields on a Patient, and saves those changes.
  * TODO implement an API method for recording a patient's death in this module (based on, but cleaner than, the PatientService.processDeath method)
- * Note: this currently is failing because it isn't setting causeOfDeath
  */
 @Component("markPatientDeadDispositionAction")
 public class MarkPatientDeadDispositionAction implements DispositionAction {

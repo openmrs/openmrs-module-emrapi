@@ -122,7 +122,7 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
 
         when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
 
-        action.action(new EncounterDomainWrapper(new Encounter()), new Obs(), new HashMap<String, String[]>());
+        action.action(new EncounterDomainWrapper(encounter), new Obs(), new HashMap<String, String[]>());
 
         verify(adtService, never()).createAdtEncounterFor(any(AdtAction.class));
     }
