@@ -13,8 +13,10 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.type.TypeReference;
 import org.joda.time.DateTime;
+import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.DrugOrder;
@@ -48,6 +50,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
 
     @Autowired
     private VisitService visitService;
+    private String dateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     @Test
     public void shouldCreateVisitWhenNoVisitsAreActive() throws Exception {
@@ -68,7 +71,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         executeDataSet("shouldCreateMatchingEncounter.xml");
 
         String encounterDateTimeString = "2011-05-01T12:10:06.000+0530";
-        Date encounterDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse(encounterDateTimeString);
+        Date encounterDateTime = new SimpleDateFormat(dateTimeFormat).parse(encounterDateTimeString);
 
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
@@ -121,7 +124,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                         "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                         "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                         "\"observations\":[" +
-                            "{\"concept\": {\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"conceptName\":\"Should be Ignored\", \"value\":20 }, " +
+                            "{\"concept\": {\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"conceptName\":\"Should be Ignored\", \"value\":20}, " +
                             "{\"concept\": {\"uuid\": \"e102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":\"text value\", \"comment\":\"overweight\"}]}";
 
         MockHttpServletResponse response1 = handle(newPostRequest("/rest/emrapi/encounter", json));
@@ -145,7 +148,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("e102c80f-1yz9-4da3-bb88-8122ce8868dd", textObservation.getConcept().getUuid());
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", textObservation.getEncounter().getUuid());
         assertEquals("overweight", textObservation.getComment());
-        assertEquals(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000"), textObservation.getObsDatetime());
+        assertEquals(DateUtils.parseDate("2005-01-01T00:00:00.000+0000", dateTimeFormat), textObservation.getObsDatetime());
 
         assertEquals(new Double(20.0), map.get(ConceptDatatype.NUMERIC).getValueNumeric());
     }
@@ -160,7 +163,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                 "\"observations\":[" +
                 "{\"concept\":{\"uuid\": \"e102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, " +
-                " \"groupMembers\" : [{\"concept\":{\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":20, \"comment\":\"overweight\" }] }" +
+                " \"groupMembers\" : [{\"concept\":{\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":20, \"comment\":\"overweight\", \"observationDateTime\": \"2005-01-01T00:00:00.000+0000\"}] }" +
                 "]}";
 
         EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
@@ -179,7 +182,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", member.getPerson().getUuid());
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", member.getEncounter().getUuid());
         assertEquals("overweight", member.getComment());
-        assertEquals(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000"), member.getObsDatetime());
+        assertEquals(new SimpleDateFormat(dateTimeFormat).parse("2005-01-01T00:00:00.000+0000"), member.getObsDatetime());
     }
 
     @Test
@@ -223,6 +226,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         executeDataSet("dispositionMetaData.xml");
         executeDataSet("diagnosisMetaData.xml");
         executeDataSet("shouldGetEncounterTransactionByDate.xml");
+        String dispositionDateTime = "2005-01-01T01:00:00.000+0000";
         String encounter1PostData = "{" +
                     "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                     "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
@@ -251,6 +255,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                 "], " +
                 "\"disposition\": {" +
                 "    \"code\": \"ADMIT\"," +
+                "    \"dispositionDateTime\": \"" + dispositionDateTime + "\"," +
                 "    \"additionalObs\": [" +
                 "        {" +
                 "            \"value\": \"Admit him to ICU.\"," +
@@ -293,6 +298,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         //Assert Disposition data
         EncounterTransaction.Disposition fetchedDisposition = fetchedEncounterTransaction.getDisposition();
         assertEquals("ADMIT", fetchedDisposition.getCode());
+        assertEquals(DateUtils.parseDate(dispositionDateTime, dateTimeFormat), fetchedDisposition.getDispositionDateTime());
         assertNotNull(fetchedDisposition.getExistingObs());
         assertEquals(1, fetchedDisposition.getAdditionalObs().size());
         assertEquals("Admit him to ICU.", fetchedDisposition.getAdditionalObs().get(0).getValue());
@@ -338,16 +344,15 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         executeDataSet("baseMetaData.xml");
         executeDataSet("diagnosisMetaData.xml");
         executeDataSet("shouldAddDiagnosisAsObservation.xml");
-
         String cancerDiagnosisUuid = "d102c80f-1yz9-4da3-bb88-8122ce8868dh";
-
+        String diagnosisDateTime = "2005-01-01T01:00:00.000+0000";
         String postData = "{" +
                                 "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899891\", " +
                                 "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
                                 "\"diagnoses\":[" +
-                                    "{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"codedAnswer\": { \"uuid\": \"" + cancerDiagnosisUuid + "\"} }" +
+                                    "{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"codedAnswer\": { \"uuid\": \"" + cancerDiagnosisUuid + "\"}, \"diagnosisDateTime\": \""+ diagnosisDateTime + "\" }" +
                                 "]" +
                            "}";
 
@@ -360,6 +365,8 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals(1, obsAtTopLevel.size());
         Obs parentObservation = obsAtTopLevel.iterator().next();
         assertTrue(parentObservation.isObsGrouping());
+        assertEquals(DateUtils.parseDate(diagnosisDateTime, dateTimeFormat), parentObservation.getObsDatetime());
+
         Set<Obs> diagnosisObservationGroupMembers = parentObservation.getGroupMembers();
         assertEquals(3, diagnosisObservationGroupMembers.size());
         ArrayList<String> valueCodedNames = getValuCodedNames(diagnosisObservationGroupMembers);

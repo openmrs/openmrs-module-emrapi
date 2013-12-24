@@ -83,14 +83,15 @@ public class EncounterObservationServiceHelperTest {
             new EncounterTransaction.Observation().setConcept(getConcept(TEXT_CONCEPT_UUID)).setValue("text value").setComment("overweight")
         );
 
+        Date encounterDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
         Patient patient = new Patient();
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
         encounter.setPatient(patient);
+        encounter.setEncounterDatetime(encounterDateTime);
 
-        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
 
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(1, encounter.getObs().size());
         Obs textObservation = encounter.getObs().iterator().next();
@@ -102,7 +103,7 @@ public class EncounterObservationServiceHelperTest {
         assertEquals("e-uuid", textObservation.getEncounter().getUuid());
         assertEquals("overweight", textObservation.getComment());
 
-        assertEquals(observationDateTime, textObservation.getObsDatetime());
+        assertEquals(encounterDateTime, textObservation.getObsDatetime());
     }
 
     @Test
@@ -119,7 +120,7 @@ public class EncounterObservationServiceHelperTest {
         encounter.setPatient(patient);
 
         Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(1, encounter.getObs().size());
         Obs codedObservation = encounter.getObs().iterator().next();
@@ -130,9 +131,9 @@ public class EncounterObservationServiceHelperTest {
     @Test
     public void shouldUpdateExistingObservation() throws ParseException {
         Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
-
+        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
         List<EncounterTransaction.Observation> observations = asList(
-                new EncounterTransaction.Observation().setUuid("o-uuid").setValue(35.0).setComment("overweight")
+                new EncounterTransaction.Observation().setUuid("o-uuid").setValue(35.0).setComment("overweight").setObservationDateTime(observationDateTime)
         );
 
         Encounter encounter = new Encounter();
@@ -142,8 +143,7 @@ public class EncounterObservationServiceHelperTest {
         obs.setConcept(numericConcept);
         encounter.addObs(obs);
 
-        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(1, encounter.getObs().size());
         Obs textObservation = encounter.getObs().iterator().next();
@@ -169,7 +169,7 @@ public class EncounterObservationServiceHelperTest {
 
         Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
 
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(1, encounter.getObs().size());
         Obs textObservation = encounter.getObs().iterator().next();
@@ -192,7 +192,7 @@ public class EncounterObservationServiceHelperTest {
         encounter.addObs(obs);
 
         Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(0, encounter.getObs().size());
         assertEquals(1, encounter.getAllObs(true).size());
@@ -208,7 +208,7 @@ public class EncounterObservationServiceHelperTest {
                 new EncounterTransaction.Observation().setConcept(getConcept("non-existent"))
         );
         Encounter encounter = new Encounter();
-        encounterObservationServiceHelper.update(encounter, observations, null);
+        encounterObservationServiceHelper.update(encounter, observations);
     }
 
     @Test
@@ -220,6 +220,7 @@ public class EncounterObservationServiceHelperTest {
 
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
+        encounter.setEncounterDatetime(new Date());
         Obs savedObservations = new Obs();
         savedObservations.addGroupMember(new Obs());
         savedObservations.addGroupMember(new Obs());
@@ -229,7 +230,7 @@ public class EncounterObservationServiceHelperTest {
         when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class))).thenReturn(savedObservations);
         when(conceptService.getConceptByUuid(diagnosisConceptUuid)).thenReturn(conceptForDiagnosis);
 
-        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosises, new Date());
+        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnosises);
 
         Set<Obs> parentObservations = encounter.getObsAtTopLevel(false);
         assertEquals(1, parentObservations.size());
@@ -260,15 +261,13 @@ public class EncounterObservationServiceHelperTest {
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
 
-        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(1, encounter.getObs().size());
         Obs textObservation = encounter.getObs().iterator().next();
 
         assertEquals(new Double(35.0), textObservation.getValueNumeric());
         assertEquals("overweight", textObservation.getComment());
-        assertEquals(observationDateTime, textObservation.getObsDatetime());
 
         assertEquals("order-uuid",textObservation.getOrder().getUuid());
     }
@@ -286,15 +285,13 @@ public class EncounterObservationServiceHelperTest {
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
 
-        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(1, encounter.getObs().size());
         Obs textObservation = encounter.getObs().iterator().next();
 
         assertEquals(new Double(35.0), textObservation.getValueNumeric());
         assertEquals("overweight", textObservation.getComment());
-        assertEquals(observationDateTime, textObservation.getObsDatetime());
 
         assertNull(textObservation.getOrder());
     }
@@ -318,15 +315,13 @@ public class EncounterObservationServiceHelperTest {
         encounter.addObs(existingObs);
         encounter.setUuid("e-uuid");
 
-        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
-        encounterObservationServiceHelper.update(encounter, observations, observationDateTime);
+        encounterObservationServiceHelper.update(encounter, observations);
 
         Set<Obs> obsSet = encounter.getObsAtTopLevel(true);
         assertEquals(1, obsSet.size());
         Obs textObservation = obsSet.iterator().next();
 
         assertEquals(new Double(value), textObservation.getValueNumeric());
-        assertEquals(observationDateTime, textObservation.getObsDatetime());
         assertTrue(textObservation.getVoided());
     }
 

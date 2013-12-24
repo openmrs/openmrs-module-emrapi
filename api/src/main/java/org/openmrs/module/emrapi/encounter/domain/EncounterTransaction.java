@@ -316,8 +316,9 @@ public class EncounterTransaction {
             return this;
         }
 
-        public void setObservationDateTime(Date observationDateTime) {
+        public Observation setObservationDateTime(Date observationDateTime) {
             this.observationDateTime = observationDateTime;
+            return this;
         }
 
         @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -389,7 +390,7 @@ public class EncounterTransaction {
 
         @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getDispositionDateTime() {
-            return dispositionDateTime == null ? new Date() : dispositionDateTime;
+            return dispositionDateTime;
         }
 
         public void setDispositionDateTime(Date date) {
@@ -543,7 +544,7 @@ public class EncounterTransaction {
 
         @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getDiagnosisDateTime() {
-            return diagnosisDateTime == null ? new Date() : diagnosisDateTime;
+            return diagnosisDateTime;
         }
 
         public void setDiagnosisDateTime(Date date) {

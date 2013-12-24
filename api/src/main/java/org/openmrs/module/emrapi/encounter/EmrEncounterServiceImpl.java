@@ -103,9 +103,9 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Visit visit = findOrCreateVisit(encounterTransaction, patient);
         Encounter encounter = findOrCreateEncounter(encounterTransaction, patient, visit);
 
-        encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations(), encounterTransaction.getEncounterDateTime());
-        encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses(), encounterTransaction.getEncounterDateTime());
-        encounterDispositionServiceHelper.update(encounter, encounterTransaction.getDisposition(), encounterTransaction.getEncounterDateTime());
+        encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations());
+        encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses());
+        encounterDispositionServiceHelper.update(encounter, encounterTransaction.getDisposition());
         encounterTestOrderServiceHelper.update(encounter, encounterTransaction.getTestOrders());
         encounterDrugOrderServiceHelper.update(encounter, encounterTransaction.getDrugOrders());
         encounterProviderServiceHelper.update(encounter, encounterTransaction.getProviders());
@@ -178,7 +178,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         EncounterParameters encounterParameters = EncounterParameters.instance()
                 .setLocation(location).setEncounterType(encounterType)
-                .setProviders(providers).setEncounterDateTime(encounterTransaction.getEncounterDateTime())
+                .setProviders(providers).setEncounterDateTime(encounterDateTime)
                 .setPatient(patient);
 
         Encounter encounter = findEncounter(visit, encounterParameters);
@@ -187,10 +187,12 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             encounter = new Encounter();
             encounter.setPatient(patient);
             encounter.setEncounterType(encounterType);
-            encounter.setEncounterDatetime(encounterDateTime);
             encounter.setUuid(UUID.randomUUID().toString());
             encounter.setObs(new HashSet<Obs>());
             visit.addEncounter(encounter);
+        }
+        if(encounterDateTime != null) {
+            encounter.setEncounterDatetime(encounterDateTime);
         }
         return encounter;
     }

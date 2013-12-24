@@ -56,7 +56,7 @@ public class EncounterDispositionServiceHelperTest {
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
         disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
 
-        encounterDispositionServiceHelper.update(encounter, disposition, new Date());
+        encounterDispositionServiceHelper.update(encounter, disposition);
 
         assertDispositionValues(noteConceptUuid, dispositionNoteValue, code, encounter);
 
@@ -114,7 +114,7 @@ public class EncounterDispositionServiceHelperTest {
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
         disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
 
-        encounterDispositionServiceHelper.update(encounter, disposition, new Date());
+        encounterDispositionServiceHelper.update(encounter, disposition);
 
         code = "DISCHARGE";
         dispositionNoteValue = dispositionNoteValue+" addendum";
@@ -122,7 +122,7 @@ public class EncounterDispositionServiceHelperTest {
         disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
         newConceptByMapping(code,null);
 
-        encounterDispositionServiceHelper.update(encounter, disposition, new Date());
+        encounterDispositionServiceHelper.update(encounter, disposition);
 
         assertDispositionValues(noteConceptUuid, dispositionNoteValue, code, encounter);
 

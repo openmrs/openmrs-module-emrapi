@@ -52,18 +52,18 @@ public class EncounterObservationServiceHelper {
         this.orderService = orderService;
     }
 
-    public void update(Encounter encounter, List<EncounterTransaction.Observation> observations, Date observationDateTime) {
+    public void update(Encounter encounter, List<EncounterTransaction.Observation> observations) {
         try {
             Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
             for (EncounterTransaction.Observation observationData : observations) {
-                updateObservation(encounter, null, existingObservations, observationDateTime, observationData);
+                updateObservation(encounter, null, existingObservations, observationData);
             }
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private void updateObservation(Encounter encounter, Obs parentObs, Set<Obs> existingObservations, Date observationDateTime, EncounterTransaction.Observation observationData) throws ParseException {
+    private void updateObservation(Encounter encounter, Obs parentObs, Set<Obs> existingObservations, EncounterTransaction.Observation observationData) throws ParseException {
         Obs observation = getMatchingObservation(existingObservations, observationData.getUuid());
         if (observation == null) {
             observation = newObservation(encounter, observationData);
@@ -75,17 +75,16 @@ public class EncounterObservationServiceHelper {
         if (observationData.getVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());
-            observation.setObsDatetime(observationDateTime);
             return;
         }
-        mapObservationProperties(observationDateTime, observationData, observation);
+        mapObservationProperties(observationData, observation);
 
         for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
-            updateObservation(encounter, observation, observation.getGroupMembers(), observationDateTime, member);
+            updateObservation(encounter, observation, observation.getGroupMembers(), member);
         }
     }
 
-    private void mapObservationProperties(Date observationDateTime, EncounterTransaction.Observation observationData, Obs observation) throws ParseException {
+    private void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) throws ParseException {
         observation.setComment(observationData.getComment());
         if (observationData.getValue() != null) {
             if (observation.getConcept().getDatatype().getHl7Abbreviation().equals("CWE")) {
@@ -98,7 +97,8 @@ public class EncounterObservationServiceHelper {
         if(observationData.getOrderUuid() != null && !observationData.getOrderUuid().isEmpty()){
             observation.setOrder(getOrderByUuid(observationData.getOrderUuid()));
         }
-        observation.setObsDatetime(observationDateTime);
+        if(observationData.getObservationDateTime() != null)
+            observation.setObsDatetime(observationData.getObservationDateTime());
     }
 
     private Order getOrderByUuid(String orderUuid){
@@ -108,6 +108,7 @@ public class EncounterObservationServiceHelper {
     private Obs newObservation(Encounter encounter, EncounterTransaction.Observation observationData) {
         Obs observation;
         observation = new Obs();
+        Date observationDateTime = observationData.getObservationDateTime() == null ? encounter.getEncounterDatetime() : observationData.getObservationDateTime();
         Concept concept = conceptService.getConceptByUuid(observationData.getConceptUuid());
         if (concept == null) {
             throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
@@ -115,6 +116,7 @@ public class EncounterObservationServiceHelper {
         observation.setPerson(encounter.getPatient());
         observation.setEncounter(encounter);
         observation.setConcept(concept);
+        observation.setObsDatetime(observationDateTime);
         return observation;
     }
 
@@ -126,12 +128,14 @@ public class EncounterObservationServiceHelper {
         return null;
     }
 
-    public void updateDiagnoses(Encounter encounter, List<EncounterTransaction.Diagnosis> diagnoses, Date observationDateTime) {
+    public void updateDiagnoses(Encounter encounter, List<EncounterTransaction.Diagnosis> diagnoses) {
         for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
             org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
             Obs obs = getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
-            if (obs.getObsDatetime() == null)
-                obs.setObsDatetime(observationDateTime);
+            if (obs.getObsDatetime() == null) {
+                Date diagnosisDateTime = diagnosisRequest.getDiagnosisDateTime() != null ? diagnosisRequest.getDiagnosisDateTime() : encounter.getEncounterDatetime();
+                obs.setObsDatetime(diagnosisDateTime);
+            }
             encounter.addObs(obs);
         }
     }

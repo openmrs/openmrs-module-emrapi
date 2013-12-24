@@ -29,50 +29,54 @@ public class EncounterDispositionServiceHelper {
 
     }
 
-    public void update(Encounter encounter, EncounterTransaction.Disposition disposition, Date observationDateTime) {
+    public void update(Encounter encounter, EncounterTransaction.Disposition disposition) {
         try {
             if(isValid(disposition)){
                 dispositionGroupConcept = getDispositionGroupConcept();
                 dispositionConcept = getDispositionConcept();
 
                 if(!hasDisposition(encounter)){
-                    Obs obs = createObsGroupForDisposition(disposition,encounter,observationDateTime);
+                    Obs obs = createObsGroupForDisposition(disposition,encounter);
                     encounter.addObs(obs);
                     return;
                 }
 
-                editExistingObservations(disposition,encounter,observationDateTime);
+                editExistingObservations(disposition,encounter);
             }
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private Obs createObsGroupForDisposition(EncounterTransaction.Disposition disposition,Encounter encounter,Date observationDateTime) throws ParseException {
+    private Obs createObsGroupForDisposition(EncounterTransaction.Disposition disposition,Encounter encounter) throws ParseException {
+        Date dispositionDateTime = disposition.getDispositionDateTime() != null ? disposition.getDispositionDateTime() :  encounter.getEncounterDatetime();
         Obs obs = new Obs();
         obs.setConcept(dispositionGroupConcept);
-        Obs dispositionAsObservation = constructDispositionObs(encounter, new Obs(), disposition.getCode(), observationDateTime);
+        Obs dispositionAsObservation = constructDispositionObs(encounter, new Obs(), disposition.getCode(), dispositionDateTime);
         obs.addGroupMember(dispositionAsObservation);
+        obs.setObsDatetime(dispositionDateTime);
 
         if(disposition.getAdditionalObs() != null){
             for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
                 if(observation.getValue() != null && !((String) observation.getValue()).isEmpty() ){
-                    obs.addGroupMember(createObsFromObservation(observation, encounter, observationDateTime));
+                    obs.addGroupMember(createObsFromObservation(observation, encounter, dispositionDateTime));
                 }
             }
         }
         return obs;
     }
 
-    private void editExistingObservations(EncounterTransaction.Disposition disposition,Encounter encounter,Date observationDateTime) throws ParseException {
+    private void editExistingObservations(EncounterTransaction.Disposition disposition, Encounter encounter) throws ParseException {
         Set<Obs> allEncounterObs = encounter.getAllObs();
         Obs existingDispositionGroup = getMatchingObservation(allEncounterObs, dispositionGroupConcept.getUuid());
+        Date dispositionDateTime = disposition.getDispositionDateTime() != null ? disposition.getDispositionDateTime() : existingDispositionGroup.getObsDatetime();
         Obs existingDisposition = getMatchingObservation(existingDispositionGroup.getGroupMembers(), dispositionConcept.getUuid());
-        constructDispositionObs(encounter, existingDisposition, disposition.getCode(), observationDateTime);
+        existingDispositionGroup.setObsDatetime(dispositionDateTime);
+        constructDispositionObs(encounter, existingDisposition, disposition.getCode(), dispositionDateTime);
         if(disposition.getAdditionalObs() != null){
             for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
                 Obs matchingObservation = getMatchingObservation(existingDispositionGroup.getGroupMembers(), observation.getConceptUuid());
-                updateObsFromObservation(observation, matchingObservation,observationDateTime);
+                updateObsFromObservation(observation, matchingObservation, dispositionDateTime);
             }
         }
     }
