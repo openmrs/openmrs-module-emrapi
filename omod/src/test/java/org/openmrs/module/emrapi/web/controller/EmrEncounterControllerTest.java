@@ -16,7 +16,6 @@ package org.openmrs.module.emrapi.web.controller;
 import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.type.TypeReference;
 import org.joda.time.DateTime;
-import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.DrugOrder;
@@ -118,11 +117,11 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
     @Test
     public void shouldAddNewObservation() throws Exception {
         executeDataSet("shouldAddNewObservation.xml");
-
+        String encounterDateTime = "2005-01-02T00:00:00.000+0000";
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                         "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                         "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
-                        "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                        "\"encounterDateTime\" : \"" + encounterDateTime + "\", " +
                         "\"observations\":[" +
                             "{\"concept\": {\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"conceptName\":\"Should be Ignored\", \"value\":20}, " +
                             "{\"concept\": {\"uuid\": \"e102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":\"text value\", \"comment\":\"overweight\"}]}";
@@ -148,7 +147,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("e102c80f-1yz9-4da3-bb88-8122ce8868dd", textObservation.getConcept().getUuid());
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", textObservation.getEncounter().getUuid());
         assertEquals("overweight", textObservation.getComment());
-        assertEquals(DateUtils.parseDate("2005-01-01T00:00:00.000+0000", dateTimeFormat), textObservation.getObsDatetime());
+        assertEquals(DateUtils.parseDate(encounterDateTime, dateTimeFormat), textObservation.getObsDatetime());
 
         assertEquals(new Double(20.0), map.get(ConceptDatatype.NUMERIC).getValueNumeric());
     }
@@ -156,14 +155,15 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
     @Test
     public void shouldAddNewObservationGroup() throws Exception {
         executeDataSet("shouldAddNewObservation.xml");
-
+        String encounterDateTime = "2005-01-02T00:00:00.000+0000";
+        String observationTime = "2005-01-02T12:00:00.000+0000";
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
-                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                "\"encounterDateTime\" : \"" + encounterDateTime + "\", " +
                 "\"observations\":[" +
                 "{\"concept\":{\"uuid\": \"e102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, " +
-                " \"groupMembers\" : [{\"concept\":{\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":20, \"comment\":\"overweight\", \"observationDateTime\": \"2005-01-01T00:00:00.000+0000\"}] }" +
+                " \"groupMembers\" : [{\"concept\":{\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":20, \"comment\":\"overweight\", \"observationDateTime\": \"" + observationTime + "\"}] }" +
                 "]}";
 
         EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
@@ -182,7 +182,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals("a76e8d23-0c38-408c-b2a8-ea5540f01b51", member.getPerson().getUuid());
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08f", member.getEncounter().getUuid());
         assertEquals("overweight", member.getComment());
-        assertEquals(new SimpleDateFormat(dateTimeFormat).parse("2005-01-01T00:00:00.000+0000"), member.getObsDatetime());
+        assertEquals(new SimpleDateFormat(dateTimeFormat).parse(observationTime), member.getObsDatetime());
     }
 
     @Test
@@ -320,7 +320,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
-                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                "\"encounterDateTime\" : \"2005-01-02T00:00:00.000+0000\", " +
                 "\"testOrders\":[" +
                 "{\"concept\": {\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"instructions\":\"do it\", \"orderTypeUuid\": \"1a61ef2a-250c-11e3-b832-0800271c1b75\" }]}";
 
@@ -390,7 +390,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
-                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                "\"encounterDateTime\" : \"2005-01-02T00:00:00.000+0000\", " +
                 "\"testOrders\":[" +
                 "{\"concept\":{ \"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, " +
                 "\"instructions\":\"do it\", \"orderTypeUuid\": \"1a61ef2a-250c-11e3-b832-0800271c1b75\" }]," +
