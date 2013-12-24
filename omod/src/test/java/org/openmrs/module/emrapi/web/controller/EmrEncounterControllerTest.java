@@ -345,12 +345,13 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         executeDataSet("diagnosisMetaData.xml");
         executeDataSet("shouldAddDiagnosisAsObservation.xml");
         String cancerDiagnosisUuid = "d102c80f-1yz9-4da3-bb88-8122ce8868dh";
-        String diagnosisDateTime = "2005-01-01T01:00:00.000+0000";
+        String encounterDateTime = "2005-01-02T00:00:00.000+0000";
+        String diagnosisDateTime = "2005-01-02T01:00:00.000+0000";
         String postData = "{" +
                                 "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899891\", " +
-                                "\"encounterDateTime\" : \"2005-01-01T00:00:00.000+0000\", " +
+                                "\"encounterDateTime\" : \"" + encounterDateTime + "\", " +
                                 "\"diagnoses\":[" +
                                     "{\"order\":\"PRIMARY\", \"certainty\": \"CONFIRMED\", \"codedAnswer\": { \"uuid\": \"" + cancerDiagnosisUuid + "\"}, \"diagnosisDateTime\": \""+ diagnosisDateTime + "\" }" +
                                 "]" +
