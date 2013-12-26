@@ -31,7 +31,7 @@ public interface EmrEncounterService extends OpenmrsService {
 
     EncounterTransaction save(EncounterTransaction encounterTransaction);
 
-    EncounterTransaction getActiveEncounter(String patientUuid, String encounterTypeUuid, String visitTypeUuid, Boolean includeAll);
-
     List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters);
+
+    EncounterTransaction getActiveEncounter(ActiveEncounterParameters activeEncounterParameters);
 }

@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.web.controller;
 
 import org.apache.commons.lang.StringUtils;
+import org.openmrs.module.emrapi.encounter.ActiveEncounterParameters;
 import org.openmrs.module.emrapi.encounter.EmrEncounterService;
 import org.openmrs.module.emrapi.encounter.EncounterSearchParameters;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
@@ -47,9 +47,8 @@ public class EmrEncounterController extends BaseRestController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/active")
     @ResponseBody
-    public EncounterTransaction getActiveEncounter(@RequestParam String patientUuid, String encounterTypeUuid,
-                                                   String visitTypeUuid, Boolean includeAll) {
-        return emrEncounterService.getActiveEncounter(patientUuid, encounterTypeUuid, visitTypeUuid, includeAll);
+    public EncounterTransaction getActiveEncounter(ActiveEncounterParameters activeEncounterParameters) {
+        return emrEncounterService.getActiveEncounter(activeEncounterParameters);
     }
 
     @RequestMapping(method = RequestMethod.GET)
