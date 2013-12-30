@@ -37,8 +37,10 @@ import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -59,7 +61,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private ProviderService providerService;
     private AdministrationService administrationService;
 
-    private BaseEncounterMatcher encounterMatcher;
+    private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
                                    LocationService locationService, ProviderService providerService, AdministrationService administrationService,
@@ -86,6 +88,10 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     public void onStartup() {
         try {
             super.onStartup();
+            List<BaseEncounterMatcher> encounterMatchers = Context.getRegisteredComponents(BaseEncounterMatcher.class);
+            for (BaseEncounterMatcher encounterMatcher : encounterMatchers) {
+                encounterMatcherMap.put(encounterMatcher.getClass().getCanonicalName(), encounterMatcher);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -198,27 +204,13 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     private Encounter findEncounter(Visit visit, EncounterParameters encounterParameters) {
-        loadEncounterMatcher();
-        return encounterMatcher.findEncounter(visit, encounterParameters);
-    }
 
-    private void loadEncounterMatcher() {
         String matcherClass = administrationService.getGlobalProperty("emr.encounterMatcher");
-        if(encounterMatcher == null){
-            if(isNotEmpty(matcherClass)){
-                List<BaseEncounterMatcher> encounterMatchers = Context.getRegisteredComponents(BaseEncounterMatcher.class);
-                for (BaseEncounterMatcher baseEencounterMatcher : encounterMatchers) {
-                    if(baseEencounterMatcher.getClass().getCanonicalName().equals(matcherClass))
-                        encounterMatcher = baseEencounterMatcher;
-                }
-            }else{
-                encounterMatcher =  new DefaultEncounterMatcher();
-            }
-        }
-
+        BaseEncounterMatcher encounterMatcher = isNotEmpty(matcherClass)? encounterMatcherMap.get(matcherClass) : new DefaultEncounterMatcher();
         if (encounterMatcher == null) {
             throw new EncounterMatcherNotFoundException();
         }
+        return encounterMatcher.findEncounter(visit, encounterParameters);
     }
 
     private Set<Provider> getProviders(Set<EncounterTransaction.Provider> encounteProviders) {
