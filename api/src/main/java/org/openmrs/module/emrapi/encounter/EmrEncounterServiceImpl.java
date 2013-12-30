@@ -86,6 +86,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     public void onStartup() {
         try {
             super.onStartup();
+            String matcherClass = administrationService.getGlobalProperty("emr.encounterMatcher");
+            loadEncounterMatcher(matcherClass);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -198,28 +200,34 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     private Encounter findEncounter(Visit visit, EncounterParameters encounterParameters) {
-        loadEncounterMatcher();
+        getEncounterMatcher();
         return encounterMatcher.findEncounter(visit, encounterParameters);
     }
 
-    private void loadEncounterMatcher() {
+    private void getEncounterMatcher() {
         String matcherClass = administrationService.getGlobalProperty("emr.encounterMatcher");
         if(encounterMatcher == null){
-            if(isNotEmpty(matcherClass)){
-                List<BaseEncounterMatcher> encounterMatchers = Context.getRegisteredComponents(BaseEncounterMatcher.class);
-                for (BaseEncounterMatcher baseEencounterMatcher : encounterMatchers) {
-                    if(baseEencounterMatcher.getClass().getCanonicalName().equals(matcherClass))
-                        encounterMatcher = baseEencounterMatcher;
-                }
-            }else{
-                encounterMatcher =  new DefaultEncounterMatcher();
-            }
+            loadEncounterMatcher(matcherClass);
         }
 
-        if (encounterMatcher == null) {
-            throw new EncounterMatcherNotFoundException();
+    }
+
+    private void loadEncounterMatcher(String matcherClass) {
+        if(isNotEmpty(matcherClass)){
+            List<BaseEncounterMatcher> encounterMatchers = Context.getRegisteredComponents(BaseEncounterMatcher.class);
+            for (BaseEncounterMatcher baseEencounterMatcher : encounterMatchers) {
+                if(baseEencounterMatcher.getClass().getCanonicalName().equals(matcherClass))
+                    encounterMatcher = baseEencounterMatcher;
+            }
+            if (encounterMatcher == null) {
+                throw new EncounterMatcherNotFoundException();
+            }
+
+        }else{
+            encounterMatcher =  new DefaultEncounterMatcher();
         }
     }
+
 
     private Set<Provider> getProviders(Set<EncounterTransaction.Provider> encounteProviders) {
 
