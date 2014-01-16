@@ -56,7 +56,7 @@ public class EncounterTransactionMapper {
             public int compare(Order o1, Order o2) {
                 if (shouldNotCompareOnCreatedDates(o2.getDateCreated(), o1.getDateCreated())) {
                     if (shouldNotCompareOnIds(o1.getId(), o2.getId()))
-                        return 0;
+                        return o1.getConcept().getName().getName().compareTo(o2.getConcept().getName().getName());
                     return o2.getId().compareTo(o1.getId());
                 }
                 return o2.getDateCreated().compareTo(o1.getDateCreated());
