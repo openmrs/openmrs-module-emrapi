@@ -13,12 +13,7 @@
 	<description>API project for EMRAPI</description>
 
 	<dependencies>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>webservices.rest-omod-common</artifactId>
-            <version>2.4-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<resources>
