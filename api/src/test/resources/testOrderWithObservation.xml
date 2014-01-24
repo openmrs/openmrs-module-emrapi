@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <visit_type visit_type_id="1" name="Clinic or Hospital Visit" creator="1" date_created="2012-10-23 18:04:14"
+                changed_by="1" date_changed="2012-10-23 18:04:14"
+                retired="0" uuid="f01c54cb-2225-471a-9cd5-d348552c337c"/>
+
+    <visit visit_id="1010" patient_id="7" visit_type_id="1" date_started="2013-04-04 00:00:00.0" date_stopped="2013-04-07 00:00:00.0" location_id="1" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="1e5d5218-6b78-11e0-94c3-18a905e044dc" />
+
+    <encounter encounter_id="1000" encounter_type="2" patient_id="7" location_id="1" form_id="1" encounter_datetime="2008-08-01 00:00:00.0" creator="1" date_created="2008-08-18 14:09:05.0" voided="false" uuid="7779d653-393b-4118-9c83-a3715b82d4ac" visit_id="1010"/>
+
+    <order_type order_type_id="1" name="Lab Order" description="Order for laboratory test" creator="2" date_created="2005-08-08 07:06:12.0" uuid="bcf7f8c8-2700-102b-80cb-0017a47871b2" retired="false"/>
+
+    <orders order_id="1024" encounter_id="1000" concept_id="19" date_created="2008-08-19 12:32:03.0" patient_id="7" order_type_id="1" uuid="bcf7f8c8-2701-102b-80cb-0017a47871b2" discontinued="0" voided="0" urgency="ROUTINE"></orders>
+
+    <test_order order_id="1024"></test_order>
+
+    <obs obs_id="1000" person_id="7" concept_id="19"  encounter_id="1000" obs_datetime="2008-08-15 00:00:00.0" location_id="1" value_text="some test value" comments="" creator="1" date_created="2008-08-19 12:32:03.0" voided="false" uuid="e26cea2c-1b9f-666e-b211-f3ef6c88af6f"/>
+    <obs obs_id="1001" order_id="1024" obs_group_id="1000" person_id="7" concept_id="19" encounter_id="1000" obs_datetime="2008-08-15 00:00:00.0" location_id="1" value_text="some test value" comments="" creator="1" date_created="2008-08-19 12:32:03.0" voided="false" uuid="e26cea2c-1b9f-666e-b211-f3ef6c88ae6f"/>
+
+</dataset>
+
+
+

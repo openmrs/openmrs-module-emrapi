@@ -17,6 +17,7 @@ import org.openmrs.DrugOrder;
 import org.openmrs.Order;
 import org.openmrs.TestOrder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.utils.HibernateLazyLoader;
 
 import java.util.Set;
 
@@ -30,7 +31,8 @@ public class EncounterOrdersMapper {
     }
 
     void update(EncounterTransaction encounterTransactionResponse, Set<Order> orders) {
-        for (Order order : orders) {
+        for (Order orderProxy : orders) {
+            Order order = new HibernateLazyLoader().load(orderProxy);
             if (order instanceof TestOrder) {
                 encounterTransactionResponse.addTestOrder(testOrderMapper.map(order));
             } else if (order instanceof DrugOrder) {
