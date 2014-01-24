@@ -24,7 +24,6 @@ import org.openmrs.api.ObsService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
 
@@ -40,7 +39,6 @@ public class EncounterObservationServiceHelper {
 
     private ConceptService conceptService;
     private EmrApiProperties emrApiProperties;
-    private DiagnosisMetadata diagnosisMetadata;
     private ObsService obsService;
     private OrderService orderService;
 
@@ -131,20 +129,13 @@ public class EncounterObservationServiceHelper {
     public void updateDiagnoses(Encounter encounter, List<EncounterTransaction.Diagnosis> diagnoses) {
         for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
             org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
-            Obs obs = getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
+            Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
             if (obs.getObsDatetime() == null) {
                 Date diagnosisDateTime = diagnosisRequest.getDiagnosisDateTime() != null ? diagnosisRequest.getDiagnosisDateTime() : encounter.getEncounterDatetime();
                 obs.setObsDatetime(diagnosisDateTime);
             }
             encounter.addObs(obs);
         }
-    }
-
-    private DiagnosisMetadata getDiagnosisMetadata() {
-        if (this.diagnosisMetadata == null) {
-            this.diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
-        }
-        return this.diagnosisMetadata;
     }
 
     private org.openmrs.module.emrapi.diagnosis.Diagnosis createDiagnosis(EncounterTransaction.Diagnosis diagnosisRequest) {
