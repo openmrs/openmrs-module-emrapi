@@ -50,12 +50,7 @@ public class EncounterTestOrderServiceHelper {
                 continue;
             }
 
-            if (order == null) {
-                order = new org.openmrs.TestOrder();
-                order.setEncounter(encounter);
-                order.setPatient(encounter.getPatient());
-                encounter.addOrder(order);
-            }
+
 
             Concept newConcept = conceptService.getConceptByUuid(testOrder.getConceptUuid());
             if (newConcept == null) {
@@ -68,9 +63,15 @@ public class EncounterTestOrderServiceHelper {
                 throw new OrderTypeNotFoundException(orderTypeUuid);
             }
 
+            if (order == null) {
+                order = new org.openmrs.TestOrder();
+                order.setEncounter(encounter);
+                order.setPatient(encounter.getPatient());
+            }
             order.setConcept(newConcept);
             order.setOrderType(orderType);
             order.setInstructions(testOrder.getInstructions());
+            encounter.addOrder(order);
         }
     }
 
