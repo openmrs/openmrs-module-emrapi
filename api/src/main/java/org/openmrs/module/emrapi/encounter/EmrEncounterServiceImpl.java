@@ -193,7 +193,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             encounter = new Encounter();
             encounter.setPatient(patient);
             encounter.setEncounterType(encounterType);
-            encounter.setUuid(UUID.randomUUID().toString());
+            String encounterUuid = encounterTransaction.getEncounterUuid() == null ?UUID.randomUUID().toString():encounterTransaction.getEncounterUuid();
+            encounter.setUuid(encounterUuid);
             encounter.setObs(new HashSet<Obs>());
             visit.addEncounter(encounter);
         }
