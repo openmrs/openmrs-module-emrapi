@@ -44,7 +44,7 @@ public class EncounterTestOrderServiceHelper {
 
             Order order = getMatchingOrder(encounter, testOrder);
 
-            if (testOrder.isVoided()) {
+            if (testOrder.isVoided() && order != null) {
                 order.setVoided(true);
                 order.setVoidReason(testOrder.getVoidReason());
                 continue;
