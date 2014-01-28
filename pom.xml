@@ -23,9 +23,9 @@
     </organization>
 
     <scm>
-        <connection>scm:git:git@github.com:openmrs/openmrs-module-emrapi.git</connection>
-        <developerConnection>scm:git:git@github.com:openmrs/openmrs-module-emrapi.git</developerConnection>
-        <url>scm:git:git@github.com:openmrs/emrapi.git</url>
+        <connection>scm:git:https://github.com/openmrs/openmrs-module-emrapi.git</connection>
+        <developerConnection>scm:git:https://github.com/openmrs/openmrs-module-emrapi.git</developerConnection>
+        <url>https://github.com/openmrs/openmrs-module-emrapi.git</url>
     </scm>
 
     <modules>
