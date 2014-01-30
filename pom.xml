@@ -133,6 +133,13 @@
 
         <!-- Begin other dependencies -->
 
+        <dependency> <!-- Needed because the UI Framework module uses HttpSession in its api project -->
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
