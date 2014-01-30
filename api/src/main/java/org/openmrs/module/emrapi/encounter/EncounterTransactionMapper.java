@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Order;
@@ -55,8 +56,12 @@ public class EncounterTransactionMapper {
             @Override
             public int compare(Order o1, Order o2) {
                 if (shouldNotCompareOnCreatedDates(o2.getDateCreated(), o1.getDateCreated())) {
-                    if (shouldNotCompareOnIds(o1.getId(), o2.getId()))
+                    if (shouldNotCompareOnIds(o1.getId(), o2.getId())){
+                        if(shouldNotCompareOnConceptNames(o1.getConcept(),o2.getConcept())){
+                            return o1.toString().compareTo(o2.toString());
+                        }
                         return o1.getConcept().getName().getName().compareTo(o2.getConcept().getName().getName());
+                    }
                     return o2.getId().compareTo(o1.getId());
                 }
                 return o2.getDateCreated().compareTo(o1.getDateCreated());
@@ -92,6 +97,10 @@ public class EncounterTransactionMapper {
 
     private boolean shouldNotCompareOnCreatedDates(Date secondDate, Date firstDate) {
         return firstDate == null || secondDate == null || secondDate.equals(firstDate);
+    }
+
+    private boolean shouldNotCompareOnConceptNames(Concept firstConcept,Concept secondConcept){
+        return firstConcept == null || secondConcept == null || firstConcept.getName() == null || secondConcept.getName() == null;
     }
 
 }
