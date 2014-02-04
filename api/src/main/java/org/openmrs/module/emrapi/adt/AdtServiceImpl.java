@@ -249,7 +249,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     public Visit ensureActiveVisit(Patient patient, Location department) {
         Visit activeVisit = getActiveVisitHelper(patient, department);
         if (activeVisit == null) {
-            Date now = new DateTime().withMillisOfSecond(0).toDate();   // hack (hopefully temporary) to trim off ms component
+            Date now = new Date();
             activeVisit = buildVisit(patient, department, now);
             visitService.saveVisit(activeVisit);
         }
@@ -396,7 +396,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         Visit visit = new Visit();
         visit.setPatient(patient);
         visit.setLocation(getLocationThatSupportsVisits(location));
-        visit.setStartDatetime(when);
+        visit.setStartDatetime(new DateTime(when).withMillisOfSecond(0).toDate());   // hack to trim off ms component) because of mysql 5.6 error
         visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
         return visit;
     }
