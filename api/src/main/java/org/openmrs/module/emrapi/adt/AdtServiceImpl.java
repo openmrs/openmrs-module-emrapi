@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -248,7 +249,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     public Visit ensureActiveVisit(Patient patient, Location department) {
         Visit activeVisit = getActiveVisitHelper(patient, department);
         if (activeVisit == null) {
-            Date now = new Date();
+            Date now = new DateTime().withMillisOfSecond(0).toDate();   // hack (hopefully temporary) to trim off ms component
             activeVisit = buildVisit(patient, department, now);
             visitService.saveVisit(activeVisit);
         }
