@@ -13,17 +13,6 @@
 */
 package org.openmrs.module.emrapi;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.hamcrest.Matcher;
@@ -33,6 +22,17 @@ import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.Provider;
 import org.openmrs.util.OpenmrsUtil;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Various utils to help with testing
@@ -167,15 +167,15 @@ public class TestUtils {
 		return string;
 	}
 
-    //use DateMatchers.within(1, SECONDS, date)
+    //use DateMatchers.within(2, SECONDS, date)
     @Deprecated
 	public static Matcher<Date> isJustNow() {
 		return new ArgumentMatcher<Date>() {
 
 			@Override
 			public boolean matches(Object o) {
-				// within the last second should be safe enough...
-				return Math.abs(System.currentTimeMillis() - ((Date) o).getTime()) < 1000;
+				// within the last two seconds should be safe enough... (needs to be more than a second to account for rounding issues)
+				return Math.abs(System.currentTimeMillis() - ((Date) o).getTime()) < 2000;
 			}
 		};
 	}
