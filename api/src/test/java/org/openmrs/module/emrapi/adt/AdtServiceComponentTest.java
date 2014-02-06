@@ -116,7 +116,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void integrationTest_ADT_workflow() {
-        Date startOfTest = new DateTime().withMillisOfSecond(0).toDate();
+        Date startOfTest = new Date();
 
         Provider provider = Context.getProviderService().getProvider(1);
 
@@ -349,9 +349,8 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         Date futureDate = new DateTime(3000, 12, 30, 0, 0, 0).toDate(); //  this test will start to fail after the year 3000! :)
 
         service.ensureActiveVisit(patient, outpatientDepartment);
-        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, now,
-                futureDate));
-        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, new DateTime(now).withMillisOfSecond(0).minusMillis(1).toDate()));     // to account for rounding issues
+        assertTrue(service.hasVisitDuring(patient, outpatientDepartment, now, futureDate));
+        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, now));
 
         // now lets just add another retrospective visit to do a quick test of the getVisits method
         startDate = new DateTime(2012, 1, 5, 0, 0, 0).toDate();

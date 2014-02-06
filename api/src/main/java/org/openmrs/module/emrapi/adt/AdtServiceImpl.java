@@ -15,7 +15,6 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -396,7 +395,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         Visit visit = new Visit();
         visit.setPatient(patient);
         visit.setLocation(getLocationThatSupportsVisits(location));
-        visit.setStartDatetime(new DateTime(when).withMillisOfSecond(0).toDate());   // hack to trim off ms component) because of mysql 5.6 error
+        visit.setStartDatetime(when);
         visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
         return visit;
     }
