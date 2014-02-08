@@ -9,12 +9,14 @@ import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterRole;
 import org.openmrs.Form;
 import org.openmrs.Location;
+import org.openmrs.Obs;
 import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateAfterVisitStopDateException;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDateException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
@@ -184,12 +186,12 @@ public class EncounterDomainWrapper {
 
             // if encounter date = today and open visit, consider this a real-time transaction and timestamp with current datetime
             if (encounterDate.equals(currentDate) && visit.isOpen()) {
-                encounter.setEncounterDatetime(new Date());
+                setEncounterDatetimeAndPropagateToObs(encounter, new Date());
             }
 
             // otherwise, if encounterDate is before visit start date, set the encounterDatetime to the visit date time
             else if (encounterDate.isBefore(new DateTime(visit.getStartDatetime()))) {
-                encounter.setEncounterDatetime(visit.getStartDatetime());
+                setEncounterDatetimeAndPropagateToObs(encounter, visit.getStartDatetime());
             }
 
             // otherwise, leave encounter date as is
@@ -197,6 +199,24 @@ public class EncounterDomainWrapper {
 
         // now associate with the visit
         encounter.setVisit(visit.getVisit());
+    }
+
+    /**
+     * Sets encounter.encounterDatetime, and if any obs in encounter.allObs had an obsDatetime equal to the original
+     * encounterDatetime, those obsDatetimes are also set. (I.e. this will change the obsDatetime of obs who
+     * "inherit" datetime from the encounter, but not touch obs who have an different obsDatetime.
+     * @param encounter
+     * @param datetime
+     */
+    private void setEncounterDatetimeAndPropagateToObs(Encounter encounter, Date datetime) {
+        Date original = encounter.getEncounterDatetime();
+        encounter.setEncounterDatetime(datetime);
+
+        for (Obs candidate : encounter.getAllObs(false)) {
+            if (OpenmrsUtil.nullSafeEquals(original, candidate.getObsDatetime())) {
+                candidate.setObsDatetime(datetime);
+            }
+        }
     }
 
     /**

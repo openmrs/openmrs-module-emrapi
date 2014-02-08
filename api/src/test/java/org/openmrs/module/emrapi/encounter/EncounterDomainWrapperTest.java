@@ -8,25 +8,25 @@ import org.junit.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterRole;
+import org.openmrs.Obs;
 import org.openmrs.Person;
 import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateAfterVisitStopDateException;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDateException;
+import uk.co.it.modular.hamcrest.date.DateMatchers;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.openmrs.module.emrapi.TestUtils.isJustNow;
@@ -249,6 +249,42 @@ public class EncounterDomainWrapperTest {
         assertThat(encounter.getEncounterDatetime(), greaterThanOrEqualTo(shouldBeLessThanEncounterDatetime));
         assertThat(encounter.getEncounterDatetime(), lessThanOrEqualTo(shouldBeGreaterThanEncounterDatetime));
         assertThat(encounter.getVisit(), is(visit));
+    }
+
+    @Test
+    public void test_attachToVisit_shouldPropagateEncounterDatetimeChangeToObs()
+            throws Exception {
+
+        Date startOfToday = new DateMidnight(System.currentTimeMillis()).toDate();
+        Date before = new DateMidnight(2003, 10, 4).toDate();
+
+        Obs child = new Obs();
+        child.setObsDatetime(startOfToday);
+
+        Obs parent = new Obs();
+        parent.setObsDatetime(startOfToday);
+        parent.addGroupMember(child);
+
+        Obs historical = new Obs();
+        historical.setObsDatetime(before);
+
+        Encounter encounter = new Encounter();
+        encounter.setEncounterDatetime(startOfToday);
+        encounter.addObs(parent);
+        encounter.addObs(child);
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(new Date());
+
+        EncounterDomainWrapper edw = new EncounterDomainWrapper(encounter);
+        edw.attachToVisit(visit);
+
+        Date encounterDatetime = encounter.getEncounterDatetime();
+        Date exactlyNow = new Date();
+        assertThat(encounterDatetime, DateMatchers.within(1, TimeUnit.SECONDS, exactlyNow));
+        assertThat(parent.getObsDatetime(), is(encounterDatetime));
+        assertThat(child.getObsDatetime(), is(encounterDatetime));
+        assertThat(historical.getObsDatetime(), is(before));
     }
 
     @Test
