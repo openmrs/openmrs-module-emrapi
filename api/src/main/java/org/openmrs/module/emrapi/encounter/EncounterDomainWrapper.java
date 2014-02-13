@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -212,9 +213,35 @@ public class EncounterDomainWrapper {
         Date original = encounter.getEncounterDatetime();
         encounter.setEncounterDatetime(datetime);
 
-        for (Obs candidate : encounter.getAllObs(false)) {
+        for (Obs candidate : allObs(encounter)) {
             if (OpenmrsUtil.nullSafeEquals(original, candidate.getObsDatetime())) {
                 candidate.setObsDatetime(datetime);
+            }
+        }
+    }
+
+    /**
+     * If an encounter has not been persisted yet, we cannot be sure that Encounter.getAllObs() will actually return all
+     * obs (because some obs group members may not yet have been attached to the encounter by the service), so we use
+     * this helper method to ensure we recursively get all obs in an encounter
+     * @param encounter
+     * @return
+     */
+    private Set<Obs> allObs(Encounter encounter) {
+        Set<Obs> allObs = new HashSet<Obs>();
+        for (Obs o : encounter.getObsAtTopLevel(false)) {
+            allObsRecursion(allObs, o);
+        }
+        return allObs;
+    }
+
+    private void allObsRecursion(Set<Obs> allObs, Obs obs) {
+        if (!obs.isVoided()) {
+            allObs.add(obs);
+            if (obs.hasGroupMembers()) {
+                for (Obs child : obs.getGroupMembers()) {
+                    allObsRecursion(allObs, child);
+                }
             }
         }
     }

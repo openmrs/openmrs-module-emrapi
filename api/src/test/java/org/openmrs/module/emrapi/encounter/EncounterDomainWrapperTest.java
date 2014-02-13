@@ -271,7 +271,7 @@ public class EncounterDomainWrapperTest {
         Encounter encounter = new Encounter();
         encounter.setEncounterDatetime(startOfToday);
         encounter.addObs(parent);
-        encounter.addObs(child);
+//        encounter.addObs(child);
 
         Visit visit = new Visit();
         visit.setStartDatetime(new Date());
