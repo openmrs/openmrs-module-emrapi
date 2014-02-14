@@ -1,3 +1,17 @@
+/*
+ * The contents of this file are subject to the OpenMRS Public License
+ * Version 1.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://license.openmrs.org
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ */
+
 package org.openmrs.module.emrapi.descriptor;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -17,25 +31,28 @@ public abstract class ConceptSetDescriptor {
     /**
      * @param conceptService
      * @param conceptSourceName
-     * @param fieldsAndConceptCodes must have an even number of elements. The first of each pair is the field name to set (on a subclass) and the second is the code in conceptSourceName.
+     * @param primaryConceptField Filed for primary concept. This concept is mandatory
+     * @param memberConceptFields Fields for member concepts of primary concept. These concepts can be mandatory or optional.
      */
-    protected void setup(ConceptService conceptService, String conceptSourceName, String... fieldsAndConceptCodes) {
+    protected void setup(ConceptService conceptService, String conceptSourceName, ConceptSetDescriptorField primaryConceptField, ConceptSetDescriptorField... memberConceptFields) {
         try {
-            String primaryConceptCode = fieldsAndConceptCodes[1];
+            String primaryConceptCode = primaryConceptField.getConceptCode();
             Concept primaryConcept = conceptService.getConceptByMapping(primaryConceptCode, conceptSourceName);
             if (primaryConcept == null) {
                 throw new IllegalStateException("Couldn't find primary concept for " + getClass().getSimpleName() + " which should be mapped as " + conceptSourceName + ":" + primaryConceptCode);
             }
-            PropertyUtils.setProperty(this, fieldsAndConceptCodes[0], primaryConcept);
-            for (int i = 2; i < fieldsAndConceptCodes.length; i += 2) {
-                String propertyName = fieldsAndConceptCodes[i];
-                String mappingCode = fieldsAndConceptCodes[i + 1];
+            PropertyUtils.setProperty(this, primaryConceptField.getName(), primaryConcept);
+            for (ConceptSetDescriptorField conceptSetDescriptorField : memberConceptFields) {
+                String propertyName = conceptSetDescriptorField.getName();
+                String mappingCode = conceptSetDescriptorField.getConceptCode();
                 Concept childConcept = conceptService.getConceptByMapping(mappingCode, conceptSourceName);
-                if (childConcept == null) {
-                    throw new IllegalStateException("Couldn't find " + propertyName + " concept for " + getClass().getSimpleName() + " which should be mapped as " + conceptSourceName + ":" + mappingCode);
-                }
-                if (!primaryConcept.getSetMembers().contains(childConcept)) {
-                    throw new IllegalStateException("Concept mapped as " + conceptSourceName + ":" + mappingCode + " needs to be a set member of concept " + primaryConcept.getConceptId() + " which is mapped as " + conceptSourceName + ":" + primaryConceptCode);
+                if(conceptSetDescriptorField.isRequired()) {
+                    if (childConcept == null) {
+                        throw new IllegalStateException("Couldn't find " + propertyName + " concept for " + getClass().getSimpleName() + " which should be mapped as " + conceptSourceName + ":" + mappingCode);
+                    }
+                    if (!primaryConcept.getSetMembers().contains(childConcept)) {
+                        throw new IllegalStateException("Concept mapped as " + conceptSourceName + ":" + mappingCode + " needs to be a set member of concept " + primaryConcept.getConceptId() + " which is mapped as " + conceptSourceName + ":" + primaryConceptCode);
+                    }
                 }
                 PropertyUtils.setProperty(this, propertyName, childConcept);
             }
