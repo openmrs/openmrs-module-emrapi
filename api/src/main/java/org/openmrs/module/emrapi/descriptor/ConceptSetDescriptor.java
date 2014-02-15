@@ -31,7 +31,7 @@ public abstract class ConceptSetDescriptor {
     /**
      * @param conceptService
      * @param conceptSourceName
-     * @param primaryConceptField Filed for primary concept. This concept is mandatory
+     * @param primaryConceptField Field for primary concept. This concept is mandatory
      * @param memberConceptFields Fields for member concepts of primary concept. These concepts can be mandatory or optional.
      */
     protected void setup(ConceptService conceptService, String conceptSourceName, ConceptSetDescriptorField primaryConceptField, ConceptSetDescriptorField... memberConceptFields) {
