@@ -22,6 +22,7 @@ import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.descriptor.ConceptSetDescriptor;
+import org.openmrs.module.emrapi.descriptor.ConceptSetDescriptorField;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +33,6 @@ import java.util.List;
  * for recording a Disposition concept set
  */
 public class DispositionDescriptor extends ConceptSetDescriptor {
-
     private Concept dispositionSetConcept;
     private Concept dispositionConcept;
     private Concept admissionLocationConcept;
@@ -41,11 +41,11 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 
     public DispositionDescriptor(ConceptService conceptService) {
         setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME,
-                "dispositionSetConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET,
-                "dispositionConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION,
-                "admissionLocationConcept", EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION,
-                "internalTransferLocationConcept", EmrApiConstants.CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION,
-                "dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH);
+                ConceptSetDescriptorField.required("dispositionSetConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET),
+                ConceptSetDescriptorField.required("dispositionConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION),
+                ConceptSetDescriptorField.optional("admissionLocationConcept", EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION),
+                ConceptSetDescriptorField.optional("internalTransferLocationConcept", EmrApiConstants.CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION),
+                ConceptSetDescriptorField.optional("dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH));
     }
 
     /**

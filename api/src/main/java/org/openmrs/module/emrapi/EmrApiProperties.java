@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptSource;
@@ -104,7 +105,7 @@ public class EmrApiProperties extends ModuleProperties {
 	}
 
 	public int getVisitExpireHours() {
-		return 12;
+        return NumberUtils.toInt(getGlobalProperty(EmrApiConstants.GP_VISIT_EXPIRE_HOURS, false), EmrApiConstants.DEFAULT_VISIT_EXPIRE_HOURS);
 	}
 
 	public VisitType getAtFacilityVisitType() {

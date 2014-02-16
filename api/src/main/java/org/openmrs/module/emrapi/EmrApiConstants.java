@@ -163,6 +163,10 @@ public class EmrApiConstants {
 
     public static final int DEFAULT_LAST_VIEWED_PATIENT_SIZE_LIMIT = 50;
 
+    public static final String GP_VISIT_EXPIRE_HOURS = "emrapi.visitExpireHours";
+
+    public static final int DEFAULT_VISIT_EXPIRE_HOURS = 12;
+
     /*public static final String CONCEPT_CODE_DISPOSITION = "Disposition";
 
     public static final String CONCEPTDISPOSITION_ANSWER_ADMIT = "Admit";

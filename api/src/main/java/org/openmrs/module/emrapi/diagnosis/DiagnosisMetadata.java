@@ -22,6 +22,7 @@ import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.descriptor.ConceptSetDescriptor;
+import org.openmrs.module.emrapi.descriptor.ConceptSetDescriptorField;
 
 /**
  * Metadata describing how a diagnosis is represented as an Obs group.
@@ -37,11 +38,11 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
     private ConceptSource emrConceptSource;
 
     public DiagnosisMetadata(ConceptService conceptService, ConceptSource emrConceptSource) {
-        setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME, "diagnosisSetConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CONCEPT_SET,
-                "codedDiagnosisConcept", EmrApiConstants.CONCEPT_CODE_CODED_DIAGNOSIS,
-                "nonCodedDiagnosisConcept", EmrApiConstants.CONCEPT_CODE_NON_CODED_DIAGNOSIS,
-                "diagnosisOrderConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_ORDER,
-                "diagnosisCertaintyConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CERTAINTY);
+        setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME, ConceptSetDescriptorField.required("diagnosisSetConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CONCEPT_SET),
+                ConceptSetDescriptorField.required("codedDiagnosisConcept", EmrApiConstants.CONCEPT_CODE_CODED_DIAGNOSIS),
+                ConceptSetDescriptorField.required("nonCodedDiagnosisConcept", EmrApiConstants.CONCEPT_CODE_NON_CODED_DIAGNOSIS),
+                ConceptSetDescriptorField.required("diagnosisOrderConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_ORDER),
+                ConceptSetDescriptorField.required("diagnosisCertaintyConcept", EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CERTAINTY));
         this.emrConceptSource = emrConceptSource;
     }
 

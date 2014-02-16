@@ -1,16 +1,15 @@
 package org.openmrs.module.emrapi.descriptor;
 
-import org.databene.benerator.gui.Setup;
+import org.hamcrest.core.IsNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Concept;
-import org.openmrs.ConceptSource;
 import org.openmrs.api.ConceptService;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 public class ConceptSetDescriptorTest {
 
@@ -42,13 +41,38 @@ public class ConceptSetDescriptorTest {
 
         ConceptSetDescriptorImpl conceptSetDescriptorImpl = new ConceptSetDescriptorImpl();
 
-        conceptSetDescriptorImpl.setup(conceptService, "someConceptSource", "setConcept", "setConceptCode",
-                "firstMemberConcept", "firstMemberConceptCode", "secondMemberConcept", "secondMemberConceptCode");
+        conceptSetDescriptorImpl.setup(conceptService, "someConceptSource",
+                ConceptSetDescriptorField.required("setConcept", "setConceptCode"),
+                ConceptSetDescriptorField.required("firstMemberConcept", "firstMemberConceptCode"),
+                ConceptSetDescriptorField.required("secondMemberConcept", "secondMemberConceptCode"));
 
         assertThat(conceptSetDescriptorImpl.getSetConcept(), is(setConcept));
         assertThat(conceptSetDescriptorImpl.getFirstMemberConcept(), is(firstMemberConcept));
         assertThat(conceptSetDescriptorImpl.getSecondMemberConcept(), is(secondMemberConcept));
 
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldRaiseExceptionIfRequiredConceptDoesNotExist() {
+
+        ConceptSetDescriptorImpl conceptSetDescriptorImpl = new ConceptSetDescriptorImpl();
+
+        conceptSetDescriptorImpl.setup(conceptService, "someConceptSource",
+                ConceptSetDescriptorField.required("setConcept", "setConceptCode"),
+                ConceptSetDescriptorField.required("firstMemberConcept", "nonExistingConceptCode"));
+    }
+
+    @Test
+    public void shouldNotRaiseExceptionIfOptionalConceptDoesNotExist() {
+
+        ConceptSetDescriptorImpl conceptSetDescriptorImpl = new ConceptSetDescriptorImpl();
+
+        conceptSetDescriptorImpl.setup(conceptService, "someConceptSource",
+                ConceptSetDescriptorField.required("setConcept", "setConceptCode"),
+                ConceptSetDescriptorField.optional("firstMemberConcept", "nonExistingConceptCode"));
+
+        assertThat(conceptSetDescriptorImpl.getSetConcept(), is(setConcept));
+        assertThat(conceptSetDescriptorImpl.getFirstMemberConcept(), IsNull.nullValue());
     }
 
 
