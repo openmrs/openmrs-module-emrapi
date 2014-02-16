@@ -33,6 +33,10 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     @Override
     public DispositionDescriptor getDispositionDescriptor() {
+        // TODO handle this better--this property is only used to allow use to inject a mock disposition descriptor
+        if (dispositionDescriptor != null) {
+            return dispositionDescriptor;
+        }
         return new DispositionDescriptor(conceptService);
     }
 
@@ -93,6 +97,9 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
         }
 
     }
+
+    // TODO handle this better--this property is only used to allow use to inject a mock disposition descriptor
+    private DispositionDescriptor dispositionDescriptor;
 
     protected void setDispositionDescriptor(DispositionDescriptor dispositionDescriptor) {
         this.dispositionDescriptor = dispositionDescriptor;
