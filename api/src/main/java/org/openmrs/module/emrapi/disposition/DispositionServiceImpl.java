@@ -23,8 +23,6 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     private PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
-    private DispositionDescriptor dispositionDescriptor;
-
     // TODO inject this in some better way than using a setter to override?
     private String dispositionConfig = "dispositionConfig.json";
 
@@ -35,10 +33,7 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     @Override
     public DispositionDescriptor getDispositionDescriptor() {
-        if (dispositionDescriptor == null) {
-            dispositionDescriptor = new DispositionDescriptor(conceptService);
-        }
-        return dispositionDescriptor;
+        return new DispositionDescriptor(conceptService);
     }
 
     @Override
