@@ -179,7 +179,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTransaction.getEncounterTypeUuid());
         Location location = locationService.getLocationByUuid(encounterTransaction.getLocationUuid());
-        Date encounterDateTime = encounterTransaction.getEncounterDateTime();
+        Date encounterDateTime = encounterTransaction.getEncounterDateTime() != null ? encounterTransaction.getEncounterDateTime() : new Date();
         Set<Provider> providers = getProviders(encounterTransaction.getProviders());
 
         EncounterParameters encounterParameters = EncounterParameters.instance()
@@ -196,10 +196,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             String encounterUuid = encounterTransaction.getEncounterUuid() == null ?UUID.randomUUID().toString():encounterTransaction.getEncounterUuid();
             encounter.setUuid(encounterUuid);
             encounter.setObs(new HashSet<Obs>());
-            visit.addEncounter(encounter);
-        }
-        if(encounterDateTime != null) {
             encounter.setEncounterDatetime(encounterDateTime);
+            visit.addEncounter(encounter);
         }
         return encounter;
     }
@@ -244,7 +242,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Visit visit = new Visit();
         visit.setPatient(patient);
         visit.setVisitType(visitService.getVisitTypeByUuid(encounterTransaction.getVisitTypeUuid()));
-        visit.setStartDatetime(encounterTransaction.getEncounterDateTime());
+        visit.setStartDatetime(encounterTransaction.getEncounterDateTime() != null ? encounterTransaction.getEncounterDateTime() : new Date());
         visit.setEncounters(new HashSet<Encounter>());
         visit.setUuid(UUID.randomUUID().toString());
         return visit;
