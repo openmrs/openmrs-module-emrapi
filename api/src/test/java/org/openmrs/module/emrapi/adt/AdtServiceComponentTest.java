@@ -72,7 +72,6 @@ import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     public static final Predicate NON_VOIDED = new Predicate() {
