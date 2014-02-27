@@ -179,21 +179,26 @@ public class EncounterTransaction {
     public static class Concept {
         private String uuid;
         private String name;
+        private String dataType;
         private boolean isSet;
 
-        public Concept(String uuid, String name,boolean isSet) {
+        public Concept(String uuid, String name, boolean isSet, String dataType) {
             this.uuid = uuid;
             this.name = name;
             this.isSet = isSet;
+            this.dataType = dataType;
+        }
+
+        public Concept(String uuid, String name, boolean isSet) {
+            this(uuid, name, isSet, null);
         }
 
         public Concept(String uuid, String name) {
-            this.uuid = uuid;
-            this.name = name;
+            this(uuid, name, false);
         }
 
         public Concept(String uuid) {
-            this(uuid, null,false);
+            this(uuid, null);
         }
 
         public Concept() {
@@ -221,6 +226,14 @@ public class EncounterTransaction {
 
         public void setSet(boolean set) {
             isSet = set;
+        }
+
+        public String getDataType() {
+            return dataType;
+        }
+
+        public void setDataType(String dataType) {
+            this.dataType = dataType;
         }
     }
 

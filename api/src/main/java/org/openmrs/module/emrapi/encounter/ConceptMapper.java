@@ -18,6 +18,6 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 public class ConceptMapper {
     EncounterTransaction.Concept map(Concept concept) {
-        return concept == null ? null : new EncounterTransaction.Concept(concept.getUuid(), concept.getName().getName(),concept.isSet());
+        return concept == null ? null : new EncounterTransaction.Concept(concept.getUuid(), concept.getName().getName(), concept.isSet(), concept.getDatatype().getName());
     }
 }
