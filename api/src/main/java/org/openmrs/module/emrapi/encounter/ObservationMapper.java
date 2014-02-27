@@ -18,12 +18,14 @@ import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
+import java.text.SimpleDateFormat;
+
 public class ObservationMapper {
     private final ConceptMapper conceptMapper = new ConceptMapper();
 
     public EncounterTransaction.Observation map(Obs obs) {
         Concept concept = obs.getConcept();
-        Object value = concept.getDatatype().isNumeric() ? obs.getValueNumeric() : obs.getValueAsString(Context.getLocale());
+        Object value = getValue(obs, concept);
         EncounterTransaction.Observation observation = new EncounterTransaction.Observation();
         observation.setUuid(obs.getUuid());
         observation.setConcept(conceptMapper.map(concept));
@@ -40,5 +42,17 @@ public class ObservationMapper {
             }
         }
         return observation;
+    }
+
+    private Object getValue(Obs obs, Concept concept) {
+        if (concept.getDatatype().isNumeric()) return obs.getValueNumeric();
+        // TODO: Remove this once openmrs date format issue is fixed
+        // https://tickets.openmrs.org/browse/TRUNK-4280
+        if (concept.getDatatype().isDate()) return getDateString(obs);
+        else return obs.getValueAsString(Context.getLocale());
+    }
+
+    private String getDateString(Obs obs) {
+        return obs.getValueDate() != null ? new SimpleDateFormat("yyyy-MM-dd").format(obs.getValueDate()) : null;
     }
 }
