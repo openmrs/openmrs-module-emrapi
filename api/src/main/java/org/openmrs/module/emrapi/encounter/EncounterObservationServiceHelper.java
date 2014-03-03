@@ -29,6 +29,7 @@ import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -85,8 +86,8 @@ public class EncounterObservationServiceHelper {
     private void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) throws ParseException {
         observation.setComment(observationData.getComment());
         if (observationData.getValue() != null) {
-            if (observation.getConcept().getDatatype().getHl7Abbreviation().equals("CWE")) {
-                observation.setValueCoded(conceptService.getConceptByUuid((String) observationData.getValue()));
+            if (observation.getConcept().getDatatype().isCoded()) {
+                observation.setValueCoded(conceptService.getConceptByUuid(getConceptUuidOfCodeObservationValue(observationData.getValue())));
             }
             else if(!observation.getConcept().getDatatype().getUuid().equals(ConceptDatatype.N_A_UUID)) {
                 observation.setValueAsString(observationData.getValue().toString());
@@ -97,6 +98,11 @@ public class EncounterObservationServiceHelper {
         }
         if(observationData.getObservationDateTime() != null)
             observation.setObsDatetime(observationData.getObservationDateTime());
+    }
+
+    private String getConceptUuidOfCodeObservationValue(Object codeObsVal) {
+        if (codeObsVal instanceof LinkedHashMap) return (String) ((LinkedHashMap) codeObsVal).get("uuid");
+        return (String) codeObsVal;
     }
 
     private Order getOrderByUuid(String orderUuid){

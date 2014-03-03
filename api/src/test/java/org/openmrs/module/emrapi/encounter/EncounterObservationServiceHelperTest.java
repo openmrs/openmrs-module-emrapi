@@ -30,6 +30,7 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
+import org.openmrs.module.emrapi.test.builder.ConceptDataTypeBuilder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -78,9 +79,9 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldAddNewObservation() throws ParseException {
-        newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
+        newConcept(new ConceptDataTypeBuilder().text(), TEXT_CONCEPT_UUID);
         List<EncounterTransaction.Observation> observations = asList(
-            new EncounterTransaction.Observation().setConcept(getConcept(TEXT_CONCEPT_UUID)).setValue("text value").setComment("overweight")
+                new EncounterTransaction.Observation().setConcept(getConcept(TEXT_CONCEPT_UUID)).setValue("text value").setComment("overweight")
         );
 
         Date encounterDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
@@ -108,8 +109,8 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldAddCodedObservation() throws ParseException {
-        newConcept(ConceptDatatype.CODED, CODED_CONCEPT_UUID);
-        Concept answerConcept = newConcept(ConceptDatatype.TEXT, "answer-uuid");
+        newConcept(new ConceptDataTypeBuilder().coded(), CODED_CONCEPT_UUID);
+        Concept answerConcept = newConcept(new ConceptDataTypeBuilder().text(), "answer-uuid");
         List<EncounterTransaction.Observation> observations = asList(
                 new EncounterTransaction.Observation().setConcept(getConcept(CODED_CONCEPT_UUID)).setValue("answer-uuid")
         );
@@ -119,7 +120,6 @@ public class EncounterObservationServiceHelperTest {
         encounter.setUuid("e-uuid");
         encounter.setPatient(patient);
 
-        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
         encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(1, encounter.getObs().size());
@@ -130,7 +130,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldUpdateExistingObservation() throws ParseException {
-        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+        Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
         Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
         List<EncounterTransaction.Observation> observations = asList(
                 new EncounterTransaction.Observation().setUuid("o-uuid").setValue(35.0).setComment("overweight").setObservationDateTime(observationDateTime)
@@ -156,7 +156,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldHandleNullValueObservationWhileSaving() throws Exception {
-        newConcept(ConceptDatatype.TEXT, TEXT_CONCEPT_UUID);
+        newConcept(new ConceptDataTypeBuilder().text(), TEXT_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
                 new EncounterTransaction.Observation().setConcept(getConcept(TEXT_CONCEPT_UUID)).setValue(null).setComment("overweight")
@@ -178,7 +178,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldVoidExistingObservation() throws ParseException {
-        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+        Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
                 new EncounterTransaction.Observation().setUuid("o-uuid").setConcept(getConcept(NUMERIC_CONCEPT_UUID)).setVoided(true).setVoidReason("closed")
@@ -250,7 +250,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldLinkOrderWithObservation() throws ParseException {
-        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+        Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
         Order obsOrder = fetchOrder("order-uuid");
 
         EncounterTransaction.Concept encConcept = new EncounterTransaction.Concept(numericConcept.getUuid());
@@ -275,7 +275,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldIgnoreNullOrdersInObservation() throws ParseException {
-        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+        Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
 
         EncounterTransaction.Concept encConcept = new EncounterTransaction.Concept(numericConcept.getUuid());
         List<EncounterTransaction.Observation> observations = asList(
@@ -298,7 +298,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldHandleVoidedObservations() throws ParseException {
-        Concept numericConcept = newConcept(ConceptDatatype.NUMERIC, NUMERIC_CONCEPT_UUID);
+        Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
 
         EncounterTransaction.Concept obsConcept = new EncounterTransaction.Concept(numericConcept.getUuid());
         double value = 35.0;
@@ -325,14 +325,11 @@ public class EncounterObservationServiceHelperTest {
         assertTrue(textObservation.getVoided());
     }
 
-
-    private Concept newConcept(String hl7, String uuid) {
+    private Concept newConcept(ConceptDatatype conceptDatatype, String conceptUuid) {
         Concept concept = new Concept();
-        ConceptDatatype conceptDataType = new ConceptDatatype();
-        conceptDataType.setHl7Abbreviation(hl7);
-        concept.setDatatype(conceptDataType);
-        concept.setUuid(uuid);
-        when(conceptService.getConceptByUuid(uuid)).thenReturn(concept);
+        concept.setDatatype(conceptDatatype);
+        concept.setUuid(conceptUuid);
+        when(conceptService.getConceptByUuid(conceptUuid)).thenReturn(concept);
         return concept;
     }
 

@@ -46,6 +46,7 @@ public class ObservationMapper {
 
     private Object getValue(Obs obs, Concept concept) {
         if (concept.getDatatype().isNumeric()) return obs.getValueNumeric();
+        if (concept.getDatatype().isCoded()) return conceptMapper.map(obs.getValueCoded());
         // TODO: Remove this once openmrs date format issue is fixed
         // https://tickets.openmrs.org/browse/TRUNK-4280
         if (concept.getDatatype().isDate()) return getDateString(obs);

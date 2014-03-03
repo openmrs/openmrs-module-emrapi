@@ -124,6 +124,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
                         "\"encounterDateTime\" : \"" + encounterDateTime + "\", " +
                         "\"observations\":[" +
                             "{\"concept\": {\"uuid\": \"d102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"conceptName\":\"Should be Ignored\", \"value\":20}, " +
+                            "{\"concept\": {\"uuid\": \"8f8e7340-a067-11e3-a5e2-0800200c9a66\"}, \"value\": {\"uuid\": \"e7167090-a067-11e3-a5e2-0800200c9a66\"}}, " +
                             "{\"concept\": {\"uuid\": \"e102c80f-1yz9-4da3-bb88-8122ce8868dd\"}, \"value\":\"text value\", \"comment\":\"overweight\"}]}";
 
         MockHttpServletResponse response1 = handle(newPostRequest("/rest/emrapi/encounter", json));
@@ -133,7 +134,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = visit.getEncounters().iterator().next();
 
-        assertEquals(2, encounter.getObs().size());
+        assertEquals(3, encounter.getObs().size());
         Iterator<Obs> obsIterator = encounter.getObs().iterator();
 
         Map<String, Obs> map = new HashMap <String, Obs>();
@@ -150,6 +151,7 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
 //        TODO : change the observation startTime logic to take current time as start time when startTime is not passed by the client
 //        assertEquals(DateUtils.parseDate(encounterDateTime, dateTimeFormat), textObservation.getObsDatetime());
 
+        assertEquals("e7167090-a067-11e3-a5e2-0800200c9a66", map.get(ConceptDatatype.CODED).getValueCoded().getUuid());
         assertEquals(new Double(20.0), map.get(ConceptDatatype.NUMERIC).getValueNumeric());
     }
 
