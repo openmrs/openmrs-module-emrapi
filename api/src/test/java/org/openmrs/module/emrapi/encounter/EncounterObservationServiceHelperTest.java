@@ -249,6 +249,45 @@ public class EncounterObservationServiceHelperTest {
     }
 
     @Test
+    public void shouldVoidDiagnosisObservation() {
+        String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
+        String existingObsUuid = "obs-uuid";
+        List<EncounterTransaction.Diagnosis> diagnoses = asList(
+                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY")
+                        .setCodedAnswer(new EncounterTransaction.Concept(diagnosisConceptUuid, "conceptName"))
+                        .setVoided(true).setExistingObs(existingObsUuid)
+        );
+
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        encounter.setEncounterDatetime(new Date());
+        Obs savedObservations = new Obs();
+        savedObservations.setUuid(existingObsUuid);
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        Concept conceptForDiagnosis = new Concept();
+        encounter.addObs(savedObservations);
+
+        when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class))).thenReturn(savedObservations);
+        when(conceptService.getConceptByUuid(diagnosisConceptUuid)).thenReturn(conceptForDiagnosis);
+        when(obsService.getObsByUuid(existingObsUuid)).thenReturn(savedObservations);
+
+        encounterObservationServiceHelper.updateDiagnoses(encounter, diagnoses);
+
+        Set<Obs> parentObservations = encounter.getObsAtTopLevel(true);
+        assertEquals(1, parentObservations.size());
+        Obs parent = parentObservations.iterator().next();
+        assertTrue(parent.isObsGrouping());
+        assertTrue(parent.isVoided());
+        Set<Obs> children = parent.getGroupMembers(true);
+        assertEquals(3, children.size());
+        for(Obs childObs : children){
+            assertTrue(childObs.isVoided());
+        }
+    }
+
+    @Test
     public void shouldLinkOrderWithObservation() throws ParseException {
         Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
         Order obsOrder = fetchOrder("order-uuid");

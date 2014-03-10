@@ -509,6 +509,8 @@ public class EncounterTransaction {
         private Concept codedAnswer;
         private String existingObs;
         private Date diagnosisDateTime;
+        private boolean voided;
+        private String voidReason;
 
         public String getOrder() {
             return order;
@@ -562,6 +564,23 @@ public class EncounterTransaction {
 
         public void setDiagnosisDateTime(Date date) {
             this.diagnosisDateTime = date;
+        }
+
+        public boolean isVoided() {
+            return voided;
+        }
+
+        public Diagnosis setVoided(boolean voided) {
+            this.voided = voided;
+            return this;
+        }
+
+        public String getVoidReason() {
+            return voidReason;
+        }
+
+        public void setVoidReason(String voidReason) {
+            this.voidReason = voidReason;
         }
     }
 

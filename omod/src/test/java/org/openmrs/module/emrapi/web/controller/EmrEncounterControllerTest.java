@@ -274,7 +274,8 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
         assertEquals(encounter1Response.getVisitUuid(), encounter2Response.getVisitUuid());
         assertNotEquals(encounter1Response.getEncounterUuid(), encounter2Response.getEncounterUuid());
 
-        List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter", new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("encounterDate", "2005-01-01")})), new TypeReference<List<EncounterTransaction>>() {});
+        List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter",
+                new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("encounterDate", "2005-01-01"), new Parameter("includeAll", "false")})), new TypeReference<List<EncounterTransaction>>() {});
 
 
         assertEquals(1, encounterTransactions.size());

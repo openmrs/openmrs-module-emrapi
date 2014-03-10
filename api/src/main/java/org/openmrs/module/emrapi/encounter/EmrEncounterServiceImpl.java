@@ -149,13 +149,15 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Visit visit = visitService.getVisitByUuid(encounterSearchParameters.getVisitUuid());
         if (visit == null) return new ArrayList<EncounterTransaction>();
 
-        return getEncounterTransactions(getEncountersForDate(encounterSearchParameters.getEncounterDateAsDate(), visit));
+        return getEncounterTransactions(
+                getEncountersForDate(encounterSearchParameters.getEncounterDateAsDate(), visit),
+                encounterSearchParameters.getIncludeAll());
     }
 
-    private List<EncounterTransaction> getEncounterTransactions(List<Encounter> encounters) {
+    private List<EncounterTransaction> getEncounterTransactions(List<Encounter> encounters, boolean includeAll) {
         List<EncounterTransaction> encounterTransactions = new ArrayList<EncounterTransaction>();
         for (Encounter encounter : encounters) {
-            encounterTransactions.add(encounterTransactionMapper.map(encounter, true));
+            encounterTransactions.add(encounterTransactionMapper.map(encounter, includeAll));
         }
         return encounterTransactions;
     }

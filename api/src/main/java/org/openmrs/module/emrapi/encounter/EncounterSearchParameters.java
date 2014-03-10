@@ -13,8 +13,6 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,6 +20,7 @@ import java.util.Date;
 public class EncounterSearchParameters {
     private String visitUuid;
     private String encounterDate;
+    private Boolean includeAll;
 
     public String getVisitUuid() {
         return visitUuid;
@@ -37,6 +36,14 @@ public class EncounterSearchParameters {
 
     public void setEncounterDate(String encounterDate) {
         this.encounterDate = encounterDate;
+    }
+
+    public Boolean getIncludeAll() {
+        return includeAll;
+    }
+
+    public void setIncludeAll(Boolean includeAll) {
+        this.includeAll = includeAll;
     }
 
     public Date getEncounterDateAsDate() {

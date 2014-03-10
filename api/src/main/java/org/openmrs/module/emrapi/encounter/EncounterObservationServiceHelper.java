@@ -140,7 +140,19 @@ public class EncounterObservationServiceHelper {
                 Date diagnosisDateTime = diagnosisRequest.getDiagnosisDateTime() != null ? diagnosisRequest.getDiagnosisDateTime() : encounter.getEncounterDatetime();
                 obs.setObsDatetime(diagnosisDateTime);
             }
+            if (diagnosisRequest.isVoided()) {
+                voidDiagnosisObservation(diagnosisRequest, obs);
+            }
             encounter.addObs(obs);
+        }
+    }
+
+    private void voidDiagnosisObservation(EncounterTransaction.Diagnosis diagnosisRequest, Obs obs) {
+        obs.setVoided(diagnosisRequest.isVoided());
+        obs.setVoidReason(diagnosisRequest.getVoidReason());
+        for (Obs groupMember : obs.getGroupMembers()) {
+            groupMember.setVoided(diagnosisRequest.isVoided());
+            groupMember.setVoidReason(diagnosisRequest.getVoidReason());
         }
     }
 
