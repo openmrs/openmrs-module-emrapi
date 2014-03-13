@@ -93,6 +93,9 @@ public class EncounterObservationServiceHelper {
                 observation.setValueAsString(observationData.getValue().toString());
             }
         }
+        else if(observationData.getGroupMembers().isEmpty()){
+            observation.setVoided(true);
+        }
         if(observationData.getOrderUuid() != null && !observationData.getOrderUuid().isEmpty()){
             observation.setOrder(getOrderByUuid(observationData.getOrderUuid()));
         }

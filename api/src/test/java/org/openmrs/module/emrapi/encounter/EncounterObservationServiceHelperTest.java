@@ -171,9 +171,9 @@ public class EncounterObservationServiceHelperTest {
 
         encounterObservationServiceHelper.update(encounter, observations);
 
-        assertEquals(1, encounter.getObs().size());
-        Obs textObservation = encounter.getObs().iterator().next();
-        assertEquals(null, textObservation.getValueText());
+        assertEquals(1, encounter.getAllObs(true).size());
+        Obs textObservation = encounter.getAllObs(true).iterator().next();
+        assertTrue(textObservation.isVoided());
     }
 
     @Test
