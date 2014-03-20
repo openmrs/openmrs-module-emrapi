@@ -15,7 +15,6 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,7 +27,6 @@ import java.util.List;
  * @see org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher
  * </pre>
  */
-@Transactional
 public interface EmrEncounterService extends OpenmrsService {
 
     EncounterTransaction save(EncounterTransaction encounterTransaction);
