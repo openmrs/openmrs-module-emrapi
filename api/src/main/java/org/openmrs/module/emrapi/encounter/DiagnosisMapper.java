@@ -25,6 +25,11 @@ public class DiagnosisMapper {
 
     public EncounterTransaction.Diagnosis map(Obs obs, DiagnosisMetadata diagnosisMetadata) {
         Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
+        EncounterTransaction.Diagnosis encounterDiagnosis = getDiagnosis(diagnosis);
+        return encounterDiagnosis;
+    }
+
+    public EncounterTransaction.Diagnosis getDiagnosis(Diagnosis diagnosis) {
         EncounterTransaction.Diagnosis encounterDiagnosis = new EncounterTransaction.Diagnosis();
         encounterDiagnosis.setCertainty(String.valueOf(diagnosis.getCertainty()));
         CodedOrFreeTextAnswer codedOrFreeTextAnswer = diagnosis.getDiagnosis();
@@ -34,7 +39,7 @@ public class DiagnosisMapper {
             encounterDiagnosis.setCodedAnswer(conceptMapper.map(codedOrFreeTextAnswer.getCodedAnswer()));
         }
         encounterDiagnosis.setOrder(String.valueOf(diagnosis.getOrder()));
-        encounterDiagnosis.setDiagnosisDateTime(obs.getObsDatetime());
+        encounterDiagnosis.setDiagnosisDateTime(diagnosis.getExistingObs().getObsDatetime());
         encounterDiagnosis.setExistingObs(diagnosis.getExistingObs() != null ? diagnosis.getExistingObs().getUuid() : null);
         return encounterDiagnosis;
     }
