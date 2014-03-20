@@ -511,6 +511,7 @@ public class EncounterTransaction {
         private Date diagnosisDateTime;
         private boolean voided;
         private String voidReason;
+        private Set<Provider> providers = new HashSet<Provider>();
 
         public String getOrder() {
             return order;
@@ -581,6 +582,14 @@ public class EncounterTransaction {
 
         public void setVoidReason(String voidReason) {
             this.voidReason = voidReason;
+        }
+
+        public void setProviders(Set<Provider> providers) {
+            this.providers = providers;
+        }
+
+        public Set<Provider> getProviders() {
+            return providers;
         }
     }
 

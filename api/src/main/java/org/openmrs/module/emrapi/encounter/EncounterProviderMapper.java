@@ -8,6 +8,11 @@ import java.util.Set;
 
 public class EncounterProviderMapper {
     public void update(EncounterTransaction encounterTransaction, Set<EncounterProvider> encounterProviders) {
+        Set<EncounterTransaction.Provider> providers = convert(encounterProviders);
+        encounterTransaction.setProviders(providers);
+    }
+
+    public Set<EncounterTransaction.Provider> convert(Set<EncounterProvider> encounterProviders) {
         Set<EncounterTransaction.Provider> providers = new HashSet<EncounterTransaction.Provider>();
         for(EncounterProvider encounterProvider : encounterProviders){
             EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
@@ -15,7 +20,7 @@ public class EncounterProviderMapper {
             provider.setUuid(encounterProvider.getProvider().getUuid());
             providers.add(provider);
         }
-        encounterTransaction.setProviders(providers);
+        return providers;
     }
 
     public static class EmptyEncounterProviderMapper extends EncounterProviderMapper {

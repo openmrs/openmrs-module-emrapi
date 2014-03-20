@@ -50,15 +50,15 @@ public class EmrDiagnosisSearchController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public Object search(@RequestParam("patientUuid") String patientUuid,@RequestParam(value = "fromDate",required = false)String date) throws Exception {
+    public List<EncounterTransaction.Diagnosis> search(@RequestParam("patientUuid") String patientUuid, @RequestParam(value = "fromDate",required = false)String date) throws Exception {
         Patient patient = patientService.getPatientByUuid(patientUuid);
 
-        List<Diagnosis> diagnosesSinceEpoch = diagnosisService.getDiagnoses(patient, toDate(date));
-        List<EncounterTransaction.Diagnosis> encounterDiagnosesSinceEpoch = new ArrayList<EncounterTransaction.Diagnosis>();
-        for (Diagnosis diagnosis : diagnosesSinceEpoch) {
-            encounterDiagnosesSinceEpoch.add(diagnosisMapper.convert(diagnosis));
+        List<Diagnosis> pastDiagnoses = diagnosisService.getDiagnoses(patient, toDate(date));
+        List<EncounterTransaction.Diagnosis> pastEncounterDiagnoses = new ArrayList<EncounterTransaction.Diagnosis>();
+        for (Diagnosis diagnosis : pastDiagnoses) {
+            pastEncounterDiagnoses.add(diagnosisMapper.convert(diagnosis));
         }
-        return encounterDiagnosesSinceEpoch;
+        return pastEncounterDiagnoses;
     }
 
     private Date toDate(String date){

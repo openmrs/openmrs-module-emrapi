@@ -14,14 +14,18 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.StringUtils;
+import org.openmrs.EncounterProvider;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
+import java.util.Set;
+
 public class DiagnosisMapper {
     private final ConceptMapper conceptMapper = new ConceptMapper();
+    private final EncounterProviderMapper encounterProviderMapper = new EncounterProviderMapper();
 
     public EncounterTransaction.Diagnosis map(Obs obs, DiagnosisMetadata diagnosisMetadata) {
         Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
@@ -40,6 +44,10 @@ public class DiagnosisMapper {
         encounterDiagnosis.setOrder(String.valueOf(diagnosis.getOrder()));
         encounterDiagnosis.setDiagnosisDateTime(diagnosis.getExistingObs().getObsDatetime());
         encounterDiagnosis.setExistingObs(diagnosis.getExistingObs() != null ? diagnosis.getExistingObs().getUuid() : null);
+
+        Set<EncounterProvider> encounterProviders = diagnosis.getExistingObs().getEncounter().getEncounterProviders();
+        encounterDiagnosis.setProviders(diagnosis.getExistingObs() != null ? encounterProviderMapper.convert(encounterProviders) : null);
+
         return encounterDiagnosis;
     }
 }
