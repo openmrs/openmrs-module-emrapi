@@ -35,15 +35,7 @@ import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
@@ -165,6 +157,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     private ArrayList<Encounter> getEncountersForDate(Date encounterDate, Visit visit) {
+        if (encounterDate == null) return new ArrayList<Encounter>(visit.getEncounters());
         ArrayList<Encounter> encounters = new ArrayList<Encounter>();
         for (Encounter encounter : visit.getEncounters()) {
             if (DateUtils.isSameDay(encounter.getEncounterDatetime(), encounterDate)) {
