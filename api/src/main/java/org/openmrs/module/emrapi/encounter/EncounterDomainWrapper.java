@@ -1,5 +1,11 @@
 package org.openmrs.module.emrapi.encounter;
 
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections.Predicate;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -18,12 +24,6 @@ import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDate
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class EncounterDomainWrapper {
     public static final Predicate NON_VOIDED_PREDICATE = new Predicate() {
@@ -190,7 +190,8 @@ public class EncounterDomainWrapper {
                 setEncounterDatetimeAndPropagateToObs(encounter, new Date());
             }
 
-            // otherwise, if encounterDate is before visit start date, set the encounterDatetime to the visit date time
+            // otherwise, consider a retrospective encounter, and so we want an encounter date to have no time component, EXCEPT
+            // if this encounter is on the first day of the visit, the encounter datetime cannot be before the visit start time
             else if (encounterDate.isBefore(new DateTime(visit.getStartDatetime()))) {
                 setEncounterDatetimeAndPropagateToObs(encounter, visit.getStartDatetime());
             }
