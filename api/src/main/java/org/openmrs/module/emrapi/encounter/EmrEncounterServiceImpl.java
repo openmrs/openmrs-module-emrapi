@@ -33,6 +33,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,7 @@ import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
+@Transactional
 public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEncounterService {
 
     private final EncounterTransactionMapper encounterTransactionMapper;

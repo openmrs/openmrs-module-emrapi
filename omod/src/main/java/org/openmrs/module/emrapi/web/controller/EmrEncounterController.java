@@ -23,6 +23,7 @@ import org.openmrs.module.emrapi.web.exception.InvalidInputException;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,6 +42,7 @@ public class EmrEncounterController extends BaseRestController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
+    @Transactional
     public EncounterTransaction update(@RequestBody EncounterTransaction encounterTransaction) {
         return emrEncounterService.save(encounterTransaction);
     }

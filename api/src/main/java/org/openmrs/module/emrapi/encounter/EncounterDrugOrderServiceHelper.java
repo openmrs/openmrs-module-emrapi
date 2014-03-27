@@ -50,7 +50,7 @@ public class EncounterDrugOrderServiceHelper {
             if (drug.getUuid() == null) {
                 throw new InvalidDrugException("Drug does not exist");
             }
-
+            Concept drugConcept = conceptService.getConceptByUuid(drug.getConceptUuid());
             Order order = getMatchingOrder(encounter, drug.getUuid());
             if (order == null) {
                 order = new DrugOrder();
@@ -63,7 +63,6 @@ public class EncounterDrugOrderServiceHelper {
             order.setStartDate(drug.getStartDate());
             order.setAutoExpireDate(drug.getEndDate());
 
-            Concept drugConcept = conceptService.getConceptByUuid(drug.getConceptUuid());
             order.setConcept(drugConcept);
             order.setOrderType(drugOrderType);
 

@@ -250,26 +250,26 @@
         </property>
     </bean>
 
+    <bean id="emrEncounterServiceTarget" class="org.openmrs.module.emrapi.encounter.EmrEncounterServiceImpl">
+        <constructor-arg  ref="patientService"/>
+        <constructor-arg  ref="visitService"/>
+        <constructor-arg  ref="encounterService"/>
+        <constructor-arg  ref="locationService"/>
+        <constructor-arg  ref="providerService"/>
+        <constructor-arg  ref="adminService"/>
+        <constructor-arg  ref="encounterObservationServiceHelper"/>
+        <constructor-arg  ref="encounterTestOrderServiceHelper"/>
+        <constructor-arg  ref="encounterDrugOrderServiceHelper"/>
+        <constructor-arg  ref="encounterDispositionServiceHelper"/>
+        <constructor-arg  ref="encounterTransactionMapper"/>
+        <constructor-arg  ref="encounterProviderServiceHelper"/>
+    </bean>
+
     <bean id="emrEncounterService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="target">
-            <bean class="org.openmrs.module.emrapi.encounter.EmrEncounterServiceImpl">
-                <constructor-arg  ref="patientService"/>
-                <constructor-arg  ref="visitService"/>
-                <constructor-arg  ref="encounterService"/>
-                <constructor-arg  ref="locationService"/>
-                <constructor-arg  ref="providerService"/>
-                <constructor-arg  ref="adminService"/>
-                <constructor-arg  ref="encounterObservationServiceHelper"/>
-                <constructor-arg  ref="encounterTestOrderServiceHelper"/>
-                <constructor-arg  ref="encounterDrugOrderServiceHelper"/>
-                <constructor-arg  ref="encounterDispositionServiceHelper"/>
-                <constructor-arg  ref="encounterTransactionMapper"/>
-                <constructor-arg  ref="encounterProviderServiceHelper"/>
-            </bean>
-        </property>
+        <property name="target"><ref local="emrEncounterServiceTarget"/></property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors"/>
         </property>
