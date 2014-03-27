@@ -27,6 +27,8 @@ public class TestOrderMapper {
         emrTestOrder.setOrderTypeUuid(order.getOrderType() != null ? order.getOrderType().getUuid() : null);
         emrTestOrder.setVoided(order.getVoided());
         emrTestOrder.setVoidReason(order.getVoidReason());
+        emrTestOrder.setDateCreated(order.getDateCreated());
+        emrTestOrder.setDateChanged(order.getDateChanged());
         return emrTestOrder;
     }
 }
