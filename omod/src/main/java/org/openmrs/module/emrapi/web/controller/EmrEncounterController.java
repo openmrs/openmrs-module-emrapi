@@ -66,12 +66,12 @@ public class EmrEncounterController extends BaseRestController {
             throw new InvalidInputException("Visit UUID cannot be empty.");
 
         String encounterDate = encounterSearchParameters.getEncounterDate();
-        if (StringUtils.isBlank(encounterDate))
-            throw new InvalidInputException("Encounter Date cannot be empty.");
-        try {
-            new SimpleDateFormat("yyyy-MM-dd").parse(encounterDate);
-        } catch (ParseException e) {
-            throw new InvalidInputException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + encounterDate + ".", e);
+        if (StringUtils.isNotBlank(encounterDate)){
+            try {
+                new SimpleDateFormat("yyyy-MM-dd").parse(encounterDate);
+            } catch (ParseException e) {
+                throw new InvalidInputException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + encounterDate + ".", e);
+            }
         }
     }
 }

@@ -47,6 +47,7 @@ public class EncounterSearchParameters {
     }
 
     public Date getEncounterDateAsDate() {
+        if (encounterDate == null) return null;
         try {
             return new SimpleDateFormat("yyyy-MM-dd").parse(encounterDate);
         } catch (ParseException e) {

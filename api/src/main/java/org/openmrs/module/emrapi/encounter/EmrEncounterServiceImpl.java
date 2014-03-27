@@ -165,6 +165,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     }
 
     private ArrayList<Encounter> getEncountersForDate(Date encounterDate, Visit visit) {
+        if (encounterDate == null) return new ArrayList<Encounter>(visit.getEncounters());
         ArrayList<Encounter> encounters = new ArrayList<Encounter>();
         for (Encounter encounter : visit.getEncounters()) {
             if (DateUtils.isSameDay(encounter.getEncounterDatetime(), encounterDate)) {

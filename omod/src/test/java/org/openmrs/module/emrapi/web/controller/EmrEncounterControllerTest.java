@@ -446,6 +446,28 @@ public class EmrEncounterControllerTest extends BaseEmrControllerTest {
 
     }
 
+    @Test
+    public void shouldGetAllEncounterTransactionsWhenDateNotProvided() throws Exception {
+        executeDataSet("baseMetaData.xml");
+        executeDataSet("dispositionMetaData.xml");
+        executeDataSet("diagnosisMetaData.xml");
+        executeDataSet("shouldGetEncounterTransactionByDate.xml");
+
+        String firstEncounter = "{" +
+                "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"encounterTypeUuid\": \"4f3c2244-9d6a-439e-b88a-6e8873489ea7\", " +
+                "\"encounterDateTime\" : \"2004-01-01T10:00:00.000+0000\" " +
+                "}";
+        EncounterTransaction encounter1Response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", firstEncounter)), EncounterTransaction.class);
+        String visitUuid = encounter1Response.getVisitUuid();
+
+        List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter",
+                new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("includeAll", "true")})), new TypeReference<List<EncounterTransaction>>() {});
+
+        assertEquals(1, encounterTransactions.size());
+    }
+
     private <T> List<T> getOrdersOfType(List<Order> orders, Class<T> clazz) {
         List<T> matchingOrders = new ArrayList<T>();
         for (Order order : orders) {
