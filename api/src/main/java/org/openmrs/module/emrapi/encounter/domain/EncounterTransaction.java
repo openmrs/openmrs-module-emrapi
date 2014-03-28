@@ -437,6 +437,8 @@ public class EncounterTransaction {
         private String uuid;
         private boolean voided;
         private String voidReason;
+        private Date dateCreated;
+        private Date dateChanged;
 
         @JsonIgnore
         public String getConceptUuid() {
@@ -496,6 +498,24 @@ public class EncounterTransaction {
         public TestOrder setOrderTypeUuid(String orderTypeUuid) {
             this.orderTypeUuid = orderTypeUuid;
             return this;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateCreated() {
+            return dateCreated;
+        }
+
+        public void setDateCreated(Date dateCreated) {
+            this.dateCreated = dateCreated;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateChanged() {
+            return dateChanged;
+        }
+
+        public void setDateChanged(Date dateChanged) {
+            this.dateChanged = dateChanged;
         }
     }
 
