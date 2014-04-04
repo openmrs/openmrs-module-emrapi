@@ -48,6 +48,11 @@ public class ObsBuilder {
         return this;
     }
 
+    public ObsBuilder setValue(Boolean valueBoolean) {
+        obs.setValueBoolean(valueBoolean);
+        return this;
+    }
+
     public ObsBuilder setValue(String valueText) {
         obs.setValueText(valueText);
         return this;

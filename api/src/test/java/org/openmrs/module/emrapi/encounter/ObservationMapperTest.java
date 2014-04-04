@@ -22,6 +22,7 @@ import org.openmrs.ConceptName;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.UUID;
 
@@ -29,13 +30,14 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class ObservationMapperTest {
+public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
     @Mock
     private Concept concept;
     @Mock
     private ConceptDatatype conceptDatatype;
     private ObservationMapper observationMapper;
+    private ObsBuilder obsBuilder;
 
     @Before
     public void setUp(){
@@ -43,11 +45,11 @@ public class ObservationMapperTest {
         when(concept.getName()).thenReturn(new ConceptName());
         when(concept.getDatatype()).thenReturn(conceptDatatype);
         observationMapper = new ObservationMapper();
+        obsBuilder = new ObsBuilder();
     }
 
     @Test
     public void shouldMapObservationWithNumericValue(){
-        ObsBuilder obsBuilder = new ObsBuilder();
         String uuid = UUID.randomUUID().toString();
         obsBuilder.setUuid(uuid).setValue(100.0).setConcept(concept);
         when(conceptDatatype.isNumeric()).thenReturn(true);
@@ -60,8 +62,17 @@ public class ObservationMapperTest {
     }
 
     @Test
+    public void shouldMapObservationWithBooleanValue(){
+        when(conceptDatatype.isBoolean()).thenReturn(true);
+        Obs obs = obsBuilder.setConcept(concept).setValue(true).get();
+
+        EncounterTransaction.Observation observation = observationMapper.map(obs);
+
+        assertEquals(true, observation.getValue());
+    }
+
+    @Test
     public void shouldMapVoidedObservation(){
-        ObsBuilder obsBuilder = new ObsBuilder();
         String uuid = UUID.randomUUID().toString();
         obsBuilder.setUuid(uuid).setValue(100.0).setConcept(concept).setVoided(true).setVoidedReason("reason");
         when(conceptDatatype.isNumeric()).thenReturn(true);
