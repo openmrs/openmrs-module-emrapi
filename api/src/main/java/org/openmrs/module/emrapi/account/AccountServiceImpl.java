@@ -1,10 +1,5 @@
 package org.openmrs.module.emrapi.account;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
@@ -18,14 +13,15 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 public class AccountServiceImpl extends BaseOpenmrsService implements AccountService {
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private UserService userService;
 
@@ -94,9 +90,6 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
                 continue;
 
             if (!user.getPerson().isVoided()) {
-
-                log.error("users: adding person " + user.getPerson().getId() + " with " + user.getPerson().isVoided());
-
                 byPerson.put(user.getPerson(), new AccountDomainWrapper(user.getPerson(), this, userService,
                         providerService, providerManagementService, personService, providerIdentifierGenerator));
             }
@@ -114,9 +107,6 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
 
             AccountDomainWrapper account = byPerson.get(provider.getPerson());
             if (account == null && !provider.getPerson().isVoided()) {
-
-                log.error("providers: adding person " + provider.getPerson().getId() + " with " + provider.getPerson().isVoided());
-
                 byPerson.put(provider.getPerson(), new AccountDomainWrapper(provider.getPerson(), this, userService,
                         providerService, providerManagementService, personService, providerIdentifierGenerator));
             }
@@ -124,7 +114,6 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
 
         List<AccountDomainWrapper> accounts = new ArrayList<AccountDomainWrapper>();
         for (AccountDomainWrapper account : byPerson.values()) {
-            log.error("person with account = " + account.getPerson().getPersonId() + " status " + account.getPerson().isVoided());
             accounts.add(account);
         }
 
