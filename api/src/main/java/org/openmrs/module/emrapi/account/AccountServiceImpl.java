@@ -1,5 +1,10 @@
 package org.openmrs.module.emrapi.account;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
@@ -14,11 +19,6 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 @Transactional
 public class AccountServiceImpl extends BaseOpenmrsService implements AccountService {
@@ -89,7 +89,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
             if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid()))
                 continue;
 
-            if (!user.getPerson().isVoided()) {
+            if (!user.getPerson().isPersonVoided()) {
                 byPerson.put(user.getPerson(), new AccountDomainWrapper(user.getPerson(), this, userService,
                         providerService, providerManagementService, personService, providerIdentifierGenerator));
             }
@@ -106,7 +106,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
                 throw new APIException("Providers not associated to a person are not supported");
 
             AccountDomainWrapper account = byPerson.get(provider.getPerson());
-            if (account == null && !provider.getPerson().isVoided()) {
+            if (account == null && !provider.getPerson().isPersonVoided()) {
                 byPerson.put(provider.getPerson(), new AccountDomainWrapper(provider.getPerson(), this, userService,
                         providerService, providerManagementService, personService, providerIdentifierGenerator));
             }
