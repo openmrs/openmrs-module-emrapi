@@ -140,10 +140,19 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Encounter encounter = findEncounter(visit, encounterParameters);
 
         if (encounter == null){
-            return new EncounterTransaction(visit.getUuid(), null);
+            encounter = newEncounter(visit, encounterParameters);
         }
 
         return encounterTransactionMapper.map(encounter, activeEncounterParameters.getIncludeAll());
+    }
+
+    private Encounter newEncounter(Visit visit, EncounterParameters encounterParameters) {
+        Encounter encounter;
+        encounter = new Encounter();
+        encounter.setVisit(visit);
+        encounter.setPatient(encounterParameters.getPatient());
+        encounter.setEncounterType(encounterParameters.getEncounterType());
+        return encounter;
     }
 
     @Override
