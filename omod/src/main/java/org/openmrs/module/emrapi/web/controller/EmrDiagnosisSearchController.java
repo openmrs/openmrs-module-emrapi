@@ -14,10 +14,8 @@
 
 package org.openmrs.module.emrapi.web.controller;
 
-import org.apache.commons.lang.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
-import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.encounter.DateMapper;
@@ -31,17 +29,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Controller
 @RequestMapping(method = RequestMethod.GET, value = "/rest/emrapi/diagnosis")
 public class EmrDiagnosisSearchController {
-    @Autowired
-    private EmrApiProperties emrApiProperties;
     @Autowired
     private DiagnosisService diagnosisService;
     @Autowired
