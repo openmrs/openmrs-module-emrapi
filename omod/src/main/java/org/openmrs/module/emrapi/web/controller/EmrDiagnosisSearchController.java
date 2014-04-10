@@ -20,6 +20,7 @@ import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.module.emrapi.encounter.DateMapper;
 import org.openmrs.module.emrapi.encounter.DiagnosisMapper;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.web.exception.InvalidInputException;
@@ -50,28 +51,16 @@ public class EmrDiagnosisSearchController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public List<EncounterTransaction.Diagnosis> search(@RequestParam("patientUuid") String patientUuid, @RequestParam(value = "fromDate",required = false)String date) throws Exception {
+    public List<EncounterTransaction.Diagnosis> search(@RequestParam("patientUuid") String patientUuid, @RequestParam(value = "fromDate", required = false) String date) throws Exception {
         Patient patient = patientService.getPatientByUuid(patientUuid);
-
-        List<Diagnosis> pastDiagnoses = diagnosisService.getDiagnoses(patient, toDate(date));
-        List<EncounterTransaction.Diagnosis> pastEncounterDiagnoses = new ArrayList<EncounterTransaction.Diagnosis>();
-        for (Diagnosis diagnosis : pastDiagnoses) {
-            pastEncounterDiagnoses.add(diagnosisMapper.convert(diagnosis));
+        Date fromDate;
+        try {
+            fromDate = new DateMapper().toDate(date);
+        } catch (Exception e) {
+            throw new InvalidInputException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + date + ".", e);
         }
-        return pastEncounterDiagnoses;
-    }
-
-    private Date toDate(String date){
-        if (!StringUtils.isBlank(date)){
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                simpleDateFormat.setLenient(false);
-                return simpleDateFormat.parse(date);
-            } catch (ParseException e) {
-                throw new InvalidInputException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + date + ".", e);
-            }
-        }
-        return new Date(0);
+        List<Diagnosis> pastDiagnoses = diagnosisService.getDiagnoses(patient, fromDate);
+        return diagnosisMapper.convert(pastDiagnoses);
     }
 }
 

@@ -21,9 +21,12 @@ import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class DiagnosisMapper {
+
     private final ConceptMapper conceptMapper = new ConceptMapper();
     private final EncounterProviderMapper encounterProviderMapper = new EncounterProviderMapper();
 
@@ -32,11 +35,19 @@ public class DiagnosisMapper {
         return convert(diagnosis);
     }
 
+    public List<EncounterTransaction.Diagnosis> convert(List<Diagnosis> pastDiagnoses) {
+        List<EncounterTransaction.Diagnosis> pastEncounterDiagnoses = new ArrayList<EncounterTransaction.Diagnosis>();
+        for (Diagnosis diagnosis : pastDiagnoses) {
+            pastEncounterDiagnoses.add(convert(diagnosis));
+        }
+        return pastEncounterDiagnoses;
+    }
+
     public EncounterTransaction.Diagnosis convert(Diagnosis diagnosis) {
         EncounterTransaction.Diagnosis encounterDiagnosis = new EncounterTransaction.Diagnosis();
         encounterDiagnosis.setCertainty(String.valueOf(diagnosis.getCertainty()));
         CodedOrFreeTextAnswer codedOrFreeTextAnswer = diagnosis.getDiagnosis();
-        if(StringUtils.isNotBlank(codedOrFreeTextAnswer.getNonCodedAnswer())) {
+        if (StringUtils.isNotBlank(codedOrFreeTextAnswer.getNonCodedAnswer())) {
             encounterDiagnosis.setFreeTextAnswer(codedOrFreeTextAnswer.getNonCodedAnswer());
         } else {
             encounterDiagnosis.setCodedAnswer(conceptMapper.map(codedOrFreeTextAnswer.getCodedAnswer()));
