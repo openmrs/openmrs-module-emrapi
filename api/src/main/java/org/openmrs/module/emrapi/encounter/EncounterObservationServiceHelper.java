@@ -136,10 +136,8 @@ public class EncounterObservationServiceHelper {
         for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
             org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
             Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
-            if (obs.getObsDatetime() == null) {
-                Date diagnosisDateTime = diagnosisRequest.getDiagnosisDateTime() != null ? diagnosisRequest.getDiagnosisDateTime() : encounter.getEncounterDatetime();
-                obs.setObsDatetime(diagnosisDateTime);
-            }
+            Date diagnosisDateTime = diagnosisRequest.getDiagnosisDateTime() != null ? diagnosisRequest.getDiagnosisDateTime() : encounter.getEncounterDatetime();
+            obs.setObsDatetime(diagnosisDateTime);
             if (diagnosisRequest.isVoided()) {
                 voidDiagnosisObservation(diagnosisRequest, obs);
             }
