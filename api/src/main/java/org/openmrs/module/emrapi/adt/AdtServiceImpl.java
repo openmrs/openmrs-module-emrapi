@@ -14,6 +14,17 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
@@ -51,19 +62,7 @@ import org.openmrs.serialization.SerializationException;
 import org.openmrs.util.OpenmrsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
@@ -90,7 +89,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private DispositionService dispositionService;
 
-    @Autowired(required = false)
     private List<PatientMergeAction> patientMergeActions;
 
 
@@ -138,6 +136,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         this.patientMergeActions = patientMergeActions;
     }
 
+    // for testing
+    public List<PatientMergeAction> getPatientMergeActions() {
+        return patientMergeActions;
+    }
 
     @Override
     public void closeInactiveVisits() {
@@ -723,6 +725,22 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
         }
         return false;
+    }
+
+    @Override
+    public void addPatientMergeAction(PatientMergeAction patientMergeAction) {
+        if (this.patientMergeActions == null) {
+            this.patientMergeActions = new ArrayList<PatientMergeAction>();
+        }
+        this.patientMergeActions.add(patientMergeAction);
+    }
+
+    @Override
+    public void removePatientMergeAction(PatientMergeAction patientMergeAction) {
+        if (this.patientMergeActions == null) {
+            this.patientMergeActions = new ArrayList<PatientMergeAction>();
+        }
+        this.patientMergeActions.remove(patientMergeAction);
     }
 
     @Transactional

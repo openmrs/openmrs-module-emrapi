@@ -14,6 +14,18 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -48,22 +60,11 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -975,6 +976,44 @@ public class AdtServiceTest {
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
     }
 
+    @Test
+    public void test_shouldAddPaperRecordMergeActions() throws Exception {
+        PatientMergeAction action1 = new DummyPatientMergeAction();
+        PatientMergeAction action2 = new DummyPatientMergeAction();
+
+        service.addPatientMergeAction(action1);
+        service.addPatientMergeAction(action2);
+
+        assertThat(service.getPatientMergeActions().size(), is(2));
+        assertTrue(service.getPatientMergeActions().contains(action1));
+        assertTrue(service.getPatientMergeActions().contains(action2));
+    }
+
+    @Test
+    public void test_shouldRemovePaperRecordMergeAction() throws Exception {
+
+        PatientMergeAction action1 = new DummyPatientMergeAction();
+        PatientMergeAction action2 = new DummyPatientMergeAction();
+
+        service.addPatientMergeAction(action1);
+        service.addPatientMergeAction(action2);
+
+        service.removePatientMergeAction(action1);
+
+        assertThat(service.getPatientMergeActions().size(), is(1));
+        assertFalse(service.getPatientMergeActions().contains(action1));
+        assertTrue(service.getPatientMergeActions().contains(action2));
+
+    }
+
+    @Test
+    public void test_removePaperRecordMergeActionShouldNotFailIfActionsNotInitialized() throws Exception  {
+
+        PatientMergeAction action = new DummyPatientMergeAction();
+        service.removePatientMergeAction(action);
+
+        assertThat(service.getPatientMergeActions().size(), is(0));
+    }
 
 
     private Encounter buildEncounter(Patient patient, Date encounterDatetime) {
@@ -994,5 +1033,17 @@ public class AdtServiceTest {
         return visit;
     }
 
+
+    private class DummyPatientMergeAction implements PatientMergeAction {
+
+        @Override
+        public void beforeMergingPatients(Patient preferred, Patient notPreferred) {
+        }
+
+        @Override
+        public void afterMergingPatients(Patient preferred, Patient notPreferred) {
+        }
+
+    }
 
 }

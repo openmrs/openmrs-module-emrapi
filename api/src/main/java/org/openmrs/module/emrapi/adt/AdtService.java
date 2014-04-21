@@ -14,6 +14,9 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import java.util.Date;
+import java.util.List;
+
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
@@ -23,10 +26,8 @@ import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
+import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * <pre>
@@ -183,6 +184,25 @@ public interface AdtService extends OpenmrsService {
      * @see org.openmrs.api.PatientService#mergePatients(org.openmrs.Patient, org.openmrs.Patient)
      */
     void mergePatients(Patient preferred, Patient notPreferred);
+
+    /**
+     * Allows another module to add a patient merge action to the list of actions to be performed
+     * when a patient is merged; (ideally, this would just happen via @Autowired, but because @Autowired
+     * in service impls greatly slow down startup, instead we have other modules inject the beans explicitly
+     * via this method). (See the FixPaperRecordRequestsForMerge class and the PaperRecordModuleActivator
+     * in the Paper Record module for an example)
+     *
+     * @param patientMergeAction
+     */
+    void addPatientMergeAction(PatientMergeAction patientMergeAction);
+
+    /**
+     * Allows another module to remove a patient merge action to the list of actions to be performed
+     * when a patient is merged; (see addPatientMergeAction above)
+     *
+     * @param patientMergeAction
+     */
+    void removePatientMergeAction(PatientMergeAction patientMergeAction);
 
     /**
      * Merge a set of consecutive patient visits
