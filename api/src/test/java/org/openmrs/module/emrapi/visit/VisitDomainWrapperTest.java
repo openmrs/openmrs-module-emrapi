@@ -38,7 +38,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -629,8 +628,9 @@ public class VisitDomainWrapperTest {
         List<Diagnosis> diagnoses = visitDomainWrapper.getPrimaryDiagnoses();
 
         assertThat(diagnoses.size(), is(2));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis1)));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis2)));
+        // TODO change this so that is doesn't depend on order being correct
+        assertThat(diagnoses.get(0), is(new ExpectedDiagnosis(primaryDiagnosis1)));
+        assertThat(diagnoses.get(1), is(new ExpectedDiagnosis(primaryDiagnosis2)));
 
     }
 
@@ -713,8 +713,9 @@ public class VisitDomainWrapperTest {
 
         // should only contain the diagnoses from the mostRecentEncounterWithAdmitDisposition
         assertThat(diagnoses.size(), is(2));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis2)));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(secondaryDiagnosis)));
+        // TODO change this so that is doesn't depend on order being correct
+        assertThat(diagnoses.get(0), is(new ExpectedDiagnosis(secondaryDiagnosis)));
+        assertThat(diagnoses.get(1), is(new ExpectedDiagnosis(primaryDiagnosis2)));
 
     }
 
