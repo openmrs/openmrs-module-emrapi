@@ -1,9 +1,9 @@
 package org.openmrs.module.emrapi.disposition;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  * Reflects a possible patient disposition such as "admit" or "discharge" that is generally collected on a consult note
@@ -24,6 +24,9 @@ public class Disposition {
 
     @JsonProperty
     private String conceptCode;
+
+    @JsonProperty
+    private DispositionType type;
 
     @JsonProperty
     private Boolean keepsVisitOpen;   // if this is the most recent disposition in a visit, visit will not be automatically closed (see closeInactiveVisits and shouldBeClosed methods in AdtService)
@@ -96,6 +99,14 @@ public class Disposition {
 
     public void setConceptCode(String conceptCode) {
         this.conceptCode = conceptCode;
+    }
+
+    public DispositionType getType() {
+        return type;
+    }
+
+    public void setType(DispositionType type) {
+        this.type = type;
     }
 
     public Boolean getKeepsVisitOpen() {

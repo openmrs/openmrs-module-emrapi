@@ -14,6 +14,12 @@
 package org.openmrs.module.emrapi.visit;
 
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,13 +35,9 @@ import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.reverseOrder;
@@ -172,22 +174,55 @@ public class VisitDomainWrapper {
         return null;
     }
 
+    /**
+     * Finds the most recent encounter in the visit with a disposition of a specific type, and retrieves
+     * all diagnoses stored on that encounter. Can be used to prepopulate an admission, transfer, or discharge note;
+     * example workflow: a doctor writes a consult note and on that note sets a disposition of admission; later on,
+     * another doctor writes the actual admission note; that doctor may want a way to prepopulate this
+     * note with the dispositions from the consult note recommending admission; see the EncounterDisposition
+     * HFE tag in CoreApps for an example of how this method is used
+     */
+    public List<Diagnosis> getDiagnosesFromMostRecentDispositionByType(DispositionType type) {
+
+        DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
+
+        for (Encounter encounter : getSortedEncounters()) {  // getSortedEncounters already excludes voided encounters
+            for (Obs obs : encounter.getObsAtTopLevel(false)) {
+                if (dispositionDescriptor.isDisposition(obs)
+                        && dispositionService.getDispositionFromObsGroup(obs).getType() == type) {
+                    return getDiagnosesFromEncounter(encounter);
+                }
+            }
+        }
+
+        return new ArrayList<Diagnosis>();  // return empty list if no matches
+    }
+
     public List<Diagnosis> getPrimaryDiagnoses() {
         List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
+        for (Encounter encounter : getSortedEncounters()) {
+            diagnoses.addAll(getDiagnosesFromEncounter(encounter, Collections.singletonList(Diagnosis.Order.PRIMARY)));
+        }
+        return diagnoses;
+    }
+
+    private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter) {
+        return getDiagnosesFromEncounter(encounter, null);
+    }
+
+    private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter, List<Diagnosis.Order> diagnosisOrders) {
         DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
-        for (Encounter encounter : visit.getEncounters()) {
-            if (!encounter.isVoided()) {
-                for (Obs obs : encounter.getObsAtTopLevel(false)) {
-                    if (diagnosisMetadata.isDiagnosis(obs)) {
-                        try {
-                            Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
-                            if (Diagnosis.Order.PRIMARY == diagnosis.getOrder()) {
-                                diagnoses.add(diagnosis);
-                            }
-                        } catch (Exception ex) {
-                            log.warn("malformed diagnosis obs group with obsId " + obs.getObsId(), ex);
-                        }
+        List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
+
+        for (Obs obs : encounter.getObsAtTopLevel(false)) {
+            if (diagnosisMetadata.isDiagnosis(obs)) {
+                try {
+                    Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
+                    if (diagnosisOrders == null || diagnosisOrders.contains(diagnosis.getOrder())) {
+                        diagnoses.add(diagnosis);
                     }
+                } catch (Exception ex) {
+                    log.warn("malformed diagnosis obs group with obsId " + obs.getObsId(), ex);
                 }
             }
         }

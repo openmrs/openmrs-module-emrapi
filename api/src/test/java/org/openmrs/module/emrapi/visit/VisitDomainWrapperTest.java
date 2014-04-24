@@ -1,11 +1,20 @@
 package org.openmrs.module.emrapi.visit;
 
 
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -14,23 +23,22 @@ import org.openmrs.Obs;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
+import org.openmrs.module.emrapi.diagnosis.Diagnosis;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -38,8 +46,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.co.it.modular.hamcrest.date.DateMatchers.within;
 
 @PrepareForTest(Calendar.class)
@@ -50,13 +58,20 @@ public class VisitDomainWrapperTest {
     private Visit visit;
     private EmrApiProperties emrApiProperties;
     private DispositionService dispositionService;
-
+    private ConceptService conceptService;
+    private DiagnosisMetadata diagnosisMetadata;
+    private DispositionDescriptor dispositionDescriptor;
 
     @Before
     public void setUp(){
         visit = mock(Visit.class);
         emrApiProperties = mock(EmrApiProperties.class);
         dispositionService = mock(DispositionService.class);
+        conceptService = mock(ConceptService.class);
+        MockMetadataTestUtil.setupMockConceptService(conceptService, emrApiProperties);
+        diagnosisMetadata = MockMetadataTestUtil.setupDiagnosisMetadata(emrApiProperties, conceptService);
+        dispositionDescriptor = MockMetadataTestUtil.setupDispositionDescriptor(conceptService);
+        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
         visitDomainWrapper = new VisitDomainWrapper(visit, emrApiProperties, dispositionService);
     }
 
@@ -542,12 +557,6 @@ public class VisitDomainWrapperTest {
     @Test
     public void shouldReturnDispositionFromObs() throws Exception {
 
-        ConceptService conceptService = mock(ConceptService.class);
-        MockMetadataTestUtil.setupMockConceptService(conceptService, emrApiProperties);
-
-        DispositionDescriptor dispositionDescriptor = MockMetadataTestUtil.setupDispositionDescriptor(conceptService);
-        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
-
         Encounter mostRecentEncounter = new Encounter();
         mostRecentEncounter.setEncounterDatetime(new DateTime(2012,12,12,12,12).toDate());
 
@@ -580,6 +589,199 @@ public class VisitDomainWrapperTest {
 
         visitDomainWrapper.getMostRecentDisposition();
         verify(dispositionService).getDispositionFromObsGroup(mostRecentDispositionGroup);
+    }
+
+    @Test
+    public void shouldReturnAllPrimaryDiagnosesFromVisit() {
+
+        Encounter encounter = new Encounter();
+        encounter.setEncounterDatetime(new DateTime(2012, 12, 12, 12, 12).toDate());
+
+        Encounter encounter2 = new Encounter();
+        encounter2.setEncounterDatetime(new DateTime(2012,11,11,11,11).toDate());
+
+        Diagnosis primaryDiagnosis1 = new Diagnosis();
+        Concept primaryDiagnosisConcept1 = new Concept();
+        primaryDiagnosis1.setDiagnosis(new CodedOrFreeTextAnswer(primaryDiagnosisConcept1));
+        primaryDiagnosis1.setOrder(Diagnosis.Order.PRIMARY);
+        primaryDiagnosis1.setCertainty(Diagnosis.Certainty.CONFIRMED);
+        encounter.addObs(diagnosisMetadata.buildDiagnosisObsGroup(primaryDiagnosis1));
+
+        Diagnosis primaryDiagnosis2 = new Diagnosis();
+        Concept primaryDiagnosisConcept2 = new Concept();
+        primaryDiagnosis2.setDiagnosis(new CodedOrFreeTextAnswer(primaryDiagnosisConcept2));
+        primaryDiagnosis2.setOrder(Diagnosis.Order.PRIMARY);
+        primaryDiagnosis2.setCertainty(Diagnosis.Certainty.PRESUMED);
+        encounter2.addObs(diagnosisMetadata.buildDiagnosisObsGroup(primaryDiagnosis2));
+
+        Diagnosis secondaryDiagnosis = new Diagnosis();
+        Concept secondaryDiagnosisConcept = new Concept();
+        secondaryDiagnosis.setDiagnosis(new CodedOrFreeTextAnswer(secondaryDiagnosisConcept));
+        secondaryDiagnosis.setOrder(Diagnosis.Order.SECONDARY);
+        secondaryDiagnosis.setCertainty(Diagnosis.Certainty.PRESUMED);
+        encounter2.addObs(diagnosisMetadata.buildDiagnosisObsGroup(secondaryDiagnosis));
+
+        Set<Encounter> encounters = new HashSet<Encounter>();
+        encounters.add(encounter);
+        encounters.add(encounter2);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        List<Diagnosis> diagnoses = visitDomainWrapper.getPrimaryDiagnoses();
+
+        assertThat(diagnoses.size(), is(2));
+        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis1)));
+        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis2)));
+
+    }
+
+    @Test
+    public void shouldReturnAllDiagnosesFromMostRecentEncounterWithAdmitDisposition() {
+
+        // create three encounters
+        Encounter encounterWithTransferDisposition = new Encounter();
+        encounterWithTransferDisposition.setEncounterDatetime(new DateTime(2012, 12, 12, 12, 12).toDate());
+
+        Encounter mostRecentEncounterWithAdmitDisposition = new Encounter();
+        mostRecentEncounterWithAdmitDisposition.setEncounterDatetime(new DateTime(2012, 11, 11, 11, 11).toDate());
+
+        Encounter olderEncounterWithAdmitDisposition = new Encounter();
+        olderEncounterWithAdmitDisposition.setEncounterDatetime(new DateTime(2012, 10, 10, 10, 10).toDate());
+
+        // create two dispositions
+        Disposition transfer = new Disposition();
+        transfer.setType(DispositionType.TRANSFER);
+
+        Disposition admit = new Disposition();
+        admit.setType(DispositionType.ADMIT);
+
+        // create three disposition obs groups
+        Obs transferDispositionObsGroup = new Obs();
+        transferDispositionObsGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        when(dispositionService.getDispositionFromObsGroup(transferDispositionObsGroup)).thenReturn(transfer);
+
+        Obs mostRecentAdmitDispositionObsGroup = new Obs();
+        mostRecentAdmitDispositionObsGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        when(dispositionService.getDispositionFromObsGroup(mostRecentAdmitDispositionObsGroup)).thenReturn(admit);
+
+        Obs olderAdmitDispositionObsGroup = new Obs();
+        olderAdmitDispositionObsGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        when(dispositionService.getDispositionFromObsGroup(olderAdmitDispositionObsGroup)).thenReturn(admit);
+
+        // create four diagnoses
+        Diagnosis primaryDiagnosis1 = new Diagnosis();
+        Concept primaryDiagnosisConcept1 = new Concept();
+        primaryDiagnosis1.setDiagnosis(new CodedOrFreeTextAnswer(primaryDiagnosisConcept1));
+        primaryDiagnosis1.setOrder(Diagnosis.Order.PRIMARY);
+        primaryDiagnosis1.setCertainty(Diagnosis.Certainty.CONFIRMED);
+
+        Diagnosis primaryDiagnosis2 = new Diagnosis();
+        Concept primaryDiagnosisConcept2 = new Concept();
+        primaryDiagnosis2.setDiagnosis(new CodedOrFreeTextAnswer(primaryDiagnosisConcept2));
+        primaryDiagnosis2.setOrder(Diagnosis.Order.PRIMARY);
+        primaryDiagnosis2.setCertainty(Diagnosis.Certainty.PRESUMED);
+
+        Diagnosis primaryDiagnosis3 = new Diagnosis();
+        Concept primaryDiagnosisConcept3 = new Concept();
+        primaryDiagnosis3.setDiagnosis(new CodedOrFreeTextAnswer(primaryDiagnosisConcept3));
+        primaryDiagnosis3.setOrder(Diagnosis.Order.PRIMARY);
+        primaryDiagnosis3.setCertainty(Diagnosis.Certainty.PRESUMED);
+
+        Diagnosis secondaryDiagnosis = new Diagnosis();
+        Concept secondaryDiagnosisConcept = new Concept();
+        secondaryDiagnosis.setDiagnosis(new CodedOrFreeTextAnswer(secondaryDiagnosisConcept));
+        secondaryDiagnosis.setOrder(Diagnosis.Order.SECONDARY);
+        secondaryDiagnosis.setCertainty(Diagnosis.Certainty.PRESUMED);
+
+        // now build the three encounters from the component parts we have created
+        encounterWithTransferDisposition.addObs(transferDispositionObsGroup);
+        encounterWithTransferDisposition.addObs(diagnosisMetadata.buildDiagnosisObsGroup(primaryDiagnosis1));
+
+        mostRecentEncounterWithAdmitDisposition.addObs(mostRecentAdmitDispositionObsGroup);
+        mostRecentEncounterWithAdmitDisposition.addObs(diagnosisMetadata.buildDiagnosisObsGroup(primaryDiagnosis2));
+        mostRecentEncounterWithAdmitDisposition.addObs(diagnosisMetadata.buildDiagnosisObsGroup(secondaryDiagnosis));
+
+        olderEncounterWithAdmitDisposition.addObs(olderAdmitDispositionObsGroup);
+        olderEncounterWithAdmitDisposition.addObs(diagnosisMetadata.buildDiagnosisObsGroup(primaryDiagnosis2));
+
+        Set<Encounter> encounters = new HashSet<Encounter>();
+        encounters.add(encounterWithTransferDisposition);
+        encounters.add(mostRecentEncounterWithAdmitDisposition);
+        encounters.add(olderEncounterWithAdmitDisposition);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        List<Diagnosis> diagnoses = visitDomainWrapper.getDiagnosesFromMostRecentDispositionByType(DispositionType.ADMIT);
+
+        // should only contain the diagnoses from the mostRecentEncounterWithAdmitDisposition
+        assertThat(diagnoses.size(), is(2));
+        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis2)));
+        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(secondaryDiagnosis)));
+
+    }
+
+    @Test
+    public void getDiagnosesFromMostRecentDispositionShouldNotFailIfDispositionHasNoType() {
+
+        Encounter encounterWithDisposition = new Encounter();
+        encounterWithDisposition.setEncounterDatetime(new DateTime(2012, 12, 12, 12, 12).toDate());
+
+        Disposition dispositionWithoutType = new Disposition();
+
+        Obs dispositionObsGroup = new Obs();
+        dispositionObsGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        when(dispositionService.getDispositionFromObsGroup(dispositionObsGroup)).thenReturn(dispositionWithoutType);
+
+        encounterWithDisposition.addObs(dispositionObsGroup);
+
+        Set<Encounter> encounters = new HashSet<Encounter>();
+        encounters.add(encounterWithDisposition);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        List<Diagnosis> diagnoses = visitDomainWrapper.getDiagnosesFromMostRecentDispositionByType(DispositionType.ADMIT);
+
+        // no assertions, just want to make sure we can do this without receiving NPE
+
+    }
+
+
+
+    @Test
+    public void shouldReturnEmptyListIfNoDiagnoses() {
+
+        Encounter encounter = new Encounter();
+        encounter.setEncounterDatetime(new DateTime(2012, 12, 12, 12, 12).toDate());
+
+        Set<Encounter> encounters = new HashSet<Encounter>();
+        encounters.add(encounter);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        List<Diagnosis> diagnoses = visitDomainWrapper.getPrimaryDiagnoses();
+
+        assertThat(diagnoses.size(), is(0));
+
+    }
+
+
+    private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
+
+        private Diagnosis expectedDiagnosis;
+
+        public ExpectedDiagnosis(Diagnosis expectedRequest) {
+            this.expectedDiagnosis = expectedRequest;
+        }
+
+        @Override
+        public boolean matches(Object o) {
+
+            Diagnosis actualDiagnosis = (Diagnosis) o;
+
+            boolean match = true;
+
+            match = match && actualDiagnosis.getDiagnosis().getCodedAnswer() == expectedDiagnosis.getDiagnosis().getCodedAnswer();
+            match = match && actualDiagnosis.getCertainty() == expectedDiagnosis.getCertainty();
+            match = match && actualDiagnosis.getOrder() == expectedDiagnosis.getOrder();
+
+            return match;
+        }
     }
 
 }
