@@ -629,8 +629,8 @@ public class VisitDomainWrapperTest {
         List<Diagnosis> diagnoses = visitDomainWrapper.getPrimaryDiagnoses();
 
         assertThat(diagnoses.size(), is(2));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis1)));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis2)));
+        assertThat(diagnoses, hasItem(primaryDiagnosis1));
+        assertThat(diagnoses, hasItem(primaryDiagnosis2));
 
     }
 
@@ -713,8 +713,8 @@ public class VisitDomainWrapperTest {
 
         // should only contain the diagnoses from the mostRecentEncounterWithAdmitDisposition
         assertThat(diagnoses.size(), is(2));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(secondaryDiagnosis)));
-        assertThat(diagnoses, hasItem(new ExpectedDiagnosis(primaryDiagnosis2)));
+        assertThat(diagnoses, hasItem(secondaryDiagnosis));
+        assertThat(diagnoses, hasItem(primaryDiagnosis2));
 
     }
 
