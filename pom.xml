@@ -44,6 +44,7 @@
         <metadatasharingVersion>1.1.8</metadatasharingVersion>
         <eventVersion>2.1</eventVersion>
         <webservicesRestModuleVersion>2.4</webservicesRestModuleVersion>
+        <appframeworkModuleVersion>2.1</appframeworkModuleVersion>
     </properties>
 
     <dependencies>
@@ -114,12 +115,22 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>appframework-api</artifactId>
+            <version>${appframeworkModuleVersion}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+
+        <dependency>
             <groupId>org.openmrs</groupId>
             <artifactId>event-api</artifactId>
             <version>${eventVersion}</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+
 
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
