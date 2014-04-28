@@ -16,10 +16,7 @@ package org.openmrs.module.emrapi.encounter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.openmrs.Concept;
-import org.openmrs.ConceptDatatype;
-import org.openmrs.ConceptName;
-import org.openmrs.Obs;
+import org.openmrs.*;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -35,6 +32,8 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     @Mock
     private Concept concept;
     @Mock
+    private ConceptNumeric conceptNumeric;
+    @Mock
     private ConceptDatatype conceptDatatype;
     private ObservationMapper observationMapper;
     private ObsBuilder obsBuilder;
@@ -42,8 +41,6 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     @Before
     public void setUp(){
         initMocks(this);
-        when(concept.getName()).thenReturn(new ConceptName());
-        when(concept.getDatatype()).thenReturn(conceptDatatype);
         observationMapper = new ObservationMapper();
         obsBuilder = new ObsBuilder();
     }
@@ -51,8 +48,11 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldMapObservationWithNumericValue(){
         String uuid = UUID.randomUUID().toString();
-        obsBuilder.setUuid(uuid).setValue(100.0).setConcept(concept);
+        obsBuilder.setUuid(uuid).setValue(100.0).setConcept(conceptNumeric);
+        when(conceptNumeric.getName()).thenReturn(new ConceptName());
+        when(conceptNumeric.getDatatype()).thenReturn(conceptDatatype);
         when(conceptDatatype.isNumeric()).thenReturn(true);
+        when(conceptNumeric.getUnits()).thenReturn("mg");
         Obs obs = obsBuilder.get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
@@ -63,6 +63,8 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void shouldMapObservationWithBooleanValue(){
+        when(concept.getName()).thenReturn(new ConceptName());
+        when(concept.getDatatype()).thenReturn(conceptDatatype);
         when(conceptDatatype.isBoolean()).thenReturn(true);
         Obs obs = obsBuilder.setConcept(concept).setValue(true).get();
 
@@ -74,8 +76,12 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldMapVoidedObservation(){
         String uuid = UUID.randomUUID().toString();
-        obsBuilder.setUuid(uuid).setValue(100.0).setConcept(concept).setVoided(true).setVoidedReason("reason");
+        obsBuilder.setUuid(uuid).setValue(100.0).setConcept(conceptNumeric).setVoided(true).setVoidedReason("reason");
+        when(conceptNumeric.getName()).thenReturn(new ConceptName());
+        when(conceptNumeric.getDatatype()).thenReturn(conceptDatatype);
         when(conceptDatatype.isNumeric()).thenReturn(true);
+        when(conceptNumeric.getUnits()).thenReturn("mg");
+
         Obs obs = obsBuilder.get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);

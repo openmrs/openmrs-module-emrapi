@@ -4,15 +4,18 @@
 
     <concept concept_id="501" retired="false" datatype_id="1" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0"/>
     <concept_name concept_id="501" name="Numeric Concept" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1501" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="82e5f23e-e0b3-4e53-b6bb-c09c1c7fb8b0"/>
+    <concept_numeric concept_id="501" precise="0"></concept_numeric>
 
     <concept concept_id="502" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="4f3c2244-9d6a-439e-b88a-6e8873489ea7"/>
     <concept_name concept_id="502" name="String Concept" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1502" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="4f3c2244-9d6a-439e-b88a-6e8873489ea7"/>
 
     <concept concept_id="503" retired="false" datatype_id="1" class_id="5" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="d102c80f-1yz9-4da3-bb88-8122ce8868dh"/>
     <concept_name concept_id="503" name="Cancer" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1503" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="d102c80f-1yz9-4da3-bb88-8122ce8868dh"/>
+    <concept_numeric concept_id="503" precise="0"></concept_numeric>
 
     <concept concept_id="504" retired="false" datatype_id="1" class_id="5" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="604dcce9-bcd9-48a8-b2f5-112743cf1db8"/>
     <concept_name concept_id="504" name="Malaria" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_id="1504" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="604dcce9-bcd9-48a8-b2f5-112743cf1db8"/>
+    <concept_numeric concept_id="504" precise="0"></concept_numeric>
 
     <location location_id="501" name="Test Location" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="f1771d8e-bf1f-4dc5-957f-0d40a5eebf09"/>
 

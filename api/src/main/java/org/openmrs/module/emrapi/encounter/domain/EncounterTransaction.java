@@ -181,12 +181,19 @@ public class EncounterTransaction {
         private String name;
         private String dataType;
         private boolean isSet;
+        @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
+        private String units;
 
-        public Concept(String uuid, String name, boolean isSet, String dataType) {
+        public Concept(String uuid, String name, boolean isSet, String dataType, String units) {
             this.uuid = uuid;
             this.name = name;
-            this.isSet = isSet;
             this.dataType = dataType;
+            this.isSet = isSet;
+            this.units = units;
+        }
+
+        public Concept(String uuid, String name, boolean isSet, String dataType) {
+            this(uuid, name, isSet, dataType, null);
         }
 
         public Concept(String uuid, String name, boolean isSet) {
@@ -234,6 +241,14 @@ public class EncounterTransaction {
 
         public void setDataType(String dataType) {
             this.dataType = dataType;
+        }
+
+        public String getUnits() {
+            return units;
+        }
+
+        public void setUnits(String units) {
+            this.units = units;
         }
     }
 

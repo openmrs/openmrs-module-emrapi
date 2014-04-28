@@ -14,10 +14,20 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Concept;
+import org.openmrs.ConceptNumeric;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.utils.HibernateLazyLoader;
 
 public class ConceptMapper {
     EncounterTransaction.Concept map(Concept concept) {
-        return concept == null ? null : new EncounterTransaction.Concept(concept.getUuid(), concept.getName().getName(), concept.isSet(), concept.getDatatype().getName());
+        if (concept == null){
+            return null;
+        }
+        concept = new HibernateLazyLoader().load(concept);
+        EncounterTransaction.Concept EncounterTransactionConcept = new EncounterTransaction.Concept(concept.getUuid(), concept.getName().getName(), concept.isSet(), concept.getDatatype().getName());
+        if(concept.isNumeric() && ((ConceptNumeric) concept).getUnits() != null) {
+            EncounterTransactionConcept.setUnits(((ConceptNumeric) concept).getUnits());
+        }
+        return EncounterTransactionConcept;
     }
 }
