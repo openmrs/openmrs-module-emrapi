@@ -1,9 +1,9 @@
 package org.openmrs.module.emrapi.disposition;
 
-import org.openmrs.Obs;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.openmrs.Obs;
 
 public interface DispositionService {
 
@@ -40,6 +40,13 @@ public interface DispositionService {
      */
     Disposition getDispositionByUniqueId(String uniqueId);
 
+    /**
+     * Gets all dispositions of the specified type
+     *
+     * @param dispositionType
+     * @return
+     */
+    List<Disposition> getDispositionsByType(DispositionType dispositionType);
 
     /**
      * Given an disposition observation, returns the disposition recorded in that obs

@@ -30,7 +30,6 @@ import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
-import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.module.emrapi.utils.ModuleProperties;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Component;
@@ -158,10 +157,6 @@ public class EmrApiProperties extends ModuleProperties {
 	public PatientIdentifierType getPrimaryIdentifierType() {
 		return getPatientIdentifierTypeByGlobalProperty(EmrApiConstants.PRIMARY_IDENTIFIER_TYPE, true);
 	}
-
-    public PatientIdentifierType getDossierIdentifierType() {
-        return GeneralUtils.getPatientIdentifierType(EmrApiConstants.DOSSIER_NUMBER_UUID);
-    }
 
 	public List<PatientIdentifierType> getExtraPatientIdentifierTypes() {
 		return getPatientIdentifierTypesByGlobalProperty(EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES, false);

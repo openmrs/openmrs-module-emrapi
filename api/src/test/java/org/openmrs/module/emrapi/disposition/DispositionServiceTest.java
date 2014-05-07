@@ -1,6 +1,16 @@
 package org.openmrs.module.emrapi.disposition;
 
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,16 +26,6 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class DispositionServiceTest {
 
@@ -60,7 +60,7 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getDispositions();
 
-        assertEquals(dispositions.size(), 2);
+        assertEquals(3, dispositions.size());
 
         assertEquals(deathDisposition, dispositions.get(0));
         assertEquals(homeDisposition, dispositions.get(1));
@@ -105,6 +105,21 @@ public class DispositionServiceTest {
     }
 
     @Test
+    public void shouldGetDispositionByType() throws Exception {
+
+        dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
+
+        List<Disposition> dispositions = dispositionService.getDispositionsByType(DispositionType.TRANSFER);
+        assertThat(dispositions.size(), is(1));
+        assertThat(dispositions.get(0).getUuid(), is("1"));
+
+        dispositions = dispositionService.getDispositionsByType(DispositionType.DISCHARGE);
+        assertThat(dispositions.size(), is(1));
+        assertThat(dispositions.get(0).getUuid(), is("66de7f60-b73a-11e2-9e96-0800200c9a66"));
+
+    }
+
+    @Test
     public void shouldGetDispositionByObs()  throws IOException {
 
         Concept deathDispositionConcept = new Concept();
@@ -112,7 +127,7 @@ public class DispositionServiceTest {
         Obs dispositionObs = new Obs();
         dispositionObs.setValueCoded(deathDispositionConcept);
 
-        when(emrConceptService.getConcept("org.openmrs.module.emrapi: Death")).thenReturn(deathDispositionConcept);
+        when(emrConceptService.getConcept("org.openmrs.module.emrapi:Death")).thenReturn(deathDispositionConcept);
 
         Disposition disposition = dispositionService.getDispositionFromObs(dispositionObs);
         assertThat(disposition, is(getDeathDisposition()));
@@ -131,18 +146,18 @@ public class DispositionServiceTest {
         dispositionObsGroup.setConcept(dispositionService.getDispositionDescriptor().getDispositionSetConcept());
         dispositionObsGroup.addGroupMember(dispositionObs);
 
-        when(emrConceptService.getConcept("org.openmrs.module.emrapi: Death")).thenReturn(deathDispositionConcept);
+        when(emrConceptService.getConcept("org.openmrs.module.emrapi:Death")).thenReturn(deathDispositionConcept);
 
         Disposition disposition = dispositionService.getDispositionFromObsGroup(dispositionObsGroup);
         assertThat(disposition, is(getDeathDisposition()));
     }
 
     private Disposition getAdmitDisposition() {
-        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.admit", "org.openmrs.module.emrapi: Admit to hospital", Collections.<String>emptyList(), Collections.<DispositionObs>emptyList());
+        return new Disposition("66de7f60-b73a-11e2-9e96-0800200c9a66", "disposition.admit", "org.openmrs.module.emrapi:Admit to hospital", Collections.<String>emptyList(), Collections.<DispositionObs>emptyList());
     }
 
     private Disposition getDeathDisposition() {
-        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "org.openmrs.module.emrapi: Death", getActions(), getAdditionalObs());
+        return new Disposition("d2d89630-b698-11e2-9e96-0800200c9a66", "disposition.death", "org.openmrs.module.emrapi:Death", getActions(), getAdditionalObs());
     }
 
     private List<String> getActions() {
@@ -152,7 +167,7 @@ public class DispositionServiceTest {
     private List<DispositionObs> getAdditionalObs() {
         List<DispositionObs> additionalObsList = new ArrayList<DispositionObs>();
         DispositionObs additionalObs = new DispositionObs();
-        additionalObs.setConceptCode("org.openmrs.module.emrapi: Date of death");
+        additionalObs.setConceptCode("org.openmrs.module.emrapi:Date of death");
         additionalObs.setLabel("emr.dateOfDeath");
         additionalObsList.add(additionalObs);
         return additionalObsList;

@@ -1,5 +1,9 @@
 package org.openmrs.module.emrapi.disposition;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.openmrs.Obs;
@@ -9,9 +13,6 @@ import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.util.List;
 
 public class DispositionServiceImpl extends BaseOpenmrsService implements DispositionService  {
 
@@ -54,6 +55,17 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
             }
         }
         return null;
+    }
+
+    @Override
+    public List<Disposition> getDispositionsByType(DispositionType dispositionType) {
+        List<Disposition> dispositions = new ArrayList<Disposition>();
+        for (Disposition candidate : getDispositions()) {
+            if (dispositionType.equals(candidate.getType())) {  // null-safe since type can be null
+                dispositions.add(candidate);
+            }
+        }
+        return dispositions;
     }
 
     @Override
