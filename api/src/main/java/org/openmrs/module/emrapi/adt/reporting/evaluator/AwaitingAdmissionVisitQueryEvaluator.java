@@ -64,11 +64,14 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
                 .whereEqual("visit.voided", false)
                 .whereEqual("visit.location", visitLocation)
                 .whereNull("visit.stopDatetime")   // stopDatetime = null means "active visit"
-                .where("(select count(*) from Encounter as admission "
+                .where("(select count(*) from Encounter as admission "    // count=0, ie no admission encounters
                         + "where admission.visit = visit "
                         + "and admission.voided = false "
                         + "and admission.encounterType = :admissionEncounterType"
                         +") = 0")
+                // restrict by context
+                .whereVisitIn("visit", evaluationContext)
+                // add parameters
                 .withValue("admissionEncounterType", emrApiProperties.getAdmissionEncounterType());
 
         VisitQueryResult result = new VisitQueryResult(visitQuery, evaluationContext);

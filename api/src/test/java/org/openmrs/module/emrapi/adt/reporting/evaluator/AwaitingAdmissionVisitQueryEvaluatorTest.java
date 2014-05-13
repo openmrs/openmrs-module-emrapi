@@ -1,13 +1,9 @@
 package org.openmrs.module.emrapi.adt.reporting.evaluator;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
-import java.util.Date;
-
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Cohort;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
@@ -20,10 +16,19 @@ import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
+import org.openmrs.module.reporting.evaluation.EvaluationContext;
+import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
+import org.openmrs.module.reporting.query.visit.VisitIdSet;
 import org.openmrs.module.reporting.query.visit.VisitQueryResult;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collections;
+import java.util.Date;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextSensitiveTest {
 
@@ -362,5 +367,65 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
     }
 
+
+    @Test
+    public void shouldNotFindVisitAwaitingAdmissionIfPatientNotInContext() throws Exception {
+
+        Patient patient = testDataManager.randomPatient().save();
+
+        // a visit with a single consult encounter with dispo = ADMIT
+        Visit visit =
+                testDataManager.visit()
+                        .patient(patient)
+                        .visitType(emrApiProperties.getAtFacilityVisitType())
+                        .started(new Date())
+                        .encounter(testDataManager.encounter()
+                                .patient(patient)
+                                .encounterDatetime(new Date())
+                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .obs(testDataManager.obs()
+                                        .concept(dispositionDescriptor.getDispositionConcept())
+                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
+                                        .get())
+                                .get())
+                        .save();
+
+        EvaluationContext context = new EvaluationContext();
+        context.setBaseCohort(new Cohort(Collections.singleton(2)));
+
+        VisitQueryResult result = visitQueryService.evaluate(query, context);
+        assertThat(result.getMemberIds().size(), is(0));
+
+    }
+
+    @Test
+    public void shouldNotFindVisitAwaitingAdmissionIfVisitNotInContext() throws Exception {
+
+        Patient patient = testDataManager.randomPatient().save();
+
+        // a visit with a single consult encounter with dispo = ADMIT
+        Visit visit =
+                testDataManager.visit()
+                        .patient(patient)
+                        .visitType(emrApiProperties.getAtFacilityVisitType())
+                        .started(new Date())
+                        .encounter(testDataManager.encounter()
+                                .patient(patient)
+                                .encounterDatetime(new Date())
+                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .obs(testDataManager.obs()
+                                        .concept(dispositionDescriptor.getDispositionConcept())
+                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
+                                        .get())
+                                .get())
+                        .save();
+
+        VisitEvaluationContext context = new VisitEvaluationContext();
+        context.setBaseVisits(new VisitIdSet(10101));  // random visit id
+
+        VisitQueryResult result = visitQueryService.evaluate(query, context);
+        assertThat(result.getMemberIds().size(), is(0));
+
+    }
 
 }
