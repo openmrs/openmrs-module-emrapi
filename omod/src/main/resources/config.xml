@@ -15,7 +15,6 @@
     <require_version>1.9.3</require_version> <!-- TRUNK-3751 prevents saying ${openmrsCoreVersion} -->
     <!-- / Module Properties -->
 
-
     <!-- Required Modules -->
     <require_modules>
         <require_module version="${reportingModuleVersion}">org.openmrs.module.reporting</require_module>
