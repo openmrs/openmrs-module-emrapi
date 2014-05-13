@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class EmrApiVisitDataLibrary extends BaseDefinitionLibrary<VisitDataDefinition> {
 
 
-    public static final String PREFIX = "emrapi.library.visitDataDefinition.";
+    public static final String PREFIX = "emrapi.visitDataDefinition.";
 
     @Override
     public Class<? super VisitDataDefinition> getDefinitionType() {

@@ -13,6 +13,7 @@ import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
+import org.openmrs.module.reporting.evaluation.service.EvaluationService;
 import org.openmrs.module.reporting.query.visit.VisitQueryResult;
 import org.openmrs.module.reporting.query.visit.definition.VisitQuery;
 import org.openmrs.module.reporting.query.visit.evaluator.VisitQueryEvaluator;
@@ -36,7 +37,7 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
     EmrApiProperties emrApiProperties;
 
     @Autowired
-    private SessionFactory sessionFactory;
+    EvaluationService evaluationService;
 
     @Override
     public VisitQueryResult evaluate(VisitQuery visitQuery, EvaluationContext evaluationContext) throws EvaluationException {
@@ -61,20 +62,18 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
                 .whereEqual("dispo.voided", false)
                 .whereEqual("dispoEncounter.voided", false)
                 .whereEqual("visit.voided", false)
+                .whereEqual("visit.location", visitLocation)
                 .whereNull("visit.stopDatetime")   // stopDatetime = null means "active visit"
                 .where("(select count(*) from Encounter as admission "
                         + "where admission.visit = visit "
                         + "and admission.voided = false "
                         + "and admission.encounterType = :admissionEncounterType"
-                        +") = 0");
-
-        // restrict to location if specified
-        if (visitLocation != null) {
-            query.whereEqual("visit.location", visitLocation);
-        }
+                        +") = 0")
+                .withValue("admissionEncounterType", emrApiProperties.getAdmissionEncounterType());
 
         VisitQueryResult result = new VisitQueryResult(visitQuery, evaluationContext);
-        List<Integer> results = query.buildQuery(sessionFactory).setParameter("admissionEncounterType", emrApiProperties.getAdmissionEncounterType()).list();
+
+        List<Integer> results= evaluationService.evaluateToList(query, Integer.class);
         result.add(results.toArray(new Integer[results.size()]));
         return result;
 

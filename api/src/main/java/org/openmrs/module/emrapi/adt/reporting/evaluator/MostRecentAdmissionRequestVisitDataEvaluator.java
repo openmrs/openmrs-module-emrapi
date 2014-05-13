@@ -1,6 +1,5 @@
 package org.openmrs.module.emrapi.adt.reporting.evaluator;
 
-import org.hibernate.SessionFactory;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.Location;
@@ -9,8 +8,6 @@ import org.openmrs.Provider;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.adt.reporting.definition.MostRecentAdmissionRequestVisitDataDefinition;
 import org.openmrs.module.emrapi.adt.util.AdtUtil;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
@@ -32,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Evaluates a VisitIdDataDefinition to produce a VisitData
+ * Evaluates a MostRecentAdmissionRequestVisitDataDefinition to produce a VisitData
  */
 @Handler(supports=MostRecentAdmissionRequestVisitDataDefinition.class, order=50)
 public class MostRecentAdmissionRequestVisitDataEvaluator implements VisitDataEvaluator {
@@ -49,6 +46,9 @@ public class MostRecentAdmissionRequestVisitDataEvaluator implements VisitDataEv
     @Autowired
     private EmrConceptService emrConceptService;
 
+    @Autowired
+    private EvaluationService evaluationService;
+
     @Override
     public EvaluatedVisitData evaluate(VisitDataDefinition visitDataDefinition, EvaluationContext evaluationContext) throws EvaluationException {
 
@@ -58,14 +58,14 @@ public class MostRecentAdmissionRequestVisitDataEvaluator implements VisitDataEv
 
         query.select("encounter.visit.id, encounter").from(Encounter.class, "encounter")
                 .innerJoin("encounter.obs", "dispo")
-                .whereEqual("dispo.concept", Context.getService(DispositionService.class).getDispositionDescriptor().getDispositionConcept())
+                .whereEqual("dispo.concept", dispositionService.getDispositionDescriptor().getDispositionConcept())
                 .whereIn("dispo.valueCoded", AdtUtil.getAdmissionDispositionsConcepts(emrConceptService, dispositionService))
                 .whereEqual("dispo.voided", false)
                 .whereEqual("encounter.voided", false)
                 .whereVisitIn("encounter.visit.id", evaluationContext);
 
 
-        List<Object[]> result = Context.getService(EvaluationService.class).evaluateToList(query);
+        List<Object[]> result = evaluationService.evaluateToList(query);
 
         for (Object[] row : result) {
 
@@ -94,8 +94,6 @@ public class MostRecentAdmissionRequestVisitDataEvaluator implements VisitDataEv
 
 
         return data;
-
-
 
     }
 

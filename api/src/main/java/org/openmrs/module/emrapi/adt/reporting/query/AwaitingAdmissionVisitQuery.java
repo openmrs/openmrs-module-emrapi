@@ -9,7 +9,9 @@ import org.openmrs.module.reporting.query.BaseQuery;
 import org.openmrs.module.reporting.query.visit.definition.VisitQuery;
 
 /**
- * Returns all encounters that represent an active admission disposition (ie. current, unfulfilled admission request)
+ * Returns all visits that contain at least one active admission disposition (ie. current, unfulfilled admission request)
+ *
+ * If a location is specified, restricts the query to only visits that have the chosen location as a visit location
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
 public class AwaitingAdmissionVisitQuery extends BaseQuery<Visit> implements VisitQuery {

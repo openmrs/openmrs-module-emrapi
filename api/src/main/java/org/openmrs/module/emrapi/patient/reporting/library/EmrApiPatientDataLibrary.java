@@ -33,7 +33,7 @@ public class EmrApiPatientDataLibrary extends BaseDefinitionLibrary<PatientDataD
     @Autowired
     private EmrApiProperties emrApiProperties;
 
-    public static final String PREFIX = "emrapi.library.patientDataDefinition.";
+    public static final String PREFIX = "emrapi.patientDataDefinition.";
 
     @Override
     public Class<? super PatientDataDefinition> getDefinitionType() {
