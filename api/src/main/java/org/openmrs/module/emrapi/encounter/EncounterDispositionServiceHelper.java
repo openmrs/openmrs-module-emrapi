@@ -76,6 +76,10 @@ public class EncounterDispositionServiceHelper {
         if(disposition.getAdditionalObs() != null){
             for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
                 Obs matchingObservation = getMatchingObservation(existingDispositionGroup.getGroupMembers(), observation.getConceptUuid());
+                if(matchingObservation == null){
+                    existingDispositionGroup.addGroupMember(createObsFromObservation(observation, encounter, dispositionDateTime));
+                    return;
+                }
                 updateObsFromObservation(observation, matchingObservation, dispositionDateTime);
             }
         }
@@ -103,13 +107,14 @@ public class EncounterDispositionServiceHelper {
     private Obs updateObsFromObservation(EncounterTransaction.Observation observation, Obs obs,Date observationDateTime) throws ParseException {
         if(observation != null && obs != null) {
             obs.setConcept(getConceptByUuid(observation.getConceptUuid()));
-            obs.setValueAsString((String) observation.getValue());
+            obs.setComment(observation.getComment());
+            obs.setObsDatetime(observationDateTime);
             if(observation.getVoided()){
                 obs.setVoided(observation.getVoided());
                 obs.setVoidReason(observation.getVoidReason());
+                return obs;
             }
-            obs.setComment(observation.getComment());
-            obs.setObsDatetime(observationDateTime);
+            obs.setValueAsString((String) observation.getValue());
         }
         return obs;
     }
