@@ -14,12 +14,6 @@
 package org.openmrs.module.emrapi.visit;
 
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +32,12 @@ import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.reverseOrder;
@@ -134,6 +134,22 @@ public class VisitDomainWrapper {
         if (encounters.size() != 0)
             return encounters.get(encounters.size() - 1);
         return null;
+    }
+
+    /**
+     * Fetches the most recent (non-voided) consult encounter from this visit
+     * @return
+     */
+    public Encounter getMostRecentConsultEncounter() {
+        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getConsultEncounterType()));
+    }
+
+    /**
+     * True/false whether there is a non-voided consult encounter associated with this visit
+     * @return
+     */
+    public boolean hasConsultEncounter() {
+        return getMostRecentConsultEncounter() != null;
     }
 
     // note that this returns the most recent encounter first

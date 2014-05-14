@@ -1,14 +1,6 @@
 package org.openmrs.module.emrapi.visit;
 
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -34,6 +26,14 @@ import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
@@ -760,6 +760,71 @@ public class VisitDomainWrapperTest {
 
     }
 
+    @Test
+    public void shouldReturnMostRecentNonVoidedConsultEncounter() throws Exception {
+
+        EncounterType consultEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getConsultEncounterType()).thenReturn(consultEncounterType);
+
+        Encounter consult1 = new Encounter();
+        consult1.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        consult1.setEncounterType(consultEncounterType);
+
+        Encounter vitals = new Encounter();
+        vitals.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+
+        Encounter consult2 = new Encounter();
+        consult2.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+        consult2.setEncounterType(consultEncounterType);
+
+        Encounter consult3 = new Encounter();
+        consult3.setEncounterDatetime(DateUtils.addHours(new Date(), 0));
+        consult3.setEncounterType(consultEncounterType);
+        consult3.setVoided(true);
+
+
+        // per the hbm.xml file, visit.encounters are sorted by encounterDatetime desc
+        Visit visit = new Visit();
+        visit.setStartDatetime(consult1.getEncounterDatetime());
+        visit.addEncounter(consult1);
+        visit.addEncounter(consult2);
+        visit.addEncounter(consult3);
+        visit.addEncounter(vitals);
+
+        VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
+        assertTrue(wrapper.hasConsultEncounter());
+        assertThat(wrapper.getMostRecentConsultEncounter(), is(consult2));  // consult #3 is voided
+    }
+
+    @Test
+    public void shouldReturnNullIfNoConsultEncounter() throws Exception {
+
+        EncounterType consultEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getConsultEncounterType()).thenReturn(consultEncounterType);
+
+        Encounter vitals = new Encounter();
+        vitals.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+
+        Encounter consult = new Encounter();
+        consult.setEncounterDatetime(DateUtils.addHours(new Date(), 0));
+        consult.setEncounterType(consultEncounterType);
+        consult.setVoided(true);   // note that this consult is voided
+
+
+        // per the hbm.xml file, visit.encounters are sorted by encounterDatetime desc
+        Visit visit = new Visit();
+        visit.addEncounter(consult);
+        visit.addEncounter(vitals);
+
+        VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
+        assertFalse(wrapper.hasConsultEncounter());
+        assertNull(wrapper.getMostRecentConsultEncounter());
+
+    }
 
     private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
 
