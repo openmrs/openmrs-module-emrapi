@@ -72,8 +72,13 @@ public class EmrApiProperties extends ModuleProperties {
 	}
 
     public EncounterType getVisitNoteEncounterType() {
-        EncounterType visitNoteEncounterType = getEncounterTypeByGlobalProperty(EmrApiConstants.GP_VISIT_NOTE_ENCOUNTER_TYPE);
-        return visitNoteEncounterType != null ? visitNoteEncounterType : getConsultEncounterType();
+        try {
+            return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_VISIT_NOTE_ENCOUNTER_TYPE);
+        }
+        // hack for implementations who are still using old global property "consultEncounterType"
+        catch (IllegalStateException ex) {
+            return getConsultEncounterType();
+        }
     }
 
     @Deprecated // use visit note encounter type, as "Visit Note" is the proper naming convention
