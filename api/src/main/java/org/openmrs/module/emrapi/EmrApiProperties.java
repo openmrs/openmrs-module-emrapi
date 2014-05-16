@@ -71,6 +71,12 @@ public class EmrApiProperties extends ModuleProperties {
 		return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CHECK_IN_CLERK_ENCOUNTER_ROLE);
 	}
 
+    public EncounterType getVisitNoteEncounterType() {
+        EncounterType visitNoteEncounterType = getEncounterTypeByGlobalProperty(EmrApiConstants.GP_VISIT_NOTE_ENCOUNTER_TYPE);
+        return visitNoteEncounterType != null ? visitNoteEncounterType : getConsultEncounterType();
+    }
+
+    @Deprecated // use visit note encounter type, as "Visit Note" is the proper naming convention
 	public EncounterType getConsultEncounterType() {
 		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_CONSULT_ENCOUNTER_TYPE);
 	}

@@ -88,24 +88,24 @@ public class VisitDomainWrapperTest {
         checkIn.setEncounterType(checkInEncounterType);
         Encounter vitals = new Encounter();
         vitals.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
-        Encounter consult = new Encounter();
-        consult.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+        Encounter visitNote = new Encounter();
+        visitNote.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
         Encounter voided = new Encounter();
         voided.setVoided(true);
-        consult.setEncounterDatetime(new Date());
+        visitNote.setEncounterDatetime(new Date());
 
         // per the hbm.xml file, visit.encounters are sorted by encounterDatetime desc
         Visit visit = new Visit();
         visit.setStartDatetime(checkIn.getEncounterDatetime());
         visit.setEncounters(new LinkedHashSet<Encounter>(4));
         visit.addEncounter(voided);
-        visit.addEncounter(consult);
+        visit.addEncounter(visitNote);
         visit.addEncounter(vitals);
         visit.addEncounter(checkIn);
 
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
         assertThat(wrapper.getCheckInEncounter(), is(checkIn));
-        assertThat(wrapper.getMostRecentEncounter(), is(consult));
+        assertThat(wrapper.getMostRecentEncounter(), is(visitNote));
     }
 
     @Test
@@ -761,70 +761,111 @@ public class VisitDomainWrapperTest {
     }
 
     @Test
-    public void shouldReturnMostRecentNonVoidedConsultEncounter() throws Exception {
+    public void shouldReturnMostRecentNonVoidedVisitNote() throws Exception {
 
-        EncounterType consultEncounterType = new EncounterType();
+        EncounterType visitNoteEncounterType = new EncounterType();
 
         EmrApiProperties props = mock(EmrApiProperties.class);
-        when(props.getConsultEncounterType()).thenReturn(consultEncounterType);
+        when(props.getVisitNoteEncounterType()).thenReturn(visitNoteEncounterType);
 
-        Encounter consult1 = new Encounter();
-        consult1.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
-        consult1.setEncounterType(consultEncounterType);
+        Encounter visitNote1 = new Encounter();
+        visitNote1.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        visitNote1.setEncounterType(visitNoteEncounterType);
 
         Encounter vitals = new Encounter();
         vitals.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
 
-        Encounter consult2 = new Encounter();
-        consult2.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
-        consult2.setEncounterType(consultEncounterType);
+        Encounter visitNote2 = new Encounter();
+        visitNote2.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+        visitNote2.setEncounterType(visitNoteEncounterType);
 
-        Encounter consult3 = new Encounter();
-        consult3.setEncounterDatetime(DateUtils.addHours(new Date(), 0));
-        consult3.setEncounterType(consultEncounterType);
-        consult3.setVoided(true);
+        Encounter visitNote3 = new Encounter();
+        visitNote3.setEncounterDatetime(DateUtils.addHours(new Date(), 0));
+        visitNote3.setEncounterType(visitNoteEncounterType);
+        visitNote3.setVoided(true);
 
 
         // per the hbm.xml file, visit.encounters are sorted by encounterDatetime desc
         Visit visit = new Visit();
-        visit.setStartDatetime(consult1.getEncounterDatetime());
-        visit.addEncounter(consult1);
-        visit.addEncounter(consult2);
-        visit.addEncounter(consult3);
+        visit.setStartDatetime(visitNote1.getEncounterDatetime());
+        visit.addEncounter(visitNote1);
+        visit.addEncounter(visitNote2);
+        visit.addEncounter(visitNote3);
         visit.addEncounter(vitals);
 
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
-        assertTrue(wrapper.hasConsultEncounter());
-        assertThat(wrapper.getMostRecentConsultEncounter(), is(consult2));  // consult #3 is voided
+        assertTrue(wrapper.hasVisitNote());
+        assertThat(wrapper.getMostRecentVisitNote(), is(visitNote2));  // visitNote #3 is voided
     }
 
     @Test
-    public void shouldReturnNullIfNoConsultEncounter() throws Exception {
+    public void shouldReturnNullIfNoVisitNote() throws Exception {
 
-        EncounterType consultEncounterType = new EncounterType();
+        EncounterType visitNoteEncounterType = new EncounterType();
 
         EmrApiProperties props = mock(EmrApiProperties.class);
-        when(props.getConsultEncounterType()).thenReturn(consultEncounterType);
+        when(props.getVisitNoteEncounterType()).thenReturn(visitNoteEncounterType);
 
         Encounter vitals = new Encounter();
         vitals.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
 
-        Encounter consult = new Encounter();
-        consult.setEncounterDatetime(DateUtils.addHours(new Date(), 0));
-        consult.setEncounterType(consultEncounterType);
-        consult.setVoided(true);   // note that this consult is voided
+        Encounter visitNote = new Encounter();
+        visitNote.setEncounterDatetime(DateUtils.addHours(new Date(), 0));
+        visitNote.setEncounterType(visitNoteEncounterType);
+        visitNote.setVoided(true);   // note that this visitNote is voided
 
 
         // per the hbm.xml file, visit.encounters are sorted by encounterDatetime desc
         Visit visit = new Visit();
-        visit.addEncounter(consult);
+        visit.addEncounter(visitNote);
         visit.addEncounter(vitals);
 
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
-        assertFalse(wrapper.hasConsultEncounter());
-        assertNull(wrapper.getMostRecentConsultEncounter());
+        assertFalse(wrapper.hasVisitNote());
+        assertNull(wrapper.getMostRecentVisitNote());
 
     }
+
+    @Test
+    public void shouldReturnMostRecentNonVoidedVisitNoteAtLocation() throws Exception {
+
+        EncounterType visitNoteEncounterType = new EncounterType();
+        Location location1 = new Location();
+        Location location2 = new Location();
+        Location otherLocation = new Location();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getVisitNoteEncounterType()).thenReturn(visitNoteEncounterType);
+
+        Encounter visitNote1 = new Encounter();
+        visitNote1.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        visitNote1.setEncounterType(visitNoteEncounterType);
+        visitNote1.setLocation(location1);
+
+        Encounter visitNote2 = new Encounter();
+        visitNote2.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+        visitNote2.setEncounterType(visitNoteEncounterType);
+        visitNote2.setLocation(location2);
+
+        // per the hbm.xml file, visit.encounters are sorted by encounterDatetime desc
+        Visit visit = new Visit();
+        visit.setStartDatetime(visitNote1.getEncounterDatetime());
+        visit.addEncounter(visitNote1);
+        visit.addEncounter(visitNote2);
+
+        VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
+
+        assertThat(wrapper.getMostRecentVisitNoteAtLocation(location1), is(visitNote1));
+        assertTrue(wrapper.hasVisitNoteAtLocation(location1));
+
+        assertThat(wrapper.getMostRecentVisitNoteAtLocation(location2), is(visitNote2));
+        assertTrue(wrapper.hasVisitNoteAtLocation(location2));
+
+        assertNull(wrapper.getMostRecentVisitNoteAtLocation(otherLocation));
+        assertFalse(wrapper.hasVisitNoteAtLocation(otherLocation));
+    }
+
+
 
     private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
 

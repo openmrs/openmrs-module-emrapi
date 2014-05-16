@@ -33,6 +33,9 @@ public class EmrApiConstants {
 
     public static final String GP_CHECK_IN_ENCOUNTER_TYPE = "emr.checkInEncounterType";
 
+    public static final String GP_VISIT_NOTE_ENCOUNTER_TYPE = "emr.visitNoteEncounterType";
+
+    @Deprecated      // replaced by GP_VISIT_NOTE_ENCOUNTER_TYPE, as "Visit Note" is the proper naming convention
     public static final String GP_CONSULT_ENCOUNTER_TYPE = "emr.consultEncounterType";
 
     public static final String GP_ADMISSION_ENCOUNTER_TYPE = "emr.admissionEncounterType";

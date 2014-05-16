@@ -1,12 +1,12 @@
 package org.openmrs.module.emrapi.disposition;
 
 
-import java.util.List;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.List;
+
 /**
- * Reflects a possible patient disposition such as "admit" or "discharge" that is generally collected on a consult note
+ * Reflects a possible patient disposition such as "admit" or "discharge" that is generally collected on a visit note
  * These dispositions are configurable via json; each disposition needs to be configured with the underlying concept
  * that represents that disposition. Dispositions can also have additional observations that are associated with
  * them (for instance, an "Admit" disposition may be configured to have an "Admit Location" obs associated with it).

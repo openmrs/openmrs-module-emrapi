@@ -28,9 +28,9 @@
     <encounter_type encounter_type_id="1002" name="Discharge" description="Discharge from Inpatient (allows autoclosing visits)" creator="1"
                     date_created="2012-10-23 18:04:14" retired="0" uuid="3bbdc54a-b8eb-11e2-9426-3edb8e345d35"/>
 
-    <global_property property="emr.consultEncounterType" property_value="06087e80-d565-11e3-9c1a-0800200c9a66"
+    <global_property property="emr.visitNoteEncounterType" property_value="06087e80-d565-11e3-9c1a-0800200c9a66"
                      uuid="111bbad0-d565-11e3-9c1a-0800200c9a665"/>
-    <encounter_type encounter_type_id="1003" name="Consult" description="Consult With Physican" creator="1"
+    <encounter_type encounter_type_id="1003" name="Visit Note" description="Consult With Physican" creator="1"
                     date_created="2012-10-23 18:04:14" retired="0" uuid="06087e80-d565-11e3-9c1a-0800200c9a66"/>
 
     <global_property property="emr.admissionEncounterType" property_value="06087111-222-11e3-9c1a-0800200c9a66"

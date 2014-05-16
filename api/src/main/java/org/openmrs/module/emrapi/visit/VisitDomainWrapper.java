@@ -137,20 +137,39 @@ public class VisitDomainWrapper {
     }
 
     /**
-     * Fetches the most recent (non-voided) consult encounter from this visit
+     * Fetches the most recent (non-voided) visit note encounter from this visit
      * @return
      */
-    public Encounter getMostRecentConsultEncounter() {
-        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getConsultEncounterType()));
+    public Encounter getMostRecentVisitNote() {
+        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getVisitNoteEncounterType()));
     }
 
     /**
-     * True/false whether there is a non-voided consult encounter associated with this visit
+     * Fetches the most recent (non-voided) visit note encounter from this visit at the  specified location
      * @return
      */
-    public boolean hasConsultEncounter() {
-        return getMostRecentConsultEncounter() != null;
+    public Encounter getMostRecentVisitNoteAtLocation(Location location) {
+        return (Encounter) find(getSortedEncounters(), new EncounterTypeAndLocationPredicate(emrApiProperties.getVisitNoteEncounterType(), location));
+
     }
+
+    /**
+     * True/false whether there is a non-voided visit encounter associated with this visit
+     * @return
+     */
+    public boolean hasVisitNote() {
+        return getMostRecentVisitNote() != null;
+    }
+
+    /**
+     * True/false whether there is a non-voided visit encounter associated with this visit at the specified location
+     * @return
+     *
+     */
+    public boolean hasVisitNoteAtLocation(Location location) {
+        return getMostRecentVisitNoteAtLocation(location) != null;
+    }
+
 
     // note that this returns the most recent encounter first
     public List<Encounter> getSortedEncounters() {
@@ -193,9 +212,9 @@ public class VisitDomainWrapper {
     /**
      * Finds the most recent encounter in the visit with a disposition of a specific type, and retrieves
      * all diagnoses stored on that encounter. Can be used to prepopulate an admission, transfer, or discharge note;
-     * example workflow: a doctor writes a consult note and on that note sets a disposition of admission; later on,
+     * example workflow: a doctor writes a visit note and on that note sets a disposition of admission; later on,
      * another doctor writes the actual admission note; that doctor may want a way to prepopulate this
-     * note with the dispositions from the consult note recommending admission; see the EncounterDisposition
+     * note with the dispositions from the visit note recommending admission; see the EncounterDisposition
      * HFE tag in CoreApps for an example of how this method is used
      */
     public List<Diagnosis> getDiagnosesFromMostRecentDispositionByType(DispositionType type) {
@@ -387,6 +406,7 @@ public class VisitDomainWrapper {
     }
 
     private class EncounterTypePredicate implements Predicate {
+
         private EncounterType type;
 
         public EncounterTypePredicate(EncounterType type) {
@@ -396,6 +416,24 @@ public class VisitDomainWrapper {
         @Override
         public boolean evaluate(Object o) {
             return type.equals(((Encounter) o).getEncounterType());
+        }
+    }
+
+    private class EncounterTypeAndLocationPredicate implements Predicate {
+
+        private EncounterType type;
+
+        private Location location;
+
+        public EncounterTypeAndLocationPredicate(EncounterType type, Location location) {
+            this.type = type;
+            this.location = location;
+        }
+
+        @Override
+        public boolean evaluate(Object o) {
+            return type.equals(((Encounter) o).getEncounterType())
+                    && location.equals(((Encounter) o).getLocation());
         }
     }
 }

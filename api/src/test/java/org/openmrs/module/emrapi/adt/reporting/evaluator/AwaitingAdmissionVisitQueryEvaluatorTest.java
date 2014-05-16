@@ -66,7 +66,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
         Patient patient = testDataManager.randomPatient().save();
 
-        // a visit with a single consult encounter with dispo = ADMIT
+        // a visit with a single visit note encounter with dispo = ADMIT
         Visit visit =
                 testDataManager.visit()
                     .patient(patient)
@@ -75,7 +75,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                     .encounter(testDataManager.encounter()
                             .patient(patient)
                             .encounterDatetime(new Date())
-                            .encounterType(emrApiProperties.getConsultEncounterType())
+                            .encounterType(emrApiProperties.getVisitNoteEncounterType())
                             .obs(testDataManager.obs()
                                     .concept(dispositionDescriptor.getDispositionConcept())
                                     .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -94,7 +94,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
         Patient patient = testDataManager.randomPatient().save();
 
-        // a visit with a single *voided* consult encounter with dispo = ADMIT
+        // a visit with a single *voided* visit note encounter with dispo = ADMIT
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -103,7 +103,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .voided(true)
                                 .dateVoided(new Date())
                                 .voidReason("test")
@@ -125,10 +125,10 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
         Patient patient = testDataManager.randomPatient().save();
 
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
-        Date consultDatetime = new DateTime(2014,2,2,10,0,0).toDate();
+        Date visitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
         Date admitDatetime = new DateTime(2014,2,2,11,0,0).toDate();
 
-        // a visit with a consult encounter with dispo = ADMIT and an admission encounter
+        // a visit with a visit note encounter with dispo = ADMIT and an admission encounter
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -136,8 +136,8 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .started(visitDatetime)
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
-                                .encounterDatetime(consultDatetime)
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterDatetime(visitNoteDatetime)
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                     .concept(dispositionDescriptor.getDispositionConcept())
                                     .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -161,10 +161,10 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
         Patient patient = testDataManager.randomPatient().save();
 
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
-        Date consultDatetime = new DateTime(2014,2,2,10,0,0).toDate();
+        Date visitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
         Date admitDatetime = new DateTime(2014,2,2,11,0,0).toDate();
 
-        // a visit with a consult encounter with dispo = ADMIT and a *voided* admission encounter
+        // a visit with a visit note encounter with dispo = ADMIT and a *voided* admission encounter
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -172,8 +172,8 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .started(visitDatetime)
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
-                                .encounterDatetime(consultDatetime)
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterDatetime(visitNoteDatetime)
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -197,15 +197,15 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
 
     @Test
-    public void shouldFindVisitEvenIfPatientHasMoreRecentConsultWithoutAdmissionDisposition() throws Exception {
+    public void shouldFindVisitEvenIfPatientHasMoreRecentVisitNoteWithoutAdmissionDisposition() throws Exception {
 
         Patient patient = testDataManager.randomPatient().save();
 
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
-        Date firstConsultDatetime = new DateTime(2014,2,2,10,0,0).toDate();
-        Date secondConsultDatetime = new DateTime(2014,2,2,11,0,0).toDate();
+        Date firstVisitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
+        Date secondVisitNoteDatetime = new DateTime(2014,2,2,11,0,0).toDate();
 
-        // a visit with a consult encounter with dispo = ADMIT and followed by a consult with dispo = DEATH
+        // a visit with a visit note encounter with dispo = ADMIT and followed by a visit note with dispo = DEATH
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -213,8 +213,8 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .started(visitDatetime)
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
-                                .encounterDatetime(firstConsultDatetime)
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterDatetime(firstVisitNoteDatetime)
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -222,8 +222,8 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                                 .get())
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
-                                .encounterDatetime(secondConsultDatetime)
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterDatetime(secondVisitNoteDatetime)
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                             .concept(dispositionDescriptor.getDispositionConcept())
                                             .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
@@ -242,9 +242,9 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
         Patient patient = testDataManager.randomPatient().save();
 
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
-        Date consultDatetime = new DateTime(2014,2,2,10,0,0).toDate();
+        Date visitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
 
-        // a visit with a consult with dispo = DEATH
+        // a visit with a visit note with dispo = DEATH
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -252,8 +252,8 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .started(visitDatetime)
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
-                                .encounterDatetime(consultDatetime)
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterDatetime(visitNoteDatetime)
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
@@ -274,7 +274,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
         Location queryLocation = testDataManager.location().name("Query Location")
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
-        // a visit with a single consult encounter with dispo = ADMIT
+        // a visit with a single visit note encounter with dispo = ADMIT
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -284,7 +284,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -305,7 +305,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
         Location queryLocation = visitLocation;
 
-        // a visit with a single consult encounter with dispo = ADMIT
+        // a visit with a single visit note encounter with dispo = ADMIT
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -315,7 +315,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -335,7 +335,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
         Patient patient = testDataManager.randomPatient().save();
 
-        // a visit with two consult encounters with dispo = ADMIT
+        // a visit with two visit note encounters with dispo = ADMIT
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -344,7 +344,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -353,7 +353,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -373,7 +373,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
         Patient patient = testDataManager.randomPatient().save();
 
-        // a visit with a single consult encounter with dispo = ADMIT
+        // a visit with a single visit note encounter with dispo = ADMIT
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -382,7 +382,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
@@ -403,7 +403,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
         Patient patient = testDataManager.randomPatient().save();
 
-        // a visit with a single consult encounter with dispo = ADMIT
+        // a visit with a single visit note encounter with dispo = ADMIT
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -412,7 +412,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .obs(testDataManager.obs()
                                         .concept(dispositionDescriptor.getDispositionConcept())
                                         .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))

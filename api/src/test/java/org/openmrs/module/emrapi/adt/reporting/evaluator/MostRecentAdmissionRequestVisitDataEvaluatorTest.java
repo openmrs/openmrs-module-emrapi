@@ -4,11 +4,6 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Concept;
-import org.openmrs.ConceptClass;
-import org.openmrs.ConceptDatatype;
-import org.openmrs.ConceptMapType;
-import org.openmrs.ConceptName;
-import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.Location;
 import org.openmrs.Patient;
@@ -24,7 +19,6 @@ import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
-import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.module.reporting.data.visit.EvaluatedVisitData;
 import org.openmrs.module.reporting.data.visit.service.VisitDataService;
 import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
@@ -33,9 +27,7 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.is;
@@ -98,7 +90,7 @@ public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseModule
         Location mostRecentAdmissionLocation = testDataManager.getLocationService().getLocation(3);
         Location otherAdmissionLocation = testDataManager.getLocationService().getLocation(1);
 
-        // a visit with two consult encounter with dispo = ADMIT and some diagnoses
+        // a visit with two visit note encounter with dispo = ADMIT and some diagnoses
         Visit visit =
                 testDataManager.visit()
                         .patient(patient)
@@ -107,7 +99,7 @@ public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseModule
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(mostRecentDate)
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .provider(encounterRole, mostRecentProvider)
                                 .location(mostRecentLocation)
                                 .obs(testDataManager.obs()
@@ -159,7 +151,7 @@ public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseModule
                         .encounter(testDataManager.encounter()
                                 .patient(patient)
                                 .encounterDatetime(otherDate)
-                                .encounterType(emrApiProperties.getConsultEncounterType())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
                                 .provider(encounterRole, otherProvider)
                                 .location(otherLocation)
                                 .obs(testDataManager.obs()
