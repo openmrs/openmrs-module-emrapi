@@ -120,8 +120,6 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_DIAGNOSIS_CONCEPT_SET = "Diagnosis Concept Set";
 
-    public static final String CONCEPT_CODE_CONSULT_FREE_TEXT_COMMENT = "Consult Free Text Comments";
-
     public static final String CONCEPT_CODE_CODED_DIAGNOSIS = "Coded Diagnosis";
 
     public static final String CONCEPT_CODE_NON_CODED_DIAGNOSIS = "Non-Coded Diagnosis";

@@ -194,10 +194,6 @@ public class EmrApiProperties extends ModuleProperties {
 		return getSingleConceptByMapping(getEmrApiConceptSource(), code);
 	}
 
-	public Concept getConsultFreeTextCommentsConcept() {
-		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_CONSULT_FREE_TEXT_COMMENT);
-	}
-
 	public Concept getUnknownCauseOfDeathConcept() {
 		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH);
 	}
