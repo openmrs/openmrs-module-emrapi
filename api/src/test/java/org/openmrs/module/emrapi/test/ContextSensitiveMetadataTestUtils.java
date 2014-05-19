@@ -145,4 +145,26 @@ public class ContextSensitiveMetadataTestUtils {
         return emrApiProperties.getDiagnosisMetadata();
     }
 
+    public static Concept setupAdmissionDecisionConcept(ConceptService conceptService, EmrApiProperties emrApiProperties)  {
+
+        ConceptSource emrSource = new EmrApiActivator().createConceptSource(conceptService);
+        ConceptMapType sameAs = conceptService.getConceptMapTypeByName("same-as");
+
+        ConceptDatatype naDatatype = conceptService.getConceptDatatypeByName("N/A");
+        ConceptDatatype codedDatatype = conceptService.getConceptDatatypeByName("Coded");
+
+        ConceptClass misc = conceptService.getConceptClassByName("Misc");
+
+        Concept deny = new ConceptBuilder(conceptService, naDatatype, misc)
+                .addName("Deny")
+                .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DENY_ADMISSION).saveAndGet();
+
+        new ConceptBuilder(conceptService, codedDatatype, misc)
+                .addName("Admission Decision")
+                .addAnswers(deny)
+                .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_ADMISSION_DECISION).saveAndGet();
+
+        return emrApiProperties.getAdmissionDecisionConcept();
+    }
+
 }

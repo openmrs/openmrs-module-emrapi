@@ -1,6 +1,5 @@
 package org.openmrs.module.emrapi.adt.reporting.evaluator;
 
-import org.hibernate.SessionFactory;
 import org.openmrs.Location;
 import org.openmrs.Visit;
 import org.openmrs.annotation.Handler;
@@ -53,7 +52,7 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
         HqlQueryBuilder query = new HqlQueryBuilder();
 
         // distinct *active* visits with a disposition of type ADMIT (on any encounter from that visit)
-        // and with no Admisstion Encounters
+        // that is NOT followed by a admission decision obs with a value of "DENY" and with no Admission Encounters
         query.select("distinct visit.visitId").from(Visit.class, "visit")
                 .innerJoin("visit.encounters", "dispoEncounter")
                 .innerJoin("dispoEncounter.obs", "dispo")
@@ -68,11 +67,21 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
                         + "where admission.visit = visit "
                         + "and admission.voided = false "
                         + "and admission.encounterType = :admissionEncounterType"
-                        +") = 0")
+                        + ") = 0")
+                .where("(select count(*) from Obs as admitDecision inner join admitDecision.encounter as encounterInVisit "   // count=0, ie no admission decision obs with value=deny
+                            + "where encounterInVisit.visit = visit "
+                            + "and encounterInVisit.voided = false "
+                            + "and admitDecision.voided = false "
+                            + "and admitDecision.concept = :admissionDecisionConcept "
+                            + "and admitDecision.valueCoded = :denyAdmissionConcept "
+                            + "and admitDecision.obsDatetime > dispoEncounter.encounterDatetime "
+                            + ") = 0")
                 // restrict by context
                 .whereVisitIn("visit", evaluationContext)
                 // add parameters
-                .withValue("admissionEncounterType", emrApiProperties.getAdmissionEncounterType());
+                .withValue("admissionEncounterType", emrApiProperties.getAdmissionEncounterType())
+                .withValue("admissionDecisionConcept", emrApiProperties.getAdmissionDecisionConcept())
+                .withValue("denyAdmissionConcept", emrApiProperties.getDenyAdmissionConcept());
 
         VisitQueryResult result = new VisitQueryResult(visitQuery, evaluationContext);
 

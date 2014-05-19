@@ -198,6 +198,14 @@ public class EmrApiProperties extends ModuleProperties {
 		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH);
 	}
 
+    public Concept getAdmissionDecisionConcept()  {
+        return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_ADMISSION_DECISION);
+    }
+
+    public Concept getDenyAdmissionConcept()  {
+        return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_DENY_ADMISSION);
+    }
+
 	public LocationAttributeType getLocationAttributeTypeNameToPrintOnIdCard() {
 		LocationAttributeType type = null;
 		type = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
