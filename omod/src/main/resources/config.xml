@@ -88,6 +88,14 @@
     </globalProperty>
 
     <globalProperty>
+        <property>emr.visitNoteEncounterType</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of the encounter type for a visit note
+        </description>
+    </globalProperty>
+
+    <globalProperty>
         <property>emr.primaryIdentifierType</property>
         <defaultValue></defaultValue>
         <description>
