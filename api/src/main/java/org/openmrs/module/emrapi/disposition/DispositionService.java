@@ -1,9 +1,10 @@
 package org.openmrs.module.emrapi.disposition;
 
+import org.openmrs.Obs;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+
 import java.io.IOException;
 import java.util.List;
-
-import org.openmrs.Obs;
 
 public interface DispositionService {
 
@@ -30,6 +31,16 @@ public interface DispositionService {
      * @throws IOException
      */
     List<Disposition> getDispositions();
+
+    /**
+     * Gets only dispositions that are valid in the specified visit context
+     *
+     * Currently, logic works as follows:
+     * 1) if visit.isActive() = false, then return all dispositions, else
+     * 2) if visit.isAdmitted() = true, then return TRANSFER, DISCHARGE, and OTHER_INPATIENT dispositions (and any dispositions without a type)
+     * 3) if visit.isAdmitted() = false, then return ADMIT and OTHER_OUTPATIENT (and any dispositions without a type)
+     */
+    List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper);
 
     /**
      * Fetches a disposition referenced by it's unique id
@@ -66,5 +77,6 @@ public interface DispositionService {
      * @throws IOException
      */
     Disposition getDispositionFromObsGroup(Obs obsGroup);
+
 
 }

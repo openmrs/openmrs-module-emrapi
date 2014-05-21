@@ -18,12 +18,38 @@
         "additionalObs": []
     },
     {
-        "uuid": "1",
+        "uuid": "799820d0-e02d-11e3-8b68-0800200c9a66",
         "name": "disposition.transfer",
         "conceptCode": "SNOMED CT:3780002",
         "type": "TRANSFER",
+        "actions": [],
+        "additionalObs": []
+    },
+    {
+        "uuid": "844436e0-e02d-11e3-8b68-0800200c9a66",
+        "name": "disposition.admit",
+        "conceptCode": "123",
+        "type": "ADMIT",
         "keepsVisitOpen": true,
         "actions": [],
         "additionalObs": []
+    },
+    {
+        "uuid": "fabe3540-e0ec-11e3-8b68-0800200c9a66",
+        "name": "disposition.other_outpatient",
+        "conceptCode": "456",
+        "type": "OTHER_OUTPATIENT",
+        "actions": [],
+        "additionalObs": []
+    },
+    {
+        "uuid": "01857000-e0ed-11e3-8b68-0800200c9a66",
+        "name": "disposition.other_inpatient",
+        "conceptCode": "789",
+        "type": "OTHER_INPATIENT",
+        "actions": [],
+        "additionalObs": []
     }
+
+
 ]

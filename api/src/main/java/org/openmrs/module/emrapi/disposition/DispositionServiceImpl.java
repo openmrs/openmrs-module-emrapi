@@ -1,18 +1,19 @@
 package org.openmrs.module.emrapi.disposition;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DispositionServiceImpl extends BaseOpenmrsService implements DispositionService  {
 
@@ -67,6 +68,33 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
         }
         return dispositions;
     }
+
+    @Override
+    public List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper) {
+
+        // just return all dispositions if the visit isn't active
+        if (!visitDomainWrapper.isActive()) {
+            return getDispositions();
+        }
+        else {
+            List<Disposition> dispositions = new ArrayList<Disposition>();
+
+            boolean isAdmitted = visitDomainWrapper.isAdmitted();
+
+            for (Disposition candidate : getDispositions()) {
+                DispositionType type = candidate.getType();
+
+                if (type == null
+                        || (isAdmitted && (type.equals(DispositionType.TRANSFER) || type.equals(DispositionType.DISCHARGE) || type.equals(DispositionType.OTHER_INPATIENT)))
+                        || (!isAdmitted && (type.equals(DispositionType.ADMIT) || type.equals(DispositionType.OTHER_OUTPATIENT))) )  {
+                    dispositions.add(candidate);
+                }
+            }
+            return dispositions;
+        }
+    }
+
+
 
     @Override
     @Transactional(readOnly = true)

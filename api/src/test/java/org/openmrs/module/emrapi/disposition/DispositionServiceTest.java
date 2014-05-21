@@ -1,6 +1,23 @@
 package org.openmrs.module.emrapi.disposition;
 
 
+import org.junit.Before;
+import org.junit.Test;
+import org.openmrs.Concept;
+import org.openmrs.Obs;
+import org.openmrs.api.ConceptService;
+import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.concept.EmrConceptService;
+import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -10,22 +27,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.openmrs.Concept;
-import org.openmrs.Obs;
-import org.openmrs.api.ConceptService;
-import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.concept.EmrConceptService;
-import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 
 public class DispositionServiceTest {
 
@@ -72,7 +73,7 @@ public class DispositionServiceTest {
         dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
         List<Disposition> dispositions = dispositionService.getDispositions();
 
-        assertEquals(dispositions.size(), 3);
+        assertEquals(dispositions.size(), 6);
 
         Map<String,Disposition> dispositionMap = new HashMap<String, Disposition>();
         for (Disposition disposition : dispositions) {
@@ -96,12 +97,19 @@ public class DispositionServiceTest {
         assertNull(home.getKeepsVisitOpen());
         assertThat(home.getType(), is(DispositionType.DISCHARGE));
 
-        Disposition transfer= dispositionMap.get("1");
+        Disposition transfer = dispositionMap.get("799820d0-e02d-11e3-8b68-0800200c9a66");
         assertNotNull(transfer);
         assertThat(transfer.getName(), is("disposition.transfer"));
         assertThat(transfer.getConceptCode(), is("SNOMED CT:3780002"));
-        assertTrue(transfer.getKeepsVisitOpen());
+        assertNull(transfer.getKeepsVisitOpen());
         assertThat(transfer.getType(), is(DispositionType.TRANSFER));
+
+        Disposition admit = dispositionMap.get("844436e0-e02d-11e3-8b68-0800200c9a66");
+        assertNotNull(admit);
+        assertThat(admit.getName(), is("disposition.admit"));
+        assertThat(admit.getConceptCode(), is("123"));
+        assertTrue(admit.getKeepsVisitOpen());
+        assertThat(admit.getType(), is(DispositionType.ADMIT));
     }
 
     @Test
@@ -111,11 +119,67 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getDispositionsByType(DispositionType.TRANSFER);
         assertThat(dispositions.size(), is(1));
-        assertThat(dispositions.get(0).getUuid(), is("1"));
+        assertThat(dispositions.get(0).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
 
         dispositions = dispositionService.getDispositionsByType(DispositionType.DISCHARGE);
         assertThat(dispositions.size(), is(1));
         assertThat(dispositions.get(0).getUuid(), is("66de7f60-b73a-11e2-9e96-0800200c9a66"));
+    }
+
+    @Test
+    public void shouldGetInpatientDispositions() throws Exception {
+
+        dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
+
+        VisitDomainWrapper visitDomainWrapper = mock(VisitDomainWrapper.class);
+        when(visitDomainWrapper.isActive()).thenReturn(true);
+        when(visitDomainWrapper.isAdmitted()).thenReturn(true);
+
+        List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper);
+
+        assertThat(dispositions.size(), is(4));
+        assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
+        assertThat(dispositions.get(1).getUuid(), is("66de7f60-b73a-11e2-9e96-0800200c9a66"));
+        assertThat(dispositions.get(2).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(3).getUuid(), is("01857000-e0ed-11e3-8b68-0800200c9a66"));
+    }
+
+    @Test
+    public void shouldGetOutpatientDispositions() throws Exception {
+
+        dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
+
+        VisitDomainWrapper visitDomainWrapper = mock(VisitDomainWrapper.class);
+        when(visitDomainWrapper.isActive()).thenReturn(true);
+        when(visitDomainWrapper.isAdmitted()).thenReturn(false);
+
+        List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper);
+
+        assertThat(dispositions.size(), is(3));
+        assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
+        assertThat(dispositions.get(1).getUuid(), is("844436e0-e02d-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(2).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
+
+    }
+
+    @Test
+    public void shouldGetAllDispositions() throws Exception {
+
+        dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
+
+        VisitDomainWrapper visitDomainWrapper = mock(VisitDomainWrapper.class);
+        when(visitDomainWrapper.isActive()).thenReturn(false);
+        when(visitDomainWrapper.isAdmitted()).thenReturn(false);
+
+        List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper);
+
+        assertThat(dispositions.size(), is(6));
+        assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
+        assertThat(dispositions.get(1).getUuid(), is("66de7f60-b73a-11e2-9e96-0800200c9a66"));
+        assertThat(dispositions.get(2).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(3).getUuid(), is("844436e0-e02d-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(4).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(5).getUuid(), is("01857000-e0ed-11e3-8b68-0800200c9a66"));
 
     }
 
