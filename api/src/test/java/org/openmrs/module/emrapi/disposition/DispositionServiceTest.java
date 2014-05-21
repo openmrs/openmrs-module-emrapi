@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
+import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
@@ -73,7 +74,7 @@ public class DispositionServiceTest {
         dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
         List<Disposition> dispositions = dispositionService.getDispositions();
 
-        assertEquals(dispositions.size(), 6);
+        assertEquals(5, dispositions.size());
 
         Map<String,Disposition> dispositionMap = new HashMap<String, Disposition>();
         for (Disposition disposition : dispositions) {
@@ -86,6 +87,7 @@ public class DispositionServiceTest {
         assertThat(death.getConceptCode(), is("SNOMED CT:397709008"));
         assertNull(death.getKeepsVisitOpen());
         assertNull(death.getType());
+        assertNull(death.getCareSettingTypes());
         assertThat(death.getActions().size(), is(2));
         assertTrue(death.getActions().contains("closeCurrentVisitAction"));
         assertTrue(death.getActions().contains("markPatientDeadAction"));
@@ -96,6 +98,8 @@ public class DispositionServiceTest {
         assertThat(home.getConceptCode(), is("SNOMED CT:3780001"));
         assertNull(home.getKeepsVisitOpen());
         assertThat(home.getType(), is(DispositionType.DISCHARGE));
+        assertThat(home.getCareSettingTypes().size(), is(1));
+        assertTrue(home.getCareSettingTypes().contains(CareSettingType.INPATIENT));
 
         Disposition transfer = dispositionMap.get("799820d0-e02d-11e3-8b68-0800200c9a66");
         assertNotNull(transfer);
@@ -103,6 +107,8 @@ public class DispositionServiceTest {
         assertThat(transfer.getConceptCode(), is("SNOMED CT:3780002"));
         assertNull(transfer.getKeepsVisitOpen());
         assertThat(transfer.getType(), is(DispositionType.TRANSFER));
+        assertThat(transfer.getCareSettingTypes().size(), is(1));
+        assertTrue(transfer.getCareSettingTypes().contains(CareSettingType.INPATIENT));
 
         Disposition admit = dispositionMap.get("844436e0-e02d-11e3-8b68-0800200c9a66");
         assertNotNull(admit);
@@ -110,6 +116,8 @@ public class DispositionServiceTest {
         assertThat(admit.getConceptCode(), is("123"));
         assertTrue(admit.getKeepsVisitOpen());
         assertThat(admit.getType(), is(DispositionType.ADMIT));
+        assertThat(admit.getCareSettingTypes().size(), is(1));
+        assertTrue(admit.getCareSettingTypes().contains(CareSettingType.OUTPATIENT));
     }
 
     @Test
@@ -118,8 +126,9 @@ public class DispositionServiceTest {
         dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
 
         List<Disposition> dispositions = dispositionService.getDispositionsByType(DispositionType.TRANSFER);
-        assertThat(dispositions.size(), is(1));
+        assertThat(dispositions.size(), is(2));
         assertThat(dispositions.get(0).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(1).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
 
         dispositions = dispositionService.getDispositionsByType(DispositionType.DISCHARGE);
         assertThat(dispositions.size(), is(1));
@@ -137,11 +146,10 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper);
 
-        assertThat(dispositions.size(), is(4));
+        assertThat(dispositions.size(), is(3));
         assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(1).getUuid(), is("66de7f60-b73a-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(2).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
-        assertThat(dispositions.get(3).getUuid(), is("01857000-e0ed-11e3-8b68-0800200c9a66"));
     }
 
     @Test
@@ -173,13 +181,12 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper);
 
-        assertThat(dispositions.size(), is(6));
+        assertThat(dispositions.size(), is(5));
         assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(1).getUuid(), is("66de7f60-b73a-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(2).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(3).getUuid(), is("844436e0-e02d-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(4).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
-        assertThat(dispositions.get(5).getUuid(), is("01857000-e0ed-11e3-8b68-0800200c9a66"));
 
     }
 

@@ -5,6 +5,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.core.io.Resource;
@@ -82,11 +83,11 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
             boolean isAdmitted = visitDomainWrapper.isAdmitted();
 
             for (Disposition candidate : getDispositions()) {
-                DispositionType type = candidate.getType();
+                List<CareSettingType> careSettingTypes = candidate.getCareSettingTypes();
 
-                if (type == null
-                        || (isAdmitted && (type.equals(DispositionType.TRANSFER) || type.equals(DispositionType.DISCHARGE) || type.equals(DispositionType.OTHER_INPATIENT)))
-                        || (!isAdmitted && (type.equals(DispositionType.ADMIT) || type.equals(DispositionType.OTHER_OUTPATIENT))) )  {
+                if (careSettingTypes == null
+                        || (isAdmitted && careSettingTypes.contains(CareSettingType.INPATIENT))
+                        || (!isAdmitted && careSettingTypes.contains(CareSettingType.OUTPATIENT)) )  {
                     dispositions.add(candidate);
                 }
             }

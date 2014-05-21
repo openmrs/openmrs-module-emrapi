@@ -37,8 +37,8 @@ public interface DispositionService {
      *
      * Currently, logic works as follows:
      * 1) if visit.isActive() = false, then return all dispositions, else
-     * 2) if visit.isAdmitted() = true, then return TRANSFER, DISCHARGE, and OTHER_INPATIENT dispositions (and any dispositions without a type)
-     * 3) if visit.isAdmitted() = false, then return ADMIT and OTHER_OUTPATIENT (and any dispositions without a type)
+     * 2) if visit.isAdmitted() = true, then return only those whore careSettingTypes contains INPATIENT (or any where careSettingType = null)
+     * 3) if visit.isAdmitted() = false, then return only those whore careSettingTypes contains OUTPATIENT (or any where careSettingType = null)
      */
     List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper);
 
