@@ -8,6 +8,7 @@ import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.PatientService;
 import org.openmrs.contrib.testdata.TestDataManager;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -673,6 +674,38 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
+
+    }
+
+
+    @Test
+    public void shouldNotFindVisitAwaitingAdmissionIfPatientIsDead() throws Exception {
+
+        Patient patient = testDataManager.randomPatient()
+                .dead(true)
+                .deathDate(new Date())
+                .causeOfDeath(conceptService.getConcept(3))   // a random concept, this doesn't matter
+                .save();
+
+        // a visit with a single visit note encounter with dispo = ADMIT
+        Visit visit =
+                testDataManager.visit()
+                        .patient(patient)
+                        .visitType(emrApiProperties.getAtFacilityVisitType())
+                        .started(new Date())
+                        .encounter(testDataManager.encounter()
+                                .patient(patient)
+                                .encounterDatetime(new Date())
+                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                                .obs(testDataManager.obs()
+                                        .concept(dispositionDescriptor.getDispositionConcept())
+                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
+                                        .get())
+                                .get())
+                        .save();
+
+        VisitQueryResult result = visitQueryService.evaluate(query, null);
+        assertThat(result.getMemberIds().size(), is(0));
 
     }
 

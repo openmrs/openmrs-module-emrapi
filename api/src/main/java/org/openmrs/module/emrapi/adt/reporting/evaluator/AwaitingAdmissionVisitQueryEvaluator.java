@@ -62,6 +62,7 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
                 .whereEqual("dispoEncounter.voided", false)
                 .whereEqual("visit.voided", false)
                 .whereEqual("visit.location", visitLocation)
+                .whereEqual("visit.patient.dead", false) // exclude dead patients
                 .whereNull("visit.stopDatetime")   // stopDatetime = null means "active visit"
                 .where("(select count(*) from Encounter as admission "    // count=0, ie no admission encounters
                         + "where admission.visit = visit "
