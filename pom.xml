@@ -45,7 +45,7 @@
         <eventVersion>2.1</eventVersion>
         <webservicesRestModuleVersion>2.4</webservicesRestModuleVersion>
         <appframeworkModuleVersion>2.1</appframeworkModuleVersion>
-        <openmrsTestutilsVersion>1.3-SNAPSHOT</openmrsTestutilsVersion>
+        <openmrsTestutilsVersion>1.3</openmrsTestutilsVersion>
     </properties>
 
     <dependencies>
