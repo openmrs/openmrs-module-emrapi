@@ -35,6 +35,7 @@ public class DispositionMapper {
     }
 
     public EncounterTransaction.Disposition getDisposition(Obs obs) {
+        if(obs.isVoided()) return null;
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
         Set<Obs> groupMembers = obs.getGroupMembers();
         List<EncounterTransaction.Observation> additionalObservations = new ArrayList<EncounterTransaction.Observation>();

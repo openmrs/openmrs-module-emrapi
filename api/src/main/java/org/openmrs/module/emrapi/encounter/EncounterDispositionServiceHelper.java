@@ -72,6 +72,8 @@ public class EncounterDispositionServiceHelper {
         Date dispositionDateTime = disposition.getDispositionDateTime() != null ? disposition.getDispositionDateTime() : existingDispositionGroup.getObsDatetime();
         Obs existingDisposition = getMatchingObservation(existingDispositionGroup.getGroupMembers(), dispositionConcept.getUuid());
         existingDispositionGroup.setObsDatetime(dispositionDateTime);
+        existingDispositionGroup.setVoided(disposition.isVoided());
+        existingDispositionGroup.setVoidReason(disposition.getVoidReason());
         constructDispositionObs(encounter, existingDisposition, disposition.getCode(), dispositionDateTime);
         if(disposition.getAdditionalObs() != null){
             for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
