@@ -263,6 +263,18 @@ public class AccountDomainWrapper {
             return !user.isRetired();
         }
     }
+    
+    public void setProviderEnabled(Boolean providerEnabled) {
+    	if(providerEnabled)
+    		initializeProviderIfNecessary();
+    }
+    
+    public Boolean getProviderEnabled() {
+    	if(provider == null)
+    		return false;
+    	else
+    		return true;
+    }
 
 
     public boolean isLocked() {
