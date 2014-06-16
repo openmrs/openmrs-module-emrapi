@@ -74,6 +74,7 @@ public class EncounterDispositionServiceHelper {
         existingDispositionGroup.setObsDatetime(dispositionDateTime);
         existingDispositionGroup.setVoided(disposition.isVoided());
         existingDispositionGroup.setVoidReason(disposition.getVoidReason());
+
         constructDispositionObs(encounter, existingDisposition, disposition.getCode(), dispositionDateTime);
         if(disposition.getAdditionalObs() != null){
             for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
@@ -84,6 +85,11 @@ public class EncounterDispositionServiceHelper {
                 }
                 updateObsFromObservation(observation, matchingObservation, dispositionDateTime);
             }
+        }
+        for (Obs groupMemberObs : existingDispositionGroup.getGroupMembers()) {
+            groupMemberObs.setObsDatetime(dispositionDateTime);
+            groupMemberObs.setVoided(disposition.isVoided());
+            groupMemberObs.setVoidReason(disposition.getVoidReason());
         }
     }
 

@@ -91,9 +91,10 @@ public class EncounterDispositionServiceHelperTest {
     }
 
     @Test
-    public void shouldVoidObsGroupWhenDispositionIsVoided() {
+    public void shouldVoidObsWhenDispositionIsVoided() {
         Encounter encounter = new Encounter();
         Obs dispositionGroupObservation = buildDispositionGroupObservation();
+        Set<Obs> groupMembersObservation = dispositionGroupObservation.getGroupMembers();
         encounter.addObs(dispositionGroupObservation);
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
         disposition.setCode("ADMIT");
@@ -105,6 +106,11 @@ public class EncounterDispositionServiceHelperTest {
         Obs updatedDispositionGroupObservation = getObsByUuid(dispositionGroupObservation.getUuid(), encounter.getAllObs(true));
         assertEquals(true, updatedDispositionGroupObservation.getVoided());
         assertEquals(disposition.getVoidReason(), updatedDispositionGroupObservation.getVoidReason());
+
+        for (Obs obs : groupMembersObservation) {
+            assertEquals(true, obs.getVoided());
+            assertEquals(disposition.getVoidReason(), obs.getVoidReason());
+        }
     }
 
     private Obs buildDispositionGroupObservation() {
