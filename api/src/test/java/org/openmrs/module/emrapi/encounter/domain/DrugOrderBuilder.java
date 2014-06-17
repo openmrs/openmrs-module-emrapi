@@ -13,7 +13,7 @@ public class DrugOrderBuilder {
     }
 
     public DrugOrderBuilder withBasicValues(String uuid, String conceptUuId, Date startDate, Date endDate,
-                                            Integer numberPerDosage,
+                                            Double numberPerDosage,
                                             String dosageInstructionUuid,
                                             String dosageFrequencyUuId){
         this.drugOrder.setUuid(uuid);

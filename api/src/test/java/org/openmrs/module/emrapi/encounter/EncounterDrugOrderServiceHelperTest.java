@@ -50,7 +50,7 @@ public class EncounterDrugOrderServiceHelperTest {
     public void shouldAddNewDrugOrder() {
 
         EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder()
-                .withBasicValues("drug-uuid", "test-concept-uuid", today, today, 3, "dosage-instruction-uuid", "dosage-frequency-uuid")
+                .withBasicValues("drug-uuid", "test-concept-uuid", today, today, 3.0, "dosage-instruction-uuid", "dosage-frequency-uuid")
                 .withNotes("this is notes")
                 .build();
         Concept drugConcept = new Concept(3);
@@ -102,7 +102,7 @@ public class EncounterDrugOrderServiceHelperTest {
     public void shouldAddNewDrugOrderWhenPrnIsTrueWIthNoDosageFrequencyOrDosageInstruction() {
 
         EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder()
-                .withBasicValues("drug-uuid", "test-concept-uuid", today, today, 3, "", "")
+                .withBasicValues("drug-uuid", "test-concept-uuid", today, today, 3.0, "", "")
                 .withPrn(true)
                 .build();
         Concept drugConcept = new Concept(3);
