@@ -649,7 +649,7 @@ public class EncounterTransaction {
         private String notes;
         private Date startDate;
         private Date  endDate;
-        private Integer numberPerDosage;
+        private Double numberPerDosage;
         private Concept dosageInstruction;
         private Concept dosageFrequency;
         private boolean prn;
@@ -703,7 +703,7 @@ public class EncounterTransaction {
             return endDate;
         }
 
-        public Integer getNumberPerDosage() {
+        public Double getNumberPerDosage() {
             return numberPerDosage;
         }
 
@@ -742,7 +742,7 @@ public class EncounterTransaction {
             this.endDate = endDate;
         }
 
-        public void setNumberPerDosage(Integer numberPerDosage) {
+        public void setNumberPerDosage(Double numberPerDosage) {
             this.numberPerDosage = numberPerDosage;
         }
 

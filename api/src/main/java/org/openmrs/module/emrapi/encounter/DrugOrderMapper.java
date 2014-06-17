@@ -14,7 +14,6 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Concept;
-import org.openmrs.ConceptName;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
 import org.openmrs.api.ConceptService;
@@ -37,7 +36,7 @@ public class DrugOrderMapper {
         emrDrugOrder.setEndDate(drugOrder.getAutoExpireDate());
         emrDrugOrder.setNotes(drugOrder.getInstructions());
         emrDrugOrder.setPrn(drugOrder.getPrn());
-        emrDrugOrder.setNumberPerDosage(drugOrder.getDose() == null ? 0 : drugOrder.getDose().intValue());
+        emrDrugOrder.setNumberPerDosage(drugOrder.getDose() == null ? 0 : drugOrder.getDose());
         emrDrugOrder.setStartDate(drugOrder.getStartDate());
         emrDrugOrder.setDateCreated(drugOrder.getDateCreated());
         emrDrugOrder.setDateChanged(drugOrder.getDateChanged());
