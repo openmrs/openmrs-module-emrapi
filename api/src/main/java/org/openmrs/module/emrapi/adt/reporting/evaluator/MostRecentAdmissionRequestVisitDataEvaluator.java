@@ -65,7 +65,7 @@ public class MostRecentAdmissionRequestVisitDataEvaluator implements VisitDataEv
                 .whereVisitIn("encounter.visit.id", evaluationContext);
 
 
-        List<Object[]> result = evaluationService.evaluateToList(query);
+        List<Object[]> result = evaluationService.evaluateToList(query, evaluationContext);
 
         for (Object[] row : result) {
 

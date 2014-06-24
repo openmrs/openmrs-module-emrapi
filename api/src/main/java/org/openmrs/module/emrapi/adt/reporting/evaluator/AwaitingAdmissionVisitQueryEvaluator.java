@@ -86,7 +86,7 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
 
         VisitQueryResult result = new VisitQueryResult(visitQuery, evaluationContext);
 
-        List<Integer> results= evaluationService.evaluateToList(query, Integer.class);
+        List<Integer> results= evaluationService.evaluateToList(query, Integer.class, evaluationContext);
         result.add(results.toArray(new Integer[results.size()]));
         return result;
 

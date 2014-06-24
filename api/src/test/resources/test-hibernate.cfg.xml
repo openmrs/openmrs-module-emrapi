@@ -12,6 +12,5 @@
         <mapping resource="ImportedPackage.hbm.xml" />
         <mapping resource="ImportedItem.hbm.xml" />
         <mapping resource="ReportDesign.hbm.xml" />
-        <mapping resource="IdsetMember.hbm.xml" />
     </session-factory>
 </hibernate-configuration>
