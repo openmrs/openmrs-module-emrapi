@@ -4,7 +4,6 @@ import org.openmrs.Person;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.person.image.EmrPersonImageService;
 import org.openmrs.module.emrapi.person.image.PersonImage;
-import org.openmrs.module.emrapi.rest.EmrModuleContext;
 import org.openmrs.module.emrapi.rest.exception.PersonNotFoundException;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -25,7 +24,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/personimage", supportedClass = PersonImage.class, supportedOpenmrsVersions = "1.9.*")
+@Resource(name = RestConstants.VERSION_1 + "/personimage", supportedClass = PersonImage.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*"})
 public class PersonImageResource extends DelegatingCrudResource<PersonImage> {
 
     @Override
