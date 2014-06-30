@@ -37,7 +37,7 @@
     <properties>
         <openmrsCoreVersion>1.9.4</openmrsCoreVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <reportingModuleVersion>0.9.1-SNAPSHOT</reportingModuleVersion>
+        <reportingModuleVersion>0.9.1</reportingModuleVersion>
         <serializationXstreamModuleVersion>0.2.7</serializationXstreamModuleVersion>
         <calculationModuleVersion>1.0</calculationModuleVersion>
         <providermanagementModuleVersion>1.1.3</providermanagementModuleVersion>
