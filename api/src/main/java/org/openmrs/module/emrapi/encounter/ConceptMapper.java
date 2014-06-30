@@ -28,9 +28,11 @@ public class ConceptMapper {
         ConceptClass conceptClass = concept.getConceptClass();
         String conceptClassName = (conceptClass != null) ? conceptClass.getName() : null;
 
+        String shortName = concept.getShortNames() != null && concept.getShortNames().size() > 0 ? concept.getShortNames().iterator().next().getName() : null;
+
         EncounterTransaction.Concept encounterTransactionConcept = new EncounterTransaction.Concept(concept.getUuid(),
                 concept.getName().getName(), concept.isSet(), concept.getDatatype().getName(), null,
-                conceptClassName);
+                conceptClassName, shortName);
         if(concept.isNumeric() && ((ConceptNumeric) concept).getUnits() != null) {
             encounterTransactionConcept.setUnits(((ConceptNumeric) concept).getUnits());
         }

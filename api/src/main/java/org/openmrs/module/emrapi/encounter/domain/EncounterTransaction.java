@@ -181,40 +181,34 @@ public class EncounterTransaction {
         private String name;
         private String dataType;
         private boolean isSet;
+        private String shortName;
         @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
         private String units;
         private String conceptClass;
 
-        public Concept(String uuid, String name, boolean isSet, String dataType, String units, String conceptClass) {
+        public Concept(String uuid, String name, boolean isSet, String dataType, String units, String conceptClass, String shortName) {
             this.uuid = uuid;
             this.name = name;
             this.dataType = dataType;
             this.isSet = isSet;
             this.units = units;
             this.conceptClass = conceptClass;
-        }
-
-        public Concept(String uuid, String name, boolean isSet, String dataType, String units) {
-            this(uuid, name, isSet, dataType, units, null);
-        }
-
-        public Concept(String uuid, String name, boolean isSet, String dataType) {
-            this(uuid, name, isSet, dataType, null);
-        }
-
-        public Concept(String uuid, String name, boolean isSet) {
-            this(uuid, name, isSet, null);
-        }
-
-        public Concept(String uuid, String name) {
-            this(uuid, name, false);
-        }
-
-        public Concept(String uuid) {
-            this(uuid, null);
+            this.shortName = shortName;
         }
 
         public Concept() {
+        }
+
+        public Concept(String uuid, String name, boolean isSet) {
+            this(uuid, name, isSet, null, null, null, null);
+        }
+
+        public Concept(String uuid, String name) {
+            this (uuid, name, false);
+        }
+
+        public Concept(String uuid) {
+            this (uuid, null, false);
         }
 
         public String getUuid() {
@@ -259,6 +253,14 @@ public class EncounterTransaction {
 
         public String getConceptClass() {
             return conceptClass;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public void setShortName(String shortName) {
+            this.shortName = shortName;
         }
 
         public void setConceptClass(String conceptClass) {
