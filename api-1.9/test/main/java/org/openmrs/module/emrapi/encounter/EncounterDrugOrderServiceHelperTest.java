@@ -3,11 +3,7 @@ package org.openmrs.module.emrapi.encounter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.openmrs.Concept;
-import org.openmrs.Drug;
-import org.openmrs.Encounter;
-import org.openmrs.OrderType;
-import org.openmrs.Patient;
+import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.DrugOrderBuilder;
@@ -17,15 +13,14 @@ import org.openmrs.module.emrapi.encounter.exception.InvalidDrugException;
 import java.util.Date;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterDrugOrderServiceHelperTest {
-
-    EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper;
+    EncounterDrugOrderServiceHelper_1_9 encounterDrugOrderServiceHelper;
     @Mock
     private OrderService orderService;
     @Mock
@@ -37,7 +32,7 @@ public class EncounterDrugOrderServiceHelperTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        encounterDrugOrderServiceHelper = new EncounterDrugOrderServiceHelper(conceptService, orderService);
+        encounterDrugOrderServiceHelper = new EncounterDrugOrderServiceHelper_1_9(conceptService, orderService);
 
         patient = new Patient();
         encounter = new Encounter();
@@ -130,7 +125,5 @@ public class EncounterDrugOrderServiceHelperTest {
         assertEquals(true, order.getPrn());
         assertEquals(null, order.getFrequency());
         assertEquals(null, order.getUnits());
-
     }
-
 }

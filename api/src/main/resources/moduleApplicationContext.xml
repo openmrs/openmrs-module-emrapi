@@ -290,11 +290,6 @@
         <constructor-arg ref="orderService"/>
     </bean>
 
-    <bean id="encounterDrugOrderServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDrugOrderServiceHelper">
-        <constructor-arg ref="conceptService"/>
-        <constructor-arg ref="orderService"/>
-    </bean>
-
     <bean id="encounterDispositionServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDispositionServiceHelper">
         <constructor-arg ref="conceptService"/>
     </bean>
@@ -358,10 +353,6 @@
     </bean>
 
     <bean id="testOrderMapper" class="org.openmrs.module.emrapi.encounter.TestOrderMapper">
-    </bean>
-
-    <bean id="drugOrderMapper" class="org.openmrs.module.emrapi.encounter.DrugOrderMapper">
-        <constructor-arg name="conceptService" ref="conceptService"/>
     </bean>
 
     <bean parent="serviceContext">
