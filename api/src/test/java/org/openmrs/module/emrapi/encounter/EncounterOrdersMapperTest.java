@@ -61,16 +61,4 @@ public class EncounterOrdersMapperTest extends BaseModuleContextSensitiveTest {
         verify(drugOrderMapper).map(drugOrder1);
         verify(drugOrderMapper).map(drugOrder2);
     }
-
-    public B someFunction() {
-        return (B) new A();
-    }
-
-    public class A {
-
-    }
-
-    public class B extends A {
-
-    }
 }

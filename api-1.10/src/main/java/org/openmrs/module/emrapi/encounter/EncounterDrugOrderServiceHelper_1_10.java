@@ -14,7 +14,13 @@
 
 package org.openmrs.module.emrapi.encounter;
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.Drug;
+import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
+import org.openmrs.Order;
+import org.openmrs.OrderFrequency;
+import org.openmrs.OrderType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -25,6 +31,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: This needs to be reworked to really use features of the new OrderEntry API
 @Component (value = "encounterDrugOrderServiceHelper")
 public class EncounterDrugOrderServiceHelper_1_10 implements EncounterDrugOrderServiceHelper{
 

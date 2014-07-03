@@ -24,7 +24,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class DrugOrderMapperImplTest {
+public class DrugOrderMapper_1_9Test {
     @Mock
     private ConceptService conceptService;
     private DrugOrderMapper drugOrderMapper;

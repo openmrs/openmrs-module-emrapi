@@ -16,7 +16,11 @@ package org.openmrs.module.emrapi.encounter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.Drug;
+import org.openmrs.Encounter;
+import org.openmrs.OrderType;
+import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.DrugOrderBuilder;
@@ -32,7 +36,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class EncounterDrugOrderServiceHelperTest {
+public class EncounterDrugOrderServiceHelper_1_9Test {
     EncounterDrugOrderServiceHelper_1_9 encounterDrugOrderServiceHelper;
     @Mock
     private OrderService orderService;
