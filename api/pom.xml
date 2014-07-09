@@ -12,9 +12,6 @@
 	<name>EMR API Module API</name>
 	<description>API project for EMRAPI</description>
 
-	<dependencies>
-	</dependencies>
-
 	<build>
 		<resources>
 			<resource>
@@ -42,5 +39,4 @@
             </testResource>
         </testResources>
 	</build>
-
 </project>

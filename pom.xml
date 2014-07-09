@@ -32,6 +32,8 @@
     <modules>
         <module>api</module>
         <module>omod</module>
+        <module>api-1.10</module>
+        <module>api-1.9</module>
     </modules>
 
     <properties>

@@ -1,3 +1,16 @@
+/**
+ * The contents of this file are subject to the OpenMRS Public License
+ * Version 1.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * http://license.openmrs.org
+ *
+ * Software distributed under the License is distributed on an "AS IS"
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+ * License for the specific language governing rights and limitations
+ * under the License.
+ *
+ * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ */
 package org.openmrs.module.emrapi.encounter;
 
 import org.junit.Before;
@@ -17,15 +30,14 @@ import org.openmrs.module.emrapi.encounter.exception.InvalidDrugException;
 import java.util.Date;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class EncounterDrugOrderServiceHelperTest {
-
-    EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper;
+public class EncounterDrugOrderServiceHelper_1_9Test {
+    EncounterDrugOrderServiceHelper_1_9 encounterDrugOrderServiceHelper;
     @Mock
     private OrderService orderService;
     @Mock
@@ -37,7 +49,7 @@ public class EncounterDrugOrderServiceHelperTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        encounterDrugOrderServiceHelper = new EncounterDrugOrderServiceHelper(conceptService, orderService);
+        encounterDrugOrderServiceHelper = new EncounterDrugOrderServiceHelper_1_9(conceptService, orderService);
 
         patient = new Patient();
         encounter = new Encounter();
@@ -130,7 +142,5 @@ public class EncounterDrugOrderServiceHelperTest {
         assertEquals(true, order.getPrn());
         assertEquals(null, order.getFrequency());
         assertEquals(null, order.getUnits());
-
     }
-
 }

@@ -22,6 +22,8 @@ public class EncounterOrdersMapperComponentTest extends BaseModuleContextSensiti
     EmrApiProperties emrApiProperties;
     @Mock
     DispositionMapper dispositionMapper;
+    @Mock
+    private DrugOrderMapper drugOrderMapper;
 
     @Before
     public void setUp() throws Exception {
@@ -37,7 +39,7 @@ public class EncounterOrdersMapperComponentTest extends BaseModuleContextSensiti
         ConceptService conceptService = Context.getConceptService();
         EncounterObservationsMapper encounterObservationsMapper = new EncounterObservationsMapper(new ObservationMapper(), new DiagnosisMapper() ,dispositionMapper, emrApiProperties);
         EncounterProviderMapper encounterProviderMapper = new EncounterProviderMapper();
-        EncounterOrdersMapper encounterOrdersMapper = new EncounterOrdersMapper(new TestOrderMapper(), new DrugOrderMapper(conceptService));
+        EncounterOrdersMapper encounterOrdersMapper = new EncounterOrdersMapper(new TestOrderMapper(), drugOrderMapper);
         EncounterTransactionMapper encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterOrdersMapper, encounterProviderMapper);
 
         Encounter encounter = Context.getEncounterService().getEncounterByUuid("7779d653-393b-4118-9c83-a3715b82d4ac");

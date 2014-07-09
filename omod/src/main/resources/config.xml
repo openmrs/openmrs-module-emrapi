@@ -26,6 +26,20 @@
     </require_modules>
     <!-- / Required Modules -->
 
+    <!-- Conditional Resources -->
+    <conditionalResources>
+        <conditionalResource>
+            <path>/lib/emrapi-api-1.10-${project.parent.version}.jar</path>
+            <openmrsVersion>1.10.*</openmrsVersion>
+        </conditionalResource>
+        <conditionalResource>
+            <path>/lib/emrapi-api-1.9-${project.parent.version}.jar</path>
+            <openmrsVersion>1.9.*</openmrsVersion>
+        </conditionalResource>
+
+    </conditionalResources>
+    <!-- / Conditional Resources -->
+
     <!-- Module Activator -->
     <activator>${project.parent.groupId}.${project.parent.artifactId}.EmrApiActivator</activator>
 

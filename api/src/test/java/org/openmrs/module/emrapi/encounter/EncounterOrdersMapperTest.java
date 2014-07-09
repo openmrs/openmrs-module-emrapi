@@ -13,30 +13,21 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Order;
-import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.builder.TestOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterOrdersMapperTest extends BaseModuleContextSensitiveTest {
@@ -70,5 +61,4 @@ public class EncounterOrdersMapperTest extends BaseModuleContextSensitiveTest {
         verify(drugOrderMapper).map(drugOrder1);
         verify(drugOrderMapper).map(drugOrder2);
     }
-
 }

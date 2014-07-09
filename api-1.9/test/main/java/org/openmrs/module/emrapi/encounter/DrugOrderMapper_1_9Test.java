@@ -24,7 +24,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
-public class DrugOrderMapperTest {
+public class DrugOrderMapper_1_9Test {
     @Mock
     private ConceptService conceptService;
     private DrugOrderMapper drugOrderMapper;
@@ -32,7 +32,7 @@ public class DrugOrderMapperTest {
     @Before
     public void setUp(){
         initMocks(this);
-        drugOrderMapper = new DrugOrderMapper(conceptService);
+        drugOrderMapper = new DrugOrderMapper_1_9(conceptService);
     }
 
     @Test
