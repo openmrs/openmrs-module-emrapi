@@ -3,7 +3,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>emrapi</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>pom</packaging>
     <name>EMR API Module</name>
     <description>Higher-level APIs to support building EMR functionality in OpenMRS, to supplement the data-level APIs
