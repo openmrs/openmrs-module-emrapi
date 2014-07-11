@@ -98,39 +98,6 @@
         </property>
     </bean>
 
-    <bean id="printerService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <bean class="org.openmrs.module.emrapi.printer.PrinterServiceImpl">
-                <property name="printerDAO">
-                    <bean class="${project.parent.groupId}.${project.parent.artifactId}.printer.db.HibernatePrinterDAO">
-                        <property name="sessionFactory">
-                            <ref bean="sessionFactory"/>
-                        </property>
-                    </bean>
-                </property>
-                <property name="locationService" ref="locationService"/>
-            </bean>
-        </property>
-        <property name="preInterceptors">
-            <ref bean="serviceInterceptors"/>
-        </property>
-        <property name="transactionAttributeSource">
-            <ref bean="transactionAttributeSource"/>
-        </property>
-    </bean>
-
-    <bean parent="serviceContext">
-        <property name="moduleService">
-            <list merge="true">
-                <value>org.openmrs.module.emrapi.printer.PrinterService</value>
-                <ref local="printerService"/>
-            </list>
-        </property>
-    </bean>
-
     <bean id="emrConceptService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>

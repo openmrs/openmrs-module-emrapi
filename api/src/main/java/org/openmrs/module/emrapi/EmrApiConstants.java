@@ -14,9 +14,6 @@
 
 package org.openmrs.module.emrapi;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  *
  */
@@ -64,8 +61,6 @@ public class EmrApiConstants {
 
     public static final String LOCATION_TAG_SUPPORTS_TRANSFER = "Transfer Location";
 
-
-
     public static final String DAEMON_USER_UUID = "A4F30A1B-5EB9-11DF-A648-37A07F9C90FB";
 
     public static final String ROLE_PREFIX_CAPABILITY = "Application Role: ";
@@ -81,10 +76,6 @@ public class EmrApiConstants {
     public static final String PRIVILEGE_PREFIX_APP = "App: ";
 
     public static final String PRIVILEGE_PREFIX_TASK = "Task: ";
-
-    public static final String PRIVILEGE_PRINTERS_ACCESS_PRINTERS = "Printers - Access Printers";
-
-    public static final String PRIVILEGE_PRINTERS_MANAGE_PRINTERS = "Printers - Manage Printers";
 
     public static final String PRIVILEGE_DELETE_ENCOUNTER = "Task: emr.patient.encounter.delete";
 
@@ -152,8 +143,6 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_DENY_ADMISSION = "Deny Admission";
 
-    public static final String LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD = "a5fb5770-409a-11e2-a25f-0800200c9a66";
-
     public static final String USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS = "emrapi.lastViewedPatientIds";
 
     public static final String EVENT_TOPIC_NAME_PATIENT_VIEWED = "org.openmrs.module.emrapi.event.PatientViewed";
@@ -182,14 +171,6 @@ public class EmrApiConstants {
 
     public static final String DISPOSITION_NOTE_CONCEPT = "Disposition Note";
 */
-
-
-    // remember if we add more types here to also create them in the module activator
-    public static final Map<String, String> LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER = new HashMap<String, String>() {{
-        put("ID_CARD", "b48ef9a0-38d3-11e2-81c1-0800200c9a66");
-        put("LABEL", "bd6c1c10-38d3-11e2-81c1-0800200c9a66");
-    }};
-
 
     public static final String CONCEPT_CODE_DISPOSITION_CONCEPT = "Disposition";
     public static final String LOCATION_TAG_SUPPORTS_DISPENSING = "Dispensing Location";

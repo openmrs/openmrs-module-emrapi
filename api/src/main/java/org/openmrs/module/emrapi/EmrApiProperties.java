@@ -22,7 +22,6 @@ import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Location;
-import org.openmrs.LocationAttributeType;
 import org.openmrs.LocationTag;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
@@ -205,15 +204,6 @@ public class EmrApiProperties extends ModuleProperties {
     public Concept getDenyAdmissionConcept()  {
         return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_DENY_ADMISSION);
     }
-
-	public LocationAttributeType getLocationAttributeTypeNameToPrintOnIdCard() {
-		LocationAttributeType type = null;
-		type = locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
-		if (type == null) {
-			throw new IllegalStateException("Configuration required: " + EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
-		}
-		return type;
-	}
 
 	public List<PatientIdentifierType> getIdentifierTypesToSearch() {
 		ArrayList<PatientIdentifierType> types = new ArrayList<PatientIdentifierType>();

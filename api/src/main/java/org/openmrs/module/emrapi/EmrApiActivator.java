@@ -18,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.ConceptSource;
 import org.openmrs.GlobalProperty;
-import org.openmrs.LocationAttributeType;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
 import org.openmrs.Privilege;
@@ -26,12 +25,10 @@ import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.LocationService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
-import org.openmrs.customdatatype.datatype.FreeTextDatatype;
 import org.openmrs.event.Event;
 import org.openmrs.event.EventListener;
 import org.openmrs.module.BaseModuleActivator;
@@ -42,8 +39,6 @@ import org.openmrs.module.ModuleException;
 import org.openmrs.module.emrapi.account.AccountService;
 import org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler;
 import org.openmrs.module.emrapi.event.PatientViewedEventListener;
-import org.openmrs.module.emrapi.printer.PrinterDatatype;
-import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.io.File;
@@ -101,15 +96,12 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         super.started();
 
         AdministrationService administrationService = Context.getAdministrationService();
-        LocationService locationService = Context.getLocationService();
         ProviderService providerService = Context.getProviderService();
         PersonService personService = Context.getPersonService();
         ConceptService conceptService = Context.getConceptService();
 
         createGlobalProperties(administrationService);
-        createLocationAttributeTypes(locationService);
         createUnknownProvider(administrationService, providerService, personService);
-
         createConceptSource(conceptService);
         eventListener = new PatientViewedEventListener(daemonToken);
         Event.subscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, eventListener);
@@ -137,67 +129,6 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         }
         gp.setPropertyValue(EmrApiVisitAssignmentHandler.class.getName());
         administrationService.saveGlobalProperty(gp);
-    }
-
-    private void createLocationAttributeTypes(LocationService locationService) {
-        LocationAttributeType defaultLabelPrinterAttributeType =
-                locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER.get("LABEL"));
-
-        if (defaultLabelPrinterAttributeType == null) {
-            defaultLabelPrinterAttributeType = new LocationAttributeType();
-            defaultLabelPrinterAttributeType.setUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER.get("LABEL"));
-            defaultLabelPrinterAttributeType.setDatatypeClassname(PrinterDatatype.class.getName());
-            defaultLabelPrinterAttributeType.setDatatypeConfig("LABEL");
-            defaultLabelPrinterAttributeType.setMaxOccurs(1);
-            defaultLabelPrinterAttributeType.setMinOccurs(0);
-            defaultLabelPrinterAttributeType.setName("Default Label Printer");
-            defaultLabelPrinterAttributeType.setDescription("The default label printer for this location");
-
-            locationService.saveLocationAttributeType(defaultLabelPrinterAttributeType);
-        } else {
-            // if you change any field values above, you need to set them here, so existing servers can be updated
-            boolean changed = GeneralUtils.setPropertyIfDifferent(defaultLabelPrinterAttributeType, "datatypeClassname", PrinterDatatype.class.getName());
-            if (changed) {
-                locationService.saveLocationAttributeType(defaultLabelPrinterAttributeType);
-            }
-        }
-
-        LocationAttributeType defaultIdCardPrinterAttributeType =
-                locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER.get("ID_CARD"));
-
-        if (defaultIdCardPrinterAttributeType == null) {
-            defaultIdCardPrinterAttributeType = new LocationAttributeType();
-            defaultIdCardPrinterAttributeType.setUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_DEFAULT_PRINTER.get("ID_CARD"));
-            defaultIdCardPrinterAttributeType.setDatatypeClassname(PrinterDatatype.class.getName());
-            defaultIdCardPrinterAttributeType.setDatatypeConfig("ID_CARD");
-            defaultIdCardPrinterAttributeType.setMaxOccurs(1);
-            defaultIdCardPrinterAttributeType.setMinOccurs(0);
-            defaultIdCardPrinterAttributeType.setName("Default ID card Printer");
-            defaultIdCardPrinterAttributeType.setDescription("The default id card printer for this location");
-
-            locationService.saveLocationAttributeType(defaultIdCardPrinterAttributeType);
-        } else {
-            // if you change any field values above, you need to set them here, so existing servers can be updated
-            boolean changed = GeneralUtils.setPropertyIfDifferent(defaultIdCardPrinterAttributeType, "datatypeClassname", PrinterDatatype.class.getName());
-            if (changed) {
-                locationService.saveLocationAttributeType(defaultIdCardPrinterAttributeType);
-            }
-        }
-
-        LocationAttributeType nameToPrintOnIdCardAttributeType =
-                locationService.getLocationAttributeTypeByUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
-
-        if (nameToPrintOnIdCardAttributeType == null) {
-            nameToPrintOnIdCardAttributeType = new LocationAttributeType();
-            nameToPrintOnIdCardAttributeType.setUuid(EmrApiConstants.LOCATION_ATTRIBUTE_TYPE_NAME_TO_PRINT_ON_ID_CARD);
-            nameToPrintOnIdCardAttributeType.setDatatypeClassname(FreeTextDatatype.class.getName());
-            nameToPrintOnIdCardAttributeType.setMaxOccurs(1);
-            nameToPrintOnIdCardAttributeType.setMinOccurs(0);
-            nameToPrintOnIdCardAttributeType.setName("Name to print on ID card");
-            nameToPrintOnIdCardAttributeType.setDescription("The name to use when printing a location on an id card");
-
-            locationService.saveLocationAttributeType(nameToPrintOnIdCardAttributeType);
-        }
     }
 
     private void createUnknownProvider(AdministrationService adminService, ProviderService providerService, PersonService personService) {

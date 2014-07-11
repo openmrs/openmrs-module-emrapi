@@ -46,7 +46,7 @@
 
     <!-- Maps hibernate files, if present -->
     <mappingFiles>
-        Printer.hbm.xml
+
     </mappingFiles>
 
     <!-- Internationalization -->

@@ -14,28 +14,13 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterRole;
-import org.openmrs.Obs;
-import org.openmrs.Order;
-import org.openmrs.Provider;
-import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
-import org.openmrs.api.ObsService;
-import org.openmrs.api.OrderService;
 import org.openmrs.api.ProviderService;
-import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
-import org.openmrs.module.emrapi.printer.PrinterService;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 public class EncounterProviderServiceHelper {
