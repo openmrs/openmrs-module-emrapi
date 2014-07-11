@@ -226,6 +226,12 @@
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <excludes>
+                            <exclude>**/MockDrugOrderMapper.class</exclude>
+                            <exclude>**/MockEncounterDrugOrderServiceHelper.class</exclude>
+                        </excludes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
