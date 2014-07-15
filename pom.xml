@@ -228,8 +228,10 @@
                     </executions>
                     <configuration>
                         <excludes>
-                            <exclude>**/MockDrugOrderMapper.class</exclude>
-                            <exclude>**/MockEncounterDrugOrderServiceHelper.class</exclude>
+                            <exclude>**/TestingApplicationContext.xml</exclude>
+                            <exclude>**/test-hibernate.cfg.xml</exclude>
+                            <exclude>**/dispositionConfig.json</exclude>
+                            <exclude>**/specifiedDispositionConfig.json</exclude>
                         </excludes>
                     </configuration>
                 </plugin>
