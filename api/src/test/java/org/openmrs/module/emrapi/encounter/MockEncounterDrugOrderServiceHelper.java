@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component (value = "encounterDrugOrderServiceHelper")
+@Component
 public class MockEncounterDrugOrderServiceHelper implements EncounterDrugOrderServiceHelper{
     @Override
     public void update(Encounter encounter, List<EncounterTransaction.DrugOrder> drugOrders) {
