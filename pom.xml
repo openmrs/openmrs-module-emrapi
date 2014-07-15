@@ -226,14 +226,6 @@
                             </goals>
                         </execution>
                     </executions>
-                    <configuration>
-                        <excludes>
-                            <exclude>**/TestingApplicationContext.xml</exclude>
-                            <exclude>**/test-hibernate.cfg.xml</exclude>
-                            <exclude>**/dispositionConfig.json</exclude>
-                            <exclude>**/specifiedDispositionConfig.json</exclude>
-                        </excludes>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
