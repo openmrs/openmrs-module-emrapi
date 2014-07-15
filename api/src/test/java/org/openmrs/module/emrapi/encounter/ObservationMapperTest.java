@@ -48,32 +48,27 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
         initMocks(this);
         observationMapper = new ObservationMapper();
         obsBuilder = new ObsBuilder();
+        obsBuilder.setUuid(UUID.randomUUID().toString()).setConcept(concept);
+        when(concept.getName()).thenReturn(new ConceptName());
+        when(concept.getDatatype()).thenReturn(conceptDatatype);
+        when(concept.getConceptClass()).thenReturn(getConceptClass("conceptClassName"));
     }
 
     @Test
-    public void map_Observation_With_NumericValue(){
-        String uuid = UUID.randomUUID().toString();
-        obsBuilder.setUuid(uuid).setValue(100.0).setConcept(conceptNumeric);
-        when(conceptNumeric.getName()).thenReturn(new ConceptName());
-        when(conceptNumeric.getDatatype()).thenReturn(conceptDatatype);
+    public void shouldMapObservationWithNumericValue(){
         when(conceptDatatype.isNumeric()).thenReturn(true);
-        when(conceptNumeric.getUnits()).thenReturn("mg");
-
-        Obs obs = obsBuilder.get();
+        Obs obs = obsBuilder.setValue(100.0).get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
 
-        assertEquals(uuid, observation.getUuid());
+        assertEquals(obs.getUuid(), observation.getUuid());
         assertEquals(100.0, observation.getValue());
     }
 
     @Test
-    public void map_Observation_With_Boolean_Value(){
-        when(concept.getName()).thenReturn(new ConceptName());
-        when(concept.getDatatype()).thenReturn(conceptDatatype);
-        when(concept.getConceptClass()).thenReturn(getConceptClass("conceptClassName"));
+    public void shouldMapObservationWithBooleanValue(){
         when(conceptDatatype.isBoolean()).thenReturn(true);
-        Obs obs = obsBuilder.setConcept(concept).setValue(true).get();
+        Obs obs = obsBuilder.setValue(true).get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
 
@@ -81,41 +76,26 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void map_Voided_Observation(){
-        String uuid = UUID.randomUUID().toString();
-        obsBuilder.setUuid(uuid).setValue(100.0).setConcept(conceptNumeric).setVoided(true).setVoidedReason("reason");
-        when(conceptNumeric.getName()).thenReturn(new ConceptName());
-        when(conceptNumeric.getDatatype()).thenReturn(conceptDatatype);
+    public void shouldMapVoidedObservation(){
         when(conceptDatatype.isNumeric()).thenReturn(true);
-        when(conceptNumeric.getUnits()).thenReturn("mg");
-        when(conceptNumeric.getConceptClass()).thenReturn(getConceptClass("conceptClassName"));
-
-        Obs obs = obsBuilder.get();
+        Obs obs = obsBuilder.setVoided(true).setVoidedReason("reason").get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
 
-        assertEquals(uuid, observation.getUuid());
-        assertEquals(100.0, observation.getValue());
+        assertEquals(obs.getUuid(), observation.getUuid());
         assertEquals(obs.getVoided(), observation.getVoided());
         assertEquals(obs.getVoidReason(), observation.getVoidReason());
     }
 
     @Test
-    public void map_concept_class(){
-        String conceptClassName = "conceptClassName";
-
-        obsBuilder.setUuid(UUID.randomUUID().toString()).setValue(100.0).setConcept(conceptNumeric);
-        when(conceptNumeric.getName()).thenReturn(new ConceptName());
-        when(conceptNumeric.getDatatype()).thenReturn(conceptDatatype);
+    public void shouldMapConceptClassAndComment(){
         when(conceptDatatype.isNumeric()).thenReturn(true);
-        when(conceptNumeric.getUnits()).thenReturn("mg");
-        when(conceptNumeric.getConceptClass()).thenReturn(getConceptClass(conceptClassName));
-
-        Obs obs = obsBuilder.get();
+        Obs obs = obsBuilder.setComment("Intermittent Pain").get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
 
-        assertEquals(conceptClassName, observation.getConcept().getConceptClass());
+        assertEquals(obs.getComment(), observation.getComment());
+        assertEquals(obs.getConcept().getConceptClass().getName(), observation.getConcept().getConceptClass());
     }
 
     private ConceptClass getConceptClass(String conceptClassName) {

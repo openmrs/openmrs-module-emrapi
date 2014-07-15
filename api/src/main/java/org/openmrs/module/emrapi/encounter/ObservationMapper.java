@@ -33,6 +33,7 @@ public class ObservationMapper {
         observation.setVoided(obs.getVoided());
         observation.setVoidReason(obs.getVoidReason());
         observation.setObservationDateTime(obs.getObsDatetime());
+        observation.setComment(obs.getComment());
         if (obs.getOrder() != null) {
             observation.setOrderUuid(obs.getOrder().getUuid());
         }
