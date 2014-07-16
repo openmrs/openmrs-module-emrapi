@@ -14,7 +14,10 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.openmrs.Concept;
+import org.openmrs.ConceptComplex;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
@@ -88,8 +91,15 @@ public class EncounterObservationServiceHelper {
         if (observationData.getValue() != null) {
             if (observation.getConcept().getDatatype().isCoded()) {
                 observation.setValueCoded(conceptService.getConceptByUuid(getConceptUuidOfCodeObservationValue(observationData.getValue())));
-            }
-            else if(!observation.getConcept().getDatatype().getUuid().equals(ConceptDatatype.N_A_UUID)) {
+            } else if (observation.getConcept().isComplex()) {
+                observation.setValueComplex(observationData.getValue().toString());
+                Concept conceptComplex = observation.getConcept();
+                if (conceptComplex instanceof HibernateProxy) {
+                    Hibernate.initialize(conceptComplex);
+                    conceptComplex = (ConceptComplex) ((HibernateProxy) conceptComplex).getHibernateLazyInitializer().getImplementation();
+                }
+                obsService.getHandler(((ConceptComplex) conceptComplex).getHandler()).saveObs(observation);
+            } else if (!observation.getConcept().getDatatype().getUuid().equals(ConceptDatatype.N_A_UUID)) {
                 observation.setValueAsString(observationData.getValue().toString());
             }
         }
