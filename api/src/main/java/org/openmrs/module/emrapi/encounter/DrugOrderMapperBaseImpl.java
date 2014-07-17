@@ -31,8 +31,7 @@ public abstract class DrugOrderMapperBaseImpl implements DrugOrderMapper{
         EncounterTransaction.DrugOrder emrDrugOrder = new EncounterTransaction.DrugOrder();
         emrDrugOrder.setUuid(drugOrder.getUuid());
         emrDrugOrder.setConcept(conceptMapper.map(drugOrder.getConcept()));
-        setDosageFrequency(drugOrder, emrDrugOrder);
-        setDosageInstruction(drugOrder, emrDrugOrder);
+        mapVersionSpecificFields(drugOrder, emrDrugOrder);
         emrDrugOrder.setEndDate(drugOrder.getAutoExpireDate());
         emrDrugOrder.setNotes(drugOrder.getInstructions());
         emrDrugOrder.setPrn(drugOrder.getPrn());
@@ -51,7 +50,5 @@ public abstract class DrugOrderMapperBaseImpl implements DrugOrderMapper{
         return emrDrugOrder;
     }
 
-    protected abstract void setDosageInstruction(DrugOrder drugOrder, EncounterTransaction.DrugOrder emrDrugOrder);
-
-    protected abstract void setDosageFrequency(DrugOrder drugOrder, EncounterTransaction.DrugOrder emrDrugOrder);
+    protected abstract void mapVersionSpecificFields(DrugOrder drugOrder, EncounterTransaction.DrugOrder emrDrugOrder);
 }

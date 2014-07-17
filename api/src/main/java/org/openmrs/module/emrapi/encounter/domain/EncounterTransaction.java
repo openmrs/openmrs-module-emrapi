@@ -661,6 +661,7 @@ public class EncounterTransaction {
         private String drugUnits;
         private Date dateCreated;
         private Date dateChanged;
+        private String dosingInstructions;
 
         public String getUuid() {
             return uuid;
@@ -801,6 +802,14 @@ public class EncounterTransaction {
         @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getDateChanged() {
             return dateChanged;
+        }
+
+        public String getDosingInstructions() {
+            return dosingInstructions;
+        }
+
+        public void setDosingInstructions(String dosingInstructions) {
+            this.dosingInstructions = dosingInstructions;
         }
     }
 
