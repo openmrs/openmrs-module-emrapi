@@ -104,7 +104,7 @@ public class VisitDomainWrapperTest {
         visit.addEncounter(checkIn);
 
         VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
-        assertThat(wrapper.getCheckInEncounter(), is(checkIn));
+        assertThat(wrapper.getMostRecentCheckInEncounter(), is(checkIn));
         assertThat(wrapper.getMostRecentEncounter(), is(visitNote));
     }
 

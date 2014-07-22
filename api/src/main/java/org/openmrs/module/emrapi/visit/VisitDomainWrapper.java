@@ -113,8 +113,17 @@ public class VisitDomainWrapper {
         return isActive();
     }
 
-    public Encounter getCheckInEncounter() {
+    /**
+     * Returns the most recent  (non-voided) check-in encounter from this visit
+     * @return
+     */
+    public Encounter getMostRecentCheckInEncounter() {
         return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getCheckInEncounterType()));
+    }
+
+    @Deprecated  // use getMostRecentCheckInEncounter, as this is a more accurate method name
+    public Encounter getCheckInEncounter() {
+        return getMostRecentCheckInEncounter();
     }
 
     public Encounter getMostRecentEncounter() {
