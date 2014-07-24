@@ -77,9 +77,9 @@ public class EncounterObservationServiceHelper {
         if (observationData.getVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());
-            return;
+        } else {
+            mapObservationProperties(observationData, observation);
         }
-        mapObservationProperties(observationData, observation);
 
         for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
             updateObservation(encounter, observation, observation.getGroupMembers(), member);
