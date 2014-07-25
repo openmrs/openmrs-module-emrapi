@@ -662,6 +662,8 @@ public class EncounterTransaction {
         private Date dateCreated;
         private Date dateChanged;
         private String dosingInstructions;
+        private boolean voided;
+        private String voidReason;
 
         public String getUuid() {
             return uuid;
@@ -810,6 +812,22 @@ public class EncounterTransaction {
 
         public void setDosingInstructions(String dosingInstructions) {
             this.dosingInstructions = dosingInstructions;
+        }
+
+        public boolean isVoided() {
+            return voided;
+        }
+
+        public void setVoided(boolean voided) {
+            this.voided = voided;
+        }
+
+        public String getVoidReason() {
+            return voidReason;
+        }
+
+        public void setVoidReason(String voidReason) {
+            this.voidReason = voidReason;
         }
     }
 

@@ -67,6 +67,8 @@ public class EncounterDrugOrderServiceHelper_1_9 implements EncounterDrugOrderSe
             order.setInstructions(drug.getNotes());
             order.setStartDate(drug.getStartDate());
             order.setAutoExpireDate(drug.getEndDate());
+            order.setVoided(drug.isVoided());
+            order.setVoidReason(drug.getVoidReason());
 
             Concept drugConcept = conceptService.getConceptByUuid(drug.getConceptUuid());
             order.setConcept(drugConcept);
