@@ -21,9 +21,7 @@ import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
@@ -82,6 +80,35 @@ public class GeneralUtilsTest {
         Assert.assertEquals(7, lastViewed.get(0).getId().intValue());
         Assert.assertEquals(6, lastViewed.get(1).getId().intValue());
         Assert.assertEquals(2, lastViewed.get(2).getId().intValue());
+    }
+
+    /**
+     * @verifies not return voided patients
+     * @see GeneralUtils#getLastViewedPatients(org.openmrs.User)
+     */
+    @Test
+    public void getLastViewedPatients_shouldNotReturnVoidedPatients() throws Exception {
+        Patient voided = new Patient(999);
+        voided.setVoided(true);
+        User user = new User(1);
+        user.setUserProperty(EmrApiConstants.USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS, "2,999,3");
+        PowerMockito.mockStatic(Context.class);
+        AdministrationService as = mock(AdministrationService.class);
+        PatientService ps = mock(PatientService.class);
+        UserService us = mock(UserService.class);
+        when(Context.getAdministrationService()).thenReturn(as);
+        when(Context.getPatientService()).thenReturn(ps);
+        when(Context.getUserService()).thenReturn(us);
+        when(as.getGlobalProperty(Mockito.eq(EmrApiConstants.UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME))).thenReturn("");
+        when(ps.getPatient(eq(2))).thenReturn(new Patient(2));
+        when(ps.getPatient(eq(3))).thenReturn(new Patient(3));
+        when(ps.getPatient(eq(999))).thenReturn(voided);
+        when(us.getUser(eq(user.getId()))).thenReturn(user);
+
+        List<Patient> lastViewed = GeneralUtils.getLastViewedPatients(user);
+        Assert.assertEquals(2, lastViewed.size());
+        Assert.assertEquals(3, lastViewed.get(0).getId().intValue());
+        Assert.assertEquals(2, lastViewed.get(1).getId().intValue());
     }
 
 }

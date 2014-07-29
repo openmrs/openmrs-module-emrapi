@@ -245,6 +245,7 @@ public class GeneralUtils {
      *
      * @param user
      * @should return a list of the patients last viewed by the specified user
+     * @should not return voided patients
      */
     public static List<Patient> getLastViewedPatients(User user) {
         List<Patient> lastViewed = new ArrayList<Patient>();
@@ -260,7 +261,7 @@ public class GeneralUtils {
                 for (String pId : patientIds) {
                     try {
                         Patient p = ps.getPatient(Integer.valueOf(pId));
-                        if (p != null) {
+                        if (p != null && !p.isVoided() && !p.isPersonVoided()) {
                             lastViewed.add(p);
                         }
                     }
