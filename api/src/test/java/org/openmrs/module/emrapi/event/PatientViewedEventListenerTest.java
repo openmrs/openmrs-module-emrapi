@@ -13,14 +13,6 @@
  */
 package org.openmrs.module.emrapi.event;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.List;
-
-import javax.jms.MapMessage;
-import javax.jms.Message;
-
 import org.apache.activemq.command.ActiveMQMapMessage;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
@@ -35,6 +27,13 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTest {
 	
@@ -77,7 +76,7 @@ public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTe
 	@Test
 	public void processMessage_shouldAddThePatientToTheLastViewedUserProperty() throws Exception {
 		setInitialLastViewedPatients(Arrays.asList(2, 6, 7));
-		final Integer lastViewedPatientId = 999;
+		final Integer lastViewedPatientId = 8;
 		Message message = createMessage(patientService.getPatient(lastViewedPatientId), user);
 		listener.processMessage(message);
 		
@@ -95,22 +94,21 @@ public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTe
 	 */
 	@Test
 	public void processMessage_shouldRemoveTheFirstPatientAndAddTheNewOneToTheStartIfTheListIsFull() throws Exception {
-		final Integer newLimit = 4;
+		final Integer newLimit = 3;
 		GlobalProperty gp = new GlobalProperty(EmrApiConstants.GP_LAST_VIEWED_PATIENT_SIZE_LIMIT, newLimit.toString());
 		adminService.saveGlobalProperty(gp);
 		
 		final Integer patientIdToRemove = 2;
-		setInitialLastViewedPatients(Arrays.asList(patientIdToRemove, 6, 7, 8));
-		final Integer lastSeenPatientId = 999;
+		setInitialLastViewedPatients(Arrays.asList(patientIdToRemove, 6, 7));
+		final Integer lastSeenPatientId = 8;
 		MapMessage message = createMessage(patientService.getPatient(lastSeenPatientId), user);
 		listener.processMessage(message);
 		
 		List<Patient> lastViewed = GeneralUtils.getLastViewedPatients(user);
 		assertEquals(newLimit.intValue(), lastViewed.size());
 		assertEquals(lastSeenPatientId, lastViewed.get(0).getId());
-		assertEquals(8, lastViewed.get(1).getId().intValue());
-		assertEquals(7, lastViewed.get(2).getId().intValue());
-		assertEquals(6, lastViewed.get(3).getId().intValue());
+		assertEquals(7, lastViewed.get(1).getId().intValue());
+		assertEquals(6, lastViewed.get(2).getId().intValue());
 	}
 	
 	/**
