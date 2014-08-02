@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
 
 @Transactional
 public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEncounterService {
@@ -193,7 +194,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTransaction.getEncounterTypeUuid());
         Location location = locationService.getLocationByUuid(encounterTransaction.getLocationUuid());
-        Date encounterDateTime = encounterTransaction.getEncounterDateTime() != null ? encounterTransaction.getEncounterDateTime() : new Date();
+        Date encounterDateTime = getCurrentDateIfNull(encounterTransaction.getEncounterDateTime());
         Set<Provider> providers = getProviders(encounterTransaction.getProviders());
 
         EncounterParameters encounterParameters = EncounterParameters.instance()
@@ -256,7 +257,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Visit visit = new Visit();
         visit.setPatient(patient);
         visit.setVisitType(visitService.getVisitTypeByUuid(encounterTransaction.getVisitTypeUuid()));
-        visit.setStartDatetime(encounterTransaction.getEncounterDateTime() != null ? encounterTransaction.getEncounterDateTime() : new Date());
+        visit.setStartDatetime(getCurrentDateIfNull(encounterTransaction.getEncounterDateTime()));
         visit.setEncounters(new HashSet<Encounter>());
         visit.setUuid(UUID.randomUUID().toString());
         return visit;
