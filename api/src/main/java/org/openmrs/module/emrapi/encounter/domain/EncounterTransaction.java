@@ -110,7 +110,7 @@ public class EncounterTransaction {
 
     @JsonSerialize(using = CustomJsonDateSerializer.class)
     public Date getEncounterDateTime() {
-        return encounterDateTime == null ? new Date() : encounterDateTime;
+        return encounterDateTime;
     }
 
     public EncounterTransaction setEncounterDateTime(Date encounterDateTime) {
