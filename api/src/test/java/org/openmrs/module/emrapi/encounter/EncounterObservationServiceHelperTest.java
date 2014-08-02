@@ -104,7 +104,6 @@ public class EncounterObservationServiceHelperTest {
         assertEquals("e-uuid", textObservation.getEncounter().getUuid());
         assertEquals("overweight", textObservation.getComment());
 
-        assertEquals(encounterDateTime, textObservation.getObsDatetime());
     }
 
     @Test

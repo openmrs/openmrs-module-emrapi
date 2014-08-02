@@ -36,6 +36,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
+
 /**
  * Add/update/delete a {@link org.openmrs.Obs} on an {@link org.openmrs.Encounter}.
  */
@@ -122,7 +124,7 @@ public class EncounterObservationServiceHelper {
     private Obs newObservation(Encounter encounter, EncounterTransaction.Observation observationData) {
         Obs observation;
         observation = new Obs();
-        Date observationDateTime = observationData.getObservationDateTime() == null ? encounter.getEncounterDatetime() : observationData.getObservationDateTime();
+        Date observationDateTime = getCurrentDateIfNull(observationData.getObservationDateTime());
         Concept concept = conceptService.getConceptByUuid(observationData.getConceptUuid());
         if (concept == null) {
             throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
@@ -146,7 +148,7 @@ public class EncounterObservationServiceHelper {
         for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
             org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
             Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
-            Date diagnosisDateTime = diagnosisRequest.getDiagnosisDateTime() != null ? diagnosisRequest.getDiagnosisDateTime() : encounter.getEncounterDatetime();
+            Date diagnosisDateTime = getCurrentDateIfNull(diagnosisRequest.getDiagnosisDateTime());
             obs.setObsDatetime(diagnosisDateTime);
             if (diagnosisRequest.isVoided()) {
                 voidDiagnosisObservation(diagnosisRequest, obs);
