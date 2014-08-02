@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
+import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
+
 public class EncounterDispositionServiceHelper {
 
     private ConceptService conceptService;
@@ -62,7 +64,7 @@ public class EncounterDispositionServiceHelper {
     }
 
     private Obs createObsGroupForDisposition(EncounterTransaction.Disposition disposition,Encounter encounter) throws ParseException {
-        Date dispositionDateTime = disposition.getDispositionDateTime() != null ? disposition.getDispositionDateTime() :  encounter.getEncounterDatetime();
+        Date dispositionDateTime = getCurrentDateIfNull(disposition.getDispositionDateTime());
         Obs obs = new Obs();
         obs.setConcept(dispositionGroupConcept);
         Obs dispositionAsObservation = constructDispositionObs(encounter, new Obs(), disposition.getCode(), dispositionDateTime);
@@ -82,7 +84,7 @@ public class EncounterDispositionServiceHelper {
     private void editExistingObservations(EncounterTransaction.Disposition disposition, Encounter encounter) throws ParseException {
         Set<Obs> allEncounterObs = encounter.getAllObs();
         Obs existingDispositionGroup = getMatchingObservation(allEncounterObs, dispositionGroupConcept.getUuid());
-        Date dispositionDateTime = disposition.getDispositionDateTime() != null ? disposition.getDispositionDateTime() : existingDispositionGroup.getObsDatetime();
+        Date dispositionDateTime = getCurrentDateIfNull(disposition.getDispositionDateTime());
         Obs existingDisposition = getMatchingObservation(existingDispositionGroup.getGroupMembers(), dispositionConcept.getUuid());
         existingDispositionGroup.setObsDatetime(dispositionDateTime);
         existingDispositionGroup.setVoided(disposition.isVoided());
