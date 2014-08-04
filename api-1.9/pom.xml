@@ -12,6 +12,16 @@
     <name>EMR API Module API 1.9</name>
     <description>API project for EMRAPI</description>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.openmrs.api</groupId>
+                <artifactId>openmrs-api</artifactId>
+                <type>jar</type>
+                <version>1.9.8</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
