@@ -36,6 +36,7 @@ import org.openmrs.util.OpenmrsUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -45,10 +46,16 @@ import static java.util.Collections.sort;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.collections.CollectionUtils.select;
 
+
 /**
  * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
  */
 public class VisitDomainWrapper {
+
+    public enum SortOrder {
+        EARLIEST_FIRST, MOST_RECENT_FIRST
+    }
+
     private static final Log log = LogFactory.getLog(VisitDomainWrapper.class);
 
     private EmrApiProperties emrApiProperties;
@@ -91,12 +98,12 @@ public class VisitDomainWrapper {
     }
 
     public Encounter getAdmissionEncounter() {
-        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getAdmissionEncounterType()));
+        return (Encounter) find(getSortedEncounters(SortOrder.MOST_RECENT_FIRST), new EncounterTypePredicate(emrApiProperties.getAdmissionEncounterType()));
     }
 
     // TODO: refactor this to use EncounterTypePredicate
     public Encounter getLatestAdtEncounter(){
-        for (Encounter e : getSortedEncounters()) {
+        for (Encounter e : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (emrApiProperties.getAdmissionEncounterType().equals(e.getEncounterType()) ||
                     emrApiProperties.getTransferWithinHospitalEncounterType().equals(e.getEncounterType()) )
                 return e;
@@ -118,7 +125,15 @@ public class VisitDomainWrapper {
      * @return
      */
     public Encounter getMostRecentCheckInEncounter() {
-        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getCheckInEncounterType()));
+        return (Encounter) find(getSortedEncounters(SortOrder.MOST_RECENT_FIRST), new EncounterTypePredicate(emrApiProperties.getCheckInEncounterType()));
+    }
+
+    /**
+     * Returns the first   (non-voided) check-in encounter from this visit
+     * @return
+     */
+    public Encounter getEarliestCheckInEncounter() {
+        return (Encounter) find(getSortedEncounters(SortOrder.EARLIEST_FIRST), new EncounterTypePredicate(emrApiProperties.getCheckInEncounterType()));
     }
 
     @Deprecated  // use getMostRecentCheckInEncounter, as this is a more accurate method name
@@ -127,7 +142,7 @@ public class VisitDomainWrapper {
     }
 
     public Encounter getMostRecentEncounter() {
-        List<Encounter> encounters = getSortedEncounters();
+        List<Encounter> encounters = getSortedEncounters(SortOrder.MOST_RECENT_FIRST);
         if (encounters.size() > 0)
             return encounters.get(0);
         return null;
@@ -138,11 +153,16 @@ public class VisitDomainWrapper {
         return getMostRecentEncounter();
     }
 
-    public Encounter getOldestEncounter() {
-        List<Encounter> encounters = getSortedEncounters();
+    public Encounter getEarliestEncounter() {
+        List<Encounter> encounters = getSortedEncounters(SortOrder.MOST_RECENT_FIRST);
         if (encounters.size() != 0)
             return encounters.get(encounters.size() - 1);
         return null;
+    }
+
+    @Deprecated // we are standardizing on "Earliest" and "Most Recent" to the
+    public Encounter getOldestEncounter() {
+        return getEarliestEncounter();
     }
 
     /**
@@ -150,7 +170,7 @@ public class VisitDomainWrapper {
      * @return
      */
     public Encounter getMostRecentVisitNote() {
-        return (Encounter) find(getSortedEncounters(), new EncounterTypePredicate(emrApiProperties.getVisitNoteEncounterType()));
+        return (Encounter) find(getSortedEncounters(SortOrder.MOST_RECENT_FIRST), new EncounterTypePredicate(emrApiProperties.getVisitNoteEncounterType()));
     }
 
     /**
@@ -158,7 +178,7 @@ public class VisitDomainWrapper {
      * @return
      */
     public Encounter getMostRecentVisitNoteAtLocation(Location location) {
-        return (Encounter) find(getSortedEncounters(), new EncounterTypeAndLocationPredicate(emrApiProperties.getVisitNoteEncounterType(), location));
+        return (Encounter) find(getSortedEncounters(SortOrder.MOST_RECENT_FIRST), new EncounterTypeAndLocationPredicate(emrApiProperties.getVisitNoteEncounterType(), location));
 
     }
 
@@ -180,11 +200,28 @@ public class VisitDomainWrapper {
     }
 
 
-    // note that this returns the most recent encounter first
+    // default is to return most recent encounter first
     public List<Encounter> getSortedEncounters() {
+        return getSortedEncounters(SortOrder.MOST_RECENT_FIRST);
+    }
+
+    /**
+     * Returns all non-voided encounters in the visit
+     *
+     * @param order whether to return the most recent first, or the earliest first
+     * @return
+     */
+    public List<Encounter> getSortedEncounters(SortOrder order) {
+
+        Comparator<Encounter> datetimeComparator = EncounterDomainWrapper.DATETIME_COMPARATOR;
+
+        if (order == SortOrder.MOST_RECENT_FIRST) {
+            datetimeComparator = reverseOrder(datetimeComparator);
+        }
+
         if (visit.getEncounters() != null) {
             List<Encounter> nonVoidedEncounters = (List<Encounter>) select(visit.getEncounters(), EncounterDomainWrapper.NON_VOIDED_PREDICATE);
-            sort(nonVoidedEncounters, reverseOrder(EncounterDomainWrapper.DATETIME_COMPARATOR));
+            sort(nonVoidedEncounters, datetimeComparator);
             return nonVoidedEncounters;
         }
         return EMPTY_LIST;
@@ -207,7 +244,7 @@ public class VisitDomainWrapper {
 
         DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
 
-        for (Encounter encounter : getSortedEncounters()) {
+        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             for (Obs obs : encounter.getObsAtTopLevel(false)) {
                 if (dispositionDescriptor.isDisposition(obs)) {
                     return dispositionService.getDispositionFromObsGroup(obs);
@@ -230,7 +267,7 @@ public class VisitDomainWrapper {
 
         DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
 
-        for (Encounter encounter : getSortedEncounters()) {  // getSortedEncounters already excludes voided encounters
+        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {  // getSortedEncounters already excludes voided encounters
             for (Obs obs : encounter.getObsAtTopLevel(false)) {
                 if (dispositionDescriptor.isDisposition(obs)
                         && dispositionService.getDispositionFromObsGroup(obs).getType() == type) {
@@ -244,7 +281,7 @@ public class VisitDomainWrapper {
 
     public List<Diagnosis> getPrimaryDiagnoses() {
         List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
-        for (Encounter encounter : getSortedEncounters()) {
+        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             diagnoses.addAll(getDiagnosesFromEncounter(encounter, Collections.singletonList(Diagnosis.Order.PRIMARY)));
         }
         return diagnoses;
@@ -284,7 +321,7 @@ public class VisitDomainWrapper {
     }
 
     public boolean hasEncounters(){
-        List<Encounter> encounters = getSortedEncounters();
+        List<Encounter> encounters = getSortedEncounters(SortOrder.MOST_RECENT_FIRST);
         if (encounters != null && encounters.size() > 0){
             return true;
         }
@@ -301,7 +338,7 @@ public class VisitDomainWrapper {
             return false;
         }
 
-        for (Encounter encounter : getSortedEncounters()) {
+        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
                 if (encounter.getEncounterType().equals(lookForEncounterType)) {
                     return true;
@@ -351,7 +388,7 @@ public class VisitDomainWrapper {
         EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
         EncounterType transferEncounterType = emrApiProperties.getTransferWithinHospitalEncounterType();
 
-        for (Encounter encounter : getSortedEncounters()) {
+        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
                 if (encounter.getEncounterType().equals(admissionEncounterType) ||
                         encounter.getEncounterType().equals(transferEncounterType)) {

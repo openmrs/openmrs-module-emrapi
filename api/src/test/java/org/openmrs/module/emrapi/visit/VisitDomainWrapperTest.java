@@ -510,7 +510,7 @@ public class VisitDomainWrapperTest {
         visit.addEncounter(encounter2);
         visit.addEncounter(encounter1);
 
-        assertThat(new VisitDomainWrapper(visit).getOldestEncounter(), is(encounter1));
+        assertThat(new VisitDomainWrapper(visit).getEarliestEncounter(), is(encounter1));
     }
 
     @Test
@@ -865,6 +865,37 @@ public class VisitDomainWrapperTest {
         assertFalse(wrapper.hasVisitNoteAtLocation(otherLocation));
     }
 
+    // this test was merged in when VisitSummary was merged into VisitDomainWrapper
+    @Test
+    public void shouldReturnFirstNonVoidedCheckInEncounter() throws Exception {
+
+        EncounterType checkInEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getCheckInEncounterType()).thenReturn(checkInEncounterType);
+
+        Encounter mostRecentCheckIn = new Encounter();
+        mostRecentCheckIn.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+        mostRecentCheckIn.setEncounterType(checkInEncounterType);
+
+        Encounter firstVoidedCheckin = new Encounter();
+        firstVoidedCheckin.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        firstVoidedCheckin.setEncounterType(checkInEncounterType);
+        firstVoidedCheckin.setVoided(true);
+
+        Encounter firstNonVoidedCheckin = new Encounter();
+        firstNonVoidedCheckin.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+        firstNonVoidedCheckin.setEncounterType(checkInEncounterType);
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(firstVoidedCheckin.getEncounterDatetime());
+        visit.addEncounter(mostRecentCheckIn);
+        visit.addEncounter(firstVoidedCheckin);
+        visit.addEncounter(firstNonVoidedCheckin);
+
+        VisitDomainWrapper wrapper = new VisitDomainWrapper(visit, props);
+        assertThat(wrapper.getEarliestCheckInEncounter(), is(firstNonVoidedCheckin));
+    }
 
 
     private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
