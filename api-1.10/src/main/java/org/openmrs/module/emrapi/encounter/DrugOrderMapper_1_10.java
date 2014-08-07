@@ -33,5 +33,7 @@ public class DrugOrderMapper_1_10 extends DrugOrderMapperBaseImpl implements Dru
             emrDrugOrder.setDosageFrequency(conceptMapper.map(frequency.getConcept()));
         }
         emrDrugOrder.setDosingInstructions(drugOrder.getDosingInstructions());
+        emrDrugOrder.setStartDate(drugOrder.getStartDate());
+
     }
 }
