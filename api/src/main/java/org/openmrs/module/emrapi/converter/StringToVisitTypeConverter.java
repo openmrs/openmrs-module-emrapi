@@ -13,23 +13,38 @@
  */
 package org.openmrs.module.emrapi.converter;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.VisitType;
-import org.openmrs.api.context.Context;
+import org.openmrs.api.VisitService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Pattern;
+
 /**
- * Converts String to VisitType, interpreting it as a VisitType.id
+ * Converts String to VisitType, interpreting it as a VisitType.id or uuid
  */
 @Component
 public class StringToVisitTypeConverter implements Converter<String, VisitType> {
-	
+
+    private Pattern onlyDigits = Pattern.compile("\\d+");
+
+    @Autowired
+    private VisitService visitService;
+
 	/**
 	 * @see org.springframework.core.convert.converter.Converter#convert(Object)
 	 */
 	@Override
 	public VisitType convert(String source) {
-		return Context.getVisitService().getVisitType(Integer.valueOf(source));
+        if (StringUtils.isBlank(source)) {
+            return null;
+        } else if (onlyDigits.matcher(source).matches()) {
+            return visitService.getVisitType(Integer.valueOf(source));
+        } else {
+            return visitService.getVisitTypeByUuid(source);
+        }
 	}
 	
 }

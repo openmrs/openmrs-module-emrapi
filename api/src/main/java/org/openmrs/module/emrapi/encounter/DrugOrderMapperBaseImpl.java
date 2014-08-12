@@ -36,7 +36,6 @@ public abstract class DrugOrderMapperBaseImpl implements DrugOrderMapper{
         emrDrugOrder.setNotes(drugOrder.getInstructions());
         emrDrugOrder.setPrn(drugOrder.getPrn());
         emrDrugOrder.setNumberPerDosage(drugOrder.getDose() == null ? 0 : drugOrder.getDose());
-        emrDrugOrder.setStartDate(drugOrder.getStartDate());
         emrDrugOrder.setDateCreated(drugOrder.getDateCreated());
         emrDrugOrder.setDateChanged(drugOrder.getDateChanged());
         emrDrugOrder.setVoided(drugOrder.getVoided());
