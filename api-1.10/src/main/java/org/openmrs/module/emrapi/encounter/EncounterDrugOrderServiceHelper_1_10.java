@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.encounter;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Concept;
+import org.openmrs.SimpleDosingInstructions;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: This needs to be reworked to really use features of the new OrderEntry API
+//TODO: Mihir: This class needs tests
 @Component (value = "encounterDrugOrderServiceHelper")
 public class EncounterDrugOrderServiceHelper_1_10 implements EncounterDrugOrderServiceHelper{
 
@@ -98,7 +100,7 @@ public class EncounterDrugOrderServiceHelper_1_10 implements EncounterDrugOrderS
                         drugOrder.setDoseUnits(conceptService.getConceptByUuid(drug.getDosageInstructionUuid()));
                     }
                 }
-                drugOrder.setComplex(false);
+                drugOrder.setDosingType(SimpleDosingInstructions.class);
             }
         }
     }
