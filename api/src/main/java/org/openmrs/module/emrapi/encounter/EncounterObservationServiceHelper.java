@@ -108,8 +108,7 @@ public class EncounterObservationServiceHelper {
         if(observationData.getOrderUuid() != null && !observationData.getOrderUuid().isEmpty()){
             observation.setOrder(getOrderByUuid(observationData.getOrderUuid()));
         }
-        if(observationData.getObservationDateTime() != null)
-            observation.setObsDatetime(observationData.getObservationDateTime());
+        observation.setObsDatetime(getCurrentDateIfNull(observationData.getObservationDateTime()));
     }
 
     private String getConceptUuidOfCodeObservationValue(Object codeObsVal) {
