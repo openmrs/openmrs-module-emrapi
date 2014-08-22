@@ -34,7 +34,6 @@ public abstract class DrugOrderMapperBaseImpl implements DrugOrderMapper{
         mapVersionSpecificFields(drugOrder, emrDrugOrder);
         emrDrugOrder.setEndDate(drugOrder.getAutoExpireDate());
         emrDrugOrder.setNotes(drugOrder.getInstructions());
-        emrDrugOrder.setPrn(drugOrder.getPrn());
         emrDrugOrder.setNumberPerDosage(drugOrder.getDose() == null ? 0 : drugOrder.getDose());
         emrDrugOrder.setDateCreated(drugOrder.getDateCreated());
         emrDrugOrder.setDateChanged(drugOrder.getDateChanged());

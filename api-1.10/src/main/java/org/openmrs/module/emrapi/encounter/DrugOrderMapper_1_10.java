@@ -27,6 +27,7 @@ public class DrugOrderMapper_1_10 extends DrugOrderMapperBaseImpl implements Dru
 
     @Override
     protected void mapVersionSpecificFields(DrugOrder drugOrder, EncounterTransaction.DrugOrder emrDrugOrder) {
+        emrDrugOrder.setPrn(drugOrder.getAsNeeded());
         emrDrugOrder.setDosageInstruction(conceptMapper.map(drugOrder.getDoseUnits()));
         OrderFrequency frequency = drugOrder.getFrequency();
         if (frequency != null) {

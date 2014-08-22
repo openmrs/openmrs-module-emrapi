@@ -82,7 +82,7 @@ public class EncounterDrugOrderServiceHelper_1_10 implements EncounterDrugOrderS
                 DrugOrder drugOrder = (DrugOrder) order;
                 drugOrder.setDrug(findDrug(drug.getUuid()));
                 drugOrder.setDose(Double.valueOf(drug.getNumberPerDosage()));
-                drugOrder.setPrn(drug.isPrn());
+                drugOrder.setAsNeeded(drug.isPrn());
 
                 if (!StringUtils.isBlank(drug.getDosageFrequencyUuid())) {
                     Concept frequencyConcept = findConcept(cachedConcepts, drug.getDosageFrequencyUuid());

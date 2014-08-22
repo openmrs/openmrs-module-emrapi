@@ -35,6 +35,7 @@ public class DrugOrderMapper_1_9 extends DrugOrderMapperBaseImpl implements Drug
 
     @Override
     protected void mapVersionSpecificFields(DrugOrder drugOrder, EncounterTransaction.DrugOrder emrDrugOrder) {
+        emrDrugOrder.setPrn(drugOrder.getPrn());
         emrDrugOrder.setDosageInstruction(conceptMapper.map(conceptService.getConceptByUuid(drugOrder.getUnits())));
         emrDrugOrder.setStartDate(drugOrder.getStartDate());
         emrDrugOrder.setDosageFrequency(conceptMapper.map(conceptService.getConceptByUuid(drugOrder.getFrequency())));
