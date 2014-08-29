@@ -156,7 +156,7 @@ public class CodedOrFreeTextAnswer {
     /**
      * Formats as either of:
      * <ul>
-     * <li>non-coded value</li>
+     * <li>\"non-coded value\"</li>
      * <li>coded value's preferred name in the current locale</li>
      * <li>specific coded value → coded value's preferred name in the current locale</li>
      * </ul>
@@ -166,7 +166,7 @@ public class CodedOrFreeTextAnswer {
      */
     public String format(Locale locale) {
         if (nonCodedAnswer != null) {
-            return nonCodedAnswer;
+            return "\"" + nonCodedAnswer + "\"";
         } else if (codedAnswer == null) {
             return "?";
         } else if (specificCodedAnswer == null) {
