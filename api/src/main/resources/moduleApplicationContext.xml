@@ -217,26 +217,11 @@
         </property>
     </bean>
 
-    <bean id="emrEncounterServiceTarget" class="org.openmrs.module.emrapi.encounter.EmrEncounterServiceImpl" autowire="constructor">
-        <constructor-arg  ref="patientService"/>
-        <constructor-arg  ref="visitService"/>
-        <constructor-arg  ref="encounterService"/>
-        <constructor-arg  ref="locationService"/>
-        <constructor-arg  ref="providerService"/>
-        <constructor-arg  ref="adminService"/>
-        <constructor-arg  ref="encounterObservationServiceHelper"/>
-        <constructor-arg  ref="encounterTestOrderServiceHelper"/>
-        <!-- autowire the encounterDrugOrderServiceHelper property so that other modules which include the test-jar, and either the 1.9 or 1.10 api won't fail -->
-        <constructor-arg  ref="encounterDispositionServiceHelper"/>
-        <constructor-arg  ref="encounterTransactionMapper"/>
-        <constructor-arg  ref="encounterProviderServiceHelper"/>
-    </bean>
-
     <bean id="emrEncounterService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
-        <property name="target"><ref local="emrEncounterServiceTarget"/></property>
+        <property name="target" ref="emrEncounterServiceTarget"/>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors"/>
         </property>
@@ -250,11 +235,6 @@
         <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
         <constructor-arg name="obsService" ref="obsService"/>
         <constructor-arg name="orderService" ref="orderService"/>
-    </bean>
-
-    <bean id="encounterTestOrderServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterTestOrderServiceHelper">
-        <constructor-arg ref="conceptService"/>
-        <constructor-arg ref="orderService"/>
     </bean>
 
     <bean id="encounterDispositionServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDispositionServiceHelper">
@@ -288,12 +268,6 @@
         <constructor-arg name="encounterTransactionMapper" ref="encounterTransactionMapper"/>
     </bean>
 
-    <bean id="encounterTransactionMapper" class="org.openmrs.module.emrapi.encounter.EncounterTransactionMapper">
-        <constructor-arg name="encounterObservationsMapper" ref="encounterObservationsMapper"/>
-        <constructor-arg name="encounterOrdersMapper" ref="encounterOrdersMapper"/>
-        <constructor-arg name="encounterProviderMapper" ref="encounterProviderMapper"/>
-    </bean>
-
     <bean id="encounterProviderMapper" class="org.openmrs.module.emrapi.encounter.EncounterProviderMapper">
     </bean>
 
@@ -312,14 +286,6 @@
 
     <bean id="dispositionMapper" class="org.openmrs.module.emrapi.encounter.DispositionMapper">
         <constructor-arg name="conceptService" ref="conceptService"/>
-    </bean>
-
-    <bean id="encounterOrdersMapper" class="org.openmrs.module.emrapi.encounter.EncounterOrdersMapper" autowire="constructor">
-        <constructor-arg name="testOrderMapper" ref="testOrderMapper"/>
-        <!-- autowire the drugOrderMapper property so that other modules which include the test-jar, and either the 1.9 or 1.10 api won't fail -->
-    </bean>
-
-    <bean id="testOrderMapper" class="org.openmrs.module.emrapi.encounter.TestOrderMapper">
     </bean>
 
     <bean parent="serviceContext">

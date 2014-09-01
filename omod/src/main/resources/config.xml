@@ -12,7 +12,7 @@
         ${project.parent.description}
     </description>
     <updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
-    <require_version>${openmrsCoreVersion}</require_version> <!-- TRUNK-3751 prevents saying ${openmrsCoreVersion} when version is a SNAPSHOT-->
+    <require_version>1.9.8</require_version> <!-- TRUNK-3751 prevents saying ${openmrsCoreVersion} when version is a SNAPSHOT-->
     <!-- / Module Properties -->
 
     <!-- Required Modules -->
