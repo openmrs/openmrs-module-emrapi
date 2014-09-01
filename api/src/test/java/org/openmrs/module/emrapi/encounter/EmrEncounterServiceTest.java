@@ -3,22 +3,22 @@ package org.openmrs.module.emrapi.encounter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
-import org.openmrs.api.AdministrationService;
-import org.openmrs.api.EncounterService;
-import org.openmrs.api.LocationService;
-import org.openmrs.api.PatientService;
-import org.openmrs.api.ProviderService;
-import org.openmrs.api.VisitService;
+import org.openmrs.api.*;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -34,10 +34,6 @@ public class EmrEncounterServiceTest {
     @Mock
     private EncounterDispositionServiceHelper encounterDispositionServiceHelper;
     @Mock
-    private EncounterTestOrderServiceHelper encounterTestOrderServiceHelper;
-    @Mock
-    private EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper;
-    @Mock
     private LocationService locationService;
     @Mock
     private ProviderService providerService;
@@ -49,16 +45,20 @@ public class EmrEncounterServiceTest {
     @Mock
     private EncounterProviderServiceHelper encounterProviderServiceHelper;
 
-    private EmrEncounterService emrEncounterService;
+    @Mock
+    private EmrOrderService orderService;
+
+    private EmrEncounterServiceImpl emrEncounterService;
+    private Patient patient;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
         emrEncounterService = new EmrEncounterServiceImpl(patientService,visitService,encounterService,locationService,providerService,
-                administrationService,encounterObservationServiceHelper,encounterTestOrderServiceHelper,encounterDrugOrderServiceHelper,
-                encounterDispositionServiceHelper,encounterTransactionMapper, encounterProviderServiceHelper);
+                administrationService,encounterObservationServiceHelper,
+                encounterDispositionServiceHelper,encounterTransactionMapper, encounterProviderServiceHelper, orderService);
 
-        Patient patient = new Patient(1);
+        patient = new Patient(1);
         patient.setUuid("patient-uuid");
         when(patientService.getPatientByUuid("patient-uuid")).thenReturn(patient);
 
@@ -95,5 +95,18 @@ public class EmrEncounterServiceTest {
         assertNotNull(encounterTransaction);
         assertEquals("visit-uuid",encounterTransaction.getVisitUuid());
         assertNotNull(encounterTransaction.getEncounterUuid());
+    }
+
+    @Test
+    public void shouldDelegateSavingOrdersToOrderService() {
+        EncounterTransaction encounterTransaction = new EncounterTransaction("visit-uuid", "encounter-uuid");
+        encounterTransaction.setPatientUuid("patient-uuid");
+        encounterTransaction.setEncounterTypeUuid("encType-invsgtn-uuid");
+        List<EncounterTransaction.DrugOrder> drugOrders = Arrays.asList(new EncounterTransaction.DrugOrder());
+        encounterTransaction.setDrugOrders(drugOrders);
+
+        emrEncounterService.save(encounterTransaction);
+
+        verify(orderService).save(same(drugOrders), any(Encounter.class));
     }
 }
