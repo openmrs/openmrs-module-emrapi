@@ -647,187 +647,139 @@ public class EncounterTransaction {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DrugOrder {
         private String uuid;
-        private Concept concept;
-        private String notes;
-        private Date startDate;
-        private Date  endDate;
-        private Double numberPerDosage;
-        private Concept dosageInstruction;
-        private Concept dosageFrequency;
-        private boolean prn;
-        private Double doseStrength;
-        private String dosageForm;
-        private String drugName;
-        private String drugUnits;
-        private Date dateCreated;
-        private Date dateChanged;
-        private String dosingInstructions;
-        private boolean voided;
-        private String voidReason;
+        private String careSetting;
+        private Drug drug;
+        private String dosingInstructionType;
+        private DosingInstructions dosingInstructions;
+        private Date scheduledDate;
+        private Date endDate;
+        private String action;
+        private String existingUuid;
+        private Concept orderReasonConcept;
+        private String orderReasonText;
+        private String instructions;
+        private String orderType;
+        private Integer duration;
+        private String durationUnits;
 
         public String getUuid() {
             return uuid;
-        }
-
-        public Concept getDosageInstruction() {
-            return dosageInstruction;
-        }
-
-        public void setDosageInstruction(Concept dosageInstruction) {
-            this.dosageInstruction = dosageInstruction;
-        }
-
-        public Concept getDosageFrequency() {
-            return dosageFrequency;
-        }
-
-        public void setDosageFrequency(Concept dosageFrequency) {
-            this.dosageFrequency = dosageFrequency;
-        }
-
-        @JsonIgnore
-        public String getConceptUuid() {
-            return concept.getUuid();
-        }
-
-        public Concept getConcept() {
-            return concept;
-        }
-
-        public String getNotes() {
-            return notes;
-        }
-
-        @JsonSerialize(using = CustomJsonDateSerializer.class)
-        public Date getStartDate() {
-            return startDate;
-        }
-
-        @JsonSerialize(using = CustomJsonDateSerializer.class)
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public Double getNumberPerDosage() {
-            return numberPerDosage;
-        }
-
-        @JsonIgnore
-        public String getDosageInstructionUuid() {
-            return dosageInstruction == null ? null : dosageInstruction.getUuid();
-        }
-
-        @JsonIgnore
-        public String getDosageFrequencyUuid() {
-            return dosageFrequency == null ?  null : dosageFrequency.getUuid();
-        }
-
-        public boolean isPrn() {
-            return prn;
         }
 
         public void setUuid(String uuid) {
             this.uuid = uuid;
         }
 
-        public DrugOrder setConcept(Concept concept) {
-            this.concept = concept;
-            return this;
+        public String getCareSetting() {
+            return careSetting;
         }
 
-        public void setNotes(String notes) {
-            this.notes = notes;
+        public void setCareSetting(String careSetting) {
+            this.careSetting = careSetting;
         }
 
-        public void setStartDate(Date startDate) {
-            this.startDate = startDate;
+        public Drug getDrug() {
+            return drug;
+        }
+
+        public void setDrug(Drug drug) {
+            this.drug = drug;
+        }
+
+        public String getDosingInstructionType() {
+            return dosingInstructionType;
+        }
+
+        public void setDosingInstructionType(String dosingInstructionType) {
+            this.dosingInstructionType = dosingInstructionType;
+        }
+
+        public DosingInstructions getDosingInstructions() {
+            return dosingInstructions;
+        }
+
+        public void setDosingInstructions(DosingInstructions dosingInstructions) {
+            this.dosingInstructions = dosingInstructions;
+        }
+
+        public Date getScheduledDate() {
+            return scheduledDate;
+        }
+
+        public void setScheduledDate(Date scheduledDate) {
+            this.scheduledDate = scheduledDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
         }
 
         public void setEndDate(Date endDate) {
             this.endDate = endDate;
         }
 
-        public void setNumberPerDosage(Double numberPerDosage) {
-            this.numberPerDosage = numberPerDosage;
+        public String getAction() {
+            return action;
         }
 
-        public void setPrn(boolean prn) {
-            this.prn = prn;
+        public void setAction(String action) {
+            this.action = action;
         }
 
-        public void setDoseStrength(Double doseStrength) {
-            this.doseStrength = doseStrength;
+        public String getExistingUuid() {
+            return existingUuid;
         }
 
-        public Double getDoseStrength() {
-            return doseStrength;
+        public void setExistingUuid(String existingUuid) {
+            this.existingUuid = existingUuid;
         }
 
-        public void setDosageForm(String dosageForm) {
-            this.dosageForm = dosageForm;
+        public Concept getOrderReasonConcept() {
+            return orderReasonConcept;
         }
 
-        public String getDosageForm() {
-            return dosageForm;
+        public void setOrderReasonConcept(Concept orderReasonConcept) {
+            this.orderReasonConcept = orderReasonConcept;
         }
 
-
-        public void setDrugName(String drugName) {
-            this.drugName = drugName;
+        public String getOrderReasonText() {
+            return orderReasonText;
         }
 
-        public String getDrugName() {
-            return drugName;
+        public void setOrderReasonText(String orderReasonText) {
+            this.orderReasonText = orderReasonText;
         }
 
-        public void setDrugUnits(String drugUnits) {
-            this.drugUnits = drugUnits;
+        public String getInstructions() {
+            return instructions;
         }
 
-        public String getDrugUnits() {
-            return drugUnits;
+        public void setInstructions(String instructions) {
+            this.instructions = instructions;
         }
 
-        public void setDateCreated(Date dateCreated) {
-            this.dateCreated = dateCreated;
+        public String getOrderType() {
+            return orderType;
         }
 
-        @JsonSerialize(using = CustomJsonDateSerializer.class)
-        public Date getDateCreated() {
-            return dateCreated;
+        public void setOrderType(String orderType) {
+            this.orderType = orderType;
         }
 
-        public void setDateChanged(Date dateChanged) {
-            this.dateChanged = dateChanged;
+        public Integer getDuration() {
+            return duration;
         }
 
-        @JsonSerialize(using = CustomJsonDateSerializer.class)
-        public Date getDateChanged() {
-            return dateChanged;
+        public void setDuration(Integer duration) {
+            this.duration = duration;
         }
 
-        public String getDosingInstructions() {
-            return dosingInstructions;
+        public String getDurationUnits() {
+            return durationUnits;
         }
 
-        public void setDosingInstructions(String dosingInstructions) {
-            this.dosingInstructions = dosingInstructions;
-        }
-
-        public boolean isVoided() {
-            return voided;
-        }
-
-        public void setVoided(boolean voided) {
-            this.voided = voided;
-        }
-
-        public String getVoidReason() {
-            return voidReason;
-        }
-
-        public void setVoidReason(String voidReason) {
-            this.voidReason = voidReason;
+        public void setDurationUnits(String durationUnits) {
+            this.durationUnits = durationUnits;
         }
     }
 
@@ -850,6 +802,131 @@ public class EncounterTransaction {
 
         public void setName(String name) {
             this.name = name;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Drug {
+        private String name;
+        private String uuid;
+        private String form;
+        private String strength;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getForm() {
+            return form;
+        }
+
+        public void setForm(String form) {
+            this.form = form;
+        }
+
+        public String getStrength() {
+            return strength;
+        }
+
+        public void setStrength(String strength) {
+            this.strength = strength;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class DosingInstructions {
+        private Double dose;
+        private String doseUnits;
+        private String route;
+        private String frequency;
+        private Boolean asNeeded;
+        private String administrationInstructions;
+        private Integer quantity;
+        private String quantityUnits;
+        private Integer numberOfRefills;
+
+        public Double getDose() {
+            return dose;
+        }
+
+        public void setDose(Double dose) {
+            this.dose = dose;
+        }
+
+        public String getDoseUnits() {
+            return doseUnits;
+        }
+
+        public void setDoseUnits(String doseUnits) {
+            this.doseUnits = doseUnits;
+        }
+
+        public String getRoute() {
+            return route;
+        }
+
+        public void setRoute(String route) {
+            this.route = route;
+        }
+
+        public String getFrequency() {
+            return frequency;
+        }
+
+        public void setFrequency(String frequency) {
+            this.frequency = frequency;
+        }
+
+        public Boolean getAsNeeded() {
+            return asNeeded;
+        }
+
+        public void setAsNeeded(Boolean asNeeded) {
+            this.asNeeded = asNeeded;
+        }
+
+        public String getAdministrationInstructions() {
+            return administrationInstructions;
+        }
+
+        public void setAdministrationInstructions(String administrationInstructions) {
+            this.administrationInstructions = administrationInstructions;
+        }
+
+        public Integer getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(Integer quantity) {
+            this.quantity = quantity;
+        }
+
+        public String getQuantityUnits() {
+            return quantityUnits;
+        }
+
+        public void setQuantityUnits(String quantityUnits) {
+            this.quantityUnits = quantityUnits;
+        }
+
+        public Integer getNumberOfRefills() {
+            return numberOfRefills;
+        }
+
+        public void setNumberOfRefills(Integer numberOfRefills) {
+            this.numberOfRefills = numberOfRefills;
         }
     }
 }

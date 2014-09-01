@@ -16,17 +16,17 @@
                   concept_name_id="1440" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="e102c80f-1yz9-4da3-bb88-8122ce8868dd"/>
 
-    <concept concept_id="3" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1"
+    <concept concept_id="113" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1"
              date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
              uuid="29dc4a20-507f-40ed-9545-d47e932483fa"/>
     <concept_name concept_id="3" name="Paracetamol" locale="en" creator="1" date_created="2004-08-12 00:00:00.0"
                   concept_name_id="1441" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="29dc4a20-507f-40ed-9545-d47e932483fa"/>
 
-    <concept concept_id="4" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1"
+    <concept concept_id="1114" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1"
              date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
              uuid="6302096d-2696-11e3-895c-0800271c1b75"/>
-    <concept_name concept_id="4" name="QDS" locale="en" creator="1" date_created="2004-08-12 00:00:00.0"
+    <concept_name concept_id="1114" name="QDS" locale="en" creator="1" date_created="2004-08-12 00:00:00.0"
                   concept_name_id="1442" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="6302096d-2696-11e3-895c-0800271c1b75"/>
 
@@ -46,7 +46,7 @@
     <concept_set concept_set_id="1109" concept_id="2226" concept_set="30" sort_weight="0.0" creator="1" date_created="2008-08-18 12:38:58.0" uuid="3a111827-639f-4cb5-961f-1e025bf88888"/>
 
 
-    <drug drug_id="6" concept_id="3" name="Paracetamol" combination="0" retired="false" creator="1"
+    <drug drug_id="6" concept_id="113" name="Paracetamol" combination="0" retired="false" creator="1"
           date_created="2004-08-12 00:00:00.0" uuid="4d6fb6e0-4950-426c-9a9b-1f97e6037893"/>
 
     <location location_id="1" name="Test Location" creator="1" date_created="2005-01-01 00:00:00.0" retired="false"
@@ -87,6 +87,14 @@
 
     <concept_set concept_set_id="107" concept_id="28" concept_set="27" sort_weight="1.0" creator="1" date_created="2008-08-18 12:38:58.0" uuid="90893230-d9e7-11e3-9c1a-0800200c9a66"/>
     <concept_word concept_word_id="1011" concept_id="1093" word="QD" locale="en" concept_name_id="10931" weight="2.72"/>
+
+
+
+    <orders order_id="1116" order_number="6" urgency="ROUTINE" encounter_id="1" order_action="NEW" order_type_id="1" concept_id="113" orderer="1" instructions="a"
+            creator="1" date_created="2012-01-19 12:24:10.0"
+            voided="false" patient_id="1" date_activated="2014-07-19 00:00:00.0"
+            uuid="0c96f25c-4949-4f72-9931-d808fbcdbbbb" care_setting="1" />
+    <drug_order order_id="1116" drug_inventory_id="6" dose="3" dose_units="51" frequency="1" as_needed="false" dosing_type="org.openmrs.SimpleDosingInstructions" duration="10" dispense_as_written="0" />
 
     <concept_reference_source concept_source_id="1000" name="ISO 8601 Duration" description="ISO 8601 Duration concept source" creator="1" date_created="2012-04-03 13:41:25.9" retired="true" uuid="cb523690-9012-4e72-b8bf-4253e1b1a687"/>
     <concept_reference_term concept_reference_term_id="12" concept_source_id="1000" code="D" name="Day(s)" description="Duration unit in day(s)" retired="0" creator="1" date_created="2004-08-12 00:00:00.0" uuid="a9e71e68-23c7-4603-be43-aa74e1de2c71"/>

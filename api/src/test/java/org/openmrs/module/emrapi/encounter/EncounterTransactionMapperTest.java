@@ -27,8 +27,6 @@ public class EncounterTransactionMapperTest {
     private EncounterTransactionMapper encounterTransactionMapper;
     @Mock
     private EncounterObservationsMapper encounterObservationsMapper;
-    @Mock
-    private EncounterOrdersMapper encounterOrdersMapper;
 
     @Mock
     private EncounterProviderMapper encounterProviderMapper;
@@ -36,7 +34,7 @@ public class EncounterTransactionMapperTest {
     @Before
     public void setUp() {
         initMocks(this);
-        encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterOrdersMapper, encounterProviderMapper);
+        encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper);
     }
 
     @Test
