@@ -26,11 +26,13 @@ public class EncounterTransactionMapper {
     private EncounterObservationsMapper encounterObservationsMapper;
     private EncounterProviderMapper encounterProviderMapper;
     private EmrOrderService emrOrderService;
+    private TestOrderMapper testOrderMapper;
 
     public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper, EmrOrderService emrOrderService) {
         this.encounterObservationsMapper = encounterObservationsMapper;
         this.encounterProviderMapper = encounterProviderMapper;
         this.emrOrderService = emrOrderService;
+        this.testOrderMapper = new TestOrderMapper();
     }
 
 
@@ -43,10 +45,11 @@ public class EncounterTransactionMapper {
         encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());
 
         encounterProviderMapper.update(encounterTransaction, encounter.getEncounterProviders());
-
         encounterObservationsMapper.update(encounterTransaction, getSortedTopLevelObservations(encounter, includeAll));
 
+        encounterTransaction.setTestOrders(testOrderMapper.map(encounter));
         encounterTransaction.setDrugOrders(emrOrderService.getDrugOrders(encounter));
+
         return encounterTransaction;
     }
 

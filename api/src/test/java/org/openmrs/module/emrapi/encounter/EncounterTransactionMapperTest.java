@@ -17,10 +17,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
+import org.openmrs.Order;
 import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
+import org.openmrs.module.emrapi.encounter.builder.TestOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterTransactionMapperTest {
@@ -44,6 +52,11 @@ public class EncounterTransactionMapperTest {
         Encounter encounter = new EncounterBuilder().build();
         boolean includeAll = false;
 
+        Order testOrder1 = new TestOrderBuilder().build();
+        Order testOrder2 = new TestOrderBuilder().build();
+        Set<Order> orders = new HashSet<Order>(Arrays.asList(testOrder1, testOrder2));
+        encounter.setOrders(orders);
+
         EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
 
         Assert.assertEquals(encounter.getUuid(), encounterTransaction.getEncounterUuid());
@@ -52,5 +65,7 @@ public class EncounterTransactionMapperTest {
         Assert.assertEquals(encounter.getEncounterType().getUuid(), encounterTransaction.getEncounterTypeUuid());
         Assert.assertEquals(encounter.getLocation().getUuid(), encounterTransaction.getLocationUuid());
         Assert.assertEquals(encounter.getVisit().getVisitType().getUuid(), encounterTransaction.getVisitTypeUuid());
+
+        Assert.assertEquals(2, encounterTransaction.getTestOrders().size());
     }
 }
