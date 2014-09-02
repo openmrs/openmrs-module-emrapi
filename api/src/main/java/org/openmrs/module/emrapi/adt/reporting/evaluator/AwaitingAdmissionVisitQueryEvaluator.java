@@ -75,7 +75,7 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
                             + "and admitDecision.voided = false "
                             + "and admitDecision.concept = :admissionDecisionConcept "
                             + "and admitDecision.valueCoded = :denyAdmissionConcept "
-                            + "and encounterInVisit.encounterDatetime > dispoEncounter.encounterDatetime "
+                            + "and encounterInVisit.encounterDatetime > dispoEncounter.encounterDatetime "  // see https://issues.openmrs.org/browse/EA-31
                             + ") = 0")
                 // restrict by context
                 .whereVisitIn("visit", evaluationContext)
