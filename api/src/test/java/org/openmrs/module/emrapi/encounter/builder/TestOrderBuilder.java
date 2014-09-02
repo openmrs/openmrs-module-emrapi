@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.builder;
 
+import org.openmrs.OrderType;
 import org.openmrs.TestOrder;
 
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class TestOrderBuilder {
     public TestOrderBuilder() {
         this.order = new TestOrder();
         this.order.setUuid(UUID.randomUUID().toString());
+        this.order.setOrderType(new OrderType("Test Order", "Test Order"));
     }
 
     public TestOrderBuilder withUuid(UUID uuid) {

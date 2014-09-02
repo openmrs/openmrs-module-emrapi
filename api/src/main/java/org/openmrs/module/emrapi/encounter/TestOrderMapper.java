@@ -15,7 +15,7 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Encounter;
 import org.openmrs.Order;
-import org.openmrs.TestOrder;
+import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class TestOrderMapper {
     public List<EncounterTransaction.TestOrder> map(Encounter encounter) {
         List<EncounterTransaction.TestOrder> testOrders = new ArrayList<EncounterTransaction.TestOrder>();
         for (Order order : encounter.getOrders()) {
-            if (order instanceof TestOrder) {
+            if (EmrApiConstants.TEST_ORDER_TYPE.equals(order.getOrderType().getName())) {
                 testOrders.add(map(order));
             }
         }

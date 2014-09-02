@@ -176,4 +176,6 @@ public class EmrApiConstants {
     public static final String LOCATION_TAG_SUPPORTS_DISPENSING = "Dispensing Location";
 
     public static final String DRUG_ORDER_TYPE = "Drug Order";
+
+    public static final String TEST_ORDER_TYPE = "Test Order";
 }

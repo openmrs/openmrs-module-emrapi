@@ -151,6 +151,11 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
         assertNotNull(response);
         Set<Order> savedDrugOrders = encounterService.getEncounterByUuid("f13d6fae-baa9-4553-955d-920098bec08f").getOrders();
         assertEquals(2, savedDrugOrders.size());
-        assertEquals("DISCONTINUE", savedDrugOrders.iterator().next().getAction().name());
+
+        List<String> actions = new ArrayList<String>();
+        for (Order savedDrugOrder : savedDrugOrders) {
+            actions.add(savedDrugOrder.getAction().name());
+        }
+        assertEquals(Arrays.asList("NEW", "DISCONTINUE"), actions);
     }
 }

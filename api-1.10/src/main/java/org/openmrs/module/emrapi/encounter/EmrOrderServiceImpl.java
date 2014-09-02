@@ -63,11 +63,12 @@ public class EmrOrderServiceImpl implements EmrOrderService {
 
     @Override
     public List<EncounterTransaction.DrugOrder> getDrugOrders(Encounter encounter) {
-        final OrderType drugOrderType = orderService.getOrderTypeByName(EmrApiConstants.DRUG_ORDER_TYPE);
-        final List<Order> drugOrders = orderService.getOrders(encounter.getPatient(), null, drugOrderType, false);
+        OrderType drugOrderType = orderService.getOrderTypeByName(EmrApiConstants.DRUG_ORDER_TYPE);
         List<EncounterTransaction.DrugOrder> orders = new ArrayList<EncounterTransaction.DrugOrder>();
-        for (Order drugOrder : drugOrders) {
-            orders.add(drugOrderMapper.map((DrugOrder) drugOrder));
+        for (Order order : encounter.getOrders()) {
+            if (drugOrderType.equals(order.getOrderType())) {
+                orders.add(drugOrderMapper.map((DrugOrder) order));
+            }
         }
         return orders;
     }
