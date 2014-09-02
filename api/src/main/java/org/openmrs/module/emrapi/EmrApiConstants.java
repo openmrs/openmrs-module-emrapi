@@ -174,4 +174,6 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_DISPOSITION_CONCEPT = "Disposition";
     public static final String LOCATION_TAG_SUPPORTS_DISPENSING = "Dispensing Location";
+
+    public static final String DRUG_ORDER_TYPE = "Drug Order";
 }

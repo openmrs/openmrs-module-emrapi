@@ -651,6 +651,7 @@ public class EncounterTransaction {
         private Drug drug;
         private String dosingInstructionType;
         private DosingInstructions dosingInstructions;
+        private Date dateActivated;
         private Date scheduledDate;
         private Date endDate;
         private String action;
@@ -658,6 +659,7 @@ public class EncounterTransaction {
         private Concept orderReasonConcept;
         private String orderReasonText;
         private String instructions;
+        private String commentToFulfiller;
         private String orderType;
         private Integer duration;
         private String durationUnits;
@@ -780,6 +782,22 @@ public class EncounterTransaction {
 
         public void setDurationUnits(String durationUnits) {
             this.durationUnits = durationUnits;
+        }
+
+        public String getCommentToFulfiller() {
+            return commentToFulfiller;
+        }
+
+        public void setCommentToFulfiller(String commentToFulfiller) {
+            this.commentToFulfiller = commentToFulfiller;
+        }
+
+        public Date getDateActivated() {
+            return dateActivated;
+        }
+
+        public void setDateActivated(Date dateActivated) {
+            this.dateActivated = dateActivated;
         }
     }
 

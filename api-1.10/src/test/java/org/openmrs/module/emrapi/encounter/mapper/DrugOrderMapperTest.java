@@ -13,165 +13,142 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import org.hamcrest.Matchers;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openmrs.CareSetting;
 import org.openmrs.Concept;
+import org.openmrs.ConceptName;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
-import org.openmrs.Encounter;
-import org.openmrs.EncounterProvider;
 import org.openmrs.Order;
+import org.openmrs.OrderFrequency;
 import org.openmrs.OrderType;
+import org.openmrs.Patient;
 import org.openmrs.SimpleDosingInstructions;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
-import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.util.LocaleUtility;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.Locale;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(LocaleUtility.class)
 public class DrugOrderMapperTest {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DRUG_ORDER_TYPE = "Drug Order";
     public static final String DAY_DURATION_UNIT = "day";
     public static final String DRUG_UUID = "drug-uuid";
-
-    @Mock
-    private OrderService orderService;
-
-    @Mock
-    private ConceptService conceptService;
-
-    @Mock
-    private DosingInstructionsMapper dosingInstructionsMapper;
+    public static final String CAPSULE_DOSE_UNIT = "Capsule";
+    public static final String TABLET_DOSAGE_FORM = "TABLET";
+    public static final String MOUTH_ROUTE = "mouth";
+    public static final String TABLET_QUANTITY_UNIT = "TABLET";
+    public static final String TWICE_A_DAY_FREQUENCY = "Twice a day";
 
     private DrugOrderMapper drugOrderMapper;
-    private Encounter encounter;
-    private Concept dayDurationUnit;
 
     @Before
     public void setup() {
-        initMocks(this);
+        mockStatic(LocaleUtility.class);
 
-        drugOrderMapper = new DrugOrderMapper(orderService,conceptService, dosingInstructionsMapper);
+        drugOrderMapper = new DrugOrderMapper();
+    }
+
+    @Test
+    public void shouldMapNewDrugOrder() throws ParseException {
+
+        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water");
+        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper.map(openMrsDrugOrder);
+
+        assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
+        assertThat(drugOrder.getAction(), is(equalTo(Order.Action.NEW.name())));
+        assertThat(drugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
+        assertThat(drugOrder.getOrderType(), is(equalTo(DRUG_ORDER_TYPE)));
+        assertThat(drugOrder.getDosingInstructionType(), is(equalTo(SimpleDosingInstructions.class.getName())));
+        assertThat(drugOrder.getDuration(), is(equalTo(5)));
+        assertThat(drugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_UNIT)));
+
+        assertThat(drugOrder.getDateActivated(), is(equalTo(new LocalDate().toDate())));
+        assertThat(drugOrder.getScheduledDate(), is(equalTo(new LocalDate().plusDays(3).toDate())));
+
+        assertThat(drugOrder.getDosingInstructions().getDose(), is(equalTo(2.0)));
+        assertThat(drugOrder.getDosingInstructions().getDoseUnits(), is(equalTo(CAPSULE_DOSE_UNIT)));
+
+        assertThat(drugOrder.getDosingInstructions().getRoute(), is(equalTo(MOUTH_ROUTE)));
+        assertTrue(drugOrder.getDosingInstructions().getAsNeeded());
+
+        assertThat(drugOrder.getDosingInstructions().getFrequency(), is(equalTo(TWICE_A_DAY_FREQUENCY)));
+
+        assertThat(drugOrder.getDosingInstructions().getQuantity(), is(equalTo(1)));
+        assertThat(drugOrder.getDosingInstructions().getQuantityUnits(), is(equalTo(TABLET_QUANTITY_UNIT)));
+        assertThat(drugOrder.getDosingInstructions().getAdministrationInstructions(), is(equalTo("3-0-2")));
+
+        assertThat(drugOrder.getInstructions(), is(equalTo("before meals")));
+        assertThat(drugOrder.getCommentToFulfiller(), is(equalTo("boil in water")));
+    }
+
+    private DrugOrder drugOrder(CareSetting.CareSettingType careSettingType, int daysToStartAfter, String dosingInstructions, int duration, String instructions, String commentToFulfiller) {
+        DrugOrder order = new DrugOrder();
+        order.setPatient(new Patient());
+        order.setCareSetting(new CareSetting(careSettingType.name(), null, CareSetting.CareSettingType.OUTPATIENT));
+        order.setAction(Order.Action.NEW);
 
         Drug drug = new Drug();
         drug.setUuid(DRUG_UUID);
-        when(conceptService.getDrugByNameOrId(DRUG_UUID)).thenReturn(drug);
+        drug.setDosageForm(concept(TABLET_DOSAGE_FORM));
+        order.setDrug(drug);
 
-        OrderType orderType = new OrderType("Drug Order", "", "org.openmrs.DrugOrder");
-        when(orderService.getOrderTypeByName(DRUG_ORDER_TYPE)).thenReturn(orderType);
+        OrderType orderType = new OrderType();
+        orderType.setName(DRUG_ORDER_TYPE);
+        order.setOrderType(orderType);
 
-        CareSetting outPatientCareSetting = new CareSetting(OUT_PATIENT_CARE_SETTING, OUT_PATIENT_CARE_SETTING, CareSetting.CareSettingType.OUTPATIENT);
-        when(orderService.getCareSettingByName(OUT_PATIENT_CARE_SETTING)).thenReturn(outPatientCareSetting);
+        order.setDosingType(SimpleDosingInstructions.class);
 
-        dayDurationUnit = new Concept();
-        when(conceptService.getConceptByName(DAY_DURATION_UNIT)).thenReturn(dayDurationUnit);
-        when(dosingInstructionsMapper.map(any(EncounterTransaction.DosingInstructions.class) , any(DrugOrder.class))).thenAnswer(argumentAt(1));
+        order.setDuration(duration);
+        order.setDurationUnits(concept(DAY_DURATION_UNIT));
 
-        encounter = new Encounter();
-        HashSet<EncounterProvider> encounterProviders = new HashSet<EncounterProvider>();
-        EncounterProvider encounterProvider = new EncounterProvider();
-        encounterProviders.add(encounterProvider);
-        encounter.setEncounterProviders(encounterProviders);
+        order.setDateActivated(new LocalDate().toDate());
+        order.setScheduledDate(new LocalDate().plusDays(daysToStartAfter).toDate());
+
+        order.setDose(2.0);
+        order.setDoseUnits(concept(CAPSULE_DOSE_UNIT));
+        order.setDosingInstructions(dosingInstructions);
+
+        order.setRoute(concept(MOUTH_ROUTE));
+        order.setAsNeeded(true);
+
+        OrderFrequency orderFrequency = new OrderFrequency();
+        orderFrequency.setFrequencyPerDay(2.0);
+        orderFrequency.setConcept(concept(TWICE_A_DAY_FREQUENCY));
+        order.setFrequency(orderFrequency);
+
+        order.setQuantity(1.0);
+        order.setQuantityUnits(concept(TABLET_QUANTITY_UNIT));
+
+        order.setInstructions(instructions);
+        order.setCommentToFulfiller(commentToFulfiller);
+        return order;
     }
 
-
-    @Test
-    public void shouldMapNewDrugOrders() throws ParseException {
-        EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample(DRUG_UUID, DAY_DURATION_UNIT);
-
-        DrugOrder openMrsDrugOrder = drugOrderMapper.map(drugOrder, encounter);
-
-        assertThat(openMrsDrugOrder.getCareSetting().getName(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
-        assertThat(openMrsDrugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
-        assertTrue(openMrsDrugOrder.getDosingType().isAssignableFrom(SimpleDosingInstructions.class));
-        assertThat(openMrsDrugOrder.getOrderType().getName(), is(equalTo(DRUG_ORDER_TYPE)));
-        assertThat(openMrsDrugOrder.getAction(), is(equalTo(Order.Action.NEW)));
-        assertThat(openMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
-        assertThat(openMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
-        assertThat(openMrsDrugOrder.getDurationUnits(), is(equalTo(dayDurationUnit)));
-        verify(dosingInstructionsMapper).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
+    private Concept concept(String name) {
+        Concept doseUnitsConcept = new Concept();
+        doseUnitsConcept.setFullySpecifiedName(new ConceptName(name, Locale.ENGLISH));
+        return doseUnitsConcept;
     }
 
-    @Test
-    public void shouldMapRevisedDrugOrders() throws ParseException {
-        EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample(DRUG_UUID, DAY_DURATION_UNIT);
-        DrugOrder openMrsDrugOrder = drugOrderMapper.map(drugOrder, encounter);
-
-        drugOrder.setAction(Order.Action.REVISE.name());
-        drugOrder.setExistingUuid(openMrsDrugOrder.getUuid());
-        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
-        DrugOrder revisedOpenMrsDrugOrder = drugOrderMapper.map(drugOrder, encounter);
-
-        assertThat(revisedOpenMrsDrugOrder.getPreviousOrder().getUuid(), is(equalTo(openMrsDrugOrder.getUuid())));
-        assertThat(revisedOpenMrsDrugOrder.getCareSetting().getName(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
-        assertThat(revisedOpenMrsDrugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
-        assertTrue(revisedOpenMrsDrugOrder.getDosingType().isAssignableFrom(SimpleDosingInstructions.class));
-        assertThat(revisedOpenMrsDrugOrder.getOrderType().getName(), is(equalTo(DRUG_ORDER_TYPE)));
-        assertThat(revisedOpenMrsDrugOrder.getAction(), is(equalTo(Order.Action.REVISE)));
-        assertThat(revisedOpenMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
-        assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
-        assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(dayDurationUnit)));
-        verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
-    }
-
-    @Test
-    public void shouldMapStoppedDrugOrders() throws ParseException {
-        EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample(DRUG_UUID, DAY_DURATION_UNIT);
-        DrugOrder openMrsDrugOrder = drugOrderMapper.map(drugOrder, encounter);
-
-        drugOrder.setAction(Order.Action.DISCONTINUE.name());
-        drugOrder.setExistingUuid(openMrsDrugOrder.getUuid());
-        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
-        DrugOrder revisedOpenMrsDrugOrder = drugOrderMapper.map(drugOrder, encounter);
-
-        assertThat(revisedOpenMrsDrugOrder.getPreviousOrder().getUuid(), is(equalTo(openMrsDrugOrder.getUuid())));
-        assertThat(revisedOpenMrsDrugOrder.getCareSetting().getName(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
-        assertThat(revisedOpenMrsDrugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
-        assertTrue(revisedOpenMrsDrugOrder.getDosingType().isAssignableFrom(SimpleDosingInstructions.class));
-        assertThat(revisedOpenMrsDrugOrder.getOrderType().getName(), is(equalTo(DRUG_ORDER_TYPE)));
-        assertThat(revisedOpenMrsDrugOrder.getAction(), is(equalTo(Order.Action.DISCONTINUE)));
-        assertThat(revisedOpenMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
-        assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
-        assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(dayDurationUnit)));
-        verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
-    }
-
-    private Answer<DrugOrder> argumentAt(final int arg) {
-        return new Answer<DrugOrder>() {
-            @Override
-            public DrugOrder answer(InvocationOnMock invocationOnMock) throws Throwable {
-                return (DrugOrder) invocationOnMock.getArguments()[arg];
-            }
-        };
-    }
-
-    private static Date date(String string) throws ParseException {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        return  formatter.parseDateTime(string).toDate();
-    }
 }

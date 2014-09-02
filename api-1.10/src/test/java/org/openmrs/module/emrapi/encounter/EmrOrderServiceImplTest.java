@@ -20,8 +20,8 @@ import org.mockito.Mock;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.api.EncounterService;
-import org.openmrs.module.emrapi.encounter.builder.DosingInstructionsBuilder;
-import org.openmrs.module.emrapi.encounter.mapper.DrugOrderMapper;
+import org.openmrs.api.OrderService;
+import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
@@ -43,7 +43,9 @@ public class EmrOrderServiceImplTest {
     private EncounterService encounterService;
 
     @Mock
-    private DrugOrderMapper drugOrderMapper;
+    private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
+    @Mock
+    private OrderService orderService;
 
     @Before
     public void setup() {
@@ -51,13 +53,13 @@ public class EmrOrderServiceImplTest {
     }
 
     @Test
-    public void shouldAddANewDrugOrder() throws ParseException {
-        EmrOrderServiceImpl emrOrderService = new EmrOrderServiceImpl(drugOrderMapper, encounterService);
+    public void shouldSaveANewDrugOrder() throws ParseException {
+        EmrOrderServiceImpl emrOrderService = new EmrOrderServiceImpl(openMRSDrugOrderMapper, encounterService, orderService);
 
         EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample("drug-uuid", "day");
         DrugOrder mappedDrugOrder = new DrugOrder();
         Encounter encounter = new Encounter();
-        when(drugOrderMapper.map(any(EncounterTransaction.DrugOrder.class),
+        when(openMRSDrugOrderMapper.map(any(EncounterTransaction.DrugOrder.class),
                 same(encounter)))
                 .thenReturn(mappedDrugOrder);
 

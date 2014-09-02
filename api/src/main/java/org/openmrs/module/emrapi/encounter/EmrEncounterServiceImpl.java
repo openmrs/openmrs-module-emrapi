@@ -70,21 +70,6 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
     @Autowired(required = false)
-    //This constructor will be called when there is no default implementation for emrOrderService defined in Spring.
-    //It is required for tests.
-    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
-                                   LocationService locationService, ProviderService providerService,
-                                   @Qualifier(value = "adminService")AdministrationService administrationService,
-                                   EncounterObservationServiceHelper encounterObservationServiceHelper,
-                                   EncounterDispositionServiceHelper encounterDispositionServiceHelper,
-                                   EncounterTransactionMapper encounterTransactionMapper,
-                                   EncounterProviderServiceHelper encounterProviderServiceHelper) {
-        this(patientService, visitService, encounterService, locationService, providerService,
-                administrationService, encounterObservationServiceHelper, encounterDispositionServiceHelper,
-                encounterTransactionMapper, encounterProviderServiceHelper, null);
-    }
-
-    @Autowired(required = false)
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
                                    LocationService locationService, ProviderService providerService,
                                    @Qualifier(value = "adminService")AdministrationService administrationService,

@@ -24,17 +24,19 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterTransactionMapperTest {
-    private EncounterTransactionMapper encounterTransactionMapper;
     @Mock
     private EncounterObservationsMapper encounterObservationsMapper;
-
     @Mock
     private EncounterProviderMapper encounterProviderMapper;
+    @Mock
+    private EmrOrderService emrOrderService;
+
+    private EncounterTransactionMapper encounterTransactionMapper;
 
     @Before
     public void setUp() {
         initMocks(this);
-        encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper);
+        encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper, emrOrderService);
     }
 
     @Test

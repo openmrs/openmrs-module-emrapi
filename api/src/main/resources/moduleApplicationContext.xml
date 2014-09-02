@@ -271,6 +271,7 @@
     <bean id="encounterTransactionMapper" class="org.openmrs.module.emrapi.encounter.EncounterTransactionMapper">
         <constructor-arg name="encounterObservationsMapper" ref="encounterObservationsMapper"/>
         <constructor-arg name="encounterProviderMapper" ref="encounterProviderMapper"/>
+        <constructor-arg name="emrOrderService" ref="emrOrderService"/>
     </bean>
 
     <bean id="encounterProviderMapper" class="org.openmrs.module.emrapi.encounter.EncounterProviderMapper">
