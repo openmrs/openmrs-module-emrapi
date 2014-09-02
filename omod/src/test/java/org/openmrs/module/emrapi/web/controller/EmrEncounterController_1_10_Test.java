@@ -70,7 +70,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
 
         assertNotNull(response);
         Set<Order> savedDrugOrders = encounterService.getEncounterByUuid("f13d6fae-baa9-4553-955d-920098bec08f").getOrders();
-        assertEquals(savedDrugOrders.size(), 1);
+        assertEquals(1, savedDrugOrders.size());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
 
         assertNotNull(response);
         Set<Order> savedDrugOrders = encounterService.getEncounterByUuid("f13d6fae-baa9-4553-955d-920098bec08f").getOrders();
-        assertEquals(savedDrugOrders.size(), 2);
+        assertEquals(2, savedDrugOrders.size());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
 
         assertNotNull(response);
         Set<Order> savedDrugOrders = encounterService.getEncounterByUuid("f13d6fae-baa9-4553-955d-920098bec08f").getOrders();
-        assertEquals(savedDrugOrders.size(), 2);
-        assertEquals(savedDrugOrders.iterator().next().getAction().name(), "DISCONTINUE");
+        assertEquals(2, savedDrugOrders.size());
+        assertEquals("DISCONTINUE", savedDrugOrders.iterator().next().getAction().name());
     }
 }
