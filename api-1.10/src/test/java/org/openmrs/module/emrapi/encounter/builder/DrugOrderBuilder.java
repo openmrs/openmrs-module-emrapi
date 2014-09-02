@@ -31,7 +31,6 @@ public class DrugOrderBuilder {
         calendar.add(Calendar.MONTH, 1);
         drugOrder.setScheduledDate(calendar.getTime());
         calendar.add(Calendar.MONTH, 1);
-        drugOrder.setEndDate(calendar.getTime());
         EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
         provider.setUuid("331c6bf8-7846-11e3-a96a-0800271c1b75");
         drugOrder.setAction("NEW");

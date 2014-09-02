@@ -65,10 +65,6 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
         openMRSDrugOrder.setDurationUnits(conceptService.getConceptByName(drugOrder.getDurationUnits()));
 
-        // Should be removed once we play https://issues.openmrs.org/browse/TRUNK-4446 - Indraneel/Vinay
-        // maybe not! - Shruthi/Rohan
-        openMRSDrugOrder.setAutoExpireDate(drugOrder.getEndDate());
-
         try {
             if (drugOrder.getDosingInstructionType() != null) {
                 openMRSDrugOrder.setDosingType((Class<? extends DosingInstructions>) Context.loadClass(drugOrder.getDosingInstructionType()));

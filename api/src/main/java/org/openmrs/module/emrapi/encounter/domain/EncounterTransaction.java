@@ -653,7 +653,10 @@ public class EncounterTransaction {
         private DosingInstructions dosingInstructions;
         private Date dateActivated;
         private Date scheduledDate;
-        private Date endDate;
+        private Date effectiveStartDate;
+        private Date autoExpireDate;
+        private Date effectiveStopDate;
+        private Date dateStopped;
         private String action;
         private String existingUuid;
         private Concept orderReasonConcept;
@@ -709,14 +712,6 @@ public class EncounterTransaction {
 
         public void setScheduledDate(Date scheduledDate) {
             this.scheduledDate = scheduledDate;
-        }
-
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
         }
 
         public String getAction() {
@@ -789,6 +784,38 @@ public class EncounterTransaction {
 
         public void setDateActivated(Date dateActivated) {
             this.dateActivated = dateActivated;
+        }
+
+        public Date getEffectiveStartDate() {
+            return effectiveStartDate;
+        }
+
+        public void setEffectiveStartDate(Date effectiveStartDate) {
+            this.effectiveStartDate = effectiveStartDate;
+        }
+
+        public Date getAutoExpireDate() {
+            return autoExpireDate;
+        }
+
+        public void setAutoExpireDate(Date autoExpireDate) {
+            this.autoExpireDate = autoExpireDate;
+        }
+
+        public Date getEffectiveStopDate() {
+            return effectiveStopDate;
+        }
+
+        public void setEffectiveStopDate(Date effectiveStopDate) {
+            this.effectiveStopDate = effectiveStopDate;
+        }
+
+        public void setDateStopped(Date dateStopped) {
+            this.dateStopped = dateStopped;
+        }
+
+        public Date getDateStopped() {
+            return dateStopped;
         }
     }
 

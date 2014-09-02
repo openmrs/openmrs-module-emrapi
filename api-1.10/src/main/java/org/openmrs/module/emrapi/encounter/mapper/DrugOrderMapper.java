@@ -14,42 +14,57 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.openmrs.DrugOrder;
+import org.openmrs.SimpleDosingInstructions;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+
+import java.util.Date;
 
 public class DrugOrderMapper {
 
-    public EncounterTransaction.DrugOrder map(DrugOrder drugOrder) {
-        EncounterTransaction.DrugOrder encounterTransactionDrugOrder = new EncounterTransaction.DrugOrder();
-        encounterTransactionDrugOrder.setCareSetting(drugOrder.getCareSetting().getName());
-        encounterTransactionDrugOrder.setAction(drugOrder.getAction().name());
+    public EncounterTransaction.DrugOrder map(DrugOrder openMRSDrugOrder) {
+        EncounterTransaction.DrugOrder drugOrder = new EncounterTransaction.DrugOrder();
+        drugOrder.setCareSetting(openMRSDrugOrder.getCareSetting().getName());
+        drugOrder.setAction(openMRSDrugOrder.getAction().name());
 
         EncounterTransaction.Drug encounterTransactionDrug = new EncounterTransaction.Drug();
-        encounterTransactionDrug.setName(drugOrder.getDrug().getDisplayName());
-        encounterTransactionDrug.setForm(drugOrder.getDrug().getDosageForm().getName().getName());
-        encounterTransactionDrug.setStrength(drugOrder.getDrug().getStrength());
-        encounterTransactionDrug.setUuid(drugOrder.getDrug().getUuid());
-        encounterTransactionDrugOrder.setDrug(encounterTransactionDrug);
+        encounterTransactionDrug.setName(openMRSDrugOrder.getDrug().getDisplayName());
+        encounterTransactionDrug.setForm(openMRSDrugOrder.getDrug().getDosageForm().getName().getName());
+        encounterTransactionDrug.setStrength(openMRSDrugOrder.getDrug().getStrength());
+        encounterTransactionDrug.setUuid(openMRSDrugOrder.getDrug().getUuid());
+        drugOrder.setDrug(encounterTransactionDrug);
 
-        encounterTransactionDrugOrder.setDosingInstructionType(drugOrder.getDosingType().getName());
-        encounterTransactionDrugOrder.setDuration(drugOrder.getDuration());
-        encounterTransactionDrugOrder.setDurationUnits(drugOrder.getDurationUnits().getName().getName());
-        encounterTransactionDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
-        encounterTransactionDrugOrder.setDateActivated(drugOrder.getDateActivated());
+        drugOrder.setDosingInstructionType(openMRSDrugOrder.getDosingType().getName());
+        drugOrder.setDuration(openMRSDrugOrder.getDuration());
+        drugOrder.setDurationUnits(openMRSDrugOrder.getDurationUnits().getName().getName());
+
+        drugOrder.setScheduledDate(openMRSDrugOrder.getScheduledDate());
+        drugOrder.setDateActivated(openMRSDrugOrder.getDateActivated());
+        drugOrder.setEffectiveStartDate(openMRSDrugOrder.getEffectiveStartDate());
+        if(drugOrder.getDosingInstructionType().equals(SimpleDosingInstructions.class.getName())) {
+            Date autoExpireDate = openMRSDrugOrder.getDosingInstructionsInstance().getAutoExpireDate(openMRSDrugOrder);
+            drugOrder.setAutoExpireDate(autoExpireDate);
+            drugOrder.setEffectiveStopDate(openMRSDrugOrder.getDateStopped() != null ? openMRSDrugOrder.getDateStopped() : autoExpireDate);
+        } else {
+            drugOrder.setAutoExpireDate(openMRSDrugOrder.getAutoExpireDate());
+            drugOrder.setEffectiveStopDate(openMRSDrugOrder.getEffectiveStopDate());
+        }
+
+        drugOrder.setDateStopped(openMRSDrugOrder.getDateStopped());
 
         EncounterTransaction.DosingInstructions dosingInstructions = new EncounterTransaction.DosingInstructions();
-        dosingInstructions.setDose(drugOrder.getDose());
-        dosingInstructions.setDoseUnits(drugOrder.getDoseUnits().getName().getName());
-        dosingInstructions.setRoute(drugOrder.getRoute().getName().getName());
-        dosingInstructions.setAsNeeded(drugOrder.getAsNeeded());
-        dosingInstructions.setFrequency(drugOrder.getFrequency().getName());
-        dosingInstructions.setQuantity(drugOrder.getQuantity().intValue());
-        dosingInstructions.setQuantityUnits(drugOrder.getQuantityUnits().getName().getName());
-        dosingInstructions.setAdministrationInstructions(drugOrder.getDosingInstructions());
-        encounterTransactionDrugOrder.setDosingInstructions(dosingInstructions);
+        dosingInstructions.setDose(openMRSDrugOrder.getDose());
+        dosingInstructions.setDoseUnits(openMRSDrugOrder.getDoseUnits().getName().getName());
+        dosingInstructions.setRoute(openMRSDrugOrder.getRoute().getName().getName());
+        dosingInstructions.setAsNeeded(openMRSDrugOrder.getAsNeeded());
+        dosingInstructions.setFrequency(openMRSDrugOrder.getFrequency().getName());
+        dosingInstructions.setQuantity(openMRSDrugOrder.getQuantity().intValue());
+        dosingInstructions.setQuantityUnits(openMRSDrugOrder.getQuantityUnits().getName().getName());
+        dosingInstructions.setAdministrationInstructions(openMRSDrugOrder.getDosingInstructions());
+        drugOrder.setDosingInstructions(dosingInstructions);
 
-        encounterTransactionDrugOrder.setInstructions(drugOrder.getInstructions());
-        encounterTransactionDrugOrder.setCommentToFulfiller(drugOrder.getCommentToFulfiller());
+        drugOrder.setInstructions(openMRSDrugOrder.getInstructions());
+        drugOrder.setCommentToFulfiller(openMRSDrugOrder.getCommentToFulfiller());
 
-        return encounterTransactionDrugOrder;
+        return drugOrder;
     }
 }

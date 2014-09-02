@@ -17,19 +17,21 @@ import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.openmrs.CareSetting;
 import org.openmrs.Concept;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptName;
+import org.openmrs.ConceptReferenceTerm;
+import org.openmrs.ConceptSource;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
+import org.openmrs.ISO8601Duration;
 import org.openmrs.Order;
 import org.openmrs.OrderFrequency;
 import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.SimpleDosingInstructions;
-import org.openmrs.api.ConceptService;
-import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.util.LocaleUtility;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -42,9 +44,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LocaleUtility.class)
@@ -84,6 +84,9 @@ public class DrugOrderMapperTest {
 
         assertThat(drugOrder.getDateActivated(), is(equalTo(new LocalDate().toDate())));
         assertThat(drugOrder.getScheduledDate(), is(equalTo(new LocalDate().plusDays(3).toDate())));
+        assertThat(drugOrder.getEffectiveStartDate(), is(equalTo(new LocalDate().plusDays(3).toDate())));
+        assertThat(drugOrder.getAutoExpireDate(), is(equalTo(new LocalDate().plusDays(8).toDate())));
+        assertThat(drugOrder.getEffectiveStopDate(), is(equalTo(new LocalDate().plusDays(8).toDate())));
 
         assertThat(drugOrder.getDosingInstructions().getDose(), is(equalTo(2.0)));
         assertThat(drugOrder.getDosingInstructions().getDoseUnits(), is(equalTo(CAPSULE_DOSE_UNIT)));
@@ -119,9 +122,14 @@ public class DrugOrderMapperTest {
         order.setDosingType(SimpleDosingInstructions.class);
 
         order.setDuration(duration);
-        order.setDurationUnits(concept(DAY_DURATION_UNIT));
+        Concept durationConcept = concept(DAY_DURATION_UNIT);
+        ConceptSource durationConceptSource = new ConceptSource();
+        durationConceptSource.setUuid(ISO8601Duration.CONCEPT_SOURCE_UUID);
+        durationConcept.addConceptMapping(new ConceptMap(new ConceptReferenceTerm(durationConceptSource, "D", "Day"), new ConceptMapType()));
+        order.setDurationUnits(durationConcept);
 
         order.setDateActivated(new LocalDate().toDate());
+        order.setUrgency(Order.Urgency.ON_SCHEDULED_DATE);
         order.setScheduledDate(new LocalDate().plusDays(daysToStartAfter).toDate());
 
         order.setDose(2.0);

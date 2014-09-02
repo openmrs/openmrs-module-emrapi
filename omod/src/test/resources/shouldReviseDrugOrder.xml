@@ -2,6 +2,10 @@
 <dataset>
     <visit_type visit_type_id="1" name="REG" uuid="b45ca846-c79a-11e2-b0c0-8e397087571c"/>
 
+    <order_type order_type_id="100" name="Drug Order" parent="2" java_class_name="org.openmrs.DrugOrder"
+                description="drug order" creator="1" date_created="2008-08-15 15:49:04.0" retired="1" retired_by="1"
+                retire_reason="None" date_retired="2008-08-15 00:00:00.0" uuid="dd3fb1d0-ae06-22e3-a5e2-0800211c9a66"/>
+
     <concept concept_id="1" retired="false" datatype_id="1" class_id="1" is_set="false" creator="1"
              date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
              uuid="d102c80f-1yz9-4da3-bb88-8122ce8868dd"/>
