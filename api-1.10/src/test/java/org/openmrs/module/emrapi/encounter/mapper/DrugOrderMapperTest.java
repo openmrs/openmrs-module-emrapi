@@ -78,7 +78,6 @@ public class DrugOrderMapperTest {
         assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
         assertThat(drugOrder.getAction(), is(equalTo(Order.Action.NEW.name())));
         assertThat(drugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
-        assertThat(drugOrder.getOrderType(), is(equalTo(DRUG_ORDER_TYPE)));
         assertThat(drugOrder.getDosingInstructionType(), is(equalTo(SimpleDosingInstructions.class.getName())));
         assertThat(drugOrder.getDuration(), is(equalTo(5)));
         assertThat(drugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_UNIT)));

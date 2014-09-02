@@ -660,7 +660,6 @@ public class EncounterTransaction {
         private String orderReasonText;
         private String instructions;
         private String commentToFulfiller;
-        private String orderType;
         private Integer duration;
         private String durationUnits;
 
@@ -758,14 +757,6 @@ public class EncounterTransaction {
 
         public void setInstructions(String instructions) {
             this.instructions = instructions;
-        }
-
-        public String getOrderType() {
-            return orderType;
-        }
-
-        public void setOrderType(String orderType) {
-            this.orderType = orderType;
         }
 
         public Integer getDuration() {

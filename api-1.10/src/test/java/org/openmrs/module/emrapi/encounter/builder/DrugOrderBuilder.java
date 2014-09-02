@@ -25,7 +25,6 @@ public class DrugOrderBuilder {
         drug.setUuid(drugUuid);
         drugOrder.setDrug(drug);
         drugOrder.setDosingInstructionType("org.openmrs.SimpleDosingInstructions");
-        drugOrder.setOrderType("Drug Order");
         EncounterTransaction.DosingInstructions dosingInstructions = DosingInstructionsBuilder.sample();
         drugOrder.setDosingInstructions(dosingInstructions);
         Calendar calendar = Calendar.getInstance();

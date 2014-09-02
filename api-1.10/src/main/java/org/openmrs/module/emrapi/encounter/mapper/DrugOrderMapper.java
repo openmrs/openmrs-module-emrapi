@@ -30,7 +30,6 @@ public class DrugOrderMapper {
         encounterTransactionDrug.setUuid(drugOrder.getDrug().getUuid());
         encounterTransactionDrugOrder.setDrug(encounterTransactionDrug);
 
-        encounterTransactionDrugOrder.setOrderType(drugOrder.getOrderType().getName());
         encounterTransactionDrugOrder.setDosingInstructionType(drugOrder.getDosingType().getName());
         encounterTransactionDrugOrder.setDuration(drugOrder.getDuration());
         encounterTransactionDrugOrder.setDurationUnits(drugOrder.getDurationUnits().getName().getName());

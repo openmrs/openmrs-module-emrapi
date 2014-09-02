@@ -14,7 +14,6 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.*;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.CareSetting;
@@ -22,13 +21,12 @@ import org.openmrs.DosingInstructions;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
-import org.openmrs.FreeTextDosingInstructions;
 import org.openmrs.Order;
-import org.openmrs.OrderType;
 import org.openmrs.Provider;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,7 +56,7 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setDrug(getDrugFrom(drugOrder, openMRSDrugOrder));
         openMRSDrugOrder.setConcept(openMRSDrugOrder.getDrug().getConcept());
         openMRSDrugOrder.setEncounter(encounter);
-        openMRSDrugOrder.setOrderType(getOrderTypeFrom(drugOrder, openMRSDrugOrder));
+        openMRSDrugOrder.setOrderType(orderService.getOrderTypeByName(EmrApiConstants.DRUG_ORDER_TYPE));
         openMRSDrugOrder.setDateActivated(new Date());
         if (drugOrder.getScheduledDate() != null && drugOrder.getScheduledDate().after(new Date())) {
             openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
@@ -102,12 +100,6 @@ public class OpenMRSDrugOrderMapper {
         } else {
             return (DrugOrder) orderService.getOrderByUuid(drugOrder.getExistingUuid()).cloneForRevision();
         }
-    }
-
-    private OrderType getOrderTypeFrom(EncounterTransaction.DrugOrder drugOrder, DrugOrder openMRSDrugOrder) {
-        return isNewDrugOrder(drugOrder)
-                ? orderService.getOrderTypeByName(drugOrder.getOrderType())
-                : openMRSDrugOrder.getOrderType();
     }
 
     private CareSetting getCareSettingFrom(EncounterTransaction.DrugOrder drugOrder, DrugOrder openMRSDrugOrder) {
