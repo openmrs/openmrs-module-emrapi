@@ -29,13 +29,7 @@ public class DrugOrderMapper {
         drugOrder.setAction(openMRSDrugOrder.getAction().name()); 
         drugOrder.setOrderType(openMRSDrugOrder.getOrderType().getName());
 
-        EncounterTransaction.Drug encounterTransactionDrug = new EncounterTransaction.Drug();
-        encounterTransactionDrug.setName(openMRSDrugOrder.getDrug().getDisplayName()); 
-        if (openMRSDrugOrder.getDrug().getDosageForm() != null) {
-            encounterTransactionDrug.setForm(openMRSDrugOrder.getDrug().getDosageForm().getName().getName());
-        }
-        encounterTransactionDrug.setStrength(openMRSDrugOrder.getDrug().getStrength()); 
-        encounterTransactionDrug.setUuid(openMRSDrugOrder.getDrug().getUuid()); 
+        EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper().map(openMRSDrugOrder.getDrug());
         drugOrder.setDrug(encounterTransactionDrug);
 
         drugOrder.setDosingInstructionType(openMRSDrugOrder.getDosingType().getName()); 
