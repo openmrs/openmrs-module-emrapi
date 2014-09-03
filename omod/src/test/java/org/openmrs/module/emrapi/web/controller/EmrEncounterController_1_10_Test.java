@@ -41,7 +41,8 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
                 "     \n" +
                 "      \"uuid\":\"331c6bf8-7846-11e3-a96a-0800271c1b75\"\n" +
                 "   }],\n" +
-                "   \"drugOrders\" : [{   \"careSetting\":\"OUTPATIENT\",\n" +
+                "   \"drugOrders\" : [{   " +
+                "      \"careSetting\":\"OUTPATIENT\",\n" +
                 "      \"drug\":{  \n" +
                 "         \"name\":\"Paracetamol\"\n" +
                 "      },\n" +
@@ -87,7 +88,8 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
                 "      \"uuid\":\"331c6bf8-7846-11e3-a96a-0800271c1b75\"\n" +
                 "   }],\n" +
                 "   \"drugOrders\" : [{ \n" +
-                "      \"existingUuid\":\"0c96f25c-4949-4f72-9931-d808fbcdbbbb\",\n" +
+                "      \"careSetting\":\"OUTPATIENT\",\n" +
+                "      \"previousOrderUuid\":\"0c96f25c-4949-4f72-9931-d808fbcdbbbb\",\n" +
                 "      \"dosingInstructionsType\":\"org.openmrs.SimpleDosingInstructions\",\n" +
                 "      \"orderType\":\"Drug order\",\n" +
                 "      \"dosingInstructions\":{  \n" +
@@ -128,7 +130,8 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
                 "      \"uuid\":\"331c6bf8-7846-11e3-a96a-0800271c1b75\"\n" +
                 "   }],\n" +
                 "   \"drugOrders\" : [{ \n" +
-                "      \"existingUuid\":\"0c96f25c-4949-4f72-9931-d808fbcdbbbb\",\n" +
+                "      \"careSetting\":\"OUTPATIENT\",\n" +
+                "      \"previousOrderUuid\":\"0c96f25c-4949-4f72-9931-d808fbcdbbbb\",\n" +
                 "      \"dosingInstructionsType\":\"org.openmrs.SimpleDosingInstructions\",\n" +
                 "      \"orderType\":\"Drug order\",\n" +
                 "      \"dosingInstructions\":{  \n" +

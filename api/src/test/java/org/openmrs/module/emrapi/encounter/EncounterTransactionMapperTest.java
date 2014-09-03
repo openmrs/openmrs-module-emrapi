@@ -30,13 +30,16 @@ public class EncounterTransactionMapperTest {
     private EncounterProviderMapper encounterProviderMapper;
     @Mock
     private EmrOrderService emrOrderService;
+    @Mock
+    private OrderMapper orderMapper;
 
     private EncounterTransactionMapper encounterTransactionMapper;
 
     @Before
     public void setUp() {
         initMocks(this);
-        encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper, emrOrderService);
+
+        encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper, orderMapper);
     }
 
     @Test

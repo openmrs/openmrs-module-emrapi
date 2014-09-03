@@ -48,7 +48,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-public class OpenMRSDrugOrderMapperTest {
+public class OpenMRSDrugOrderMapper110Test {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DRUG_ORDER_TYPE = "Drug Order";
@@ -86,7 +86,7 @@ public class OpenMRSDrugOrderMapperTest {
 
         dayDurationUnit = new Concept();
         when(conceptService.getConceptByName(DAY_DURATION_UNIT)).thenReturn(dayDurationUnit);
-        when(dosingInstructionsMapper.map(any(EncounterTransaction.DosingInstructions.class) , any(DrugOrder.class))).thenAnswer(argumentAt(1));
+        when(dosingInstructionsMapper.map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class))).thenAnswer(argumentAt(1));
 
         encounter = new Encounter();
         HashSet<EncounterProvider> encounterProviders = new HashSet<EncounterProvider>();
@@ -119,7 +119,7 @@ public class OpenMRSDrugOrderMapperTest {
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
         drugOrder.setAction(Order.Action.REVISE.name());
-        drugOrder.setExistingUuid(openMrsDrugOrder.getUuid());
+        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
         when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
         DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
@@ -141,7 +141,7 @@ public class OpenMRSDrugOrderMapperTest {
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
         drugOrder.setAction(Order.Action.DISCONTINUE.name());
-        drugOrder.setExistingUuid(openMrsDrugOrder.getUuid());
+        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
         when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
         DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 

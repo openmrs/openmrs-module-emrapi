@@ -15,13 +15,4 @@ public class MockEmrOrderServiceImpl implements EmrOrderService {
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
     }
 
-    @Override
-    public List<EncounterTransaction.DrugOrder> getDrugOrders(Encounter encounter) {
-        return new ArrayList<EncounterTransaction.DrugOrder>();
-    }
-
-    @Override
-    public List<EncounterTransaction.TestOrder> getTestOrders(Encounter encounter) {
-        return new ArrayList<EncounterTransaction.TestOrder>();
-    }
 }

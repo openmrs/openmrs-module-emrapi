@@ -20,16 +20,5 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 public class TestOrderMapper {
     private final ConceptMapper conceptMapper = new ConceptMapper();
 
-    public EncounterTransaction.TestOrder map(Order order) {
-        EncounterTransaction.TestOrder emrTestOrder = new EncounterTransaction.TestOrder();
-        emrTestOrder.setUuid(order.getUuid());
-        emrTestOrder.setConcept(conceptMapper.map(order.getConcept()));
-        emrTestOrder.setInstructions(order.getInstructions());
-        emrTestOrder.setOrderTypeUuid(order.getOrderType() != null ? order.getOrderType().getUuid() : null);
-        emrTestOrder.setVoided(order.getVoided());
-        emrTestOrder.setVoidReason(order.getVoidReason());
-        emrTestOrder.setDateCreated(order.getDateCreated());
-        emrTestOrder.setDateChanged(order.getDateChanged());
-        return emrTestOrder;
-    }
+
 }

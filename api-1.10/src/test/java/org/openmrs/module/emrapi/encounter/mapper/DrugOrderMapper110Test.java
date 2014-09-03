@@ -48,7 +48,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LocaleUtility.class)
-public class DrugOrderMapperTest {
+public class DrugOrderMapper110Test {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DRUG_ORDER_TYPE = "Drug Order";
@@ -60,20 +60,20 @@ public class DrugOrderMapperTest {
     public static final String TABLET_QUANTITY_UNIT = "TABLET";
     public static final String TWICE_A_DAY_FREQUENCY = "Twice a day";
 
-    private DrugOrderMapper drugOrderMapper;
+    private OrderMapper1_10 drugOrderMapper110;
 
     @Before
     public void setup() {
         mockStatic(LocaleUtility.class);
 
-        drugOrderMapper = new DrugOrderMapper();
+        drugOrderMapper110 = new OrderMapper1_10();
     }
 
     @Test
     public void shouldMapNewDrugOrder() throws ParseException {
 
         DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water");
-        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper.map(openMrsDrugOrder);
+        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
         assertThat(drugOrder.getAction(), is(equalTo(Order.Action.NEW.name())));
@@ -131,6 +131,7 @@ public class DrugOrderMapperTest {
         order.setDateActivated(new LocalDate().toDate());
         order.setUrgency(Order.Urgency.ON_SCHEDULED_DATE);
         order.setScheduledDate(new LocalDate().plusDays(daysToStartAfter).toDate());
+        order.setAutoExpireDate(new LocalDate().plusDays(daysToStartAfter + duration).toDate());
 
         order.setDose(2.0);
         order.setDoseUnits(concept(CAPSULE_DOSE_UNIT));

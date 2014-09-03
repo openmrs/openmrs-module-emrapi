@@ -14,8 +14,6 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.CareSetting;
 import org.openmrs.DosingInstructions;
 import org.openmrs.Drug;
@@ -55,7 +53,7 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setConcept(openMRSDrugOrder.getDrug().getConcept());
         openMRSDrugOrder.setEncounter(encounter);
         openMRSDrugOrder.setOrderType(orderService.getOrderTypeByName(drugOrder.getOrderType()));
-        openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated() == null ? new Date() : drugOrder.getDateActivated());
+        openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated());
         if (drugOrder.getScheduledDate() != null && drugOrder.getScheduledDate().after(new Date())) {
             openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
             openMRSDrugOrder.setUrgency(Order.Urgency.ON_SCHEDULED_DATE);
@@ -79,7 +77,7 @@ public class OpenMRSDrugOrderMapper {
     }
 
     private boolean isNewDrugOrder(EncounterTransaction.DrugOrder drugOrder) {
-        return StringUtils.isBlank(drugOrder.getExistingUuid());
+        return StringUtils.isBlank(drugOrder.getPreviousOrderUuid());
     }
 
     private boolean isDrugOrderDiscontinued(EncounterTransaction.DrugOrder drugOrder) {
@@ -90,9 +88,9 @@ public class OpenMRSDrugOrderMapper {
         if (isNewDrugOrder(drugOrder)) {
             return new DrugOrder();
         } else if (isDrugOrderDiscontinued(drugOrder)) {
-            return (DrugOrder) orderService.getOrderByUuid(drugOrder.getExistingUuid()).cloneForDiscontinuing();
+            return (DrugOrder) orderService.getOrderByUuid(drugOrder.getPreviousOrderUuid()).cloneForDiscontinuing();
         } else {
-            return (DrugOrder) orderService.getOrderByUuid(drugOrder.getExistingUuid()).cloneForRevision();
+            return (DrugOrder) orderService.getOrderByUuid(drugOrder.getPreviousOrderUuid()).cloneForRevision();
         }
     }
 

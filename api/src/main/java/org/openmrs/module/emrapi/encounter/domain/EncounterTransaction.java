@@ -659,7 +659,7 @@ public class EncounterTransaction {
         private Date effectiveStopDate;
         private Date dateStopped;
         private String action;
-        private String existingUuid;
+        private String previousOrderUuid;
         private Concept orderReasonConcept;
         private String orderReasonText;
         private String instructions;
@@ -723,12 +723,12 @@ public class EncounterTransaction {
             this.action = action;
         }
 
-        public String getExistingUuid() {
-            return existingUuid;
+        public String getPreviousOrderUuid() {
+            return previousOrderUuid;
         }
 
-        public void setExistingUuid(String existingUuid) {
-            this.existingUuid = existingUuid;
+        public void setPreviousOrderUuid(String previousOrderUuid) {
+            this.previousOrderUuid = previousOrderUuid;
         }
 
         public Concept getOrderReasonConcept() {

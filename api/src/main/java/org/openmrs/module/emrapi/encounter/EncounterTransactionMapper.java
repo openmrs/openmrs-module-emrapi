@@ -25,12 +25,12 @@ import java.util.TreeSet;
 public class EncounterTransactionMapper {
     private EncounterObservationsMapper encounterObservationsMapper;
     private EncounterProviderMapper encounterProviderMapper;
-    private EmrOrderService emrOrderService;
+    private OrderMapper orderMapper;
 
-    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper, EmrOrderService emrOrderService) {
+    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper, OrderMapper orderMapper) {
         this.encounterObservationsMapper = encounterObservationsMapper;
         this.encounterProviderMapper = encounterProviderMapper;
-        this.emrOrderService = emrOrderService;
+        this.orderMapper = orderMapper;
     }
 
 
@@ -45,8 +45,8 @@ public class EncounterTransactionMapper {
         encounterProviderMapper.update(encounterTransaction, encounter.getEncounterProviders());
         encounterObservationsMapper.update(encounterTransaction, getSortedTopLevelObservations(encounter, includeAll));
 
-        encounterTransaction.setTestOrders(emrOrderService.getTestOrders(encounter));
-        encounterTransaction.setDrugOrders(emrOrderService.getDrugOrders(encounter));
+        encounterTransaction.setDrugOrders(orderMapper.mapDrugOrders(encounter));
+        encounterTransaction.setTestOrders(orderMapper.mapTestOrders(encounter));
 
         return encounterTransaction;
     }
