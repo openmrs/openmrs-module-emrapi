@@ -25,7 +25,7 @@ public class DosingInstructionsBuilder {
         dosingInstructions.setFrequency("QDS");
         dosingInstructions.setAsNeeded(false);
         dosingInstructions.setAdministrationInstructions("AC");
-        dosingInstructions.setQuantity(1);
+        dosingInstructions.setQuantity(1.0);
         dosingInstructions.setQuantityUnits("bottle");
         dosingInstructions.setNumberOfRefills(1);
         return dosingInstructions;

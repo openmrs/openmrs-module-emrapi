@@ -96,7 +96,7 @@ public class DrugOrderMapper110Test {
 
         assertThat(drugOrder.getDosingInstructions().getFrequency(), is(equalTo(TWICE_A_DAY_FREQUENCY)));
 
-        assertThat(drugOrder.getDosingInstructions().getQuantity(), is(equalTo(1)));
+        assertThat(drugOrder.getDosingInstructions().getQuantity(), is(equalTo(1.0)));
         assertThat(drugOrder.getDosingInstructions().getQuantityUnits(), is(equalTo(TABLET_QUANTITY_UNIT)));
         assertThat(drugOrder.getDosingInstructions().getAdministrationInstructions(), is(equalTo("3-0-2")));
 

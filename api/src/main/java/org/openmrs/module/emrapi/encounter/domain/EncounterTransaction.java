@@ -898,7 +898,7 @@ public class EncounterTransaction {
         private String frequency;
         private Boolean asNeeded;
         private String administrationInstructions;
-        private Integer quantity;
+        private Double quantity;
         private String quantityUnits;
         private Integer numberOfRefills;
 
@@ -950,11 +950,11 @@ public class EncounterTransaction {
             this.administrationInstructions = administrationInstructions;
         }
 
-        public Integer getQuantity() {
+        public Double getQuantity() {
             return quantity;
         }
 
-        public void setQuantity(Integer quantity) {
+        public void setQuantity(Double quantity) {
             this.quantity = quantity;
         }
 

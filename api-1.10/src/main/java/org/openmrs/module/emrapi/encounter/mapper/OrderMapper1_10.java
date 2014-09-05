@@ -98,7 +98,7 @@ public class OrderMapper1_10 implements OrderMapper {
             dosingInstructions.setFrequency(openMRSDrugOrder.getFrequency().getName());
         }
         if (openMRSDrugOrder.getQuantity() != null) {
-            dosingInstructions.setQuantity(openMRSDrugOrder.getQuantity().intValue());
+            dosingInstructions.setQuantity(openMRSDrugOrder.getQuantity());
         }
         dosingInstructions.setQuantityUnits(getConceptName(openMRSDrugOrder.getQuantityUnits()));
         dosingInstructions.setAdministrationInstructions(openMRSDrugOrder.getDosingInstructions());
