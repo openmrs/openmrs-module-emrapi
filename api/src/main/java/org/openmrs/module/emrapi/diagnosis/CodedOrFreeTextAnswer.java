@@ -21,6 +21,7 @@ import org.openmrs.ConceptMap;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
+import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.util.OpenmrsUtil;
@@ -61,6 +62,22 @@ public class CodedOrFreeTextAnswer {
             setNonCodedAnswer(spec.substring(NON_CODED_PREFIX.length()));
         } else {
             throw new IllegalArgumentException("Unknown format: " + spec);
+        }
+    }
+
+    public CodedOrFreeTextAnswer(Obs codedOrNonCodedValue) {
+        if (codedOrNonCodedValue.getValueCodedName() != null) {
+            this.specificCodedAnswer = codedOrNonCodedValue.getValueCodedName();
+            this.codedAnswer = this.specificCodedAnswer.getConcept();
+        }
+        else if (codedOrNonCodedValue.getValueCoded() != null) {
+            this.codedAnswer = codedOrNonCodedValue.getValueCoded();
+        }
+        else if (codedOrNonCodedValue.getValueText() != null) {
+            this.nonCodedAnswer = codedOrNonCodedValue.getValueText();
+        }
+        else {
+            throw new IllegalArgumentException("codedOrNonCodedValue must have one of valueCodedName, valueCoded, or valueText");
         }
     }
 
