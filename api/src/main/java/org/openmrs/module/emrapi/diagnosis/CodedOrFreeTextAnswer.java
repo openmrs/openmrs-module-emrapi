@@ -106,6 +106,19 @@ public class CodedOrFreeTextAnswer {
         }
     }
 
+    /**
+     * @return specificCodedAnswer || codedAnswer || nonCodedAnswer
+     */
+    public Object getValue() {
+        if (specificCodedAnswer != null) {
+            return specificCodedAnswer;
+        } else if (codedAnswer != null) {
+            return codedAnswer;
+        } else {
+            return nonCodedAnswer;
+        }
+    }
+
     public Concept getCodedAnswer() {
         return codedAnswer;
     }
