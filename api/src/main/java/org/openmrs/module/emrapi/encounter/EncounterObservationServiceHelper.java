@@ -123,6 +123,9 @@ public class EncounterObservationServiceHelper {
     private Obs newObservation(Encounter encounter, EncounterTransaction.Observation observationData) {
         Obs observation;
         observation = new Obs();
+        if(!StringUtils.isBlank(observationData.getUuid())){
+            observation.setUuid(observationData.getUuid());
+        }
         Date observationDateTime = getCurrentDateIfNull(observationData.getObservationDateTime());
         Concept concept = conceptService.getConceptByUuid(observationData.getConceptUuid());
         if (concept == null) {
