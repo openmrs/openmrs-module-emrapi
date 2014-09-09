@@ -15,18 +15,13 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
-import org.openmrs.Order;
-import org.openmrs.TestOrder;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.mapper.OrderMapper1_10;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
-import org.openmrs.module.emrapi.encounter.mapper.TestOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service(value = "emrOrderService")

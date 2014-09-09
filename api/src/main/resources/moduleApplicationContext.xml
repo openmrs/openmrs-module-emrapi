@@ -268,12 +268,6 @@
         <constructor-arg name="encounterTransactionMapper" ref="encounterTransactionMapper"/>
     </bean>
 
-    <bean id="encounterTransactionMapper" class="org.openmrs.module.emrapi.encounter.EncounterTransactionMapper">
-        <constructor-arg name="encounterObservationsMapper" ref="encounterObservationsMapper"/>
-        <constructor-arg name="encounterProviderMapper" ref="encounterProviderMapper"/>
-        <constructor-arg name="orderMapper" ref="orderMapper"/>
-    </bean>
-
     <bean id="encounterProviderMapper" class="org.openmrs.module.emrapi.encounter.EncounterProviderMapper">
     </bean>
 

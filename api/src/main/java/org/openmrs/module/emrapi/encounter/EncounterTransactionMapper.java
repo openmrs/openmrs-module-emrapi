@@ -16,23 +16,31 @@ package org.openmrs.module.emrapi.encounter;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+@Component(value = "encounterTransactionMapper")
 public class EncounterTransactionMapper {
     private EncounterObservationsMapper encounterObservationsMapper;
     private EncounterProviderMapper encounterProviderMapper;
     private OrderMapper orderMapper;
 
+    @Autowired(required = false)
+    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper) {
+        this(encounterObservationsMapper, encounterProviderMapper, null);
+    }
+
+    @Autowired(required = false)
     public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper, OrderMapper orderMapper) {
         this.encounterObservationsMapper = encounterObservationsMapper;
         this.encounterProviderMapper = encounterProviderMapper;
         this.orderMapper = orderMapper;
     }
-
 
     public EncounterTransaction map(Encounter encounter, Boolean includeAll) {
         EncounterTransaction encounterTransaction = new EncounterTransaction(encounter.getVisit().getUuid(), encounter.getUuid());
@@ -45,8 +53,10 @@ public class EncounterTransactionMapper {
         encounterProviderMapper.update(encounterTransaction, encounter.getEncounterProviders());
         encounterObservationsMapper.update(encounterTransaction, getSortedTopLevelObservations(encounter, includeAll));
 
-        encounterTransaction.setDrugOrders(orderMapper.mapDrugOrders(encounter));
-        encounterTransaction.setTestOrders(orderMapper.mapTestOrders(encounter));
+        if (orderMapper != null) {
+            encounterTransaction.setDrugOrders(orderMapper.mapDrugOrders(encounter));
+            encounterTransaction.setTestOrders(orderMapper.mapTestOrders(encounter));
+        }
 
         return encounterTransaction;
     }

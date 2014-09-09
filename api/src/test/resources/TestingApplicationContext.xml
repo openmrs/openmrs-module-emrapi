@@ -20,9 +20,5 @@
         </property>
         <!--  default properties must be set in the hibernate.default.properties -->
     </bean>
-
-    <bean id="emrOrderService" class="org.openmrs.module.emrapi.test.MockEmrOrderServiceImpl">
-    </bean>
-
 </beans>
 

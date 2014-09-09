@@ -20,8 +20,8 @@ import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.OrderFrequency;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.builder.DosingInstructionsBuilder;
+import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -31,9 +31,9 @@ import static org.openmrs.module.emrapi.encounter.domain.EncounterTransaction.Do
 import static org.powermock.api.mockito.PowerMockito.when;
 
 public class DosingInstructionsMapperTest {
-    @Mock
-    private OrderService orderService;
 
+    @Mock
+    private OrderMetadataService orderMetadataService;
     @Mock
     private ConceptService conceptService;
 
@@ -52,12 +52,12 @@ public class DosingInstructionsMapperTest {
         Concept frequencyConcept = new Concept();
         when(conceptService.getConceptByName(dosingInstructions.getFrequency())).thenReturn(frequencyConcept);
         OrderFrequency orderFrequency = new OrderFrequency();
-        when(orderService.getOrderFrequencyByConcept(frequencyConcept)).thenReturn(orderFrequency);
+        when(orderMetadataService.getOrderFrequencyByName("QDS", false)).thenReturn(orderFrequency);
         Concept quantityUnits = new Concept();
         when(conceptService.getConceptByName(dosingInstructions.getQuantityUnits())).thenReturn(quantityUnits);
 
         DrugOrder drugOrder = new DrugOrder();
-        DosingInstructionsMapper dosingInstructionsMapper = new DosingInstructionsMapper(conceptService, orderService);
+        DosingInstructionsMapper dosingInstructionsMapper = new DosingInstructionsMapper(conceptService, orderMetadataService);
 
         dosingInstructionsMapper.map(dosingInstructions, drugOrder);
 
@@ -78,7 +78,7 @@ public class DosingInstructionsMapperTest {
         dosingInstructions.setNumberOfRefills(null);
         DrugOrder drugOrder = new DrugOrder();
 
-        DosingInstructionsMapper dosingInstructionsMapper = new DosingInstructionsMapper(conceptService, orderService);
+        DosingInstructionsMapper dosingInstructionsMapper = new DosingInstructionsMapper(conceptService, orderMetadataService);
 
         dosingInstructionsMapper.map(dosingInstructions, drugOrder);
         assertThat(drugOrder.getNumRefills(), is(equalTo(0)));

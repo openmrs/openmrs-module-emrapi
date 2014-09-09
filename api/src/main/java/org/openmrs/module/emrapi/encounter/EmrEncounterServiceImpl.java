@@ -91,6 +91,17 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.emrOrderService = emrOrderService;
     }
 
+    @Autowired(required = false)
+    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
+                                   LocationService locationService, ProviderService providerService,
+                                   @Qualifier(value = "adminService")AdministrationService administrationService,
+                                   EncounterObservationServiceHelper encounterObservationServiceHelper,
+                                   EncounterDispositionServiceHelper encounterDispositionServiceHelper,
+                                   EncounterTransactionMapper encounterTransactionMapper,
+                                   EncounterProviderServiceHelper encounterProviderServiceHelper) {
+        this(patientService, visitService, encounterService, locationService, providerService, administrationService, encounterObservationServiceHelper, encounterDispositionServiceHelper, encounterTransactionMapper, encounterProviderServiceHelper, null);
+    }
+
     @Override
     public void onStartup() {
         try {

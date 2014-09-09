@@ -48,7 +48,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LocaleUtility.class)
-public class DrugOrderMapper110Test {
+public class DrugOrderMapper1_10Test {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DRUG_ORDER_TYPE = "Drug Order";

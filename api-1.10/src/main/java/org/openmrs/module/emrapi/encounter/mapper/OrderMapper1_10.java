@@ -13,14 +13,12 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
 import org.openmrs.Concept;
-import org.openmrs.ConceptComplex;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.TestOrder;
+import org.openmrs.api.db.hibernate.HibernateUtil;
 import org.openmrs.module.emrapi.encounter.ConceptMapper;
 import org.openmrs.module.emrapi.encounter.OrderMapper;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -39,11 +37,8 @@ public class OrderMapper1_10 implements OrderMapper {
 
         List<EncounterTransaction.DrugOrder> orders = new ArrayList<EncounterTransaction.DrugOrder>();
         for (Order order : encounter.getOrders()) {
-            if (DrugOrder.class.equals(order.getOrderType().getJavaClass())) {
-                if (order instanceof HibernateProxy) {
-                    Hibernate.initialize(order);
-                    order = (DrugOrder) ((HibernateProxy) order).getHibernateLazyInitializer().getImplementation();
-                }
+            order = HibernateUtil.getRealObjectFromProxy(order);
+            if (DrugOrder.class.equals(order.getClass())) {
                 orders.add(mapDrugOrder((DrugOrder) order));
             }
         }
@@ -54,11 +49,8 @@ public class OrderMapper1_10 implements OrderMapper {
     public List<EncounterTransaction.TestOrder> mapTestOrders(Encounter encounter) {
         List<EncounterTransaction.TestOrder> testOrders = new ArrayList<EncounterTransaction.TestOrder>();
         for (Order order : encounter.getOrders()) {
-            if (TestOrder.class.equals(order.getOrderType().getJavaClass())) {
-                if (order instanceof HibernateProxy) {
-                    Hibernate.initialize(order);
-                    order = (TestOrder) ((HibernateProxy) order).getHibernateLazyInitializer().getImplementation();
-                }
+            order = HibernateUtil.getRealObjectFromProxy(order);
+            if (TestOrder.class.equals(order.getClass())) {
                 testOrders.add(mapTestOrder((TestOrder) order));
             }
         }

@@ -15,22 +15,21 @@ package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
-import org.openmrs.OrderFrequency;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DosingInstructionsMapper {
     private ConceptService conceptService;
-    private OrderService orderService;
+    private OrderMetadataService orderMetadataService;
 
     @Autowired
-    public DosingInstructionsMapper(ConceptService conceptService, OrderService orderService) {
+    public DosingInstructionsMapper(ConceptService conceptService, OrderMetadataService orderMetadataService) {
         this.conceptService = conceptService;
-        this.orderService = orderService;
+        this.orderMetadataService = orderMetadataService;
     }
 
     public DrugOrder map(EncounterTransaction.DosingInstructions dosingInstructions, DrugOrder drugOrder) {
@@ -39,16 +38,12 @@ public class DosingInstructionsMapper {
         drugOrder.setDosingInstructions(dosingInstructions.getAdministrationInstructions());
         drugOrder.setRoute(conceptByName(dosingInstructions.getRoute()));
         drugOrder.setAsNeeded(dosingInstructions.getAsNeeded());
-        drugOrder.setFrequency(orderFrequency(conceptByName(dosingInstructions.getFrequency())));
+        drugOrder.setFrequency(orderMetadataService.getOrderFrequencyByName(dosingInstructions.getFrequency(), false));
         drugOrder.setQuantity(Double.valueOf(dosingInstructions.getQuantity()));
         drugOrder.setQuantityUnits(conceptByName(dosingInstructions.getQuantityUnits()));
         Integer numberOfRefills = dosingInstructions.getNumberOfRefills();
         drugOrder.setNumRefills(numberOfRefills == null? 0: numberOfRefills);
         return drugOrder;
-    }
-
-    private OrderFrequency orderFrequency(Concept frequencyConcept) {
-        return orderService.getOrderFrequencyByConcept(frequencyConcept);
     }
 
     private Concept conceptByName(String name) {

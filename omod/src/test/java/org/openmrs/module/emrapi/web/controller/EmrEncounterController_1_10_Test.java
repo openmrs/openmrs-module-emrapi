@@ -47,12 +47,11 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
                 "         \"name\":\"Paracetamol\"\n" +
                 "      },\n" +
                 "      \"dosingInstructionsType\":\"org.openmrs.SimpleDosingInstructions\",\n" +
-                "      \"orderType\":\"Drug order\",\n" +
                 "      \"dosingInstructions\":{  \n" +
                 "         \"dose\":2,\n" +
                 "         \"doseUnits\":\"tab (s)\",\n" +
                 "         \"route\":\"PO\",\n" +
-                "         \"frequency\":\"QDS\",\n" +
+                "         \"frequency\":\"QD\",\n" +
                 "         \"asNeeded\":false,\n" +
                 "         \"administrationInstructions\": \"AC\",\n" +
                 "         \"quantity\":16,\n" +
@@ -91,7 +90,6 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
                 "      \"careSetting\":\"OUTPATIENT\",\n" +
                 "      \"previousOrderUuid\":\"0c96f25c-4949-4f72-9931-d808fbcdbbbb\",\n" +
                 "      \"dosingInstructionsType\":\"org.openmrs.SimpleDosingInstructions\",\n" +
-                "      \"orderType\":\"Drug order\",\n" +
                 "      \"dosingInstructions\":{  \n" +
                 "         \"dose\":4,\n" +
                 "         \"doseUnits\":\"tab (s)\",\n" +
@@ -133,7 +131,6 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
                 "      \"careSetting\":\"OUTPATIENT\",\n" +
                 "      \"previousOrderUuid\":\"0c96f25c-4949-4f72-9931-d808fbcdbbbb\",\n" +
                 "      \"dosingInstructionsType\":\"org.openmrs.SimpleDosingInstructions\",\n" +
-                "      \"orderType\":\"Drug order\",\n" +
                 "      \"dosingInstructions\":{  \n" +
                 "         \"dose\":4,\n" +
                 "         \"doseUnits\":\"tab (s)\",\n" +

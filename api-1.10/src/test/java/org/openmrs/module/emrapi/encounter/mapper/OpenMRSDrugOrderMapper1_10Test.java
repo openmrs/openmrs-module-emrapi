@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import org.hamcrest.Matchers;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
@@ -33,6 +34,8 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
+import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -48,12 +51,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-public class OpenMRSDrugOrderMapper110Test {
+public class OpenMRSDrugOrderMapper1_10Test {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DRUG_ORDER_TYPE = "Drug Order";
     public static final String DAY_DURATION_UNIT = "day";
     public static final String DRUG_UUID = "drug-uuid";
+    private final Concept DAY_DURATION_CONCEPT = new Concept();
 
     @Mock
     private OrderService orderService;
@@ -64,28 +68,30 @@ public class OpenMRSDrugOrderMapper110Test {
     @Mock
     private DosingInstructionsMapper dosingInstructionsMapper;
 
+    @Mock
+    private OrderMetadataService orderMetadataService;
+
     private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private Encounter encounter;
-    private Concept dayDurationUnit;
 
     @Before
     public void setup() {
         initMocks(this);
 
-        openMRSDrugOrderMapper = new OpenMRSDrugOrderMapper(orderService,conceptService, dosingInstructionsMapper);
+        openMRSDrugOrderMapper = new OpenMRSDrugOrderMapper(orderService,conceptService, dosingInstructionsMapper, orderMetadataService);
 
         Drug drug = new Drug();
         drug.setUuid(DRUG_UUID);
         when(conceptService.getDrugByNameOrId(DRUG_UUID)).thenReturn(drug);
 
         OrderType orderType = new OrderType("Drug Order", "", "org.openmrs.DrugOrder");
-        when(orderService.getOrderTypeByName(DRUG_ORDER_TYPE)).thenReturn(orderType);
+        when(orderService.getOrderTypeByConcept(any(Concept.class))).thenReturn(orderType);
+
+        when(orderMetadataService.getDurationUnitsConceptByName(DAY_DURATION_UNIT)).thenReturn(DAY_DURATION_CONCEPT);
 
         CareSetting outPatientCareSetting = new CareSetting(OUT_PATIENT_CARE_SETTING, OUT_PATIENT_CARE_SETTING, CareSetting.CareSettingType.OUTPATIENT);
         when(orderService.getCareSettingByName(OUT_PATIENT_CARE_SETTING)).thenReturn(outPatientCareSetting);
 
-        dayDurationUnit = new Concept();
-        when(conceptService.getConceptByName(DAY_DURATION_UNIT)).thenReturn(dayDurationUnit);
         when(dosingInstructionsMapper.map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class))).thenAnswer(argumentAt(1));
 
         encounter = new Encounter();
@@ -109,7 +115,7 @@ public class OpenMRSDrugOrderMapper110Test {
         assertThat(openMrsDrugOrder.getAction(), is(equalTo(Order.Action.NEW)));
         assertThat(openMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
         assertThat(openMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
-        assertThat(openMrsDrugOrder.getDurationUnits(), is(equalTo(dayDurationUnit)));
+        assertThat(openMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
         verify(dosingInstructionsMapper).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
     }
 
@@ -131,7 +137,7 @@ public class OpenMRSDrugOrderMapper110Test {
         assertThat(revisedOpenMrsDrugOrder.getAction(), is(equalTo(Order.Action.REVISE)));
         assertThat(revisedOpenMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
         assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
-        assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(dayDurationUnit)));
+        assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
         verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
     }
 
@@ -153,7 +159,7 @@ public class OpenMRSDrugOrderMapper110Test {
         assertThat(revisedOpenMrsDrugOrder.getAction(), is(equalTo(Order.Action.DISCONTINUE)));
         assertThat(revisedOpenMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
         assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
-        assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(dayDurationUnit)));
+        assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
         verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
     }
 
