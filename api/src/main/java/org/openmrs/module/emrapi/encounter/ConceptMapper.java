@@ -20,7 +20,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.utils.HibernateLazyLoader;
 
 public class ConceptMapper {
-    EncounterTransaction.Concept map(Concept concept) {
+    public EncounterTransaction.Concept map(Concept concept) {
         if (concept == null){
             return null;
         }

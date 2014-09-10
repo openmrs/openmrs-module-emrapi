@@ -13,28 +13,34 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
-import org.openmrs.Order;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
+@Component(value = "encounterTransactionMapper")
 public class EncounterTransactionMapper {
-    protected EncounterObservationsMapper encounterObservationsMapper;
-    protected EncounterOrdersMapper encounterOrdersMapper;
-    protected EncounterProviderMapper encounterProviderMapper;
+    private EncounterObservationsMapper encounterObservationsMapper;
+    private EncounterProviderMapper encounterProviderMapper;
+    private OrderMapper orderMapper;
 
-    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterOrdersMapper encounterOrdersMapper, EncounterProviderMapper encounterProviderMapper) {
-        this.encounterObservationsMapper = encounterObservationsMapper;
-        this.encounterOrdersMapper = encounterOrdersMapper;
-        this.encounterProviderMapper = encounterProviderMapper;
+    @Autowired(required = false)
+    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper) {
+        this(encounterObservationsMapper, encounterProviderMapper, null);
     }
 
+    @Autowired(required = false)
+    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper, OrderMapper orderMapper) {
+        this.encounterObservationsMapper = encounterObservationsMapper;
+        this.encounterProviderMapper = encounterProviderMapper;
+        this.orderMapper = orderMapper;
+    }
 
     public EncounterTransaction map(Encounter encounter, Boolean includeAll) {
         EncounterTransaction encounterTransaction = new EncounterTransaction(encounter.getVisit().getUuid(), encounter.getUuid());
@@ -45,32 +51,14 @@ public class EncounterTransactionMapper {
         encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());
 
         encounterProviderMapper.update(encounterTransaction, encounter.getEncounterProviders());
-
         encounterObservationsMapper.update(encounterTransaction, getSortedTopLevelObservations(encounter, includeAll));
-        encounterOrdersMapper.update(encounterTransaction, getSortedOrders(encounter));
+
+        if (orderMapper != null) {
+            encounterTransaction.setDrugOrders(orderMapper.mapDrugOrders(encounter));
+            encounterTransaction.setTestOrders(orderMapper.mapTestOrders(encounter));
+        }
+
         return encounterTransaction;
-    }
-
-    private Set<Order> getSortedOrders(Encounter encounter) {
-        TreeSet<Order> sortedOrders = new TreeSet<Order>(new Comparator<Order>() {
-            @Override
-            public int compare(Order o1, Order o2) {
-                if (shouldNotCompareOnCreatedDates(o2.getDateCreated(), o1.getDateCreated())) {
-                    if (shouldNotCompareOnIds(o1.getId(), o2.getId())){
-                        if(shouldNotCompareOnConceptNames(o1.getConcept(),o2.getConcept())){
-                            return o1.toString().compareTo(o2.toString());
-                        }
-                        return o1.getConcept().getName().getName().compareTo(o2.getConcept().getName().getName());
-                    }
-                    return o2.getId().compareTo(o1.getId());
-                }
-                return o2.getDateCreated().compareTo(o1.getDateCreated());
-            }
-        });
-
-        Set<Order> orders = encounter.getOrders();
-        sortedOrders.addAll(orders);
-        return sortedOrders;
     }
 
     private Set<Obs> getSortedTopLevelObservations(Encounter encounter, Boolean includeAll) {
@@ -98,9 +86,4 @@ public class EncounterTransactionMapper {
     private boolean shouldNotCompareOnCreatedDates(Date secondDate, Date firstDate) {
         return firstDate == null || secondDate == null || secondDate.equals(firstDate);
     }
-
-    private boolean shouldNotCompareOnConceptNames(Concept firstConcept,Concept secondConcept){
-        return firstConcept == null || secondConcept == null || firstConcept.getName() == null || secondConcept.getName() == null;
-    }
-
 }

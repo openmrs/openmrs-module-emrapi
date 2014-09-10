@@ -11,20 +11,14 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.encounter.domain;
+package org.openmrs.module.emrapi.encounter.mapper;
 
-import org.junit.Test;
+import org.openmrs.Order;
+import org.openmrs.module.emrapi.encounter.ConceptMapper;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
-import java.util.Date;
+public class TestOrderMapper {
+    private final ConceptMapper conceptMapper = new ConceptMapper();
 
-import static org.junit.Assert.assertEquals;
 
-public class EncounterTransactionTest {
-
-    @Test
-    public void dateConversion() {
-        EncounterTransaction encounterTransaction = new EncounterTransaction();
-        encounterTransaction.setEncounterDateTime(new Date(2013, 10, 30, 0, 0, 0));
-        assertEquals(new Date(2013, 10, 30, 0, 0, 0), encounterTransaction.getEncounterDateTime());
-    }
 }
