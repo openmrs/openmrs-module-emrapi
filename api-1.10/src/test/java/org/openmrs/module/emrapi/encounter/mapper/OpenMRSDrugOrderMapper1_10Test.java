@@ -111,7 +111,7 @@ public class OpenMRSDrugOrderMapper1_10Test {
         assertThat(openMrsDrugOrder.getCareSetting().getName(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
         assertThat(openMrsDrugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
         assertTrue(openMrsDrugOrder.getDosingType().isAssignableFrom(SimpleDosingInstructions.class));
-        assertThat(openMrsDrugOrder.getOrderType().getName(), is(equalTo(DRUG_ORDER_TYPE)));
+        assertTrue(openMrsDrugOrder instanceof DrugOrder);
         assertThat(openMrsDrugOrder.getAction(), is(equalTo(Order.Action.NEW)));
         assertThat(openMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
         assertThat(openMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
@@ -133,7 +133,7 @@ public class OpenMRSDrugOrderMapper1_10Test {
         assertThat(revisedOpenMrsDrugOrder.getCareSetting().getName(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
         assertThat(revisedOpenMrsDrugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
         assertTrue(revisedOpenMrsDrugOrder.getDosingType().isAssignableFrom(SimpleDosingInstructions.class));
-        assertThat(revisedOpenMrsDrugOrder.getOrderType().getName(), is(equalTo(DRUG_ORDER_TYPE)));
+        assertTrue(openMrsDrugOrder instanceof DrugOrder);
         assertThat(revisedOpenMrsDrugOrder.getAction(), is(equalTo(Order.Action.REVISE)));
         assertThat(revisedOpenMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
         assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
@@ -155,7 +155,7 @@ public class OpenMRSDrugOrderMapper1_10Test {
         assertThat(revisedOpenMrsDrugOrder.getCareSetting().getName(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
         assertThat(revisedOpenMrsDrugOrder.getDrug().getUuid(), is(equalTo(DRUG_UUID)));
         assertTrue(revisedOpenMrsDrugOrder.getDosingType().isAssignableFrom(SimpleDosingInstructions.class));
-        assertThat(revisedOpenMrsDrugOrder.getOrderType().getName(), is(equalTo(DRUG_ORDER_TYPE)));
+        assertTrue(openMrsDrugOrder instanceof DrugOrder);
         assertThat(revisedOpenMrsDrugOrder.getAction(), is(equalTo(Order.Action.DISCONTINUE)));
         assertThat(revisedOpenMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
         assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));

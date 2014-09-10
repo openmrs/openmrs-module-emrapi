@@ -70,11 +70,6 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setDrug(drug);
         openMRSDrugOrder.setEncounter(encounter);
 
-        OrderType orderType = orderService.getOrderTypeByConcept(drug.getConcept());
-        if(orderType == null) {
-            throw new APIException("Concept " + drug.getConcept() + " should have a concept class that maps to a valid order type");
-        }
-        openMRSDrugOrder.setOrderType(orderType);
         openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated());
         if (drugOrder.getScheduledDate() != null && drugOrder.getScheduledDate().after(new Date())) {
             openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
