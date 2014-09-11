@@ -20,6 +20,7 @@ import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.OrderType;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component(value = "encounterDrugOrderServiceHelper")
+@OpenmrsProfile(openmrsVersion = "1.9")
 public class EncounterDrugOrderServiceHelper_1_9 implements EncounterDrugOrderServiceHelper{
 
     private ConceptService conceptService;

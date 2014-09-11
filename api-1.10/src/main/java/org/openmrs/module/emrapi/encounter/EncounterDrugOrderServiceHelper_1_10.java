@@ -22,6 +22,7 @@ import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.OrderFrequency;
 import org.openmrs.OrderType;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -35,6 +36,7 @@ import java.util.List;
 //TODO: This needs to be reworked to really use features of the new OrderEntry API
 //TODO: Mihir: This class needs tests
 @Component (value = "encounterDrugOrderServiceHelper")
+@OpenmrsProfile(openmrsVersion = "1.10")
 public class EncounterDrugOrderServiceHelper_1_10 implements EncounterDrugOrderServiceHelper{
 
     private ConceptService conceptService;

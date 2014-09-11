@@ -15,10 +15,12 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.DrugOrder;
 import org.openmrs.OrderFrequency;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.stereotype.Component;
 
 @Component(value = "drugOrderMapper")
+@OpenmrsProfile(openmrsVersion = "1.10")
 public class DrugOrderMapper_1_10 extends DrugOrderMapperBaseImpl implements DrugOrderMapper {
 
     public DrugOrderMapper_1_10() {
