@@ -45,7 +45,7 @@ public class EncounterTransactionMapper {
     public EncounterTransaction map(Encounter encounter, Boolean includeAll) {
         EncounterTransaction encounterTransaction = new EncounterTransaction(encounter.getVisit().getUuid(), encounter.getUuid());
         encounterTransaction.setPatientUuid(encounter.getPatient().getUuid());
-        encounterTransaction.setEncounterTypeUuid(encounter.getEncounterType().getUuid());
+        encounterTransaction.setEncounterTypeUuid(encounter.getEncounterType() != null ? encounter.getEncounterType().getUuid() : null);
         encounterTransaction.setLocationUuid(encounter.getLocation() != null ? encounter.getLocation().getUuid() : null);
         encounterTransaction.setVisitTypeUuid(encounter.getVisit().getVisitType().getUuid());
         encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());

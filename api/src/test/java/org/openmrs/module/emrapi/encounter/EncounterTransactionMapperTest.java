@@ -56,4 +56,13 @@ public class EncounterTransactionMapperTest {
         Assert.assertEquals(encounter.getLocation().getUuid(), encounterTransaction.getLocationUuid());
         Assert.assertEquals(encounter.getVisit().getVisitType().getUuid(), encounterTransaction.getVisitTypeUuid());
     }
+
+    @Test
+    public void shouldMapEncounterWithoutEncounterType() throws Exception {
+        Encounter encounter = new EncounterBuilder().withEncounterType(null).build();
+
+        EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, false);
+
+        Assert.assertEquals(null, encounterTransaction.getEncounterTypeUuid());
+    }
 }

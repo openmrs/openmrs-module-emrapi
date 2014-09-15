@@ -64,4 +64,9 @@ public class EncounterBuilder {
     public Encounter build() {
         return encounter;
     }
+
+    public EncounterBuilder withEncounterType(EncounterType encounterType) {
+        encounter.setEncounterType(encounterType);
+        return this;
+    }
 }
