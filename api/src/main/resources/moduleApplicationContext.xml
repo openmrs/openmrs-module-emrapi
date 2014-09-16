@@ -230,12 +230,36 @@
         </property>
     </bean>
 
+    <bean id="encounterTransactionMapper" class="org.openmrs.module.emrapi.encounter.EncounterTransactionMapper">
+        <constructor-arg name="encounterObservationsMapper" ref="encounterObservationsMapper"/>
+        <constructor-arg name="encounterProviderMapper" ref="encounterProviderMapper"/>
+        <constructor-arg name="orderMapper" ref="orderMapper"/>
+    </bean>
+
+    <bean name="emrEncounterServiceTarget" class="org.openmrs.module.emrapi.encounter.EmrEncounterServiceImpl">
+        <constructor-arg name="administrationService" ref="adminService"/>
+        <constructor-arg name="encounterDispositionServiceHelper" ref="encounterDispositionServiceHelper"/>
+        <constructor-arg name="encounterObservationServiceHelper" ref="encounterObservationServiceHelper"/>
+        <constructor-arg name="encounterProviderServiceHelper" ref="encounterProviderServiceHelper"/>
+        <constructor-arg name="encounterService" ref="encounterService"/>
+        <constructor-arg name="encounterTransactionMapper" ref="encounterTransactionMapper"/>
+        <constructor-arg name="locationService" ref="locationService"/>
+        <constructor-arg name="patientService" ref="patientService"/>
+        <constructor-arg name="providerService" ref="providerService"/>
+        <constructor-arg name="visitService" ref="visitService"/>
+        <constructor-arg name="emrOrderService" ref="emrOrderService"/>
+    </bean>
+
+    <bean name="emrOrderService" class="org.openmrs.module.emrapi.encounter.DefaultEmrOrderServiceImpl"/>
+
     <bean id="encounterObservationServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterObservationServiceHelper">
         <constructor-arg name="conceptService" ref="conceptService"/>
         <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
         <constructor-arg name="obsService" ref="obsService"/>
         <constructor-arg name="orderService" ref="orderService"/>
     </bean>
+
+    <bean id="orderMapper" class="org.openmrs.module.emrapi.encounter.DefaultOrderMapper"/>
 
     <bean id="encounterDispositionServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDispositionServiceHelper">
         <constructor-arg ref="conceptService"/>

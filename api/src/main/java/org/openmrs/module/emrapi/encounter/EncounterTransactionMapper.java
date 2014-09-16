@@ -24,18 +24,11 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
-@Component(value = "encounterTransactionMapper")
 public class EncounterTransactionMapper {
     private EncounterObservationsMapper encounterObservationsMapper;
     private EncounterProviderMapper encounterProviderMapper;
     private OrderMapper orderMapper;
 
-    @Autowired(required = false)
-    public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper) {
-        this(encounterObservationsMapper, encounterProviderMapper, null);
-    }
-
-    @Autowired(required = false)
     public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper, OrderMapper orderMapper) {
         this.encounterObservationsMapper = encounterObservationsMapper;
         this.encounterProviderMapper = encounterProviderMapper;
