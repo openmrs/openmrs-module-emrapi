@@ -16,10 +16,12 @@ package org.openmrs.module.emrapi.encounter;
 import java.util.List;
 import org.openmrs.Encounter;
 import org.openmrs.annotation.OpenmrsProfile;
+import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 @OpenmrsProfile(openmrsVersion = "1.9.*")
-public class DefaultEmrOrderServiceImpl implements EmrOrderService{
+public class DefaultEmrOrderServiceImpl implements EmrOrderService {
+
     @Override
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
     }

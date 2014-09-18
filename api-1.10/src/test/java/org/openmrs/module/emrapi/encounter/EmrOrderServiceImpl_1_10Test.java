@@ -54,7 +54,9 @@ public class EmrOrderServiceImpl_1_10Test {
 
     @Test
     public void shouldSaveANewDrugOrder() throws ParseException {
-        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService);
+        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10();
+        emrOrderService.setEncounterService(encounterService);
+        emrOrderService.setOpenMRSDrugOrderMapper(openMRSDrugOrderMapper);
 
         EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample("drug-uuid", "day");
         DrugOrder mappedDrugOrder = new DrugOrder();

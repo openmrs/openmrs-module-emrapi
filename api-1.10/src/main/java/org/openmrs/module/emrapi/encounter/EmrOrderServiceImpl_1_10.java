@@ -26,18 +26,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional
-@OpenmrsProfile(openmrsVersion = "1.10.*")
+@OpenmrsProfile(openmrsVersion = "1.10")
 public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
-    private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
-    private final EncounterService encounterService;
+    private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
+    private EncounterService encounterService;
 
-    @Autowired
-    public EmrOrderServiceImpl_1_10(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService) {
+    public void setOpenMRSDrugOrderMapper(OpenMRSDrugOrderMapper openMRSDrugOrderMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
+    }
+
+    public void setEncounterService(EncounterService encounterService) {
         this.encounterService = encounterService;
     }
 
     @Override
+    @Transactional
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);

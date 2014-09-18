@@ -23,9 +23,9 @@
     <bean id="orderMapper" class="org.openmrs.module.emrapi.encounter.mapper.OrderMapper1_10">
     </bean>
 
-    <bean id="emrOrderService" class="org.openmrs.module.emrapi.encounter.EmrOrderServiceImpl_1_10">
-        <constructor-arg name="encounterService" ref="encounterService"/>
-        <constructor-arg name="openMRSDrugOrderMapper" ref="openMRSDrugOrderMapper"/>
+    <bean id="emrOrderServiceTarget" class="org.openmrs.module.emrapi.encounter.EmrOrderServiceImpl_1_10">
+        <property name="openMRSDrugOrderMapper" ref="openMRSDrugOrderMapper"/>
+        <property name="encounterService" ref="encounterService"/>
     </bean>
 
 </beans>

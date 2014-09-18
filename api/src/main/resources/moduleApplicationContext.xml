@@ -250,7 +250,23 @@
         <constructor-arg name="emrOrderService" ref="emrOrderService"/>
     </bean>
 
-    <bean name="emrOrderService" class="org.openmrs.module.emrapi.encounter.DefaultEmrOrderServiceImpl"/>
+    <bean name="emrOrderServiceTarget" class="org.openmrs.module.emrapi.encounter.DefaultEmrOrderServiceImpl">
+    </bean>
+
+    <bean id="emrOrderService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target" ref="emrOrderServiceTarget"/>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+
 
     <bean id="encounterObservationServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterObservationServiceHelper">
         <constructor-arg name="conceptService" ref="conceptService"/>
