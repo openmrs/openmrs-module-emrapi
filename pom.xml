@@ -23,8 +23,8 @@
     </organization>
 
     <scm>
-        <connection>scm:git:https://github.com/openmrs/openmrs-module-emrapi.git</connection>
-        <developerConnection>scm:git:https://github.com/openmrs/openmrs-module-emrapi.git</developerConnection>
+        <connection>scm:git:git@github.com:openmrs/openmrs-module-emrapi.git</connection>
+        <developerConnection>scm:git:git@github.com:openmrs/openmrs-module-emrapi.git</developerConnection>
         <url>https://github.com/openmrs/openmrs-module-emrapi.git</url>
       <tag>HEAD</tag>
   </scm>
@@ -53,12 +53,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>webservices.rest-omod-common</artifactId>
-                <version>2.6-SNAPSHOT</version>
-                <type>test-jar</type>
-            </dependency>
         </dependencies>
     </dependencyManagement> 
 
@@ -70,21 +64,18 @@
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
             <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
 
        <dependency>
             <groupId>org.openmrs.test</groupId>
             <artifactId>openmrs-test</artifactId>
             <type>pom</type>
-            <scope>test</scope>
         </dependency> 
 
         <!-- End OpenMRS core -->
@@ -94,38 +85,32 @@
        <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>reporting-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>serialization.xstream-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>calculation-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>providermanagement-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>metadatasharing-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>appframework-api</artifactId>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency>
 
 
@@ -133,7 +118,6 @@
             <groupId>org.openmrs</groupId>
             <artifactId>event-api</artifactId>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency>
 
 
@@ -142,7 +126,6 @@
             <artifactId>geronimo-jms_1.1_spec</artifactId>
             <version>1.1.1</version>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency> 
 
         <!-- End OpenMRS modules -->
