@@ -14,9 +14,6 @@
 
 package org.openmrs.module.emrapi.disposition.actions;
 
-import java.util.Date;
-import java.util.HashMap;
-
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +26,6 @@ import org.openmrs.Obs;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.LocationService;
-import org.openmrs.module.appframework.feature.FeatureToggleProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.AdtAction;
 import org.openmrs.module.emrapi.adt.AdtService;
@@ -39,8 +35,10 @@ import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
+import java.util.Date;
+import java.util.HashMap;
+
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -57,7 +55,6 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
     private LocationService locationService;
     private DispositionService dispositionService;
     private DispositionDescriptor dispositionDescriptor;
-    private FeatureToggleProperties featureToggles;
     private VisitDomainWrapper visitDomainWrapper;
     private Concept dispositionObsGroupConcept = new Concept();
 
@@ -68,18 +65,15 @@ public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedU
         adtService = mock(AdtService.class);
         dispositionService = mock(DispositionService.class);
         dispositionDescriptor = mock(DispositionDescriptor.class);
-        visitDomainWrapper = mock(VisitDomainWrapper.class);
-        featureToggles = mock(FeatureToggleProperties.class);
+        visitDomainWrapper = mock(VisitDomainWrapper.class);;
 
         when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
         when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
-        when(featureToggles.isFeatureEnabled(anyString())).thenReturn(false);
 
         action = new AdmitToSpecificLocationDispositionAction();
         action.setLocationService(locationService);
         action.setAdtService(adtService);
         action.setDispositionService(dispositionService);
-        action.setFeatureToggles(featureToggles);
     }
 
     @Test

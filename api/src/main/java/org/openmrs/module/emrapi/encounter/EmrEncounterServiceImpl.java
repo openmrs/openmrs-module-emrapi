@@ -33,6 +33,9 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -46,8 +49,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
 
 @Transactional
+@Component (value = "emrEncounterServiceTarget")
 public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEncounterService {
 
     private final EncounterTransactionMapper encounterTransactionMapper;
@@ -56,34 +61,45 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private EncounterService encounterService;
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
     private EncounterDispositionServiceHelper encounterDispositionServiceHelper;
-    private EncounterTestOrderServiceHelper encounterTestOrderServiceHelper;
-    private EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper;
     private EncounterProviderServiceHelper encounterProviderServiceHelper;
+    private EmrOrderService emrOrderService;
     private LocationService locationService;
     private ProviderService providerService;
     private AdministrationService administrationService;
 
     private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
+    @Autowired(required = false)
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
-                                   LocationService locationService, ProviderService providerService, AdministrationService administrationService,
+                                   LocationService locationService, ProviderService providerService,
+                                   @Qualifier(value = "adminService")AdministrationService administrationService,
                                    EncounterObservationServiceHelper encounterObservationServiceHelper,
-                                   EncounterTestOrderServiceHelper encounterTestOrderServiceHelper,
-                                   EncounterDrugOrderServiceHelper encounterDrugOrderServiceHelper,
                                    EncounterDispositionServiceHelper encounterDispositionServiceHelper,
-                                   EncounterTransactionMapper encounterTransactionMapper, EncounterProviderServiceHelper encounterProviderServiceHelper) {
+                                   EncounterTransactionMapper encounterTransactionMapper,
+                                   EncounterProviderServiceHelper encounterProviderServiceHelper,
+                                   EmrOrderService emrOrderService) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
         this.encounterObservationServiceHelper = encounterObservationServiceHelper;
-        this.encounterTestOrderServiceHelper = encounterTestOrderServiceHelper;
         this.locationService = locationService;
         this.providerService = providerService;
         this.administrationService = administrationService;
-        this.encounterDrugOrderServiceHelper = encounterDrugOrderServiceHelper;
         this.encounterDispositionServiceHelper = encounterDispositionServiceHelper;
         this.encounterTransactionMapper = encounterTransactionMapper;
         this.encounterProviderServiceHelper = encounterProviderServiceHelper;
+        this.emrOrderService = emrOrderService;
+    }
+
+    @Autowired(required = false)
+    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
+                                   LocationService locationService, ProviderService providerService,
+                                   @Qualifier(value = "adminService")AdministrationService administrationService,
+                                   EncounterObservationServiceHelper encounterObservationServiceHelper,
+                                   EncounterDispositionServiceHelper encounterDispositionServiceHelper,
+                                   EncounterTransactionMapper encounterTransactionMapper,
+                                   EncounterProviderServiceHelper encounterProviderServiceHelper) {
+        this(patientService, visitService, encounterService, locationService, providerService, administrationService, encounterObservationServiceHelper, encounterDispositionServiceHelper, encounterTransactionMapper, encounterProviderServiceHelper, null);
     }
 
     @Override
@@ -108,11 +124,13 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations());
         encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses());
         encounterDispositionServiceHelper.update(encounter, encounterTransaction.getDisposition());
-        encounterTestOrderServiceHelper.update(encounter, encounterTransaction.getTestOrders());
-        encounterDrugOrderServiceHelper.update(encounter, encounterTransaction.getDrugOrders());
         encounterProviderServiceHelper.update(encounter, encounterTransaction.getProviders());
 
         visitService.saveVisit(visit);
+
+        if (emrOrderService != null) {
+            emrOrderService.save(encounterTransaction.getDrugOrders(), encounter);
+        }
 
         return new EncounterTransaction(visit.getUuid(), encounter.getUuid());
     }
@@ -123,13 +141,17 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(activeEncounterParameters.getEncounterTypeUuid());
 
         Provider provider = null;
+        Location location = null;
         HashSet<Provider> providers = new HashSet<Provider>();
         if(activeEncounterParameters.getProviderUuid() != null)
             provider = providerService.getProviderByUuid(activeEncounterParameters.getProviderUuid());
             providers.add(provider);
 
+        if(activeEncounterParameters.getLocationUuid() != null){
+            location = locationService.getLocationByUuid(activeEncounterParameters.getLocationUuid());
+        }
         EncounterParameters encounterParameters = EncounterParameters.instance().
-                            setPatient(patient).setEncounterType(encounterType).setProviders(providers);
+                            setPatient(patient).setEncounterType(encounterType).setProviders(providers).setLocation(location);
 
         Visit visit = getActiveVisit(patient);
 
@@ -193,7 +215,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         EncounterType encounterType = encounterService.getEncounterTypeByUuid(encounterTransaction.getEncounterTypeUuid());
         Location location = locationService.getLocationByUuid(encounterTransaction.getLocationUuid());
-        Date encounterDateTime = encounterTransaction.getEncounterDateTime() != null ? encounterTransaction.getEncounterDateTime() : new Date();
+        Date encounterDateTime = getCurrentDateIfNull(encounterTransaction.getEncounterDateTime());
         Set<Provider> providers = getProviders(encounterTransaction.getProviders());
 
         EncounterParameters encounterParameters = EncounterParameters.instance()
@@ -211,6 +233,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             encounter.setUuid(encounterUuid);
             encounter.setObs(new HashSet<Obs>());
             encounter.setEncounterDatetime(encounterDateTime);
+            encounter.setLocation(location);
             visit.addEncounter(encounter);
         }
         return encounter;
@@ -256,7 +279,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         Visit visit = new Visit();
         visit.setPatient(patient);
         visit.setVisitType(visitService.getVisitTypeByUuid(encounterTransaction.getVisitTypeUuid()));
-        visit.setStartDatetime(encounterTransaction.getEncounterDateTime() != null ? encounterTransaction.getEncounterDateTime() : new Date());
+        visit.setStartDatetime(getCurrentDateIfNull(encounterTransaction.getEncounterDateTime()));
         visit.setEncounters(new HashSet<Encounter>());
         visit.setUuid(UUID.randomUUID().toString());
         return visit;

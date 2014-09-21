@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Date;
 
 /**
  *
@@ -275,4 +276,7 @@ public class GeneralUtils {
         return lastViewed;
     }
 
+    public static Date getCurrentDateIfNull(Date date){
+        return date == null ? new Date() : date;
+    }
 }

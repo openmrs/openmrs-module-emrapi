@@ -19,6 +19,15 @@ public class ActiveEncounterParameters {
     String visitTypeUuid;
     String providerUuid;
     Boolean includeAll;
+    String locationUuid;
+
+    public String getLocationUuid() {
+        return locationUuid;
+    }
+
+    public void setLocationUuid(String locationUuid) {
+        this.locationUuid = locationUuid;
+    }
 
     public String getProviderUuid() {
         return providerUuid;

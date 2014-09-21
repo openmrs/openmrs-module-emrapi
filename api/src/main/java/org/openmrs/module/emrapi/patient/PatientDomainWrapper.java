@@ -175,9 +175,9 @@ public class PatientDomainWrapper {
 		if (types != null && types.size() > 0) {
 			patientIdentifiers = new ArrayList<PatientIdentifier>();
 			for (PatientIdentifierType type : types) {
-				PatientIdentifier patientIdentifier = patient.getPatientIdentifier(type);
-				if (patientIdentifier != null) {
-					patientIdentifiers.add(patientIdentifier);
+				List<PatientIdentifier> extraPatientIdentifiers = patient.getPatientIdentifiers(type);
+				if (extraPatientIdentifiers != null) {
+					patientIdentifiers.addAll(extraPatientIdentifiers);
 				}
 			}
 		}

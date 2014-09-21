@@ -21,6 +21,7 @@ import org.openmrs.ConceptMap;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
+import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.util.OpenmrsUtil;
@@ -64,6 +65,22 @@ public class CodedOrFreeTextAnswer {
         }
     }
 
+    public CodedOrFreeTextAnswer(Obs codedOrNonCodedValue) {
+        if (codedOrNonCodedValue.getValueCodedName() != null) {
+            this.specificCodedAnswer = codedOrNonCodedValue.getValueCodedName();
+            this.codedAnswer = this.specificCodedAnswer.getConcept();
+        }
+        else if (codedOrNonCodedValue.getValueCoded() != null) {
+            this.codedAnswer = codedOrNonCodedValue.getValueCoded();
+        }
+        else if (codedOrNonCodedValue.getValueText() != null) {
+            this.nonCodedAnswer = codedOrNonCodedValue.getValueText();
+        }
+        else {
+            throw new IllegalArgumentException("codedOrNonCodedValue must have one of valueCodedName, valueCoded, or valueText");
+        }
+    }
+
     public CodedOrFreeTextAnswer(Concept codedAnswer) {
         this.codedAnswer = codedAnswer;
     }
@@ -86,6 +103,19 @@ public class CodedOrFreeTextAnswer {
         }
         else {
             return NON_CODED_PREFIX + nonCodedAnswer;
+        }
+    }
+
+    /**
+     * @return specificCodedAnswer || codedAnswer || nonCodedAnswer
+     */
+    public Object getValue() {
+        if (specificCodedAnswer != null) {
+            return specificCodedAnswer;
+        } else if (codedAnswer != null) {
+            return codedAnswer;
+        } else {
+            return nonCodedAnswer;
         }
     }
 
@@ -156,7 +186,7 @@ public class CodedOrFreeTextAnswer {
     /**
      * Formats as either of:
      * <ul>
-     * <li>non-coded value</li>
+     * <li>\"non-coded value\"</li>
      * <li>coded value's preferred name in the current locale</li>
      * <li>specific coded value → coded value's preferred name in the current locale</li>
      * </ul>
@@ -166,7 +196,7 @@ public class CodedOrFreeTextAnswer {
      */
     public String format(Locale locale) {
         if (nonCodedAnswer != null) {
-            return nonCodedAnswer;
+            return "\"" + nonCodedAnswer + "\"";
         } else if (codedAnswer == null) {
             return "?";
         } else if (specificCodedAnswer == null) {

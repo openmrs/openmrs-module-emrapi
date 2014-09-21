@@ -13,14 +13,8 @@
  */
 package org.openmrs.module.emrapi.encounter.domain;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
-import org.openmrs.TestOrder;
-import org.openmrs.module.emrapi.encounter.builder.TestOrderBuilder;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
