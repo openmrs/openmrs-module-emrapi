@@ -26,7 +26,7 @@ import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
-import org.openmrs.ISO8601Duration;
+import org.openmrs.Duration;
 import org.openmrs.Order;
 import org.openmrs.OrderFrequency;
 import org.openmrs.OrderType;
@@ -124,7 +124,7 @@ public class DrugOrderMapper1_10Test {
         order.setDuration(duration);
         Concept durationConcept = concept(DAY_DURATION_UNIT);
         ConceptSource durationConceptSource = new ConceptSource();
-        durationConceptSource.setUuid(ISO8601Duration.CONCEPT_SOURCE_UUID);
+        durationConceptSource.setUuid(Duration.SNOMED_CT_CONCEPT_SOURCE_HL7_CODE);
         durationConcept.addConceptMapping(new ConceptMap(new ConceptReferenceTerm(durationConceptSource, "D", "Day"), new ConceptMapType()));
         order.setDurationUnits(durationConcept);
 
