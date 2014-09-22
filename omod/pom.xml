@@ -252,7 +252,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <openmrsCoreVersion>1.10.0-SNAPSHOT</openmrsCoreVersion>
+                <openmrsCoreVersion>1.10.0</openmrsCoreVersion>
             </properties>
 
            <!-- <dependencies>
