@@ -23,6 +23,7 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>${project.parent.artifactId}-api-1.10</artifactId>
             <version>${project.parent.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -50,24 +51,20 @@
             <groupId>org.openmrs.web</groupId>
             <artifactId>openmrs-web</artifactId>
             <type>jar</type>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.web</groupId>
             <artifactId>openmrs-web</artifactId>
             <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod-common</artifactId>
             <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
