@@ -39,6 +39,13 @@
                 <version>${openMRSVersion}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.openmrs.api</groupId>
+                <artifactId>openmrs-api</artifactId>
+                <type>test-jar</type>
+                <version>${openMRSVersion}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
