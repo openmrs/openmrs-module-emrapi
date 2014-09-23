@@ -12,11 +12,16 @@
     <name>EMR API Module API 1.10</name>
     <description>API project for EMRAPI</description>
 
+    <properties>
+        <openMRSVersion>1.10.0</openMRSVersion>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>${project.parent.artifactId}-api</artifactId>
             <version>${project.parent.version}</version>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>org.openmrs.api</groupId>
@@ -28,22 +33,22 @@
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
-            <version>1.10.0</version>
+            <version>${openMRSVersion}</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
-            <type>test-jar</type>
-            <version>1.10.0</version>
+            <type>test-jar</type>            
+            <version>${openMRSVersion}</version>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.test</groupId>
             <artifactId>openmrs-test</artifactId>
-            <version>1.10.0</version>
+            <version>${openMRSVersion}</version>
             <type>pom</type>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
