@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +73,7 @@ public class DrugOrderMapper1_10Test {
     @Test
     public void shouldMapNewDrugOrder() throws ParseException {
 
-        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water");
+        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null);
         EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
@@ -104,7 +105,16 @@ public class DrugOrderMapper1_10Test {
         assertThat(drugOrder.getCommentToFulfiller(), is(equalTo("boil in water")));
     }
 
-    private DrugOrder drugOrder(CareSetting.CareSettingType careSettingType, int daysToStartAfter, String dosingInstructions, int duration, String instructions, String commentToFulfiller) {
+    @Test
+    public void shouldSetPreviousOrder(){
+        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", "previousOrderUuid");
+        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
+
+        assertThat(drugOrder.getPreviousOrderUuid(), is(equalTo("previousOrderUuid")));
+    }
+
+    private DrugOrder drugOrder(CareSetting.CareSettingType careSettingType, int daysToStartAfter, String dosingInstructions,
+                                int duration, String instructions, String commentToFulfiller, String previousOrderUuid) {
         DrugOrder order = new DrugOrder();
         order.setPatient(new Patient());
         order.setCareSetting(new CareSetting(careSettingType.name(), null, CareSetting.CareSettingType.OUTPATIENT));
@@ -150,6 +160,13 @@ public class DrugOrderMapper1_10Test {
 
         order.setInstructions(instructions);
         order.setCommentToFulfiller(commentToFulfiller);
+
+        if (StringUtils.isNotBlank(previousOrderUuid)) {
+            Order previousOrder = new Order();
+            previousOrder.setUuid(previousOrderUuid);
+            order.setPreviousOrder(previousOrder);
+        }
+
         return order;
     }
 

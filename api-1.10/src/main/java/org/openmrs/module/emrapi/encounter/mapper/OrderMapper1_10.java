@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import org.apache.commons.lang3.*;
 import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
@@ -60,11 +61,17 @@ public class OrderMapper1_10 implements OrderMapper {
     @Override
     public EncounterTransaction.DrugOrder mapDrugOrder(DrugOrder openMRSDrugOrder) {
         EncounterTransaction.DrugOrder drugOrder = new EncounterTransaction.DrugOrder();
+        drugOrder.setUuid(openMRSDrugOrder.getUuid());
         if (openMRSDrugOrder.getCareSetting() != null) {
             drugOrder.setCareSetting(openMRSDrugOrder.getCareSetting().getName());
         }
         drugOrder.setAction(openMRSDrugOrder.getAction().name());
         drugOrder.setOrderType(openMRSDrugOrder.getOrderType().getName());
+
+        Order previousOrder = openMRSDrugOrder.getPreviousOrder();
+        if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())){
+            drugOrder.setPreviousOrderUuid(previousOrder.getUuid());
+        }
 
         EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper().map(openMRSDrugOrder.getDrug());
         drugOrder.setDrug(encounterTransactionDrug);
