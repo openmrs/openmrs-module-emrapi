@@ -12,32 +12,6 @@
     <name>EMR API Module API 1.9</name>
     <description>API project for EMRAPI</description>
 
-    <properties>
-        <openMRSVersion>1.9.8</openMRSVersion>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.openmrs.api</groupId>
-                <artifactId>openmrs-api</artifactId>
-                <type>jar</type>
-                <version>${openMRSVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openmrs.api</groupId>
-                <artifactId>openmrs-api</artifactId>
-                <type>jar</type>
-                <version>${openMRSVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openmrs.test</groupId>
-                <artifactId>openmrs-test</artifactId>
-                <type>pom</type>
-                <version>${openMRSVersion}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>

@@ -16,7 +16,6 @@ package org.openmrs.module.emrapi.encounter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.openmrs.Concept;
 import org.openmrs.ConceptClass;
 import org.openmrs.ConceptDatatype;
@@ -31,6 +30,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
@@ -45,7 +45,7 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
     @Before
     public void setUp(){
-        MockitoAnnotations.initMocks(this);
+        initMocks(this);
         observationMapper = new ObservationMapper();
         obsBuilder = new ObsBuilder();
         obsBuilder.setUuid(UUID.randomUUID().toString()).setConcept(concept);
