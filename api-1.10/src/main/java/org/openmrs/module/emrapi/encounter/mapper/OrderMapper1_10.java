@@ -18,6 +18,7 @@ import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.TestOrder;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.db.hibernate.HibernateUtil;
 import org.openmrs.module.emrapi.encounter.ConceptMapper;
 import org.openmrs.module.emrapi.encounter.OrderMapper;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component(value = "orderMapper")
+@OpenmrsProfile(openmrsVersion = "1.10.*")
 public class OrderMapper1_10 implements OrderMapper {
 
     private final ConceptMapper conceptMapper = new ConceptMapper();

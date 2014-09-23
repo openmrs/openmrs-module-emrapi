@@ -13,20 +13,16 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.openmrs.DrugOrder;
-import org.openmrs.Encounter;
-import org.openmrs.TestOrder;
-import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import org.openmrs.Encounter;
+import org.openmrs.annotation.OpenmrsProfile;
+import org.openmrs.api.EncounterService;
+import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
-public interface OrderMapper {
-    public List<EncounterTransaction.DrugOrder> mapDrugOrders(Encounter encounter);
+@OpenmrsProfile(openmrsVersion = "1.9.*")
+public class DefaultEmrOrderServiceImpl implements EmrOrderService {
 
-    public List<EncounterTransaction.TestOrder> mapTestOrders(Encounter encounter);
-
-    EncounterTransaction.DrugOrder mapDrugOrder(DrugOrder openMRSDrugOrder);
-
-    EncounterTransaction.TestOrder mapTestOrder(TestOrder order);
+    @Override
+    public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
+    }
 }

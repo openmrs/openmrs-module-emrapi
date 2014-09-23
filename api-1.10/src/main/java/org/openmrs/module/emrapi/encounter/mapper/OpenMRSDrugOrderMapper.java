@@ -41,7 +41,6 @@ import java.util.List;
  *
  * Version 1.0
  */
-@Component
 public class OpenMRSDrugOrderMapper {
 
     private OrderService orderService;
@@ -49,7 +48,6 @@ public class OpenMRSDrugOrderMapper {
     private DosingInstructionsMapper dosingInstructionsMapper;
     private OrderMetadataService orderMetadataService;
 
-    @Autowired
     public OpenMRSDrugOrderMapper(OrderService orderService, ConceptService conceptService,
                                   DosingInstructionsMapper dosingInstructionsMapper, OrderMetadataService orderMetadataService) {
         this.orderService = orderService;
