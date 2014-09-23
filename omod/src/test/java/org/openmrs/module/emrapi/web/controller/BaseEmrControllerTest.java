@@ -29,6 +29,7 @@ import org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMa
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@Ignore
 public class BaseEmrControllerTest extends BaseModuleWebContextSensitiveTest {
 
     @Autowired

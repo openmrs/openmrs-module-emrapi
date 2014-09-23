@@ -37,7 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-public class EmrOrderServiceImpl_1_10Test {
+public class EmrOrderServiceImplTest {
 
     @Mock
     private EncounterService encounterService;
@@ -54,9 +54,7 @@ public class EmrOrderServiceImpl_1_10Test {
 
     @Test
     public void shouldSaveANewDrugOrder() throws ParseException {
-        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10();
-        emrOrderService.setEncounterService(encounterService);
-        emrOrderService.setOpenMRSDrugOrderMapper(openMRSDrugOrderMapper);
+        EmrOrderServiceImpl emrOrderService = new EmrOrderServiceImpl(openMRSDrugOrderMapper, encounterService);
 
         EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample("drug-uuid", "day");
         DrugOrder mappedDrugOrder = new DrugOrder();

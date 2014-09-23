@@ -15,7 +15,6 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
-import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
@@ -25,22 +24,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service(value = "emrOrderService")
 @Transactional
-@OpenmrsProfile(openmrsVersion = "1.10")
-public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
-    private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
-    private EncounterService encounterService;
+public class EmrOrderServiceImpl implements EmrOrderService {
+    private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
+    private final EncounterService encounterService;
 
-    public void setOpenMRSDrugOrderMapper(OpenMRSDrugOrderMapper openMRSDrugOrderMapper) {
+    @Autowired
+    public EmrOrderServiceImpl(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
-    }
-
-    public void setEncounterService(EncounterService encounterService) {
         this.encounterService = encounterService;
     }
 
     @Override
-    @Transactional
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
