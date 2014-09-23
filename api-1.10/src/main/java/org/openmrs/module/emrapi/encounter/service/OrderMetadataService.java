@@ -21,9 +21,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class OrderMetadataService {
     private OrderService orderService;
 
+    @Autowired
     public OrderMetadataService(OrderService orderService) {
         this.orderService = orderService;
     }

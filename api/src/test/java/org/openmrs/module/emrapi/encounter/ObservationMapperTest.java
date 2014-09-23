@@ -46,7 +46,6 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     @Before
     public void setUp(){
         initMocks(this);
-
         observationMapper = new ObservationMapper();
         obsBuilder = new ObsBuilder();
         obsBuilder.setUuid(UUID.randomUUID().toString()).setConcept(concept);

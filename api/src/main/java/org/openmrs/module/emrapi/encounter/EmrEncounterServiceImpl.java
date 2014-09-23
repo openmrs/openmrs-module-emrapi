@@ -21,7 +21,6 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
-import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
@@ -53,6 +52,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
 
 @Transactional
+@Component (value = "emrEncounterServiceTarget")
 public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEncounterService {
 
     private final EncounterTransactionMapper encounterTransactionMapper;
@@ -69,9 +69,10 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
     private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
 
+    @Autowired(required = false)
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
                                    LocationService locationService, ProviderService providerService,
-                                   AdministrationService administrationService,
+                                   @Qualifier(value = "adminService")AdministrationService administrationService,
                                    EncounterObservationServiceHelper encounterObservationServiceHelper,
                                    EncounterDispositionServiceHelper encounterDispositionServiceHelper,
                                    EncounterTransactionMapper encounterTransactionMapper,
@@ -88,6 +89,17 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.encounterTransactionMapper = encounterTransactionMapper;
         this.encounterProviderServiceHelper = encounterProviderServiceHelper;
         this.emrOrderService = emrOrderService;
+    }
+
+    @Autowired(required = false)
+    public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
+                                   LocationService locationService, ProviderService providerService,
+                                   @Qualifier(value = "adminService")AdministrationService administrationService,
+                                   EncounterObservationServiceHelper encounterObservationServiceHelper,
+                                   EncounterDispositionServiceHelper encounterDispositionServiceHelper,
+                                   EncounterTransactionMapper encounterTransactionMapper,
+                                   EncounterProviderServiceHelper encounterProviderServiceHelper) {
+        this(patientService, visitService, encounterService, locationService, providerService, administrationService, encounterObservationServiceHelper, encounterDispositionServiceHelper, encounterTransactionMapper, encounterProviderServiceHelper, null);
     }
 
     @Override
