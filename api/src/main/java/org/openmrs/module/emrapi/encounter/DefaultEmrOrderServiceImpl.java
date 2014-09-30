@@ -18,7 +18,9 @@ import org.openmrs.Encounter;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.springframework.stereotype.Component;
 
+@Component (value = "emrOrderService")
 @OpenmrsProfile(openmrsVersion = "1.9.*")
 public class DefaultEmrOrderServiceImpl implements EmrOrderService {
 

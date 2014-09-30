@@ -21,7 +21,6 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
-import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
@@ -34,9 +33,6 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -116,9 +112,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         visitService.saveVisit(visit);
 
-        if (emrOrderService != null) {
-            emrOrderService.save(encounterTransaction.getDrugOrders(), encounter);
-        }
+        emrOrderService.save(encounterTransaction.getDrugOrders(), encounter);
 
         return new EncounterTransaction(visit.getUuid(), encounter.getUuid());
     }
