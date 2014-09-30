@@ -13,7 +13,6 @@
 	<description>OMOD project for EMRAPI</description>
 
 	<dependencies>
-
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>${project.parent.artifactId}-api-1.9</artifactId>
@@ -37,25 +36,17 @@
             <scope>test</scope>
             <exclusions />
         </dependency>
-        <!--
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>${project.parent.artifactId}-api</artifactId>
-            <version>${project.parent.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        -->
-
         <dependency>
             <groupId>org.openmrs.web</groupId>
             <artifactId>openmrs-web</artifactId>
             <type>jar</type>
+            <version>${openMRSVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openmrs.web</groupId>
             <artifactId>openmrs-web</artifactId>
             <type>test-jar</type>
+            <version>${openMRSVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
@@ -64,6 +55,20 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod-common</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.test</groupId>
+            <artifactId>openmrs-test</artifactId>
+            <version>${openMRSVersion}</version>
+            <scope>test</scope>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.api</groupId>
+            <artifactId>openmrs-api</artifactId>
+            <version>${openMRSVersion}</version>
+            <scope>test</scope>
             <type>test-jar</type>
         </dependency>
     </dependencies>
@@ -211,11 +216,8 @@
     <profiles>
         <profile>
             <id>MRS1.9</id>
-            <!--<activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>-->
             <properties>
-                <openmrsCoreVersion>1.9.4</openmrsCoreVersion>
+                <openMRSVersion>1.9.8</openMRSVersion>
             </properties>
             <dependencies>
                 <dependency>
@@ -249,16 +251,9 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <openmrsCoreVersion>1.10.0</openmrsCoreVersion>
+                <openMRSVersion>1.10.0</openMRSVersion>
             </properties>
 
-           <!-- <dependencies>
-                <dependency>
-                    <groupId>${project.parent.groupId}</groupId>
-                    <artifactId>${project.parent.artifactId}-api-1.10</artifactId>
-                    <version>${project.parent.version}</version>
-                </dependency>
-            </dependencies>-->
             <build>
                 <plugins>
                     <plugin>
