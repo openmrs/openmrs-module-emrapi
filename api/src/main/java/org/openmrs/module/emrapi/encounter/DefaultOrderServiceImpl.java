@@ -11,14 +11,19 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.encounter.mapper;
+package org.openmrs.module.emrapi.encounter;
 
-import org.openmrs.Order;
-import org.openmrs.module.emrapi.encounter.ConceptMapper;
+import java.util.List;
+import org.openmrs.Encounter;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.springframework.stereotype.Component;
 
-public class TestOrderMapper {
-    private final ConceptMapper conceptMapper = new ConceptMapper();
+@Component(value = "emrOrderService")
+@OpenmrsProfile(openmrsVersion = "1.9.*")
+public class DefaultOrderServiceImpl implements EmrOrderService{
 
-
+    @Override
+    public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
+    }
 }

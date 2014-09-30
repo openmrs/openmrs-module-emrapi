@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
@@ -25,13 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service(value = "emrOrderService")
-@Transactional
-public class EmrOrderServiceImpl implements EmrOrderService {
+@OpenmrsProfile(openmrsVersion = "1.10")
+public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
 
     @Autowired
-    public EmrOrderServiceImpl(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService) {
+    public EmrOrderServiceImpl_1_10(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
     }
