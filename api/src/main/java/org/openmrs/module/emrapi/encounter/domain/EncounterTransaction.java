@@ -666,6 +666,8 @@ public class EncounterTransaction {
         private String commentToFulfiller;
         private Integer duration;
         private String durationUnits;
+        private Boolean voided;
+        private String voidReason;
 
         public String getUuid() {
             return uuid;
@@ -825,6 +827,22 @@ public class EncounterTransaction {
 
         public void setOrderType(String orderType) {
             this.orderType = orderType;
+        }
+
+        public void setVoided(Boolean voided) {
+            this.voided = voided;
+        }
+
+        public Boolean getVoided() {
+            return voided;
+        }
+
+        public void setVoidReason(String voidReason) {
+            this.voidReason = voidReason;
+        }
+
+        public String getVoidReason() {
+            return voidReason;
         }
     }
 

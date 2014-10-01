@@ -106,6 +106,9 @@ public class OrderMapper1_10 implements OrderMapper {
         drugOrder.setInstructions(openMRSDrugOrder.getInstructions());
         drugOrder.setCommentToFulfiller(openMRSDrugOrder.getCommentToFulfiller());
 
+        drugOrder.setVoided(openMRSDrugOrder.getVoided());
+        drugOrder.setVoidReason(openMRSDrugOrder.getVoidReason());
+
         return drugOrder;
     }
 
