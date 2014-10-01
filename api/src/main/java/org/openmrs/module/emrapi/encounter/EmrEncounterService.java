@@ -34,4 +34,6 @@ public interface EmrEncounterService extends OpenmrsService {
     List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters);
 
     EncounterTransaction getActiveEncounter(ActiveEncounterParameters activeEncounterParameters);
+
+    EncounterTransaction getEncounterTransaction(String uuid, Boolean includeAll);
 }

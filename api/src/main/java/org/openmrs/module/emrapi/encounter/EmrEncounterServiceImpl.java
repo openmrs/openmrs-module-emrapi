@@ -153,6 +153,13 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         return encounterTransactionMapper.map(encounter, activeEncounterParameters.getIncludeAll());
     }
 
+    @Override
+    public EncounterTransaction getEncounterTransaction(String uuid, Boolean includeAll) {
+        includeAll = includeAll != null ? includeAll : false;
+        Encounter encounter = encounterService.getEncounterByUuid(uuid);
+        return encounterTransactionMapper.map(encounter, includeAll);
+    }
+
     private Encounter newEncounter(Visit visit, EncounterParameters encounterParameters) {
         Encounter encounter;
         encounter = new Encounter();

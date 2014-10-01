@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
+import org.codehaus.jackson.type.TypeReference;
 import org.junit.*;
 import org.openmrs.*;
 import org.openmrs.api.*;
@@ -161,5 +162,28 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
         assertEquals(2, actions.size());
         assertTrue(actions.contains("NEW"));
         assertTrue(actions.contains("DISCONTINUE"));
+    }
+
+    @Test
+    public void shouldGetEncounterTransactionForEncounterUuid() throws Exception {
+        executeDataSet("baseMetaData.xml");
+        executeDataSet("dispositionMetaData.xml");
+        executeDataSet("diagnosisMetaData.xml");
+        executeDataSet("shouldGetEncounterTransactionByDate.xml");
+
+        String firstEncounter = "{" +
+                "\"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
+                "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"encounterTypeUuid\": \"4f3c2244-9d6a-439e-b88a-6e8873489ea7\", " +
+                "\"encounterDateTime\" : \"2004-01-01T10:00:00.000+0000\" " +
+                "}";
+        EncounterTransaction encounter1Response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", firstEncounter)), EncounterTransaction.class);
+        String encounterUuid = encounter1Response.getEncounterUuid();
+
+        EncounterTransaction encounterTransaction = deserialize(handle(newGetRequest("/rest/emrapi/encounter/" + encounterUuid,
+                new Parameter[]{new Parameter("includeAll", "false")})), new TypeReference<EncounterTransaction>() {
+        });
+
+        assertNotNull(encounterTransaction);
     }
 }

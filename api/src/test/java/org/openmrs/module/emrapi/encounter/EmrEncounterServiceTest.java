@@ -8,6 +8,7 @@ import org.openmrs.EncounterType;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.*;
+import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.Arrays;
@@ -108,5 +109,16 @@ public class EmrEncounterServiceTest {
         emrEncounterService.save(encounterTransaction);
 
         verify(orderService).save(same(drugOrders), any(Encounter.class));
+    }
+
+    @Test
+    public void shouldFetchEncounterTransactionByUuid() throws Exception {
+        Encounter encounter = new EncounterBuilder().build();
+        when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
+        when(encounterTransactionMapper.map(encounter, false)).thenReturn(new EncounterTransaction());
+        EncounterTransaction encounterTransaction = emrEncounterService.getEncounterTransaction("encounterUuid", false);
+        verify(encounterTransactionMapper).map(encounter, false);
+
+        assertNotNull(encounterTransaction);
     }
 }
