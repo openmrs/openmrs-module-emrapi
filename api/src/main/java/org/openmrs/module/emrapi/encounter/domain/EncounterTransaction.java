@@ -53,7 +53,7 @@ public class EncounterTransaction {
     }
 
     public void setDisposition(Disposition disposition) {
-        this.disposition = disposition;
+        this.disposition = disposition; 
     }
 
     public String getPatientUuid() {
