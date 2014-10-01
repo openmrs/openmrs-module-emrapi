@@ -57,29 +57,6 @@
     </dependencyManagement> 
 
     <dependencies>
-
-        <!-- Begin OpenMRS core -->
-
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <type>jar</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <type>test-jar</type>
-        </dependency>
-
-       <dependency>
-            <groupId>org.openmrs.test</groupId>
-            <artifactId>openmrs-test</artifactId>
-            <type>pom</type>
-        </dependency> 
-
-        <!-- End OpenMRS core -->
-
         <!-- Begin OpenMRS modules -->
 
        <dependency>

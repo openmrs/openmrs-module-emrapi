@@ -13,15 +13,14 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.CareSetting;
-import org.openmrs.Concept;
 import org.openmrs.DosingInstructions;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
-import org.openmrs.OrderType;
 import org.openmrs.Provider;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
@@ -29,11 +28,6 @@ import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * OpenMRSDrugOrderMapper.
@@ -41,7 +35,6 @@ import java.util.List;
  *
  * Version 1.0
  */
-@Component
 public class OpenMRSDrugOrderMapper {
 
     private OrderService orderService;
@@ -49,7 +42,6 @@ public class OpenMRSDrugOrderMapper {
     private DosingInstructionsMapper dosingInstructionsMapper;
     private OrderMetadataService orderMetadataService;
 
-    @Autowired
     public OpenMRSDrugOrderMapper(OrderService orderService, ConceptService conceptService,
                                   DosingInstructionsMapper dosingInstructionsMapper, OrderMetadataService orderMetadataService) {
         this.orderService = orderService;
