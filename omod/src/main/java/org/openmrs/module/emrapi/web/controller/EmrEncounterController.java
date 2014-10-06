@@ -24,6 +24,7 @@ import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestControlle
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -53,6 +54,12 @@ public class EmrEncounterController extends BaseRestController {
         return emrEncounterService.getActiveEncounter(activeEncounterParameters);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/{uuid}")
+    @ResponseBody
+    public EncounterTransaction get(@PathVariable("uuid") String uuid, Boolean includeAll) {
+        return emrEncounterService.getEncounterTransaction(uuid, includeAll);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters) {
@@ -75,6 +82,3 @@ public class EmrEncounterController extends BaseRestController {
         }
     }
 }
-
-
-

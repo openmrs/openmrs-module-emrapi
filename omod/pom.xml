@@ -33,8 +33,8 @@
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>${project.parent.artifactId}-api</artifactId>
             <version>${project.parent.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
-            <exclusions />
         </dependency>
         <dependency>
             <groupId>org.openmrs.web</groupId>
