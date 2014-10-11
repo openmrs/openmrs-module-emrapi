@@ -16,10 +16,8 @@ package org.openmrs.module.emrapi;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.LocationAttributeType;
 import org.openmrs.Provider;
 import org.openmrs.Role;
-import org.openmrs.api.LocationService;
 import org.openmrs.api.UserService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
