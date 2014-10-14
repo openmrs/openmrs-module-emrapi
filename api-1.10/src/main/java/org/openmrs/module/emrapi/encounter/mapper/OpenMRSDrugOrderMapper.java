@@ -41,6 +41,7 @@ public class OpenMRSDrugOrderMapper {
     private ConceptService conceptService;
     private DosingInstructionsMapper dosingInstructionsMapper;
     private OrderMetadataService orderMetadataService;
+    public static final Order.Urgency DEFAULT_URGENCY = Order.Urgency.ROUTINE;
 
     public OpenMRSDrugOrderMapper(OrderService orderService, ConceptService conceptService,
                                   DosingInstructionsMapper dosingInstructionsMapper, OrderMetadataService orderMetadataService) {
@@ -66,6 +67,9 @@ public class OpenMRSDrugOrderMapper {
         if (drugOrder.getScheduledDate() != null && drugOrder.getScheduledDate().after(new Date())) {
             openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
             openMRSDrugOrder.setUrgency(Order.Urgency.ON_SCHEDULED_DATE);
+        } else {
+            openMRSDrugOrder.setScheduledDate(null);
+            openMRSDrugOrder.setUrgency(DEFAULT_URGENCY);
         }
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
         openMRSDrugOrder.setDurationUnits(orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits()));

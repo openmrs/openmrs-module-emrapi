@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.hamcrest.Matchers;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -40,9 +41,11 @@ import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -104,7 +107,7 @@ public class OpenMRSDrugOrderMapper1_10Test {
 
     @Test
     public void shouldMapNewDrugOrders() throws ParseException {
-        EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample(DRUG_UUID, DAY_DURATION_UNIT);
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
 
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
@@ -121,7 +124,7 @@ public class OpenMRSDrugOrderMapper1_10Test {
 
     @Test
     public void shouldMapRevisedDrugOrders() throws ParseException {
-        EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample(DRUG_UUID, DAY_DURATION_UNIT);
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
         drugOrder.setAction(Order.Action.REVISE.name());
@@ -142,8 +145,26 @@ public class OpenMRSDrugOrderMapper1_10Test {
     }
 
     @Test
+    public void shouldClearScheduledDateAndUrgencyWhenScheduledOrderRevisedToStartFromToday(){
+        DrugOrder previousOpenMrsDrugOrder = new DrugOrder();
+        previousOpenMrsDrugOrder.setScheduledDate(DateUtils.addDays(new Date(), 2));
+        previousOpenMrsDrugOrder.setUrgency(Order.Urgency.ON_SCHEDULED_DATE);
+        previousOpenMrsDrugOrder.setUuid(UUID.randomUUID().toString());
+        Drug drug = new Drug();
+        drug.setUuid(DRUG_UUID);
+        previousOpenMrsDrugOrder.setDrug(drug);
+        when(orderService.getOrderByUuid(previousOpenMrsDrugOrder.getUuid())).thenReturn(previousOpenMrsDrugOrder);
+        EncounterTransaction.DrugOrder revisedDrugOrder = new DrugOrderBuilder().withScheduledDate(new Date()).withAction(Order.Action.REVISE.name()).withPreviousOrderUuid(previousOpenMrsDrugOrder.getUuid()).withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
+
+        DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(revisedDrugOrder, encounter);
+
+        assertNull(revisedOpenMrsDrugOrder.getScheduledDate());
+        assertThat(revisedOpenMrsDrugOrder.getUrgency(), is(equalTo(OpenMRSDrugOrderMapper.DEFAULT_URGENCY)));
+    }
+
+    @Test
     public void shouldMapStoppedDrugOrders() throws ParseException {
-        EncounterTransaction.DrugOrder drugOrder = DrugOrderBuilder.sample(DRUG_UUID, DAY_DURATION_UNIT);
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
         drugOrder.setAction(Order.Action.DISCONTINUE.name());
