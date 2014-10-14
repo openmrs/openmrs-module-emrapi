@@ -64,13 +64,8 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setEncounter(encounter);
 
         openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated());
-        if (drugOrder.getScheduledDate() != null && drugOrder.getScheduledDate().after(new Date())) {
-            openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
-            openMRSDrugOrder.setUrgency(Order.Urgency.ON_SCHEDULED_DATE);
-        } else {
-            openMRSDrugOrder.setScheduledDate(null);
-            openMRSDrugOrder.setUrgency(DEFAULT_URGENCY);
-        }
+        openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
+        openMRSDrugOrder.setUrgency(drugOrder.getScheduledDate() != null ? Order.Urgency.ON_SCHEDULED_DATE : DEFAULT_URGENCY);
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
         openMRSDrugOrder.setDurationUnits(orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits()));
 

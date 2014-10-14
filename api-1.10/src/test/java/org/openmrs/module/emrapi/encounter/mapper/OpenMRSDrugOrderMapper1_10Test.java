@@ -154,12 +154,12 @@ public class OpenMRSDrugOrderMapper1_10Test {
         drug.setUuid(DRUG_UUID);
         previousOpenMrsDrugOrder.setDrug(drug);
         when(orderService.getOrderByUuid(previousOpenMrsDrugOrder.getUuid())).thenReturn(previousOpenMrsDrugOrder);
-        EncounterTransaction.DrugOrder revisedDrugOrder = new DrugOrderBuilder().withScheduledDate(new Date()).withAction(Order.Action.REVISE.name()).withPreviousOrderUuid(previousOpenMrsDrugOrder.getUuid()).withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
+        EncounterTransaction.DrugOrder revisedDrugOrder = new DrugOrderBuilder().withScheduledDate(null).withAction(Order.Action.REVISE.name()).withPreviousOrderUuid(previousOpenMrsDrugOrder.getUuid()).withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
 
         DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(revisedDrugOrder, encounter);
 
-        assertNull(revisedOpenMrsDrugOrder.getScheduledDate());
         assertThat(revisedOpenMrsDrugOrder.getUrgency(), is(equalTo(OpenMRSDrugOrderMapper.DEFAULT_URGENCY)));
+        assertNull(revisedOpenMrsDrugOrder.getScheduledDate());
     }
 
     @Test
