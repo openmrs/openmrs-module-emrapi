@@ -23,9 +23,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -308,6 +310,53 @@ public class PatientDomainWrapperTest {
         assertThat(identifiers.size(), is(3));
         assertThat(identifiers, hasItems(identifier1, identifier2, identifier3));  // should not have the identifier at the other child locations
 
+    }
+
+    @Test
+    public void shouldReturnExtraPatientIdentifiersMappedByType() {
+
+        PatientIdentifierType pit1 = new PatientIdentifierType();
+        PatientIdentifierType pit2 = new PatientIdentifierType();
+        PatientIdentifierType pit3 = new PatientIdentifierType();
+
+        PatientIdentifier identifier1 = new PatientIdentifier();
+        identifier1.setId(1);
+        identifier1.setIdentifier("1");
+        identifier1.setIdentifierType(pit1);
+
+        PatientIdentifier identifier2 = new PatientIdentifier();
+        identifier2.setId(2);
+        identifier2.setIdentifier("2");
+        identifier2.setIdentifierType(pit2);
+
+        PatientIdentifier identifier3 = new PatientIdentifier();
+        identifier3.setId(3);
+        identifier3.setIdentifier("3");
+        identifier3.setIdentifierType(pit2);
+
+        PatientIdentifier identifier4 = new PatientIdentifier();
+        identifier4.setId(4);
+        identifier4.setIdentifier("4");
+        identifier4.setIdentifierType(pit3);
+
+        patient.addIdentifier(identifier1);
+        patient.addIdentifier(identifier2);
+        patient.addIdentifier(identifier3);
+        patient.addIdentifier(identifier4);
+
+        when(emrApiProperties.getExtraPatientIdentifierTypes()).thenReturn(Arrays.asList(pit1, pit2));
+
+        Map<PatientIdentifierType, List<PatientIdentifier>> identifierMap = patientDomainWrapper.getExtraIdentifiersMappedByType();
+
+        assertThat(identifierMap.keySet().size(), is(2));
+        assertTrue(identifierMap.containsKey(pit1));
+        assertTrue(identifierMap.containsKey(pit2));
+
+        assertThat(identifierMap.get(pit1).size(), is(1));
+        assertThat(identifierMap.get(pit1), hasItem(identifier1));
+
+        assertThat(identifierMap.get(pit2).size(), is(2));
+        assertThat(identifierMap.get(pit2), hasItems(identifier2, identifier3));
     }
 
 

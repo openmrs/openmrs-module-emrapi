@@ -39,7 +39,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -188,8 +190,6 @@ public class PatientDomainWrapper {
                if (extraPatientIdentifiers != null) {
 
                    for (PatientIdentifier extraPatientIdentifier: extraPatientIdentifiers) {
-
-
                         if (type.getLocationBehavior() == null || !type.getLocationBehavior().equals(PatientIdentifierType.LocationBehavior.REQUIRED)
                                 || location == null || Location.isInHierarchy(location, extraPatientIdentifier.getLocation())) {
                             patientIdentifiers.add(extraPatientIdentifier);
@@ -202,15 +202,30 @@ public class PatientDomainWrapper {
        return patientIdentifiers;
    }
 
+    public Map<PatientIdentifierType, List<PatientIdentifier>> getExtraIdentifiersMappedByType(Location location) {
 
-// This can no longer be on PatientDomainWrapper since we pulled out the paperrecord module
-//    public List<PatientIdentifier> getPaperRecordIdentifiers() {
-//        PatientIdentifierType paperRecordIdentifierType = emrApiProperties.getPaperRecordIdentifierType();
-//        if (paperRecordIdentifierType == null) {
-//            return new ArrayList<PatientIdentifier>();
-//        }
-//        return patient.getPatientIdentifiers(paperRecordIdentifierType);
-//    }
+        Map<PatientIdentifierType, List<PatientIdentifier>> identifierMap = new HashMap<PatientIdentifierType, List<PatientIdentifier>>();
+
+        List<PatientIdentifier> patientIdentifiers = getExtraIdentifiers(location);
+
+        if (patientIdentifiers != null) {
+
+            for (PatientIdentifier patientIdentifier : patientIdentifiers) {
+
+                if (!identifierMap.containsKey(patientIdentifier.getIdentifierType())) {
+                    identifierMap.put(patientIdentifier.getIdentifierType(), new ArrayList<PatientIdentifier>());
+                }
+                identifierMap.get(patientIdentifier.getIdentifierType()).add(patientIdentifier);
+            }
+        }
+
+        return identifierMap;
+    }
+
+    public Map<PatientIdentifierType, List<PatientIdentifier>> getExtraIdentifiersMappedByType() {
+        return getExtraIdentifiersMappedByType(null);
+    }
+
 
 	public Encounter getLastEncounter() {
 		return adtService.getLastEncounter(patient);
