@@ -159,30 +159,49 @@ public class PatientDomainWrapper {
 		return patient.getPatientIdentifiers(emrApiProperties.getPrimaryIdentifierType());
 	}
 
-// This can no longer be on PatientDomainWrapper since we pulled out the paperrecord module
-//    public PatientIdentifier getPaperRecordIdentifier() {
-//        List<PatientIdentifier> paperRecordIdentifiers = getPaperRecordIdentifiers();
-//        if (paperRecordIdentifiers.size() == 0) {
-//            return null;
-//        } else {
-//            return paperRecordIdentifiers.get(0);
-//        }
-//    }
 
-	public List<PatientIdentifier> getExtraIdentifiers() {
-		List<PatientIdentifier> patientIdentifiers = null;
-		List<PatientIdentifierType> types = emrApiProperties.getExtraPatientIdentifierTypes();
-		if (types != null && types.size() > 0) {
-			patientIdentifiers = new ArrayList<PatientIdentifier>();
-			for (PatientIdentifierType type : types) {
-				List<PatientIdentifier> extraPatientIdentifiers = patient.getPatientIdentifiers(type);
-				if (extraPatientIdentifiers != null) {
-					patientIdentifiers.addAll(extraPatientIdentifiers);
-				}
-			}
-		}
-		return patientIdentifiers;
-	}
+    public List<PatientIdentifier> getExtraIdentifiers() {
+	    return getExtraIdentifiers(null);
+    }
+
+    /**
+     * Return all extra identifiers associated with this patient, restricted by the specified location
+     *
+     * If an identifier type has locationBehaviour = REQUIRED, only return identifiers for which
+     * the specified location fails within the hierarchy of the location associated with the identifier (ie, if "Clinic B"
+     * is passed in as the location parameter, don't return identifiers that fall under the "Clinic A" location hierarchy)
+     *
+     * @param location
+     * @return
+     */
+   public List<PatientIdentifier> getExtraIdentifiers(Location location) {
+
+       List<PatientIdentifier> patientIdentifiers = null;
+       List<PatientIdentifierType> types = emrApiProperties.getExtraPatientIdentifierTypes();
+
+       if (types != null && types.size() > 0) {
+           patientIdentifiers = new ArrayList<PatientIdentifier>();
+
+           for (PatientIdentifierType type : types) {
+               List<PatientIdentifier> extraPatientIdentifiers = patient.getPatientIdentifiers(type);
+
+               if (extraPatientIdentifiers != null) {
+
+                   for (PatientIdentifier extraPatientIdentifier: extraPatientIdentifiers) {
+
+
+                        if (type.getLocationBehavior() == null || !type.getLocationBehavior().equals(PatientIdentifierType.LocationBehavior.REQUIRED)
+                                || location == null || Location.isInHierarchy(location, extraPatientIdentifier.getLocation())) {
+                            patientIdentifiers.add(extraPatientIdentifier);
+                        }
+
+                   }
+               }
+           }
+       }
+       return patientIdentifiers;
+   }
+
 
 // This can no longer be on PatientDomainWrapper since we pulled out the paperrecord module
 //    public List<PatientIdentifier> getPaperRecordIdentifiers() {

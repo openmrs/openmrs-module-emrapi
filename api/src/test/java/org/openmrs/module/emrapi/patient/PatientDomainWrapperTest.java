@@ -2,7 +2,10 @@ package org.openmrs.module.emrapi.patient;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Location;
 import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
@@ -15,12 +18,15 @@ import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -28,7 +34,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 
 public class PatientDomainWrapperTest {
@@ -202,6 +207,109 @@ public class PatientDomainWrapperTest {
 
         assertThat(patientDomainWrapper.getAgeInDays(), is(3));
     }
+
+    @Test
+    public void shouldReturnExtraPatientIdentifiers() {
+
+        PatientIdentifierType pit1 = new PatientIdentifierType();
+        PatientIdentifierType pit2 = new PatientIdentifierType();
+        PatientIdentifierType pit3 = new PatientIdentifierType();
+
+        PatientIdentifier identifier1 = new PatientIdentifier();
+        identifier1.setIdentifierType(pit1);
+        PatientIdentifier identifier2 = new PatientIdentifier();
+        identifier2.setIdentifierType(pit2);
+        PatientIdentifier identifier3 = new PatientIdentifier();
+        identifier3.setIdentifierType(pit3);
+
+        patient.addIdentifier(identifier1);
+        patient.addIdentifier(identifier2);
+        patient.addIdentifier(identifier3);
+
+        when(emrApiProperties.getExtraPatientIdentifierTypes()).thenReturn(Arrays.asList(pit1, pit2));
+
+        List<PatientIdentifier> identifiers = patientDomainWrapper.getExtraIdentifiers();
+
+        assertThat(identifiers.size(), is(2));
+        assertThat(identifiers, hasItems(identifier1, identifier2));
+
+    }
+
+    @Test
+    public void shouldReturnExtraPatientIdentifiersRestrictedByLocation() {
+
+        Location parentLocation = new Location();
+        Location childLocation1 = new Location();
+        Location childLocation2 = new Location();
+
+        parentLocation.addChildLocation(childLocation1);
+        parentLocation.addChildLocation(childLocation2);
+
+        PatientIdentifierType pit = new PatientIdentifierType();
+        pit.setLocationBehavior(PatientIdentifierType.LocationBehavior.REQUIRED);
+
+        PatientIdentifier identifier1 = new PatientIdentifier();
+        identifier1.setIdentifierType(pit);
+        identifier1.setLocation(parentLocation);
+
+        PatientIdentifier identifier2 = new PatientIdentifier();
+        identifier2.setIdentifierType(pit);
+        identifier2.setLocation(childLocation1);
+
+        PatientIdentifier identifier3 = new PatientIdentifier();
+        identifier3.setIdentifierType(pit);
+        identifier3.setLocation(childLocation2);
+
+        patient.addIdentifier(identifier1);
+        patient.addIdentifier(identifier2);
+        patient.addIdentifier(identifier3);
+
+        when(emrApiProperties.getExtraPatientIdentifierTypes()).thenReturn(Collections.singletonList(pit));
+
+        List<PatientIdentifier> identifiers = patientDomainWrapper.getExtraIdentifiers(childLocation2);
+
+        assertThat(identifiers.size(), is(2));
+        assertThat(identifiers, hasItems(identifier1, identifier3));  // should not have the identifier at the other child locations
+
+    }
+
+    @Test
+    public void shouldReturnExtraPatientIdentifiersShouldNotRestrictLocationsForTypesWhereLocationIsNotRequired() {
+
+        Location parentLocation = new Location();
+        Location childLocation1 = new Location();
+        Location childLocation2 = new Location();
+
+        parentLocation.addChildLocation(childLocation1);
+        parentLocation.addChildLocation(childLocation2);
+
+        PatientIdentifierType pit = new PatientIdentifierType();
+
+        PatientIdentifier identifier1 = new PatientIdentifier();
+        identifier1.setIdentifierType(pit);
+        identifier1.setLocation(parentLocation);
+
+        PatientIdentifier identifier2 = new PatientIdentifier();
+        identifier2.setIdentifierType(pit);
+        identifier2.setLocation(childLocation1);
+
+        PatientIdentifier identifier3 = new PatientIdentifier();
+        identifier3.setIdentifierType(pit);
+        identifier3.setLocation(childLocation2);
+
+        patient.addIdentifier(identifier1);
+        patient.addIdentifier(identifier2);
+        patient.addIdentifier(identifier3);
+
+        when(emrApiProperties.getExtraPatientIdentifierTypes()).thenReturn(Collections.singletonList(pit));
+
+        List<PatientIdentifier> identifiers = patientDomainWrapper.getExtraIdentifiers(childLocation2);
+
+        assertThat(identifiers.size(), is(3));
+        assertThat(identifiers, hasItems(identifier1, identifier2, identifier3));  // should not have the identifier at the other child locations
+
+    }
+
 
     private PersonName createPreferredPersonName(String givenName, String familyName) {
         PersonName personNamePreferred = createPersonName(givenName, familyName, true);
