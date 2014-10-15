@@ -19,6 +19,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Matchers.isNull;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -184,6 +185,25 @@ public class OpenMRSDrugOrderMapper1_10Test {
         verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
     }
 
+    @Test
+    public void shouldRemoveAutoExpireDateForReviseOrdersWithADuration() {
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder()
+                .withDrugUuid(DRUG_UUID)
+                .withDurationUnits(DAY_DURATION_UNIT)
+                .build();
+        DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+        openMrsDrugOrder.setAutoExpireDate(new Date());
+
+
+        drugOrder.setAction(Order.Action.REVISE.name());
+        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
+        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
+        DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+
+        assertNull(revisedOpenMrsDrugOrder.getAutoExpireDate());
+
+    }
+
     private Answer<DrugOrder> argumentAt(final int arg) {
         return new Answer<DrugOrder>() {
             @Override
@@ -193,8 +213,4 @@ public class OpenMRSDrugOrderMapper1_10Test {
         };
     }
 
-    private static Date date(String string) throws ParseException {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        return  formatter.parseDateTime(string).toDate();
-    }
 }

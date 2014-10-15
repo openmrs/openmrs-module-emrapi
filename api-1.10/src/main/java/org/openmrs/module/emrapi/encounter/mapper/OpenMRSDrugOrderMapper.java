@@ -77,6 +77,10 @@ public class OpenMRSDrugOrderMapper {
             throw new APIException("Class not found for : DosingInstructionType " + drugOrder.getDosingInstructionType(), e);
         }
 
+        if (Order.Action.REVISE == openMRSDrugOrder.getAction() && openMRSDrugOrder.getDuration() != null) {
+            openMRSDrugOrder.setAutoExpireDate(null);
+        }
+
         dosingInstructionsMapper.map(drugOrder.getDosingInstructions(), openMRSDrugOrder);
         openMRSDrugOrder.setInstructions(drugOrder.getInstructions());
         Provider provider = encounter.getEncounterProviders().iterator().next().getProvider();
