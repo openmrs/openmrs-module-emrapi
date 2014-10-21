@@ -14,17 +14,20 @@
 package org.openmrs.module.emrapi.encounter.builder;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
+
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 public class DrugOrderBuilder {
 
-    public static EncounterTransaction.DrugOrder sample(String drugUuid, String durationUnits) {
-        EncounterTransaction.DrugOrder drugOrder = new EncounterTransaction.DrugOrder();
+    private final EncounterTransaction.DrugOrder drugOrder;
+
+    public DrugOrderBuilder() {
+        drugOrder = new EncounterTransaction.DrugOrder();
         drugOrder.setCareSetting("OUTPATIENT");
         drugOrder.setOrderType("Drug Order");
-        EncounterTransaction.Drug drug = new EncounterTransaction.Drug();
-        drug.setUuid(drugUuid);
-        drugOrder.setDrug(drug);
+        withDrugUuid(UUID.randomUUID().toString());
         drugOrder.setDosingInstructionType("org.openmrs.SimpleDosingInstructions");
         EncounterTransaction.DosingInstructions dosingInstructions = DosingInstructionsBuilder.sample();
         drugOrder.setDosingInstructions(dosingInstructions);
@@ -36,7 +39,42 @@ public class DrugOrderBuilder {
         provider.setUuid("331c6bf8-7846-11e3-a96a-0800271c1b75");
         drugOrder.setAction("NEW");
         drugOrder.setDuration(2);
-        drugOrder.setDurationUnits(durationUnits);
+        drugOrder.setDurationUnits("Day");
+    }
+
+    public EncounterTransaction.DrugOrder build() {
         return drugOrder;
+    }
+
+    public DrugOrderBuilder withDurationUnits(String durationUnits) {
+        drugOrder.setDurationUnits(durationUnits);
+        return this;
+    }
+
+    public DrugOrderBuilder withDrugUuid(String drugUuid) {
+        EncounterTransaction.Drug drug = new EncounterTransaction.Drug();
+        drug.setUuid(drugUuid);
+        drugOrder.setDrug(drug);
+        return this;
+    }
+
+    public DrugOrderBuilder withScheduledDate(Date scheduledDate) {
+        drugOrder.setScheduledDate(scheduledDate);
+        return this;
+    }
+
+    public DrugOrderBuilder withAction(String action) {
+        drugOrder.setAction(action);
+        return this;
+    }
+
+    public DrugOrderBuilder withPreviousOrderUuid(String previousOrderUuid) {
+        drugOrder.setPreviousOrderUuid(previousOrderUuid);
+        return this;
+    }
+
+    public DrugOrderBuilder withAutoExpireDate(Date date) {
+        drugOrder.setAutoExpireDate(date);
+        return this;
     }
 }

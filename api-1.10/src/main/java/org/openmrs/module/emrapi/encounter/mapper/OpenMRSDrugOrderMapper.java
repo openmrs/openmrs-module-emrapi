@@ -13,7 +13,6 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.CareSetting;
 import org.openmrs.DosingInstructions;
@@ -32,7 +31,7 @@ import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
 /**
  * OpenMRSDrugOrderMapper.
  * Maps EncounterTransaction DrugOrder to OpenMRS DrugOrders.
- *
+ * <p/>
  * Version 1.0
  */
 public class OpenMRSDrugOrderMapper {
@@ -41,6 +40,7 @@ public class OpenMRSDrugOrderMapper {
     private ConceptService conceptService;
     private DosingInstructionsMapper dosingInstructionsMapper;
     private OrderMetadataService orderMetadataService;
+    public static final Order.Urgency DEFAULT_URGENCY = Order.Urgency.ROUTINE;
 
     public OpenMRSDrugOrderMapper(OrderService orderService, ConceptService conceptService,
                                   DosingInstructionsMapper dosingInstructionsMapper, OrderMetadataService orderMetadataService) {
@@ -56,19 +56,18 @@ public class OpenMRSDrugOrderMapper {
 
         Drug drug = getDrugFrom(drugOrder, openMRSDrugOrder);
 
-        if(drug == null) {
+        if (drug == null) {
             throw new APIException("No such drug : " + drugOrder.getDrug().getName());
         }
         openMRSDrugOrder.setDrug(drug);
         openMRSDrugOrder.setEncounter(encounter);
 
         openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated());
-        if (drugOrder.getScheduledDate() != null && drugOrder.getScheduledDate().after(new Date())) {
-            openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
-            openMRSDrugOrder.setUrgency(Order.Urgency.ON_SCHEDULED_DATE);
-        }
+        openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
+        openMRSDrugOrder.setUrgency(drugOrder.getScheduledDate() != null ? Order.Urgency.ON_SCHEDULED_DATE : DEFAULT_URGENCY);
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
         openMRSDrugOrder.setDurationUnits(orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits()));
+        openMRSDrugOrder.setAutoExpireDate(drugOrder.getAutoExpireDate());
 
         try {
             if (drugOrder.getDosingInstructionType() != null) {
