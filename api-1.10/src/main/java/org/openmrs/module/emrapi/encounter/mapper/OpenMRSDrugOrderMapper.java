@@ -13,7 +13,6 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.CareSetting;
 import org.openmrs.DosingInstructions;
@@ -32,7 +31,7 @@ import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
 /**
  * OpenMRSDrugOrderMapper.
  * Maps EncounterTransaction DrugOrder to OpenMRS DrugOrders.
- *
+ * <p/>
  * Version 1.0
  */
 public class OpenMRSDrugOrderMapper {
@@ -57,7 +56,7 @@ public class OpenMRSDrugOrderMapper {
 
         Drug drug = getDrugFrom(drugOrder, openMRSDrugOrder);
 
-        if(drug == null) {
+        if (drug == null) {
             throw new APIException("No such drug : " + drugOrder.getDrug().getName());
         }
         openMRSDrugOrder.setDrug(drug);
@@ -68,6 +67,7 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setUrgency(drugOrder.getScheduledDate() != null ? Order.Urgency.ON_SCHEDULED_DATE : DEFAULT_URGENCY);
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
         openMRSDrugOrder.setDurationUnits(orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits()));
+        openMRSDrugOrder.setAutoExpireDate(drugOrder.getAutoExpireDate());
 
         try {
             if (drugOrder.getDosingInstructionType() != null) {
@@ -75,10 +75,6 @@ public class OpenMRSDrugOrderMapper {
             }
         } catch (ClassNotFoundException e) {
             throw new APIException("Class not found for : DosingInstructionType " + drugOrder.getDosingInstructionType(), e);
-        }
-
-        if (Order.Action.REVISE == openMRSDrugOrder.getAction() && openMRSDrugOrder.getDuration() != null) {
-            openMRSDrugOrder.setAutoExpireDate(null);
         }
 
         dosingInstructionsMapper.map(drugOrder.getDosingInstructions(), openMRSDrugOrder);

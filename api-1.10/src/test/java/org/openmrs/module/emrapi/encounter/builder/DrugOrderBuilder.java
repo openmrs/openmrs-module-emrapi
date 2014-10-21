@@ -72,4 +72,9 @@ public class DrugOrderBuilder {
         drugOrder.setPreviousOrderUuid(previousOrderUuid);
         return this;
     }
+
+    public DrugOrderBuilder withAutoExpireDate(Date date) {
+        drugOrder.setAutoExpireDate(date);
+        return this;
+    }
 }

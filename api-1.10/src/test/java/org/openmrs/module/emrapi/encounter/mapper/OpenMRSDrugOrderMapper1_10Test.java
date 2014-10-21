@@ -58,7 +58,6 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class OpenMRSDrugOrderMapper1_10Test {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
-    public static final String DRUG_ORDER_TYPE = "Drug Order";
     public static final String DAY_DURATION_UNIT = "day";
     public static final String DRUG_UUID = "drug-uuid";
     private final Concept DAY_DURATION_CONCEPT = new Concept();
@@ -108,7 +107,12 @@ public class OpenMRSDrugOrderMapper1_10Test {
 
     @Test
     public void shouldMapNewDrugOrders() throws ParseException {
-        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
+        Date autoExpireDate = new Date();
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder()
+                .withDrugUuid(DRUG_UUID)
+                .withDurationUnits(DAY_DURATION_UNIT)
+                .withAutoExpireDate(autoExpireDate)
+                .build();
 
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
@@ -120,6 +124,7 @@ public class OpenMRSDrugOrderMapper1_10Test {
         assertThat(openMrsDrugOrder.getEncounter(), is(equalTo(encounter)));
         assertThat(openMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
         assertThat(openMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
+        assertThat(openMrsDrugOrder.getAutoExpireDate(), is(equalTo(autoExpireDate)));
         verify(dosingInstructionsMapper).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
     }
 
@@ -183,25 +188,6 @@ public class OpenMRSDrugOrderMapper1_10Test {
         assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
         assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
         verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
-    }
-
-    @Test
-    public void shouldRemoveAutoExpireDateForReviseOrdersWithADuration() {
-        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder()
-                .withDrugUuid(DRUG_UUID)
-                .withDurationUnits(DAY_DURATION_UNIT)
-                .build();
-        DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
-        openMrsDrugOrder.setAutoExpireDate(new Date());
-
-
-        drugOrder.setAction(Order.Action.REVISE.name());
-        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
-        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
-        DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
-
-        assertNull(revisedOpenMrsDrugOrder.getAutoExpireDate());
-
     }
 
     private Answer<DrugOrder> argumentAt(final int arg) {
