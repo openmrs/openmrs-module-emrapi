@@ -200,6 +200,9 @@ public class MetadataUtil {
 
             log.debug("Finished. Running total number of distinct items: " + itemToDateMap.size());
             System.out.println("Finished. Running total number of distinct items: " + itemToDateMap.size());
+
+            Context.flushSession();
+            Context.clearSession();
         }
 
         if (log.isInfoEnabled()) {
