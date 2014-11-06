@@ -85,7 +85,7 @@ public class OpenMRSDrugOrderMapper1_10Test {
 
         Drug drug = new Drug();
         drug.setUuid(DRUG_UUID);
-        when(conceptService.getDrugByNameOrId(DRUG_UUID)).thenReturn(drug);
+        when(conceptService.getDrugByUuid(DRUG_UUID)).thenReturn(drug);
 
         OrderType orderType = new OrderType("Drug Order", "", "org.openmrs.DrugOrder");
         when(orderService.getOrderTypeByConcept(any(Concept.class))).thenReturn(orderType);

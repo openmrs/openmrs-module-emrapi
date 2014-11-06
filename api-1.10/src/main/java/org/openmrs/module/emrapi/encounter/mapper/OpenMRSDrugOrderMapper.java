@@ -115,8 +115,8 @@ public class OpenMRSDrugOrderMapper {
         }
         EncounterTransaction.Drug drug = drugOrder.getDrug();
         if (drug.getUuid() == null || drug.getUuid().isEmpty()) {
-            return conceptService.getDrugByNameOrId(drug.getName());
+            return conceptService.getDrug(drug.getName());
         }
-        return conceptService.getDrugByNameOrId(drugOrder.getDrug().getUuid());
+        return conceptService.getDrugByUuid(drug.getUuid());
     }
 }

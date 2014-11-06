@@ -75,6 +75,50 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
     }
 
     @Test
+    public void shouldRespectDrugUuidIfProvidedWhileAddingDrugs() throws Exception {
+        executeDataSet("shouldAddNewDrugOrder.xml");
+
+        String json = "{  \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", \n" +
+                "   \"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", \n" +
+                "   \"encounterDateTime\" : \"2011-05-01T12:10:06.000+0530\", \n" +
+                "   \"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\",\n" +
+                "   \"providers\" : [{ \n" +
+                "     \n" +
+                "      \"uuid\":\"331c6bf8-7846-11e3-a96a-0800271c1b75\"\n" +
+                "   }],\n" +
+                "   \"drugOrders\" : [{   " +
+                "      \"careSetting\":\"OUTPATIENT\",\n" +
+                "      \"drug\":{  \n" +
+                "         \"uuid\":\"4d6fb6e0-4950-426c-9a9b-1f97e6037893\"\n" +
+                "      },\n" +
+                "      \"dosingInstructionsType\":\"org.openmrs.SimpleDosingInstructions\",\n" +
+                "      \"dosingInstructions\":{  \n" +
+                "         \"dose\":2,\n" +
+                "         \"doseUnits\":\"tab (s)\",\n" +
+                "         \"route\":\"PO\",\n" +
+                "         \"frequency\":\"QD\",\n" +
+                "         \"asNeeded\":false,\n" +
+                "         \"administrationInstructions\": \"AC\",\n" +
+                "         \"quantity\":16,\n" +
+                "         \"quantityUnits\": \"tab (s)\",\n" +
+                "         \"numRefills\":0\n" +
+                "      },\n" +
+                "      \"duration\": \"1\",\n" +
+                "      \"durationUnits\": \"Day(s)\",\n" +
+                "      \"scheduledDate\":\"2013-12-02T12:27:32.518Z\",\n" +
+                "      \"endDate\":\"2014-12-04T12:27:32.518Z\",\n" +
+                "      \"action\":\"NEW\"\n" +
+                "   }]\n" +
+                "}";
+
+        EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
+
+        assertNotNull(response);
+        Set<Order> savedDrugOrders = encounterService.getEncounterByUuid("f13d6fae-baa9-4553-955d-920098bec08f").getOrders();
+        assertEquals(1, savedDrugOrders.size());
+    }
+
+    @Test
     public void shouldReviseDrugOrder() throws Exception{
 
         executeDataSet("shouldReviseDrugOrder.xml");
