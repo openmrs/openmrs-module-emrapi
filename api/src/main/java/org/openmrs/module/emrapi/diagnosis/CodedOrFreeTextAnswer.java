@@ -206,7 +206,7 @@ public class CodedOrFreeTextAnswer {
                 return specificCodedAnswer.getName();
             }
             ConceptName preferredName = codedAnswer.getName(locale);
-            if (preferredName == null || preferredName.equals(specificCodedAnswer)) {
+            if (preferredName == null || preferredName.getName().equals(specificCodedAnswer.getName())) {
                 return specificCodedAnswer.getName();
             } else {
                 return specificCodedAnswer.getName() + " → " + preferredName.getName();
