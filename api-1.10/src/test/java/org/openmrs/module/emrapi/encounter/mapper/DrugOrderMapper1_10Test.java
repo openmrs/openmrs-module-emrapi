@@ -38,6 +38,7 @@ import org.openmrs.util.LocaleUtility;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.Locale;
 
@@ -71,9 +72,9 @@ public class DrugOrderMapper1_10Test {
     }
 
     @Test
-    public void shouldMapNewDrugOrder() throws ParseException {
+    public void shouldMapNewDrugOrder() throws ParseException, NoSuchFieldException, IllegalAccessException {
 
-        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null);
+        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-100");
         EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
@@ -103,18 +104,19 @@ public class DrugOrderMapper1_10Test {
 
         assertThat(drugOrder.getInstructions(), is(equalTo("before meals")));
         assertThat(drugOrder.getCommentToFulfiller(), is(equalTo("boil in water")));
+        assertThat(drugOrder.getOrderNumber(), is(equalTo("ORD-100")));
     }
 
     @Test
-    public void shouldSetPreviousOrder(){
-        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", "previousOrderUuid");
+    public void shouldSetPreviousOrder() throws NoSuchFieldException, IllegalAccessException {
+        DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", "previousOrderUuid", "ORD-100");
         EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getPreviousOrderUuid(), is(equalTo("previousOrderUuid")));
     }
 
     private DrugOrder drugOrder(CareSetting.CareSettingType careSettingType, int daysToStartAfter, String dosingInstructions,
-                                int duration, String instructions, String commentToFulfiller, String previousOrderUuid) {
+                                int duration, String instructions, String commentToFulfiller, String previousOrderUuid, String orderNumber) throws NoSuchFieldException, IllegalAccessException {
         DrugOrder order = new DrugOrder();
         order.setPatient(new Patient());
         order.setCareSetting(new CareSetting(careSettingType.name(), null, CareSetting.CareSettingType.OUTPATIENT));
@@ -160,6 +162,10 @@ public class DrugOrderMapper1_10Test {
 
         order.setInstructions(instructions);
         order.setCommentToFulfiller(commentToFulfiller);
+
+        Field field = Order.class.getDeclaredField("orderNumber");
+        field.setAccessible(true);
+        field.set(order, orderNumber);
 
         if (StringUtils.isNotBlank(previousOrderUuid)) {
             Order previousOrder = new Order();

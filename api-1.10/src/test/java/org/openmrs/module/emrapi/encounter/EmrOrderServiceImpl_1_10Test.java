@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
+import org.openmrs.Order;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
@@ -26,12 +27,16 @@ import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -53,21 +58,50 @@ public class EmrOrderServiceImpl_1_10Test {
     }
 
     @Test
-    public void shouldSaveANewDrugOrder() throws ParseException {
+    public void shouldSaveNewDrugOrdersInTheSequenceOfOrdering() throws ParseException {
         EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService);
-
-        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid("drug-uuid").withDurationUnits("day").build();
-        DrugOrder mappedDrugOrder = new DrugOrder();
+        EncounterTransaction.DrugOrder drugOrder1 = new DrugOrderBuilder().withDrugUuid("drug-uuid1").build();
+        EncounterTransaction.DrugOrder drugOrder2 = new DrugOrderBuilder().withDrugUuid("drug-uuid2").build();
+        DrugOrder mappedDrugOrder1 = new DrugOrder();
+        DrugOrder mappedDrugOrder2 = new DrugOrder();
         Encounter encounter = new Encounter();
-        when(openMRSDrugOrderMapper.map(any(EncounterTransaction.DrugOrder.class),
-                same(encounter)))
-                .thenReturn(mappedDrugOrder);
+        when(openMRSDrugOrderMapper.map(drugOrder1, encounter)).thenReturn(mappedDrugOrder1);
+        when(openMRSDrugOrderMapper.map(drugOrder2, encounter)).thenReturn(mappedDrugOrder2);
 
-        emrOrderService.save(Arrays.asList(drugOrder), encounter);
+        emrOrderService.save(Arrays.asList(drugOrder1, drugOrder2), encounter);
 
         ArgumentCaptor<Encounter> encounterArgumentCaptor = ArgumentCaptor.forClass(Encounter.class);
         verify(encounterService).saveEncounter(encounterArgumentCaptor.capture());
-        DrugOrder savedDrugOrder = (DrugOrder) encounterArgumentCaptor.getValue().getOrders().iterator().next();
-        assertThat(savedDrugOrder, is(sameInstance(mappedDrugOrder)));
+        Encounter savedEncounter = encounterArgumentCaptor.getValue();
+        ArrayList<Order> savedOrders = new ArrayList<Order>(savedEncounter.getOrders());
+        assertThat(savedOrders.size(), is(2));
+        assertThat((DrugOrder)savedOrders.get(0), is(sameInstance(mappedDrugOrder1)));
+        assertThat((DrugOrder)savedOrders.get(1), is(sameInstance(mappedDrugOrder2)));
+    }
+
+    @Test
+    public void shouldSaveNewDrugOrdersInTheSequenceOfOrderingToAnEncounterWithExistingOrders() throws ParseException {
+        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService);
+        EncounterTransaction.DrugOrder drugOrder3 = new DrugOrderBuilder().withDrugUuid("drug-uuid3").build();
+        EncounterTransaction.DrugOrder drugOrder4 = new DrugOrderBuilder().withDrugUuid("drug-uuid4").build();
+        DrugOrder existingDrugOrder1 = new DrugOrder();
+        DrugOrder existingDrugOrder2 = new DrugOrder();
+        DrugOrder mappedDrugOrder3 = new DrugOrder();
+        DrugOrder mappedDrugOrder4 = new DrugOrder();
+        Encounter encounter = new Encounter();
+        encounter.addOrder(existingDrugOrder1);
+        encounter.addOrder(existingDrugOrder2);
+        when(openMRSDrugOrderMapper.map(drugOrder3, encounter)).thenReturn(mappedDrugOrder3);
+        when(openMRSDrugOrderMapper.map(drugOrder4, encounter)).thenReturn(mappedDrugOrder4);
+
+        emrOrderService.save(Arrays.asList(drugOrder3, drugOrder4), encounter);
+
+        ArgumentCaptor<Encounter> encounterArgumentCaptor = ArgumentCaptor.forClass(Encounter.class);
+        verify(encounterService).saveEncounter(encounterArgumentCaptor.capture());
+        Encounter savedEncounter = encounterArgumentCaptor.getValue();
+        ArrayList<Order> savedOrders = new ArrayList<Order>(savedEncounter.getOrders());
+        assertThat(savedOrders.size(), is(4));
+        assertThat((DrugOrder)savedOrders.get(2), is(sameInstance(mappedDrugOrder3)));
+        assertThat((DrugOrder)savedOrders.get(3), is(sameInstance(mappedDrugOrder4)));
     }
 }
