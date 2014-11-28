@@ -470,6 +470,7 @@ public class EncounterTransaction {
         private String voidReason;
         private Date dateCreated;
         private Date dateChanged;
+        private String orderNumber;
 
         @JsonIgnore
         public String getConceptUuid() {
@@ -547,6 +548,14 @@ public class EncounterTransaction {
 
         public void setDateChanged(Date dateChanged) {
             this.dateChanged = dateChanged;
+        }
+
+        public void setOrderNumber(String orderNumber) {
+            this.orderNumber = orderNumber;
+        }
+
+        public String getOrderNumber() {
+            return orderNumber;
         }
     }
 
@@ -668,6 +677,7 @@ public class EncounterTransaction {
         private String durationUnits;
         private Boolean voided;
         private String voidReason;
+        private String orderNumber;
 
         public String getUuid() {
             return uuid;
@@ -843,6 +853,14 @@ public class EncounterTransaction {
 
         public String getVoidReason() {
             return voidReason;
+        }
+
+        public String getOrderNumber() {
+            return orderNumber;
+        }
+
+        public void setOrderNumber(String orderNumber) {
+            this.orderNumber = orderNumber;
         }
     }
 

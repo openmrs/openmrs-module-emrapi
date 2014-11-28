@@ -110,6 +110,7 @@ public class OrderMapper1_10 implements OrderMapper {
 
         drugOrder.setVoided(openMRSDrugOrder.getVoided());
         drugOrder.setVoidReason(openMRSDrugOrder.getVoidReason());
+        drugOrder.setOrderNumber(openMRSDrugOrder.getOrderNumber());
 
         return drugOrder;
     }
@@ -125,6 +126,7 @@ public class OrderMapper1_10 implements OrderMapper {
         emrTestOrder.setVoidReason(order.getVoidReason());
         emrTestOrder.setDateCreated(order.getDateCreated());
         emrTestOrder.setDateChanged(order.getDateChanged());
+        emrTestOrder.setOrderNumber(order.getOrderNumber());
         return emrTestOrder;
     }
 

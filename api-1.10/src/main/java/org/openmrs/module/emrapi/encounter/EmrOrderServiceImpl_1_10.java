@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
+import org.openmrs.Order;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service(value = "emrOrderService")
@@ -39,6 +41,7 @@ public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
 
     @Override
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
+        encounter.setOrders(new LinkedHashSet<Order>(encounter.getOrders()));
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
             encounter.addOrder(omrsDrugOrder);
