@@ -41,7 +41,7 @@
         <openmrsTestutilsVersion>1.3</openmrsTestutilsVersion>
         <distro.groupId>org.openmrs.distro</distro.groupId>
         <distro.artifactId>referenceapplication</distro.artifactId>
-        <distro.version>2.2-SNAPSHOT</distro.version>
+        <distro.version>LATEST</distro.version>
     </properties>
 
     <dependencyManagement>
