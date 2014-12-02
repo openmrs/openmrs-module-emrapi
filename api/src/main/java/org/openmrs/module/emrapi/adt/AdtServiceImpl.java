@@ -14,17 +14,6 @@
 
 package org.openmrs.module.emrapi.adt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
@@ -63,6 +52,17 @@ import org.openmrs.util.OpenmrsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
@@ -629,6 +629,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     private PatientDomainWrapper wrap(Patient notPreferred) {
+        // TODO remove, use PatientDomainWrapperFactory instead
         return new PatientDomainWrapper(notPreferred, emrApiProperties, this, visitService, encounterService, diagnosisService);
     }
 
