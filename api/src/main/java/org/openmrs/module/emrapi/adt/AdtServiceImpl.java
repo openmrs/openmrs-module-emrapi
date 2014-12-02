@@ -165,8 +165,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         VisitDomainWrapper visitDomainWrapper = wrap(visit);
 
-        if (visitDomainWrapper.isAdmitted() || visitDomainWrapper.isAwaitingAdmission()) {
-            return false;  // don't close the visit if patient is admitted or is awaiting admission
+        if (visitDomainWrapper.isAdmitted()) {
+            return false;  // don't close the visit if patient is admitted
         }
 
         Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();
