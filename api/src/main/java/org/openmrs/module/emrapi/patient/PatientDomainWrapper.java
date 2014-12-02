@@ -341,38 +341,4 @@ public class PatientDomainWrapper {
 		return diagnoses;
 	}
 
-    /**
-     * Returns true/false if the patient is currently has an active visit awaiting admission at the *visit* location associated with the
-     * specified location
-     * (Note that this does not differentiate based on the requested admission location--for example, if you have "Mirebalais Hospital" visit location
-     * with two children locations "Inpatient" and "Outpatient", and the patient is currently awaiting admission to the Inpatient Ward, then calling
-     * isAwaitingAdmission("Mirebalais Hospital"), isAwaitingAdmission("Inpatient") and isAwaitingAdmission("Outpatient") will all return true because the
-     * patient has an active visit at Mirebalais Hospital as is awaiting admission)
-     */
-    public boolean isAwaitingAdmission(Location visitLocation) {
-
-        VisitDomainWrapper activeVisit = getActiveVisit(visitLocation);
-
-        if (activeVisit == null) {
-            return false;
-        }
-
-        VisitQueryResult result = null;
-
-        VisitEvaluationContext context = new VisitEvaluationContext();
-        context.setBaseVisits(new VisitIdSet(activeVisit.getVisitId()));
-
-        AwaitingAdmissionVisitQuery query = new AwaitingAdmissionVisitQuery();
-        query.setLocation(visitLocation);
-
-        try {
-            result = visitQueryService.evaluate(query, context);
-        }
-        catch (EvaluationException e) {
-            throw new IllegalStateException("Unable to evaluate awaiting admission query", e);
-        }
-
-        return result != null && result.getMemberIds().size() > 0;
-    }
-
 }

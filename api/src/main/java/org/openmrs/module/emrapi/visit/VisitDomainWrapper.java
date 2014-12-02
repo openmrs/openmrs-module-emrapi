@@ -24,6 +24,7 @@ import org.openmrs.Obs;
 import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.Disposition;
@@ -31,7 +32,14 @@ import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
+import org.openmrs.module.reporting.evaluation.EvaluationException;
+import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
+import org.openmrs.module.reporting.query.visit.VisitIdSet;
+import org.openmrs.module.reporting.query.visit.VisitQueryResult;
+import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.util.OpenmrsUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -58,11 +66,21 @@ public class VisitDomainWrapper {
 
     private static final Log log = LogFactory.getLog(VisitDomainWrapper.class);
 
-    private EmrApiProperties emrApiProperties;
+    @Qualifier("emrApiProperties")
+    @Autowired
+    protected EmrApiProperties emrApiProperties;
 
-    private DispositionService dispositionService;
+    @Qualifier("dispositionService")
+    @Autowired
+    protected DispositionService dispositionService;
+
+    @Autowired
+    protected VisitQueryService visitQueryService;
 
     private Visit visit;
+
+    public VisitDomainWrapper(){
+    }
 
     @Deprecated
     public VisitDomainWrapper(Visit visit) {
@@ -75,6 +93,8 @@ public class VisitDomainWrapper {
         this.emrApiProperties = emrApiProperties;
     }
 
+    // use new VisitDomainWrapperFactory instead to instantiate a visit domain wrapper
+    @Deprecated
     public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties, DispositionService dispositionService) {
         this.visit = visit;
         this.emrApiProperties = emrApiProperties;
@@ -87,6 +107,10 @@ public class VisitDomainWrapper {
      */
     public Visit getVisit() {
         return visit;
+    }
+
+    public void setVisit(Visit visit) {
+        this.visit = visit;
     }
 
     public int getVisitId() {
@@ -377,6 +401,30 @@ public class VisitDomainWrapper {
         }
 
         return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType, onDate);
+    }
+
+    public boolean isAwaitingAdmission() {
+
+        if (!isActive()) {
+            return false;
+        }
+
+        VisitQueryResult result = null;
+
+        VisitEvaluationContext context = new VisitEvaluationContext();
+        context.setBaseVisits(new VisitIdSet(getVisitId()));
+
+        AwaitingAdmissionVisitQuery query = new AwaitingAdmissionVisitQuery();
+        query.setLocation(visit.getLocation());
+
+        try {
+            result = visitQueryService.evaluate(query, context);
+        }
+        catch (EvaluationException e) {
+            throw new IllegalStateException("Unable to evaluate awaiting admission query", e);
+        }
+
+        return result != null && result.getMemberIds().size() > 0;
     }
 
     public Location getInpatientLocation(Date onDate) {
