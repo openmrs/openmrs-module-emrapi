@@ -82,19 +82,19 @@ public class VisitDomainWrapper {
     public VisitDomainWrapper(){
     }
 
-    @Deprecated
+    @Deprecated   // use new VisitDomainWrapperFactory instead to instantiate a visit domain wrapper
     public VisitDomainWrapper(Visit visit) {
         this.visit = visit;
     }
 
-    @Deprecated
+    @Deprecated    // use new VisitDomainWrapperFactory instead to instantiate a visit domain wrapper
     public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties) {
         this.visit = visit;
         this.emrApiProperties = emrApiProperties;
     }
 
-    // use new VisitDomainWrapperFactory instead to instantiate a visit domain wrapper
-    @Deprecated
+
+    @Deprecated      // use new VisitDomainWrapperFactory instead to instantiate a visit domain wrapper
     public VisitDomainWrapper(Visit visit, EmrApiProperties emrApiProperties, DispositionService dispositionService) {
         this.visit = visit;
         this.emrApiProperties = emrApiProperties;

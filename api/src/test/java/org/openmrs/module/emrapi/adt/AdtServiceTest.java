@@ -29,7 +29,6 @@ import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
 import org.openmrs.Patient;
-import org.openmrs.PatientIdentifierType;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
@@ -49,6 +48,8 @@ import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
+import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
+import org.openmrs.module.emrapi.patient.PatientDomainWrapperFactory;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
@@ -108,6 +109,7 @@ public class AdtServiceTest {
     private DispositionService mockDispositionService;
     private VisitQueryService mockVisitQueryService;
     private VisitDomainWrapperFactory mockVisitDomainWrapperFactory;
+    private PatientDomainWrapperFactory mockPatientDomainWrapperFactory;
     private EmrApiProperties emrApiProperties;
 
     private Person personForCurrentUser;
@@ -128,7 +130,6 @@ public class AdtServiceTest {
     private Location inpatientDepartment;
     private Location radiologyDepartment;
     private PersonAttributeType unknownPatientPersonAttributeType;
-    private PatientIdentifierType paperRecordIdentifierType;
 
     @Before
     public void setup() {
@@ -152,6 +153,7 @@ public class AdtServiceTest {
         mockVisitQueryService = mock(VisitQueryService.class);
 
         mockVisitDomainWrapperFactory = new MockVisitDomainWrapperFactory();
+        mockPatientDomainWrapperFactory = new MockPatientDomainWrapperFactory();
 
         checkInClerkEncounterRole = new EncounterRole();
         checkInEncounterType = new EncounterType();
@@ -184,8 +186,6 @@ public class AdtServiceTest {
         unknownPatientPersonAttributeType.setName(EmrApiConstants.UNKNOWN_PATIENT_PERSON_ATTRIBUTE_TYPE_NAME);
         unknownPatientPersonAttributeType.setFormat("java.lang.String");
 
-        paperRecordIdentifierType = new PatientIdentifierType();
-
         emrApiProperties = mock(EmrApiProperties.class);
         when(emrApiProperties.getVisitExpireHours()).thenReturn(10);
         when(emrApiProperties.getCheckInEncounterType()).thenReturn(checkInEncounterType);
@@ -205,8 +205,8 @@ public class AdtServiceTest {
         service.setEncounterService(mockEncounterService);
         service.setProviderService(mockProviderService);
         service.setEmrApiProperties(emrApiProperties);
-        service.setDispositionService(mockDispositionService);
         service.setVisitDomainWrapperFactory(mockVisitDomainWrapperFactory);
+        service.setPatientDomainWrapperFactory(mockPatientDomainWrapperFactory);
         this.service = service;
     }
 
@@ -1072,5 +1072,25 @@ public class AdtServiceTest {
             return visitDomainWrapper;
         }
     }
+
+    private class MockPatientDomainWrapperFactory extends PatientDomainWrapperFactory{
+
+        @Override
+        public PatientDomainWrapper newPatientDomainWrapper() {
+            PatientDomainWrapper patientDomainWrapper = new PatientDomainWrapper();
+            patientDomainWrapper.setEmrApiProperties(emrApiProperties);
+            patientDomainWrapper.setVisitQueryService(mockVisitQueryService);
+            patientDomainWrapper.setAdtService(service);
+            return patientDomainWrapper;
+        }
+
+        @Override
+        public PatientDomainWrapper newPatientDomainWrapper(Patient patient) {
+            PatientDomainWrapper patientDomainWrapper = newPatientDomainWrapper();
+            patientDomainWrapper.setPatient(patient);
+            return patientDomainWrapper;
+        }
+    }
+
 
 }

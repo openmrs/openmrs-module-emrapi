@@ -83,6 +83,7 @@ public class PatientDomainWrapper {
 	public PatientDomainWrapper() {
 	}
 
+    @Deprecated  // use the PatientDomainWrapperFactory component to instantiate a new PDW
 	public PatientDomainWrapper(Patient patient, EmrApiProperties emrApiProperties, AdtService adtService,
 								VisitService visitService, EncounterService encounterService, DiagnosisService diagnosisService) {
 		this.patient = patient;
@@ -97,7 +98,31 @@ public class PatientDomainWrapper {
 		this.patient = patient;
 	}
 
-	public Patient getPatient() {
+    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
+        this.emrApiProperties = emrApiProperties;
+    }
+
+    public void setAdtService(AdtService adtService) {
+        this.adtService = adtService;
+    }
+
+    public void setVisitService(VisitService visitService) {
+        this.visitService = visitService;
+    }
+
+    public void setEncounterService(EncounterService encounterService) {
+        this.encounterService = encounterService;
+    }
+
+    public void setDiagnosisService(DiagnosisService diagnosisService) {
+        this.diagnosisService = diagnosisService;
+    }
+
+    public void setVisitQueryService(VisitQueryService visitQueryService) {
+        this.visitQueryService = visitQueryService;
+    }
+
+    public Patient getPatient() {
 		return patient;
 	}
 

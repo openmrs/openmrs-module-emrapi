@@ -29,10 +29,8 @@ import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.api.APIException;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
-import org.openmrs.api.OrderService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
@@ -41,11 +39,10 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.disposition.Disposition;
-import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
+import org.openmrs.module.emrapi.patient.PatientDomainWrapperFactory;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory;
 import org.openmrs.serialization.SerializationException;
@@ -72,13 +69,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private EmrApiProperties emrApiProperties;
 
-    private AdministrationService administrationService;
-
     private PatientService patientService;
 
     private EncounterService encounterService;
-
-    private OrderService orderService;
 
     private VisitService visitService;
 
@@ -86,18 +79,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private LocationService locationService;
 
-	private DiagnosisService diagnosisService;
-
-    private DispositionService dispositionService;
-
     private VisitDomainWrapperFactory visitDomainWrapperFactory;
 
+    private PatientDomainWrapperFactory patientDomainWrapperFactory;
+
     private List<PatientMergeAction> patientMergeActions;
-
-
-	public void setOrderService(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     public void setPatientService(PatientService patientService) {
         this.patientService = patientService;
@@ -119,20 +105,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         this.visitService = visitService;
     }
 
-    public void setAdministrationService(AdministrationService administrationService) {
-        this.administrationService = administrationService;
-    }
-
     public void setProviderService(ProviderService providerService) {
         this.providerService = providerService;
-    }
-
-	public void setDiagnosisService(DiagnosisService diagnosisService) {
-		this.diagnosisService = diagnosisService;
-	}
-
-    public void setDispositionService(DispositionService dispositionService) {
-        this.dispositionService = dispositionService;
     }
 
     public void setPatientMergeActions(List<PatientMergeAction> patientMergeActions) {
@@ -141,6 +115,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     public void setVisitDomainWrapperFactory(VisitDomainWrapperFactory visitDomainWrapperFactory) {
         this.visitDomainWrapperFactory = visitDomainWrapperFactory;
+    }
+
+    public void setPatientDomainWrapperFactory(PatientDomainWrapperFactory patientDomainWrapperFactory) {
+        this.patientDomainWrapperFactory = patientDomainWrapperFactory;
     }
 
     // for testing
@@ -569,8 +547,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional
     @Override
     public void mergePatients(Patient preferred, Patient notPreferred) {
-        boolean preferredWasUnknown = wrap(preferred).isUnknownPatient();
-        boolean notPreferredWasUnknown = wrap(notPreferred).isUnknownPatient();
+        boolean preferredWasUnknown = patientDomainWrapperFactory.newPatientDomainWrapper(preferred).isUnknownPatient();
+        boolean notPreferredWasUnknown = patientDomainWrapperFactory.newPatientDomainWrapper(notPreferred).isUnknownPatient();
         if (preferredWasUnknown && !notPreferredWasUnknown) {
             throw new IllegalArgumentException("Cannot merge a permanent record into an unknown one");
         }
@@ -631,11 +609,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
         }
 
-    }
-
-    private PatientDomainWrapper wrap(Patient notPreferred) {
-        // TODO remove, use PatientDomainWrapperFactory instead
-        return new PatientDomainWrapper(notPreferred, emrApiProperties, this, visitService, encounterService, diagnosisService);
     }
 
     private void removeAttributeOfUnknownPatient(Patient preferred) {
@@ -779,8 +752,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     @Override
+    @Deprecated  // use new VisitDomainWrapperFactory instead (this service method has been delegated to use the new factory)
     public VisitDomainWrapper wrap(Visit visit) {
-        return new VisitDomainWrapper(visit, emrApiProperties, dispositionService);
+        return visitDomainWrapperFactory.newVisitDomainWrapper(visit);
     }
 
     @Override

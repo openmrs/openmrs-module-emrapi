@@ -14,9 +14,6 @@
 
 package org.openmrs.module.emrapi.adt;
 
-import java.util.Date;
-import java.util.List;
-
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Obs;
@@ -28,6 +25,9 @@ import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * <pre>
@@ -241,6 +241,7 @@ public interface AdtService extends OpenmrsService {
      * @param visit
      * @return
      */
+    @Deprecated  // use new VisitDomainWrapperFactory instead (this service method has been delegated to use the new factory)
     VisitDomainWrapper wrap(Visit visit);
 
     /**

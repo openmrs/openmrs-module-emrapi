@@ -70,16 +70,13 @@
         <property name="target">
             <bean class="${project.parent.groupId}.${project.parent.artifactId}.adt.AdtServiceImpl">
                 <property name="emrApiProperties" ref="emrApiProperties"/>
-                <property name="administrationService" ref="adminService"/>
                 <property name="encounterService" ref="encounterService"/>
-                <property name="orderService" ref="orderService"/>
                 <property name="visitService" ref="visitService"/>
                 <property name="locationService" ref="locationService"/>
                 <property name="providerService" ref="providerService"/>
                 <property name="patientService" ref="patientService"/>
-				<property name="diagnosisService" ref="diagnosisService"/>
-                <property name="dispositionService" ref="dispositionService"/>
                 <property name="visitDomainWrapperFactory" ref="visitDomainWrapperFactory"/>
+                <property name="patientDomainWrapperFactory" ref="patientDomainWrapperFactory"/>
             </bean>
         </property>
         <property name="preInterceptors">
