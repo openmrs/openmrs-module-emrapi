@@ -14,18 +14,6 @@
 
 package org.openmrs.module.emrapi.adt;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -62,9 +50,23 @@ import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodExce
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory;
+import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.serialization.SerializationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
@@ -99,12 +101,14 @@ public class AdtServiceTest {
 
     private AdtServiceImpl service;
 
-    VisitService mockVisitService;
-    EncounterService mockEncounterService;
-    ProviderService mockProviderService;
-    PatientService mockPatientService;
-    DispositionService mockDispositionService;
-    EmrApiProperties emrApiProperties;
+    private VisitService mockVisitService;
+    private EncounterService mockEncounterService;
+    private ProviderService mockProviderService;
+    private PatientService mockPatientService;
+    private DispositionService mockDispositionService;
+    private VisitQueryService mockVisitQueryService;
+    private VisitDomainWrapperFactory mockVisitDomainWrapperFactory;
+    private EmrApiProperties emrApiProperties;
 
     private Person personForCurrentUser;
     private Provider providerForCurrentUser;
@@ -145,6 +149,9 @@ public class AdtServiceTest {
         mockEncounterService = mock(EncounterService.class);
         mockPatientService = mock(PatientService.class);
         mockDispositionService = mock(DispositionService.class);
+        mockVisitQueryService = mock(VisitQueryService.class);
+
+        mockVisitDomainWrapperFactory = new MockVisitDomainWrapperFactory();
 
         checkInClerkEncounterRole = new EncounterRole();
         checkInEncounterType = new EncounterType();
@@ -199,6 +206,7 @@ public class AdtServiceTest {
         service.setProviderService(mockProviderService);
         service.setEmrApiProperties(emrApiProperties);
         service.setDispositionService(mockDispositionService);
+        service.setVisitDomainWrapperFactory(mockVisitDomainWrapperFactory);
         this.service = service;
     }
 
@@ -508,7 +516,7 @@ public class AdtServiceTest {
 
     @Test
     public void shouldCloseInactiveVisitWithLastEncounterDateAfterVisitExpireTime() {
-        Visit visit = new Visit();
+        Visit visit = new Visit(1);
         visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
 
         Encounter encounter1 = new Encounter();
@@ -532,7 +540,7 @@ public class AdtServiceTest {
 
     @Test
     public void shouldNotCloseVisitWithAnAdmissionEncounter() {
-        Visit visit = new Visit();
+        Visit visit = new Visit(1);
         visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
 
         Encounter encounter1 = new Encounter();
@@ -550,7 +558,7 @@ public class AdtServiceTest {
 
     @Test
     public void shouldCloseVisitWithAdmissionAndDischargeEncounters() {
-        Visit visit = new Visit();
+        Visit visit = new Visit(1);
         visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
 
         Encounter encounter1 = new Encounter();
@@ -576,7 +584,7 @@ public class AdtServiceTest {
 
     @Test
     public void shouldCloseInactiveVisitWithStartDateIfNoEncounters() {
-        Visit visit = new Visit();
+        Visit visit = new Visit(1);
         Date startDatetime = DateUtils.addHours(new Date(), -14);
         visit.setStartDatetime(startDatetime);
 
@@ -590,18 +598,18 @@ public class AdtServiceTest {
 
     @Test
     public void shouldCloseAnyInactiveButOpenVisits() {
-        Visit old1 = new Visit();
+        Visit old1 = new Visit(1);
         old1.setStartDatetime(DateUtils.addDays(new Date(), -2));
 
         Encounter oldEncounter = new Encounter();
         oldEncounter.setEncounterType(checkInEncounterType);
         oldEncounter.setEncounterDatetime(DateUtils.addHours(DateUtils.addDays(new Date(), -2), 6));
 
-        Visit old2 = new Visit();
+        Visit old2 = new Visit(2);
         old2.setStartDatetime(DateUtils.addDays(new Date(), -2));
         old2.addEncounter(oldEncounter);
 
-        Visit new1 = new Visit();
+        Visit new1 = new Visit(3);
         new1.setStartDatetime(DateUtils.addHours(new Date(), -2));
 
         when(mockVisitService.getVisits(anyCollection(), anyCollection(), anyCollection(), anyCollection(), any(Date.class), any(Date.class), any(Date.class), any(Date.class), anyMap(), anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(old1, old2, new1));
@@ -1044,6 +1052,25 @@ public class AdtServiceTest {
         public void afterMergingPatients(Patient preferred, Patient notPreferred) {
         }
 
+    }
+
+    private class MockVisitDomainWrapperFactory extends VisitDomainWrapperFactory{
+
+        @Override
+        public VisitDomainWrapper newVisitDomainWrapper() {
+            VisitDomainWrapper visitDomainWrapper = new VisitDomainWrapper();
+            visitDomainWrapper.setVisitQueryService(mockVisitQueryService);
+            visitDomainWrapper.setEmrApiProperties(emrApiProperties);
+            visitDomainWrapper.setDispositionService(mockDispositionService);
+            return visitDomainWrapper;
+        }
+
+        @Override
+        public VisitDomainWrapper newVisitDomainWrapper(Visit visit) {
+            VisitDomainWrapper visitDomainWrapper = newVisitDomainWrapper();
+            visitDomainWrapper.setVisit(visit);
+            return visitDomainWrapper;
+        }
     }
 
 }

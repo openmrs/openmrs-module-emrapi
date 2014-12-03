@@ -5,7 +5,9 @@ import org.openmrs.ConceptClass;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptSource;
+import org.openmrs.LocationTag;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.EmrApiActivator;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -165,6 +167,13 @@ public class ContextSensitiveMetadataTestUtils {
                 .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_ADMISSION_DECISION).saveAndGet();
 
         return emrApiProperties.getAdmissionDecisionConcept();
+    }
+
+    public static LocationTag setupSupportsVisitLocationTag(LocationService locationService) {
+        LocationTag supportsVisits = new LocationTag();
+        supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
+        locationService.saveLocationTag(supportsVisits);
+        return supportsVisits;
     }
 
 }

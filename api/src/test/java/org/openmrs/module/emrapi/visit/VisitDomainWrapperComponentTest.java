@@ -59,7 +59,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
     }
 
     @Test
-    public void shouldFindVisitAwaitingAdmission() throws Exception {
+    public void isAwaitingAdmission_shouldReturnTrueIfVisitAwaitingAdmission() throws Exception {
 
         Patient patient = testDataManager.randomPatient().save();
 
@@ -89,7 +89,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
     }
 
     @Test
-    public void shouldNotCountDispositionOnVoidedEncounter() throws Exception {
+    public void isAwaitingAdmission_shouldReturnFalseIfVisitNotAwaitingAdmission() throws Exception {
 
         Patient patient = testDataManager.randomPatient().save();
 

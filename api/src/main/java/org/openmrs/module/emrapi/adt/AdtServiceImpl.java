@@ -47,6 +47,7 @@ import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory;
 import org.openmrs.serialization.SerializationException;
 import org.openmrs.util.OpenmrsUtil;
 import org.slf4j.Logger;
@@ -88,6 +89,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 	private DiagnosisService diagnosisService;
 
     private DispositionService dispositionService;
+
+    private VisitDomainWrapperFactory visitDomainWrapperFactory;
 
     private List<PatientMergeAction> patientMergeActions;
 
@@ -136,6 +139,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         this.patientMergeActions = patientMergeActions;
     }
 
+    public void setVisitDomainWrapperFactory(VisitDomainWrapperFactory visitDomainWrapperFactory) {
+        this.visitDomainWrapperFactory = visitDomainWrapperFactory;
+    }
+
     // for testing
     public List<PatientMergeAction> getPatientMergeActions() {
         return patientMergeActions;
@@ -153,9 +160,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
                 }
             }
         }
-
     }
-
 
     private boolean shouldBeClosed(Visit visit) {
 
@@ -163,10 +168,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             return false;  // already closed
         }
 
-        VisitDomainWrapper visitDomainWrapper = wrap(visit);
+        VisitDomainWrapper visitDomainWrapper = visitDomainWrapperFactory.newVisitDomainWrapper(visit);
 
-        if (visitDomainWrapper.isAdmitted()) {
-            return false;  // don't close the visit if patient is admitted
+        if (visitDomainWrapper.isAdmitted() || visitDomainWrapper.isAwaitingAdmission()) {
+            return false;  // don't close the visit if patient is admitted or waiting admission
         }
 
         Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();

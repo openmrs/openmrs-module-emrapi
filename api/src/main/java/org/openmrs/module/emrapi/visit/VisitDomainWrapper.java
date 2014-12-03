@@ -117,8 +117,17 @@ public class VisitDomainWrapper {
         return visit.getVisitId();
     }
 
+    // setters for mocking purposes
     public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
         this.emrApiProperties = emrApiProperties;
+    }
+
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
+    }
+
+    public void setVisitQueryService(VisitQueryService visitQueryService) {
+        this.visitQueryService = visitQueryService;
     }
 
     public Encounter getAdmissionEncounter() {

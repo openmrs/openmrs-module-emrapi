@@ -79,6 +79,7 @@
                 <property name="patientService" ref="patientService"/>
 				<property name="diagnosisService" ref="diagnosisService"/>
                 <property name="dispositionService" ref="dispositionService"/>
+                <property name="visitDomainWrapperFactory" ref="visitDomainWrapperFactory"/>
             </bean>
         </property>
         <property name="preInterceptors">

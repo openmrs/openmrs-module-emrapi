@@ -63,6 +63,7 @@ import java.util.concurrent.Future;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -115,19 +116,15 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void integrationTest_ADT_workflow() {
+
+        ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
         Date startOfTest = new Date();
 
         Provider provider = Context.getProviderService().getProvider(1);
-
         Patient patient = Context.getPatientService().getPatient(7);
 
-        // parent location should support visits
-        LocationTag supportsVisits = new LocationTag();
-        supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
-        locationService.saveLocationTag(supportsVisits);
-
         Location parentLocation = locationService.getLocation(2);
-        parentLocation.addTag(supportsVisits);
+        parentLocation.addTag(emrApiProperties.getSupportsVisitsLocationTag());
         locationService.saveLocation(parentLocation);
 
         // add a child location where we'll do the actual check-in
@@ -251,13 +248,10 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     @Test
     public void integrationTest_createRetrospectiveVisit() throws Exception {
 
-        // parent location should support visits
-        LocationTag supportsVisits = new LocationTag();
-        supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
-        locationService.saveLocationTag(supportsVisits);
+        ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
 
         Location parentLocation = locationService.getLocation(2);
-        parentLocation.addTag(supportsVisits);
+        parentLocation.addTag(emrApiProperties.getSupportsVisitsLocationTag());
         locationService.saveLocation(parentLocation);
 
         // add a child location where we'll enter the actual visit
@@ -286,13 +280,10 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     @Test
     public void test_getVisitsAndHasVisitDuring() throws Exception {
 
-        // parent location should support visits
-        LocationTag supportsVisits = new LocationTag();
-        supportsVisits.setName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
-        locationService.saveLocationTag(supportsVisits);
+        ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
 
         Location parentLocation = locationService.getLocation(2);
-        parentLocation.addTag(supportsVisits);
+        parentLocation.addTag(emrApiProperties.getSupportsVisitsLocationTag());
         locationService.saveLocation(parentLocation);
 
         // add a child location where we'll do the actual visit
@@ -390,20 +381,62 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertThat(CollectionUtils.select(encounters, NON_VOIDED).size(), is(2));
     }
 
+    @Test
+    public void test_shouldCloseActiveVisits() throws Exception {
+
+        ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
+        ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
+        ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
+
+        Location location = locationService.getLocation(1);
+        location.addTag(emrApiProperties.getSupportsVisitsLocationTag());
+        locationService.saveLocation(location);
+
+        // sanity check--visits in the standard test data set that are open
+        assertThat(visitService.getVisit(1).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(2).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(3).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(4).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(5).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(6).getStopDatetime(), nullValue());
+
+        service.closeInactiveVisits();
+
+        // all these visits should now have stop datetime
+        assertThat(visitService.getVisit(1).getStopDatetime(), notNullValue());
+        assertThat(visitService.getVisit(2).getStopDatetime(), notNullValue());
+        assertThat(visitService.getVisit(3).getStopDatetime(), notNullValue());
+        assertThat(visitService.getVisit(4).getStopDatetime(), notNullValue());
+        assertThat(visitService.getVisit(5).getStopDatetime(), notNullValue());
+
+        // should ignore voided visits
+        assertThat(visitService.getVisit(6).getStopDatetime(), nullValue());
+    }
+
 
     @Test
     public void test_shouldNotCloseVisitIfMostRecentDispositionKeepsVisitOpen() throws Exception {
 
         ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
+        ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
+        ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
 
         Patient patient = patientService.getPatient(7);    // patient already has one visit in test dataset
+
+        // need o tag the unknown location so we don't run into an error when testing against the existing visits in the test dataset
+        Location unknownLocation = locationService.getLocation(1);
+        unknownLocation.addTag(emrApiProperties.getSupportsVisitsLocationTag());
+        locationService.saveLocation(unknownLocation);
+
         Location location = locationService.getLocation(2);
+        location.addTag(emrApiProperties.getSupportsVisitsLocationTag());
+        locationService.saveLocation(location);
 
         Visit visit = new Visit();
         visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
         visit.setPatient(patient);
         visit.setLocation(location);
-        visit.setVisitType(emrApiProperties.getAtFacilityVisitType());;
+        visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 
         // create an encounter with a disposition obs
         Encounter encounter = new Encounter();
