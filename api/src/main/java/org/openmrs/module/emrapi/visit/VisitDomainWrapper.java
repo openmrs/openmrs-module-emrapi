@@ -31,6 +31,7 @@ import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
@@ -58,7 +59,7 @@ import static org.apache.commons.collections.CollectionUtils.select;
 /**
  * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
  */
-public class VisitDomainWrapper {
+public class VisitDomainWrapper implements DomainWrapper {
 
     public enum SortOrder {
         EARLIEST_FIRST, MOST_RECENT_FIRST

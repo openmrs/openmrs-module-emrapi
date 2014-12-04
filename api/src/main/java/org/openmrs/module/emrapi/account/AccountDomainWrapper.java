@@ -10,11 +10,14 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.module.providermanagement.Provider;
 import org.openmrs.module.providermanagement.ProviderRole;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -23,7 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class AccountDomainWrapper {
+public class AccountDomainWrapper implements DomainWrapper {
 
     private Person person;
 
@@ -35,18 +38,33 @@ public class AccountDomainWrapper {
 
     private String confirmPassword;
 
-    private AccountService accountService;
+    @Qualifier("accountService")
+    @Autowired
+    protected AccountService accountService;
 
-    private UserService userService;
+    @Qualifier("userService")
+    @Autowired
+    protected UserService userService;
 
-    private PersonService personService;
+    @Qualifier("personService")
+    @Autowired
+    protected PersonService personService;
 
-    private ProviderService providerService;
+    @Qualifier("providerService")
+    @Autowired
+    protected ProviderService providerService;
 
-    private ProviderManagementService providerManagementService;
+    @Qualifier("providerManagementService")
+    @Autowired
+    protected ProviderManagementService providerManagementService;
 
-    private ProviderIdentifierGenerator providerIdentifierGenerator;
+    @Autowired(required = false)
+    protected ProviderIdentifierGenerator providerIdentifierGenerator;
 
+    public AccountDomainWrapper() {
+    }
+
+    @Deprecated  // use DomainWrapperFactory instead
     public AccountDomainWrapper(Person person, AccountService accountService, UserService userService, ProviderService providerService,
                                 ProviderManagementService providerManagementService, PersonService personService,
                                 ProviderIdentifierGenerator providerIdentifierGenerator) {
@@ -57,6 +75,34 @@ public class AccountDomainWrapper {
         this.personService = personService;
         this.providerIdentifierGenerator = providerIdentifierGenerator;
 
+        initializeWithPerson(person);
+    }
+
+    public void setAccountService(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public void setProviderService(ProviderService providerService) {
+        this.providerService = providerService;
+    }
+
+    public void setPersonService(PersonService personService) {
+        this.personService = personService;
+    }
+
+    public void setProviderManagementService(ProviderManagementService providerManagementService) {
+        this.providerManagementService = providerManagementService;
+    }
+
+    public void setProviderIdentifierGenerator(ProviderIdentifierGenerator providerIdentifierGenerator) {
+        this.providerIdentifierGenerator = providerIdentifierGenerator;
+    }
+
+    public void initializeWithPerson(Person person) {
         this.person = person;
 
         // only fetch user and provider if person has been persisted

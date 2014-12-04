@@ -1,10 +1,5 @@
 package org.openmrs.module.emrapi.account;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
@@ -17,8 +12,14 @@ import org.openmrs.api.UserService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 public class AccountServiceImpl extends BaseOpenmrsService implements AccountService {
@@ -31,7 +32,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
 
     private ProviderManagementService providerManagementService;
 
-    private ProviderIdentifierGenerator providerIdentifierGenerator = null;
+    private DomainWrapperFactory domainWrapperFactory;
 
     private EmrApiProperties emrApiProperties;
 
@@ -63,12 +64,8 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
         this.personService = personService;
     }
 
-    /**
-     * @param providerIdentifierGenerator
-     */
-    @Override
-    public void setProviderIdentifierGenerator(ProviderIdentifierGenerator providerIdentifierGenerator) {
-        this.providerIdentifierGenerator = providerIdentifierGenerator;
+    public void setDomainWrapperFactory(DomainWrapperFactory domainWrapperFactory) {
+        this.domainWrapperFactory = domainWrapperFactory;
     }
 
     public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
@@ -90,8 +87,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
                 continue;
 
             if (!user.getPerson().isPersonVoided()) {
-                byPerson.put(user.getPerson(), new AccountDomainWrapper(user.getPerson(), this, userService,
-                        providerService, providerManagementService, personService, providerIdentifierGenerator));
+                byPerson.put(user.getPerson(), domainWrapperFactory.newAccountDomainWrapper(user.getPerson()));
             }
         }
 
@@ -107,8 +103,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
 
             AccountDomainWrapper account = byPerson.get(provider.getPerson());
             if (account == null && !provider.getPerson().isPersonVoided()) {
-                byPerson.put(provider.getPerson(), new AccountDomainWrapper(provider.getPerson(), this, userService,
-                        providerService, providerManagementService, personService, providerIdentifierGenerator));
+                byPerson.put(provider.getPerson(), domainWrapperFactory.newAccountDomainWrapper(provider.getPerson()));
             }
         }
 
@@ -144,8 +139,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
     @Override
     @Transactional(readOnly = true)
     public AccountDomainWrapper getAccountByPerson(Person person) {
-        return new AccountDomainWrapper(person, this, userService,
-                providerService, providerManagementService, personService, providerIdentifierGenerator);
+        return domainWrapperFactory.newAccountDomainWrapper(person);
     }
 
     /**

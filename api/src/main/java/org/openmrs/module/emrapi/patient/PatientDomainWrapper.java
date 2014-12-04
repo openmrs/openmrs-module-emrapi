@@ -34,6 +34,7 @@ import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
@@ -53,7 +54,7 @@ import java.util.Set;
 /**
  * A rich-domain-model class that wraps a Patient, and lets you perform common queries.
  */
-public class PatientDomainWrapper {
+public class PatientDomainWrapper implements DomainWrapper {
 
 	private Patient patient;
 
@@ -121,6 +122,8 @@ public class PatientDomainWrapper {
     public void setVisitQueryService(VisitQueryService visitQueryService) {
         this.visitQueryService = visitQueryService;
     }
+
+
 
     public Patient getPatient() {
 		return patient;

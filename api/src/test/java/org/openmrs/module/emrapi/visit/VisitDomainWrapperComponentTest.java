@@ -12,6 +12,7 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
     private TestDataManager testDataManager;
 
     @Autowired
-    private VisitDomainWrapperFactory factory;
+    private DomainWrapperFactory factory;
 
     private DispositionDescriptor dispositionDescriptor;
 

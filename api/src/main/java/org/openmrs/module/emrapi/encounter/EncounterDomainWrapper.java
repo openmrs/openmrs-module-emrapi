@@ -28,6 +28,7 @@ import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateAfterVisitStopDateException;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDateException;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class EncounterDomainWrapper {
+public class EncounterDomainWrapper implements DomainWrapper {
+
     public static final Predicate NON_VOIDED_PREDICATE = new Predicate() {
         @Override
         public boolean evaluate(Object o) {
@@ -54,6 +56,10 @@ public class EncounterDomainWrapper {
 
     private Encounter encounter;
 
+    public EncounterDomainWrapper() {
+    }
+
+    @Deprecated  // use DomainWrapperFactory
     public EncounterDomainWrapper(Encounter encounter) {
         this.encounter = encounter;
     }

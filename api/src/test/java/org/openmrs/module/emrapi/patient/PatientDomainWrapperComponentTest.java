@@ -16,27 +16,10 @@ package org.openmrs.module.emrapi.patient;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.Location;
-import org.openmrs.Patient;
-import org.openmrs.Visit;
-import org.openmrs.api.ConceptService;
-import org.openmrs.contrib.testdata.TestDataManager;
-import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
-import org.openmrs.module.emrapi.concept.EmrConceptService;
-import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
-import org.openmrs.module.emrapi.disposition.DispositionService;
-import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
-import org.openmrs.module.reporting.query.visit.VisitQueryResult;
-import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
-import java.util.Date;
-
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 
@@ -46,12 +29,7 @@ import static org.junit.Assert.assertThat;
 public class PatientDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
-    private PatientDomainWrapperFactory factory;
-
-    @Before
-    public void setup() throws Exception {
-        executeDataSet("baseTestDataset.xml");
-    }
+    private DomainWrapperFactory factory;
 
     @Test
     public void testThatBeanCanHavePropertiesAutowired() throws Exception {
@@ -60,3 +38,4 @@ public class PatientDomainWrapperComponentTest extends BaseModuleContextSensitiv
     }
 
 }
+

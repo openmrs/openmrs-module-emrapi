@@ -9,13 +9,6 @@ import java.util.List;
 public interface AccountService {
 
     /**
-     * Sets the provider identifier generator to use
-     *
-     * @param providerIdentifierGenerator
-     */
-    void setProviderIdentifierGenerator(ProviderIdentifierGenerator providerIdentifierGenerator);
-
-    /**
      * @return
      * @should get all unique accounts
      */

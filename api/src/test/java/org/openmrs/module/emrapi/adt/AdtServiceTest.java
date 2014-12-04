@@ -47,11 +47,10 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
-import org.openmrs.module.emrapi.patient.PatientDomainWrapperFactory;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.openmrs.module.emrapi.visit.VisitDomainWrapperFactory;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.serialization.SerializationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -108,8 +107,7 @@ public class AdtServiceTest {
     private PatientService mockPatientService;
     private DispositionService mockDispositionService;
     private VisitQueryService mockVisitQueryService;
-    private VisitDomainWrapperFactory mockVisitDomainWrapperFactory;
-    private PatientDomainWrapperFactory mockPatientDomainWrapperFactory;
+    private DomainWrapperFactory mockDomainWrapperFactory;
     private EmrApiProperties emrApiProperties;
 
     private Person personForCurrentUser;
@@ -152,8 +150,7 @@ public class AdtServiceTest {
         mockDispositionService = mock(DispositionService.class);
         mockVisitQueryService = mock(VisitQueryService.class);
 
-        mockVisitDomainWrapperFactory = new MockVisitDomainWrapperFactory();
-        mockPatientDomainWrapperFactory = new MockPatientDomainWrapperFactory();
+        mockDomainWrapperFactory = new MockDomainWrapperFactory();
 
         checkInClerkEncounterRole = new EncounterRole();
         checkInEncounterType = new EncounterType();
@@ -205,8 +202,7 @@ public class AdtServiceTest {
         service.setEncounterService(mockEncounterService);
         service.setProviderService(mockProviderService);
         service.setEmrApiProperties(emrApiProperties);
-        service.setVisitDomainWrapperFactory(mockVisitDomainWrapperFactory);
-        service.setPatientDomainWrapperFactory(mockPatientDomainWrapperFactory);
+        service.setDomainWrapperFactory(mockDomainWrapperFactory);
         this.service = service;
     }
 
@@ -1054,7 +1050,7 @@ public class AdtServiceTest {
 
     }
 
-    private class MockVisitDomainWrapperFactory extends VisitDomainWrapperFactory{
+    private class MockDomainWrapperFactory extends DomainWrapperFactory{
 
         @Override
         public VisitDomainWrapper newVisitDomainWrapper() {
@@ -1071,9 +1067,7 @@ public class AdtServiceTest {
             visitDomainWrapper.setVisit(visit);
             return visitDomainWrapper;
         }
-    }
 
-    private class MockPatientDomainWrapperFactory extends PatientDomainWrapperFactory{
 
         @Override
         public PatientDomainWrapper newPatientDomainWrapper() {
@@ -1090,7 +1084,6 @@ public class AdtServiceTest {
             patientDomainWrapper.setPatient(patient);
             return patientDomainWrapper;
         }
+
     }
-
-
 }

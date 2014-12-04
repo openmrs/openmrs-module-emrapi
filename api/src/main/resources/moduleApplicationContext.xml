@@ -14,6 +14,7 @@
                 <property name="personService" ref="personService"/>
                 <property name="providerService" ref="providerService"/>
                 <property name="providerManagementService" ref="providerManagementService"/>
+                <property name="domainWrapperFactory" ref="domainWrapperFactory"/>
                 <property name="emrApiProperties" ref="emrApiProperties"/>
             </bean>
         </property>
@@ -75,8 +76,7 @@
                 <property name="locationService" ref="locationService"/>
                 <property name="providerService" ref="providerService"/>
                 <property name="patientService" ref="patientService"/>
-                <property name="visitDomainWrapperFactory" ref="visitDomainWrapperFactory"/>
-                <property name="patientDomainWrapperFactory" ref="patientDomainWrapperFactory"/>
+                <property name="domainWrapperFactory" ref="domainWrapperFactory"/>
             </bean>
         </property>
         <property name="preInterceptors">

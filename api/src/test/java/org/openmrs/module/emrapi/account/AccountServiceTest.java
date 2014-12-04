@@ -15,6 +15,7 @@ import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 
@@ -44,6 +45,8 @@ public class AccountServiceTest {
 
     private EmrApiProperties emrApiProperties;
 
+    private DomainWrapperFactory domainWrapperFactory;
+
     @Before
     public void setup() {
         userService = mock(UserService.class);
@@ -52,12 +55,15 @@ public class AccountServiceTest {
         providerManagementService = mock(ProviderManagementService.class);
         emrApiProperties = mock(EmrApiProperties.class);
 
+        domainWrapperFactory = new MockDomainWrapperFactory();
+
         accountService = new AccountServiceImpl();
         accountService.setUserService(userService);
         accountService.setPersonService(personService);
         accountService.setProviderService(providerService);
         accountService.setProviderManagementService(providerManagementService);
         accountService.setEmrApiProperties(emrApiProperties);
+        accountService.setDomainWrapperFactory(domainWrapperFactory);
     }
 
     /**
@@ -233,6 +239,27 @@ public class AccountServiceTest {
         List<Privilege> applicationPrivileges = accountService.getApplicationPrivileges();
         assertThat(applicationPrivileges.size(), is(2));
         assertThat(applicationPrivileges, containsInAnyOrder(vitalsApp, orderEntryTask));
+    }
+
+    private class MockDomainWrapperFactory extends DomainWrapperFactory{
+
+        @Override
+        public AccountDomainWrapper newAccountDomainWrapper() {
+            AccountDomainWrapper accountDomainWrapper = new AccountDomainWrapper();
+            accountDomainWrapper.setAccountService(accountService);
+            accountDomainWrapper.setUserService(userService);
+            accountDomainWrapper.setPersonService(personService);
+            accountDomainWrapper.setProviderManagementService(providerManagementService);
+            accountDomainWrapper.setProviderService(providerService);
+            return accountDomainWrapper;
+        }
+
+        @Override
+        public AccountDomainWrapper newAccountDomainWrapper(Person person) {
+            AccountDomainWrapper accountDomainWrapper = newAccountDomainWrapper();
+            accountDomainWrapper.initializeWithPerson(person);
+            return accountDomainWrapper;
+        }
     }
 
 }
