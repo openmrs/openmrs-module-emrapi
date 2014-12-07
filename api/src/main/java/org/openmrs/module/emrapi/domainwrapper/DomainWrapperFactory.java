@@ -8,14 +8,13 @@ import org.openmrs.module.emrapi.account.AccountDomainWrapper;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DomainWrapperFactory {
+public class DomainWrapperFactory implements ApplicationContextAware {
 
-    @Autowired
     private ApplicationContext applicationContext;
 
     public PatientDomainWrapper newPatientDomainWrapper() {
@@ -67,10 +66,7 @@ public class DomainWrapperFactory {
         return domainWrapper;
     }
 
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
