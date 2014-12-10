@@ -13,7 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
@@ -27,6 +27,8 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Component(value = "orderMapper")
@@ -45,7 +47,17 @@ public class OrderMapper1_10 implements OrderMapper {
                 orders.add(mapDrugOrder((DrugOrder) order));
             }
         }
+        sortByOrderNumber(orders);
         return orders;
+    }
+
+    private void sortByOrderNumber(List<EncounterTransaction.DrugOrder> orders) {
+        Collections.sort(orders, new Comparator<EncounterTransaction.DrugOrder>() {
+            @Override
+            public int compare(EncounterTransaction.DrugOrder drugOrder1, EncounterTransaction.DrugOrder drugOrder2) {
+                return drugOrder1.getOrderNumber().compareTo(drugOrder2.getOrderNumber());
+            }
+        });
     }
 
     @Override
