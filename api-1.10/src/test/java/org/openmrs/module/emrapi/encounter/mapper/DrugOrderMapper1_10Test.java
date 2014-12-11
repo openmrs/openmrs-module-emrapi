@@ -32,6 +32,7 @@ import org.openmrs.Order;
 import org.openmrs.OrderFrequency;
 import org.openmrs.OrderType;
 import org.openmrs.Patient;
+import org.openmrs.Encounter;
 import org.openmrs.SimpleDosingInstructions;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.util.LocaleUtility;
@@ -41,11 +42,15 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.util.Locale;
+import java.util.List;
+import java.util.HashSet;
+import java.util.Arrays;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
@@ -113,6 +118,21 @@ public class DrugOrderMapper1_10Test {
         EncounterTransaction.DrugOrder drugOrder = drugOrderMapper110.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getPreviousOrderUuid(), is(equalTo("previousOrderUuid")));
+    }
+
+    @Test
+    public void shouldReturnOrdersSortedByOrderNumber() throws NoSuchFieldException, IllegalAccessException {
+        DrugOrder drugOrder100 = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-100");
+        DrugOrder drugOrder201 = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-201");
+        DrugOrder drugOrder350 = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-350");
+
+        Encounter encounter = new Encounter();
+        encounter.setOrders(new HashSet<Order>(Arrays.asList(drugOrder350, drugOrder100, drugOrder201)));
+        List<EncounterTransaction.DrugOrder> sortedDrugOrders = drugOrderMapper110.mapDrugOrders(encounter);
+
+        assertEquals("ORD-100", sortedDrugOrders.get(0).getOrderNumber());
+        assertEquals("ORD-201", sortedDrugOrders.get(1).getOrderNumber());
+        assertEquals("ORD-350", sortedDrugOrders.get(2).getOrderNumber());
     }
 
     private DrugOrder drugOrder(CareSetting.CareSettingType careSettingType, int daysToStartAfter, String dosingInstructions,
