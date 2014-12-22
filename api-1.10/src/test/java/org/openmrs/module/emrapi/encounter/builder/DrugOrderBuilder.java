@@ -63,6 +63,12 @@ public class DrugOrderBuilder {
         return this;
     }
 
+    public DrugOrderBuilder withFrequency(String frequency) {
+        drugOrder.getDosingInstructions().setFrequency(frequency);
+        return this;
+    }
+
+
     public DrugOrderBuilder withAction(String action) {
         drugOrder.setAction(action);
         return this;
