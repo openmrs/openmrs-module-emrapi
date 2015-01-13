@@ -11,18 +11,11 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.conditionlist.service;
+package org.openmrs.module.emrapi.conditionlist.util;
 
-import org.openmrs.Patient;
-import org.openmrs.annotation.Authorized;
-import org.openmrs.module.emrapi.conditionlist.domain.Condition;
-import org.openmrs.module.emrapi.conditionlist.util.PrivilegeConstants;
+import org.openmrs.annotation.AddOnStartup;
 
-import java.util.List;
-
-public interface ConditionService {
-    @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
-    Condition save(Condition condition);
-    Condition getConditionByUuid(String uuid);
-    List<Condition> getConditions(Patient patient);
+public class PrivilegeConstants {
+    @AddOnStartup(description = "Able to edit conditions")
+    public static final String EDIT_CONDITIONS = "Edit conditions";
 }
