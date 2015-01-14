@@ -19,16 +19,13 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Patient;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Component
-public class ConditionDaoImpl implements ConditionDao {
+public class HibernateConditionDAO implements ConditionDAO {
 
-    protected static final Log log = LogFactory.getLog(ConditionDao.class);
+    protected static final Log log = LogFactory.getLog(ConditionDAO.class);
     /**
      * Hibernate session factory
      */
@@ -40,7 +37,6 @@ public class ConditionDaoImpl implements ConditionDao {
      *
      * @param sessionFactory
      */
-    @Autowired
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
@@ -53,19 +49,15 @@ public class ConditionDaoImpl implements ConditionDao {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Condition getConditionByUuid(String uuid) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from Condition where uuid=:uuid");
-        query.setString("uuid", uuid);
-        List<Condition> list = query.list();
-        if (list.size() != 0) {
-            return list.get(0);
-        }
-        return null;
+        return (Condition) sessionFactory.getCurrentSession().createQuery("from Condition c where c.uuid = :uuid")
+                .setString("uuid", uuid).uniqueResult();
     }
 
     @Override
-    public List<Condition> getConditions(Patient patient) {
+    @Transactional(readOnly = true)
+    public List<Condition> getConditionsByPatient(Patient patient) {
         Query query = sessionFactory.getCurrentSession().createQuery("from Condition where patient.patientId=:patientId");
         query.setInteger("patientId", patient.getId());
         return query.list();

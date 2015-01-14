@@ -1,4 +1,3 @@
-package org.openmrs.module.emrapi.conditionlist.service;
 /**
  * The contents of this file are subject to the OpenMRS Public License
  * Version 1.0 (the "License"); you may not use this file except in
@@ -12,64 +11,32 @@ package org.openmrs.module.emrapi.conditionlist.service;
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
+package org.openmrs.module.emrapi.conditionlist.service;
 
 import org.openmrs.Patient;
-import org.openmrs.api.APIException;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.conditionlist.dao.ConditionDao;
+import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.conditionlist.dao.ConditionDAO;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
-import org.openmrs.module.emrapi.conditionlist.util.ConditionListConstants;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 
-@Component
-public class ConditionServiceImpl implements ConditionService {
+public class ConditionServiceImpl extends BaseOpenmrsService implements ConditionService {
 
-    @Autowired
-    private ConditionDao conditionDao;
+    private ConditionDAO conditionDao;
 
-    public ConditionDao getConditionDao() {
-        return conditionDao;
-    }
-
-    public void setConditionDao(ConditionDao conditionDao) {
+    public ConditionServiceImpl(ConditionDAO conditionDao) {
         this.conditionDao = conditionDao;
     }
 
     @Override
     public Condition save(Condition condition) {
-        String nonCodedConditionUuid = Context.getAdministrationService().getGlobalProperty(ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID);
-        if (condition.getConditionNonCoded() != null) {
-            if (!condition.getConcept().getUuid().equals(nonCodedConditionUuid)) {
-                throw new APIException("Non-coded value not supported for coded condition");
-            }
-        } else {
-            if (condition.getConcept().getUuid().equals(nonCodedConditionUuid)) {
-                throw new APIException("Non-coded value needed for non-coded condition");
-            }
-        }
-        Condition existingCondition = getConditionByUuid(condition.getUuid());
-        if (existingCondition != null && !condition.getConcept().equals(existingCondition.getConcept())) {
-            throw new APIException("Concept cannot be updated");
-        }
-        List<Condition> conditionsForPatient = getConditions(condition.getPatient());
-        if (condition.getConditionNonCoded() != null) {
-            for (Condition eachCondition : conditionsForPatient) {
-                if (eachCondition.getConcept().equals(condition.getConcept())
-                        && eachCondition.getConditionNonCoded().equalsIgnoreCase(condition.getConditionNonCoded().replaceAll("\\s", "")) && !eachCondition.getUuid().equals(condition.getUuid())) {
-                    throw new APIException("Duplicates are not allowed");
-                }
-            }
-        }
         return conditionDao.saveOrUpdate(condition);
     }
 
     @Override
-    public List<Condition> getConditions(Patient patient) {
-        return conditionDao.getConditions(patient);
+    public List<Condition> getConditionsByPatient(Patient patient) {
+        return conditionDao.getConditionsByPatient(patient);
     }
 
     @Override

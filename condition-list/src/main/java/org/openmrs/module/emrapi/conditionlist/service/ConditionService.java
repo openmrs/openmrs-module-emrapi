@@ -15,14 +15,15 @@ package org.openmrs.module.emrapi.conditionlist.service;
 
 import org.openmrs.Patient;
 import org.openmrs.annotation.Authorized;
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
 import org.openmrs.module.emrapi.conditionlist.util.PrivilegeConstants;
 
 import java.util.List;
 
-public interface ConditionService {
+public interface ConditionService extends OpenmrsService {
     @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
     Condition save(Condition condition);
     Condition getConditionByUuid(String uuid);
-    List<Condition> getConditions(Patient patient);
+    List<Condition> getConditionsByPatient(Patient patient);
 }

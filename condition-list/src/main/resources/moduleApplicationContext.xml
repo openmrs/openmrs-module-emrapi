@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/context
-		http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <context:component-scan base-package="org.openmrs.module.emrapi.conditionlist"/>
+		 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+    <bean id="conditionDAO" class="org.openmrs.module.emrapi.conditionlist.dao.HibernateConditionDAO">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="conditionValidator" class="org.openmrs.module.emrapi.conditionlist.validator.ConditionValidator">
+        <constructor-arg name="conditionDAO" ref="conditionDAO"/>
+        <constructor-arg name="administrationService" ref="adminService"/>
+    </bean>
+
+    <bean id="conditionServiceTarget" class="org.openmrs.module.emrapi.conditionlist.service.ConditionServiceImpl">
+        <constructor-arg ref="conditionDAO"/>
+    </bean>
+
+    <bean id="conditionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <ref local="conditionServiceTarget"/>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
 </beans>

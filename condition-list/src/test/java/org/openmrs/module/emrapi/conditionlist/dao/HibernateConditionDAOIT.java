@@ -28,13 +28,13 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class ConditionDaoImplIT extends BaseModuleContextSensitiveTest {
+public class HibernateConditionDAOIT extends BaseModuleContextSensitiveTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Autowired
-    ConditionDao conditionDao;
+    ConditionDAO conditionDao;
     @Autowired
     PatientService patientService;
 
@@ -54,7 +54,7 @@ public class ConditionDaoImplIT extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldGetConditionsForPatient() {
         Patient patient = patientService.getPatient(1);
-        List<Condition> conditionsForPatient = conditionDao.getConditions(patient);
+        List<Condition> conditionsForPatient = conditionDao.getConditionsByPatient(patient);
         assertEquals(conditionsForPatient.size(), 4);
     }
 }

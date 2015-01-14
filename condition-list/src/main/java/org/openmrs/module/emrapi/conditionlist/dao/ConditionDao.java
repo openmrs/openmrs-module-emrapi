@@ -18,8 +18,8 @@ import org.openmrs.module.emrapi.conditionlist.domain.Condition;
 
 import java.util.List;
 
-public interface ConditionDao {
+public interface ConditionDAO {
     Condition saveOrUpdate(Condition condition);
     Condition getConditionByUuid(String uuid);
-    List<Condition> getConditions(Patient patient);
+    List<Condition> getConditionsByPatient(Patient patient);
 }

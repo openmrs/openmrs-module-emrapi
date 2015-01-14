@@ -120,7 +120,7 @@
             <ref bean="transactionAttributeSource"/>
         </property>
     </bean>
-    
+
      <bean id="emrPatientService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>

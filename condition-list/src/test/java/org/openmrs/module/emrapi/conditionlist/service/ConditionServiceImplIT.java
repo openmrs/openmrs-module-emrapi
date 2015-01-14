@@ -15,14 +15,13 @@
 package org.openmrs.module.emrapi.conditionlist.service;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
-import org.openmrs.api.APIException;
+import org.openmrs.User;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
+import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +31,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+@org.springframework.test.context.ContextConfiguration(locations = {"classpath:TestingApplicationContext.xml"}, inheritLocations = true)
 public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
 
     @Autowired
@@ -43,8 +43,8 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     @Autowired
     PatientService patientService;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @Autowired
+    UserService userService;
 
     @Before
     public void setUp() throws Exception {
@@ -70,8 +70,11 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
         condition.setUuid("3584c584-c291-46c8-8584-96dc33d19584");
         conditionService.save(condition);
 
-        List<Condition> allConditions = conditionService.getConditions(patient);
-        assertEquals(allConditions.size(), 7);
+        User user = userService.getUserByUsername("superman");
+        condition.setCreator(user);
+
+        List<Condition> allConditions = conditionService.getConditionsByPatient(patient);
+        assertEquals(allConditions.size(), 3);
 
         assertTrue(condition.getId() > 0);
         assertEquals(condition.getUuid(), "3584c584-c291-46c8-8584-96dc33d19584");
@@ -84,8 +87,8 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     public void shouldNotCreateDuplicateCondition() {
         Condition condition = conditionService.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
         conditionService.save(condition);
-        List<Condition> conditionsList = conditionService.getConditions(condition.getPatient());
-        assertEquals(conditionsList.size(), 6);
+        List<Condition> conditionsList = conditionService.getConditionsByPatient(condition.getPatient());
+        assertEquals(conditionsList.size(), 4);
     }
 
     @Test
@@ -97,67 +100,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
         assertEquals("Angina", savedCondition.getConcept().getDisplayString());
         assertEquals(Condition.Status.HISTORY_OF, savedCondition.getStatus());
 
-        List<Condition> conditionsList = conditionService.getConditions(condition.getPatient());
-        assertEquals(conditionsList.size(), 6);
-    }
-
-    @Test
-    public void shouldNotAllowNonCodedConceptConditionWithoutNonCodedConditionValue() {
-        thrown.expect(APIException.class);
-        thrown.expectMessage("Non-coded value needed for non-coded condition");
-        Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-9038-a6c5e4d22fb7");
-        conditionService.save(condition);
-    }
-
-    @Test
-    public void shouldNotAllowNonCodedValueForCodedConceptCondition() {
-        thrown.expect(APIException.class);
-        thrown.expectMessage("Non-coded value not supported for coded condition");
-        Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
-        conditionService.save(condition);
-    }
-
-    @Test
-    public void shouldNotAllowDuplicateConditionsWhiteSpacesAndCaseChangesInConditionNonCodedValue() {
-        thrown.expect(APIException.class);
-        thrown.expectMessage("Duplicates are not allowed");
-        Condition condition = new Condition();
-        assertNull(condition.getId());
-
-        condition.setStatus(Condition.Status.PRESUMED);
-
-        Concept nonCodedConcept = conceptService.getConceptByName("OTHER, NON-CODED");
-        condition.setConcept(nonCodedConcept);
-
-        Patient patient = patientService.getPatient(2);
-        condition.setPatient(patient);
-
-        Date dateCreated = new Date();
-        condition.setDateCreated(dateCreated);
-
-        condition.setUuid("3584c584-c291-46c8-8584-96dc33d19584");
-        condition.setConditionNonCoded("P a I n ");
-        conditionService.save(condition);
-    }
-
-    @Test
-    public void shouldNotAllowUpdatingConceptInCondition() {
-        thrown.expect(APIException.class);
-        thrown.expectMessage("Concept cannot be updated");
-
-        Condition condition = new Condition();
-        condition.setStatus(Condition.Status.CONFIRMED);
-
-        Concept anginaConcept = conceptService.getConceptByName("Angina");
-        condition.setConcept(anginaConcept);
-
-        Patient patient = patientService.getPatient(1);
-        condition.setPatient(patient);
-
-        Date dateCreated = new Date();
-        condition.setDateCreated(dateCreated);
-
-        condition.setUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
-        conditionService.save(condition);
+        List<Condition> conditionsList = conditionService.getConditionsByPatient(condition.getPatient());
+        assertEquals(conditionsList.size(), 4);
     }
 }
