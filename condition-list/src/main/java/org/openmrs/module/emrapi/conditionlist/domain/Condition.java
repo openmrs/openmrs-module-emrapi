@@ -59,7 +59,7 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
     private String conditionNonCoded;
     private Date onsetDate;
     private String additionalDetail;
-    private Concept endDate;
+    private Date endDate;
     private Concept endReason;
 
 
@@ -195,7 +195,7 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      * @return Returns the endDate.
      */
     @Attribute(required = true)
-    public Concept getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
@@ -203,7 +203,7 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      * @param endDate The endDate to set.
      */
     @Attribute(required = false)
-    public void setEndDate(Concept endDate) {
+    public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 

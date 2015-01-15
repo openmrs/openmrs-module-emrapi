@@ -22,8 +22,8 @@ import org.openmrs.User;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
-import org.openmrs.module.emrapi.conditionlist.dao.ConditionDAO;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
+import org.openmrs.module.emrapi.conditionlist.service.ConditionService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
@@ -36,7 +36,7 @@ import java.util.List;
 public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
 
     @Autowired
-    ConditionDAO conditionDao;
+    ConditionService conditionService;
     @Autowired
     ConceptService conceptService;
     @Autowired
@@ -45,7 +45,6 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
     PatientService patientService;
     @Autowired
     ConditionValidator conditionValidator;
-
 
     @Before
     public void setUp() throws Exception {
@@ -62,7 +61,7 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
 
     @Test
     public void shouldNotAllowNonCodedConceptConditionWithoutNonCodedConditionValue() {
-        Condition condition = conditionDao.getConditionByUuid("2ss6880e-2c46-11e4-9038-a6c5e4d22fb7");
+        Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-9038-a6c5e4d22fb7");
         Errors errors = new BindException(condition, "condition");
         conditionValidator.validate(condition, errors);
         Assert.assertTrue(errors.hasErrors());
@@ -71,7 +70,7 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
 
     @Test
     public void shouldNotAllowNonCodedValueForCodedConceptCondition() {
-        Condition condition = conditionDao.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
+        Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
         Errors errors = new BindException(condition, "condition");
         conditionValidator.validate(condition, errors);
         Assert.assertTrue(errors.hasErrors());
@@ -94,6 +93,36 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
         conditionValidator.validate(condition, errors);
         Assert.assertTrue(errors.hasErrors());
         Assert.assertEquals("Condition.error.conceptsCannotBeUpdated", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
+    }
+
+    @Test
+    public void shouldNotAllowInValidEndReasonConcept() {
+        Condition condition = createCondition(Condition.Status.CONFIRMED, "Tuberculosis", 1, "2cc6880e-2c46-11e4-9038-a6c5e4d22fb7", null);
+        Concept endReasonConcept = conceptService.getConceptByName("invalid end reason");
+        condition.setEndReason(endReasonConcept);
+        Errors errors = new BindException(condition, "condition");
+        conditionValidator.validate(condition, errors);
+        Assert.assertTrue(errors.hasErrors());
+        Assert.assertEquals("Condition.error.notAmongAllowedConcepts", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
+    }
+
+    @Test
+    public void shouldAllowValidEndReasonConcept() {
+        Condition condition = createCondition(Condition.Status.CONFIRMED, "Tuberculosis", 1, "2cc6880e-2c46-11e4-9038-a6c5e4d22fb7", null);
+        Concept endReasonConcept = conceptService.getConceptByName("cured");
+        condition.setEndReason(endReasonConcept);
+        Errors errors = new BindException(condition, "condition");
+        conditionValidator.validate(condition, errors);
+        Assert.assertFalse(errors.hasErrors());
+    }
+
+    @Test
+    public void shouldMandateEndReasonToEndCondition() {
+        Condition condition = conditionService.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
+        condition.setEndDate(new Date());
+        Errors errors = new BindException(condition, "condition");
+        conditionValidator.validate(condition, errors);
+        Assert.assertEquals("Condition.error.endReasonIsMandatory", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
     }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {

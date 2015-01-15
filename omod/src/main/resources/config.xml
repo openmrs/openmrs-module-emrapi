@@ -177,5 +177,21 @@
         </description>
     </globalProperty>
 
+    <globalProperty>
+        <property>conditionList.endReasonConceptSetUuid</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of end reason concept set
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>conditionList.nonCodedUuid</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of non coded concept
+        </description>
+    </globalProperty>
+
 </module>
 
