@@ -14,13 +14,10 @@
         </property>
     </bean>
 
-    <bean id="conditionValidator" class="org.openmrs.module.emrapi.conditionlist.validator.ConditionValidator">
-        <constructor-arg name="conditionDAO" ref="conditionDAO"/>
-        <constructor-arg name="administrationService" ref="adminService"/>
-    </bean>
-
     <bean id="conditionServiceTarget" class="org.openmrs.module.emrapi.conditionlist.service.ConditionServiceImpl">
-        <constructor-arg ref="conditionDAO"/>
+        <constructor-arg index="0" ref="conditionDAO"/>
+        <constructor-arg index="1" ref="conceptService"/>
+        <constructor-arg index="2" ref="adminService"/>
     </bean>
 
     <bean id="conditionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -36,5 +33,10 @@
         <property name="transactionAttributeSource">
             <ref bean="transactionAttributeSource"/>
         </property>
+    </bean>
+
+    <bean id="conditionValidator" class="org.openmrs.module.emrapi.conditionlist.validator.ConditionValidator">
+        <constructor-arg name="conditionService" ref="conditionService"/>
+        <constructor-arg name="administrationService" ref="adminService"/>
     </bean>
 </beans>

@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 public final class ConditionListConstants {
 
     private static Log log = LogFactory.getLog(ConditionListConstants.class);
+    public static final String GP_END_REASON_CONCEPT_SET_UUID = "conditionList.endReasonConceptSetUuid" ;
     public static final String GLOBAL_PROPERTY_NON_CODED_UUID = "conditionList.nonCodedUuid";
 
 }

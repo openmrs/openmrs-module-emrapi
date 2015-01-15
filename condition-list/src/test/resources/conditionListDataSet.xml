@@ -42,7 +42,6 @@
                   date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
                   voided="false" uuid="s102c80f-1yz9-4da3-bb88-8122ce8868df"/>
 
-
     <concept concept_id="411" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
              date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
              uuid="s584584f-1yz9-4da3-bb88-8122ce8868ss"/>
@@ -50,6 +49,40 @@
                   date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
                   voided="false" uuid="s584584f-1yz9-4da3-bb88-8122ce8868df"/>
 
+    <concept concept_id="412" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="cured84f-1yz9-4da3-bb88-8122ce8868ss"/>
+    <concept_name concept_id="412" concept_name_id="1412" name="Cured" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
+                  voided="false" uuid="cured84f-1yz9-4da3-bb88-8122ce8868df"/>
+
+    <concept concept_id="413" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="ruled84f-1yz9-4da3-bb88-8122ce8868ss"/>
+    <concept_name concept_id="413" concept_name_id="1413" name="Ruled out" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
+                  voided="false" uuid="ruled84f-1yz9-4da3-bb88-8122ce8868df"/>
+
+    <concept concept_id="414" retired="false" datatype_id="2" class_id="11" is_set="true" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="reason4f-1yz9-4da3-bb88-8122ce8868ss"/>
+    <concept_name concept_id="414" concept_name_id="1414" name="endReason" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
+                  voided="false" uuid="reason4f-1yz9-4da3-bb88-8122ce8868df"/>
+
+    <concept_set concept_set_id="5844" concept_id="412" concept_set="414" creator="1"
+                 date_created="2004-08-12 00:00:00.0"
+                 sort_weight="3"/>
+    <concept_set concept_set_id="5845" concept_id="413" concept_set="414" creator="1"
+                 date_created="2004-08-12 00:00:00.0"
+                 sort_weight="2"/>
+
+    <concept concept_id="415" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="fe9ca84f-1yz9-4da3-bb88-8122ce8868ss"/>
+    <concept_name concept_id="415" concept_name_id="1415" name="invalid end reason" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
+                  voided="false" uuid="fd9ac84f-1yz9-4da3-bb88-8122ce8868df"/>
 
     <conditions condition_id="1" patient_id="1" status="CONFIRMED" concept_id="409" creator="1"
                 date_created="2015-01-12 00:00:00" uuid="2cc6880e-2c46-11e4-9038-a6c5e4d22fb7"/>
@@ -74,6 +107,11 @@
                 condition_non_coded="fracture"/>
 
 
-    <global_property property="conditionList.nonCodedUuid" property_value="s102c80f-1yz9-4da3-bb88-8122ce8868ss" uuid="35584f40-d9c5-11e3-9c1a-0800200c9a66"/>
+    <global_property property="conditionList.nonCodedUuid" property_value="s102c80f-1yz9-4da3-bb88-8122ce8868ss"
+                     uuid="35584f40-d9c5-11e3-9c1a-0800200c9a66"/>
+
+    <global_property property="conditionList.endReasonConceptSetUuid"
+                     property_value="reason4f-1yz9-4da3-bb88-8122ce8868ss"
+                     uuid="58584f40-d9c5-55e3-9c1a-0800200c9584"/>
 
 </dataset>
