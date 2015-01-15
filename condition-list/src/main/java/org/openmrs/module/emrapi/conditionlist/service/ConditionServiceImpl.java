@@ -17,6 +17,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.conditionlist.dao.ConditionDAO;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -37,6 +38,14 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
     @Override
     public List<Condition> getConditionsByPatient(Patient patient) {
         return conditionDao.getConditionsByPatient(patient);
+    }
+
+    @Override
+    public Condition voidCondition(Condition condition, String voidReason) {
+        if (!StringUtils.hasLength(voidReason)) {
+            throw new IllegalArgumentException("voidReason cannot be empty or null");
+        }
+        return conditionDao.saveOrUpdate(condition);
     }
 
     @Override

@@ -24,6 +24,10 @@ import java.util.List;
 public interface ConditionService extends OpenmrsService {
     @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
     Condition save(Condition condition);
+
     Condition getConditionByUuid(String uuid);
     List<Condition> getConditionsByPatient(Patient patient);
+
+    @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
+    Condition voidCondition(Condition condition, String voidReason);
 }

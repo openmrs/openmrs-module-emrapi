@@ -18,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.conditionlist.dao.ConditionDAO;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
 import org.openmrs.module.emrapi.conditionlist.util.ConditionListConstants;
