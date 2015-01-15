@@ -13,21 +13,32 @@
  */
 package org.openmrs.module.emrapi.conditionlist.service;
 
+import org.openmrs.Concept;
 import org.openmrs.Patient;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.conditionlist.dao.ConditionDAO;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
+import org.openmrs.module.emrapi.conditionlist.util.ConditionListConstants;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
 public class ConditionServiceImpl extends BaseOpenmrsService implements ConditionService {
 
     private ConditionDAO conditionDao;
+    private ConceptService conceptService;
+    private AdministrationService administrationService;
 
-    public ConditionServiceImpl(ConditionDAO conditionDao) {
+    public ConditionServiceImpl(ConditionDAO conditionDao, ConceptService conceptService, AdministrationService administrationService) {
         this.conditionDao = conditionDao;
+        this.conceptService = conceptService;
+        this.administrationService = administrationService;
     }
 
     @Override
@@ -51,5 +62,30 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
     @Override
     public Condition getConditionByUuid(String uuid) {
         return conditionDao.getConditionByUuid(uuid);
+    }
+
+    @Override
+    public Condition endCondition(Condition condition, Date endDate, Concept endReason) {
+        if (endDate == null) {
+            endDate = new Date();
+        }
+        condition.setEndDate(endDate);
+        condition.setEndReason(endReason);
+        return conditionDao.saveOrUpdate(condition);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Concept> getEndReasonConcepts() {
+        return getSetMembersOfConceptSetFromGP(ConditionListConstants.GP_END_REASON_CONCEPT_SET_UUID);
+    }
+
+    private List<Concept> getSetMembersOfConceptSetFromGP(String globalProperty) {
+        String conceptUuid = administrationService.getGlobalProperty(globalProperty);
+        Concept concept = conceptService.getConceptByUuid(conceptUuid);
+        if (concept != null && concept.isSet()) {
+            return concept.getSetMembers();
+        }
+        return Collections.emptyList();
     }
 }

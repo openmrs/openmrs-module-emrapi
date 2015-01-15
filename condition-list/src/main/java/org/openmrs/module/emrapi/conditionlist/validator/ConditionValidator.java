@@ -16,10 +16,11 @@ package org.openmrs.module.emrapi.conditionlist.validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.module.emrapi.conditionlist.dao.ConditionDAO;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
+import org.openmrs.module.emrapi.conditionlist.service.ConditionService;
 import org.openmrs.module.emrapi.conditionlist.util.ConditionListConstants;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -35,10 +36,10 @@ public class ConditionValidator implements Validator {
     protected final Log log = LogFactory.getLog(getClass());
 
     private AdministrationService administrationService;
-    private ConditionDAO conditionDao;
+    private ConditionService conditionService;
 
-    public ConditionValidator(ConditionDAO conditionDAO, AdministrationService administrationService) {
-        this.conditionDao = conditionDAO;
+    public ConditionValidator(ConditionService conditionService, AdministrationService administrationService) {
+        this.conditionService = conditionService;
         this.administrationService = administrationService;
     }
 
@@ -68,13 +69,23 @@ public class ConditionValidator implements Validator {
             ValidationUtils.rejectIfEmpty(errors, "uuid", "error.null");
 
             validateNonCodedCondition(condition, errors);
-            validateUpdatingConcept(condition, errors);
+            validateConcept(condition, errors);
             validateDuplicateConditions(condition, errors);
+            validateEndReasonConceptAmongAllowedConcepts(condition, errors);
+        }
+    }
+
+    private void validateEndReasonConceptAmongAllowedConcepts(Condition condition, Errors errors) {
+        if (condition.getEndReason() != null) {
+            List<Concept> endReasonConcepts = conditionService.getEndReasonConcepts();
+            if (!endReasonConcepts.contains(condition.getEndReason())) {
+                errors.rejectValue("endReason", "Condition.error.notAmongAllowedConcepts");
+            }
         }
     }
 
     private void validateDuplicateConditions(Condition condition, Errors errors) {
-        List<Condition> conditionsForPatient = conditionDao.getConditionsByPatient(condition.getPatient());
+        List<Condition> conditionsForPatient = conditionService.getConditionsByPatient(condition.getPatient());
         if (condition.getConditionNonCoded() != null) {
             for (Condition eachCondition : conditionsForPatient) {
                 if (eachCondition.getConcept().equals(condition.getConcept())
@@ -85,15 +96,15 @@ public class ConditionValidator implements Validator {
         }
     }
 
-    private void validateUpdatingConcept(Condition condition, Errors errors) {
-        Condition existingCondition = conditionDao.getConditionByUuid(condition.getUuid());
+    private void validateConcept(Condition condition, Errors errors) {
+        Condition existingCondition = conditionService.getConditionByUuid(condition.getUuid());
         if (existingCondition != null && !condition.getConcept().equals(existingCondition.getConcept())) {
             errors.rejectValue("concept", "Condition.error.conceptsCannotBeUpdated");
         }
     }
 
     private void validateNonCodedCondition(Condition condition, Errors errors) {
-            String nonCodedConditionUuid = administrationService.getGlobalProperty(ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID);
+        String nonCodedConditionUuid = administrationService.getGlobalProperty(ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID);
         if (condition.getConditionNonCoded() != null) {
             if (!condition.getConcept().getUuid().equals(nonCodedConditionUuid)) {
                 errors.rejectValue("conditionNonCoded", "Condition.error.conditionNonCodedValueNotSupportedForCodedCondition");

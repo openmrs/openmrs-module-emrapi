@@ -90,7 +90,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void shouldVoidGivenCondition() {
+    public void shouldVoidConditionSetVoidedAndVoidedReason() {
         Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
         Condition voidedCondition = conditionService.voidCondition(condition, "voiding");
         assertTrue(voidedCondition.getVoided());
@@ -98,11 +98,21 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void shouldMandateVoidReason() {
+    public void shouldMandateVoidReasonToVoidCondition() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("voidReason cannot be empty or null");
         Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
-        Condition voidedCondition = conditionService.voidCondition(condition, null);
+        conditionService.voidCondition(condition, null);
+    }
+
+    @Test
+    public void shouldEndConditionSetEndDateAndEndReason() {
+        Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
+        Date endDate = new Date();
+        Concept endReason = conceptService.getConceptByUuid("cured84f-1yz9-4da3-bb88-8122ce8868df");
+        Condition savedCondition = conditionService.endCondition(condition, endDate, endReason);
+        assertEquals(savedCondition.getEndDate(), endDate);
+        assertEquals(savedCondition.getEndReason(), endReason);
     }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {
