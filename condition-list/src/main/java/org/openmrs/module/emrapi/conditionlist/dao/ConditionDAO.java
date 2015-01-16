@@ -22,4 +22,5 @@ public interface ConditionDAO {
     Condition saveOrUpdate(Condition condition);
     Condition getConditionByUuid(String uuid);
     List<Condition> getConditionsByPatient(Patient patient);
+    List<Condition> getActiveConditions(Patient patient);
 }

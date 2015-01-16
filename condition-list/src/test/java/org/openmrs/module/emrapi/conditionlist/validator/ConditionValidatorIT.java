@@ -137,6 +137,7 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
         condition.setCreator(user);
         condition.setStatus(status);
         condition.setDateCreated(new Date());
+        condition.setVoided(false);
         condition.setConditionNonCoded(conditionNonCoded);
         condition.setUuid(uuid);
 

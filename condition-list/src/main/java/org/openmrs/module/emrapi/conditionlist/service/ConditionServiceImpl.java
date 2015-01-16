@@ -55,6 +55,11 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
     }
 
     @Override
+    public List<Condition> getActiveConditions(Patient patient) {
+        return conditionDAO.getActiveConditions(patient);
+    }
+
+    @Override
     public Condition voidCondition(Condition condition, String voidReason) {
         if (!StringUtils.hasLength(voidReason)) {
             throw new IllegalArgumentException("voidReason cannot be empty or null");

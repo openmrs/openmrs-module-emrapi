@@ -65,6 +65,7 @@ public class ConditionValidator implements Validator {
             ValidationUtils.rejectIfEmpty(errors, "status", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "creator", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "concept", "error.null");
+            ValidationUtils.rejectIfEmpty(errors, "voided", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "dateCreated", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "uuid", "error.null");
 
@@ -76,11 +77,11 @@ public class ConditionValidator implements Validator {
     }
 
     private void validateEndReasonConcept(Condition condition, Errors errors) {
-        if(condition.getEndReason() == null){
-            if(condition.getEndDate() != null){
+        if (condition.getEndReason() == null) {
+            if (condition.getEndDate() != null) {
                 errors.rejectValue("endReason", "Condition.error.endReasonIsMandatory");
             }
-        }else {
+        } else {
             List<Concept> endReasonConcepts = conditionService.getEndReasonConcepts();
             if (!endReasonConcepts.contains(condition.getEndReason())) {
                 errors.rejectValue("endReason", "Condition.error.notAmongAllowedConcepts");

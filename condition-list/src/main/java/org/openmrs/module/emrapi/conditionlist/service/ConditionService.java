@@ -20,7 +20,6 @@ import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
 import org.openmrs.module.emrapi.conditionlist.util.PrivilegeConstants;
 
-import java.util.Date;
 import java.util.List;
 
 public interface ConditionService extends OpenmrsService {
@@ -35,5 +34,9 @@ public interface ConditionService extends OpenmrsService {
 
     List<Condition> getConditionsByPatient(Patient patient);
 
+    @Authorized({PrivilegeConstants.GET_CONDITIONS})
+    List<Condition> getActiveConditions(Patient patient);
+
     List<Concept> getEndReasonConcepts();
+
 }
