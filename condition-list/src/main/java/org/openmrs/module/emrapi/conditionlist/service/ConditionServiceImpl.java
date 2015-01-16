@@ -50,8 +50,8 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
     }
 
     @Override
-    public List<Condition> getConditionsByPatient(Patient patient) {
-        return conditionDAO.getConditionsByPatient(patient);
+    public List<Condition> getConditionHistory(Patient patient) {
+        return conditionDAO.getConditionHistory(patient);
     }
 
     @Override

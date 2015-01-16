@@ -21,6 +21,6 @@ import java.util.List;
 public interface ConditionDAO {
     Condition saveOrUpdate(Condition condition);
     Condition getConditionByUuid(String uuid);
-    List<Condition> getConditionsByPatient(Patient patient);
+    List<Condition> getConditionHistory(Patient patient);
     List<Condition> getActiveConditions(Patient patient);
 }

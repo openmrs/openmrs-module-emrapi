@@ -90,7 +90,7 @@ public class ConditionValidator implements Validator {
     }
 
     private void validateDuplicateConditions(Condition condition, Errors errors) {
-        List<Condition> conditionsForPatient = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> conditionsForPatient = conditionService.getActiveConditions(condition.getPatient());
         if (condition.getConditionNonCoded() != null) {
             for (Condition eachCondition : conditionsForPatient) {
                 if (eachCondition.getConcept().equals(condition.getConcept())

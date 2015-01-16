@@ -52,10 +52,19 @@ public class HibernateConditionDAOIT extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetConditionsForPatient() {
-        Patient patient = patientService.getPatient(1);
-        List<Condition> conditionsForPatient = conditionDao.getConditionsByPatient(patient);
-        assertEquals(4, conditionsForPatient.size());
+    public void shouldGetConditionHistoryReturnOnlyNonVoidedConditionsForPatient() {
+        Patient patient = patientService.getPatient(3);
+        List<Condition> conditionsForPatient = conditionDao.getConditionHistory(patient);
+        assertEquals(3, conditionsForPatient.size());
+    }
+
+    @Test
+    public void shouldGetConditionsInDateCreatedOrder() {
+        Patient patient = patientService.getPatient(3);
+        List<Condition> conditionsForPatient = conditionDao.getConditionHistory(patient);
+        assertEquals("p84i8o0r-2n46-mse4-58f4-a6i5e4du2fb7", conditionsForPatient.get(0).getUuid());
+        assertEquals("p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7", conditionsForPatient.get(1).getUuid());
+        assertEquals("c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7", conditionsForPatient.get(2).getUuid());
     }
 
     @Test

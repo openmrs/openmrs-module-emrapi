@@ -121,11 +121,11 @@
                 voided="false"/>
 
     <conditions condition_id="9" patient_id="3" status="PRESUMED" concept_id="409" creator="1"
-                date_created="2015-01-12 00:00:00" voided="false" uuid="p84i8o0r-2n46-mse4-58f4-a6i5e4du2fb7"
+                date_created="2015-01-13 00:00:00" voided="false" uuid="p84i8o0r-2n46-mse4-58f4-a6i5e4du2fb7"
                 end_date="2015-01-12 00:00:00" end_reason="413"/>
 
     <conditions condition_id="10" patient_id="3" status="PRESUMED" concept_id="410" creator="1"
-                date_created="2015-01-12 00:00:00" uuid="p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7"
+                date_created="2015-01-12 01:00:00" uuid="p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7"
                 condition_non_coded="pain" voided="false"/>
 
     <conditions condition_id="11" patient_id="3" status="PRESUMED" concept_id="411" creator="1"

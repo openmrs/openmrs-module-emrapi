@@ -60,7 +60,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     public void shouldCreateNewCondition() {
         Condition condition = createCondition(Condition.Status.PRESUMED, "Tuberculosis", 2, "3584c584-c291-46c8-8584-96dc33d19584", null);
         conditionService.save(condition);
-        List<Condition> allConditions = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> allConditions = conditionService.getConditionHistory(condition.getPatient());
         assertEquals(allConditions.size(), 3);
         assertTrue(condition.getId() > 0);
         assertEquals("3584c584-c291-46c8-8584-96dc33d19584", condition.getUuid());
@@ -72,7 +72,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     public void shouldNotCreateDuplicateCondition() {
         Condition condition = conditionService.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
         conditionService.save(condition);
-        List<Condition> conditionsList = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> conditionsList = conditionService.getConditionHistory(condition.getPatient());
         assertEquals(conditionsList.size(), 4);
     }
 
@@ -85,7 +85,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
         assertEquals("Angina", savedCondition.getConcept().getDisplayString());
         assertEquals(Condition.Status.HISTORY_OF, savedCondition.getStatus());
 
-        List<Condition> conditionsList = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> conditionsList = conditionService.getConditionHistory(condition.getPatient());
         assertEquals(conditionsList.size(), 4);
     }
 
