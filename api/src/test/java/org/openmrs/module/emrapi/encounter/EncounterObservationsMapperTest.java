@@ -21,6 +21,7 @@ import org.openmrs.Obs;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.matcher.ObservationTypeMatcher;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -40,11 +41,14 @@ public class EncounterObservationsMapperTest {
     private DispositionMapper dispositionMapper;
     @Mock
     private EmrApiProperties emrApiProperties;
+    @Mock
+    private ObservationTypeMatcher observationTypeMatcher;
+
 
     @Before
     public void setUp(){
         initMocks(this);
-        encounterObservationsMapper = new EncounterObservationsMapper(observationMapper, diagnosisMapper, dispositionMapper, emrApiProperties);
+        encounterObservationsMapper = new EncounterObservationsMapper(observationMapper, diagnosisMapper, dispositionMapper, emrApiProperties, observationTypeMatcher);
         when(emrApiProperties.getDiagnosisMetadata()).thenReturn(diagnosisMetadata);
     }
 
@@ -56,12 +60,12 @@ public class EncounterObservationsMapperTest {
         Obs obs3 = new Obs();
         Obs obs4 = new Obs();
         HashSet<Obs> allObs = new HashSet<Obs>(Arrays.asList(obs1, obs2, obs3, obs4));
-        when(diagnosisMetadata.isDiagnosis(obs1)).thenReturn(true);
-        when(diagnosisMetadata.isDiagnosis(obs2)).thenReturn(false);
-        when(diagnosisMetadata.isDiagnosis(obs3)).thenReturn(true);
+        when(observationTypeMatcher.getObservationType(obs1)).thenReturn(ObservationTypeMatcher.ObservationType.DIAGNOSIS);
+        when(observationTypeMatcher.getObservationType(obs2)).thenReturn(ObservationTypeMatcher.ObservationType.OBSERVATION);
+        when(observationTypeMatcher.getObservationType(obs3)).thenReturn(ObservationTypeMatcher.ObservationType.DIAGNOSIS);
 
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
-        when(dispositionMapper.isDispositionGroup(obs4)).thenReturn(true);
+        when(observationTypeMatcher.getObservationType(obs4)).thenReturn(ObservationTypeMatcher.ObservationType.DISPOSITION);
         when(dispositionMapper.getDisposition(obs4)).thenReturn(disposition);
 
         encounterObservationsMapper.update(encounterTransaction, allObs);

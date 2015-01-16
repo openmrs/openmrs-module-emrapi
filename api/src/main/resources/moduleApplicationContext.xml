@@ -288,6 +288,7 @@
         <constructor-arg name="diagnosisMapper" ref="diagnosisMapper"/>
         <constructor-arg name="dispositionMapper" ref="dispositionMapper"/>
         <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
+        <constructor-arg name="observationTypeMatcher" ref="observationTypeMatcher"/>
     </bean>
 
     <bean id="observationMapper" class="org.openmrs.module.emrapi.encounter.ObservationMapper">
@@ -297,6 +298,11 @@
     </bean>
 
     <bean id="dispositionMapper" class="org.openmrs.module.emrapi.encounter.DispositionMapper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+    </bean>
+
+    <bean id="observationTypeMatcher" class="org.openmrs.module.emrapi.encounter.matcher.ObservationTypeMatcher">
+        <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
         <constructor-arg name="conceptService" ref="conceptService"/>
     </bean>
 

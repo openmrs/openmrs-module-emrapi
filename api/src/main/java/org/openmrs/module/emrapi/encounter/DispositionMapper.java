@@ -71,25 +71,12 @@ public class DispositionMapper {
         return null;
     }
 
-    public boolean isDispositionGroup(Obs obs) {
-        Concept dispositionGroupConcept = getDispositionGroupConcept();
-        return obs.getConcept().getUuid().equals(dispositionGroupConcept.getUuid());
-    }
-
-    boolean isDisposition(Obs obs) {
+    private boolean isDisposition(Obs obs) {
         Concept dispositionConcept = getDispositionConcept();
         return obs.getConcept().getUuid().equals(dispositionConcept.getUuid());
     }
 
-    Concept getDispositionGroupConcept() {
-        Concept concept = conceptService.getConceptByMapping(EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
-        if (concept == null) {
-            throw new ConceptNotFoundException("Disposition group concept does not exist. Code : " + EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET);
-        }
-        return concept;
-    }
-
-    Concept getDispositionConcept() {
+    private Concept getDispositionConcept() {
         Concept concept = conceptService.getConceptByMapping(EmrApiConstants.CONCEPT_CODE_DISPOSITION, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
         if (concept == null) {
             throw new ConceptNotFoundException("Disposition concept does not exist. Code : " + EmrApiConstants.CONCEPT_CODE_DISPOSITION);
