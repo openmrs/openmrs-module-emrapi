@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Patient;
+import org.openmrs.api.db.ConceptDAO;
 import org.openmrs.module.emrapi.conditionlist.domain.Condition;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +59,9 @@ public class HibernateConditionDAO implements ConditionDAO {
     @Override
     @Transactional(readOnly = true)
     public List<Condition> getConditionHistory(Patient patient) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from Condition c where c.patient.patientId = :patientId and c.voided = false order by c.dateCreated desc");
+        Query query = sessionFactory.getCurrentSession().createQuery("select con from Condition as con " +
+                " inner join fetch con.concept as c left join c.names as name with name.conceptNameType = 'FULLY_SPECIFIED' " +
+                " where con.patient.patientId = :patientId and con.voided = false  group by c.conceptId, con.conditionId order by name.name asc , con.dateCreated desc");
         query.setInteger("patientId", patient.getId());
         return query.list();
     }
