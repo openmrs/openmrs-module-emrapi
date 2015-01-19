@@ -12,13 +12,16 @@
         ${project.parent.description}
     </description>
     <updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
-    <require_version>1.9.8</require_version> <!-- TRUNK-3751 prevents saying ${openmrsCoreVersion} when version is a SNAPSHOT-->
+    <require_version>1.9.8</require_version>
+    <!-- TRUNK-3751 prevents saying ${openmrsCoreVersion} when version is a SNAPSHOT-->
     <!-- / Module Properties -->
+
 
     <!-- Required Modules -->
     <require_modules>
         <require_module version="${reportingModuleVersion}">org.openmrs.module.reporting</require_module>
-        <require_module version="${providermanagementModuleVersion}">org.openmrs.module.providermanagement</require_module>
+        <require_module version="${providermanagementModuleVersion}">org.openmrs.module.providermanagement
+        </require_module>
         <require_module version="${metadatasharingVersion}">org.openmrs.module.metadatasharing</require_module>
         <require_module version="${eventVersion}">org.openmrs.event</require_module>
         <require_module version="${webservicesRestModuleVersion}">org.openmrs.module.webservices.rest</require_module>
@@ -46,7 +49,7 @@
 
     <!-- Maps hibernate files, if present -->
     <mappingFiles>
-
+        Condition.hbm.xml
     </mappingFiles>
 
     <!-- Internationalization -->
@@ -149,21 +152,21 @@
         </description>
     </globalProperty>
 
-	<globalProperty>
-		<property>emrapi.suppressedDiagnosisConcepts</property>
-		<defaultValue></defaultValue>
-		<description>
-			UUIDs or mappings of suppressed diagnosis concepts
-		</description>
-	</globalProperty>
+    <globalProperty>
+        <property>emrapi.suppressedDiagnosisConcepts</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUIDs or mappings of suppressed diagnosis concepts
+        </description>
+    </globalProperty>
 
-	<globalProperty>
-		<property>emrapi.nonDiagnosisConceptSets</property>
-		<defaultValue></defaultValue>
-		<description>
-			UUIDs or mapping of non diagnosis concept sets
-		</description>
-	</globalProperty>
+    <globalProperty>
+        <property>emrapi.nonDiagnosisConceptSets</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUIDs or mapping of non diagnosis concept sets
+        </description>
+    </globalProperty>
 
     <globalProperty>
         <property>emrapi.lastViewedPatientSizeLimit</property>
@@ -171,6 +174,22 @@
         <description>
             Specifies the system wide number of patients to store as last viewed for a single user,
             defaults to 50 if not specified
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>conditionList.endReasonConceptSetUuid</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of end reason concept set
+        </description>
+    </globalProperty>
+
+    <globalProperty>
+        <property>conditionList.nonCodedUuid</property>
+        <defaultValue></defaultValue>
+        <description>
+            UUID of non coded concept
         </description>
     </globalProperty>
 

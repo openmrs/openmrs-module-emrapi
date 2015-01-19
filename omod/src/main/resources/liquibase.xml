@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="Shruthi, Sravanthi" id="20150109-0505">
+        <createTable tableName="conditions">
+            <column name="condition_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="previous_condition_id" type="int"/>
+            <column name="patient_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="concept_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="condition_non_coded" type="varchar(1024)"/>
+            <column name="onset_date" type="datetime"/>
+            <column name="additional_detail" type="varchar(1024)"/>
+            <column name="end_date" type="datetime"/>
+            <column name="end_reason" type="int"/>
+            <column name="creator" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int"/>
+            <column name="date_voided" type="datetime"/>
+            <column name="void_reason" type="varchar(255)"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+    <changeSet author="Shruthi, Sravanthi" id="20150109-0627">
+        <addForeignKeyConstraint constraintName="conditions_previous_condition_id_fk" baseTableName="conditions"
+                                 baseColumnNames="previous_condition_id" referencedTableName="conditions"
+                                 referencedColumnNames="condition_id"/>
+        <addForeignKeyConstraint baseColumnNames="patient_id" baseTableName="conditions"
+                                 constraintName="conditions_patient_fk" deferrable="false" initiallyDeferred="false"
+                                 onUpdate="CASCADE" referencedColumnNames="patient_id" referencedTableName="patient"/>
+        <addForeignKeyConstraint baseColumnNames="concept_id" baseTableName="conditions"
+                                 constraintName="conditions_concept_fk"
+                                 deferrable="false" initiallyDeferred="false" referencedColumnNames="concept_id"
+                                 referencedTableName="concept"/>
+        <addForeignKeyConstraint baseColumnNames="end_reason" baseTableName="conditions"
+                                 constraintName="conditions_end_reason_fk"
+                                 deferrable="false" initiallyDeferred="false" referencedColumnNames="concept_id"
+                                 referencedTableName="concept"/>
+        <addForeignKeyConstraint baseColumnNames="creator" baseTableName="conditions"
+                                 constraintName="conditions_created_by_fk"
+                                 deferrable="false" initiallyDeferred="false" referencedColumnNames="user_id"
+                                 referencedTableName="users"/>
+        <addForeignKeyConstraint baseColumnNames="voided_by" baseTableName="conditions"
+                                 constraintName="conditions_voided_by_fk"
+                                 deferrable="false" initiallyDeferred="false" referencedColumnNames="user_id"
+                                 referencedTableName="users"/>
+    </changeSet>
+
+    <changeSet author="Shruthi, Sravanthi" id="20150109-0521">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="condition_uuid_index"/>
+            </not>
+        </preConditions>
+        <comment>Creating unique index on condition.uuid column</comment>
+        <createIndex tableName="conditions" unique="true" indexName="condition_uuid_index">
+            <column name="uuid"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
