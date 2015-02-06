@@ -54,7 +54,7 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
     private Integer conditionId;
     private Condition previousCondition;
     private Patient patient;
-    private Status status;
+    private Status status = Status.PRESUMED;
     private Concept concept;
     private String conditionNonCoded;
     private Date onsetDate;
@@ -89,6 +89,8 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
 
     /**
      * @param previousCondition The previousCondition to set.
+     * When a condition is altered (e.g., a symptom explicitly converted into a diagnosis), this field
+     * is used to link the new condition to the condition(s) it has replaced.
      */
     @Attribute(required = false)
     public void setPreviousCondition(Condition previousCondition) {
@@ -121,6 +123,15 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
 
     /**
      * @param status The status to set.
+     * The clinical status of the condition.  Default is PRESUMED.
+     * <ul>
+     *   <li><b>PRESUMED</b> when the condition is suspected, but not yet confirmed
+     *   (HL7 uses the term "working")</li>
+     *   <li><b>CONFIRMED</b> when the condition has been confirmed (typically for
+     *   diagnoses)</li>
+     *   <li><b>HISTORY_OF</b> when the history of a condition is relevant to the
+     *   patient's ongoing medical care (e.g., history of stroke)</li>
+     * </ul>
      */
     @Attribute(required = true)
     public void setStatus(Status status) {
@@ -153,6 +164,8 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
 
     /**
      * @param conditionNonCoded The conditionNonCoded to set.
+     * When a condition is not codified, the concept for the condition is set to a concept for
+     * NON-CODED and the free text representation of the condition is stored here.
      */
     @Attribute(required = false)
     public void setConditionNonCoded(String conditionNonCoded) {
@@ -185,6 +198,12 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
 
     /**
      * @param additionalDetail The additionalDetail to set.
+     * Additional detail about the condition.  This is used to further refine the concept and
+     * <em>not</em> meant for encounter-specific detail or notes.  For example, detail
+     * such as "left more than right" or "diagnosed by chest x-ray 5-June-2010" would be
+     * appropriate additional detail; however, "hurts worse today" would not, since the
+     * additional detail is assumed to be refining the condition and not providing encounter-
+     * specific information.
      */
     @Attribute(required = false)
     public void setAdditionalDetail(String additionalDetail) {
