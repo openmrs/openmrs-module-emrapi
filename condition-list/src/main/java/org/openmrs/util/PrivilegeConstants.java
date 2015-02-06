@@ -11,7 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.conditionlist.util;
+package org.openmrs.util;
 
 import org.openmrs.annotation.AddOnStartup;
 

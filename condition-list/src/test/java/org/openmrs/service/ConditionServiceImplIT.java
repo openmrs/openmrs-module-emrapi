@@ -12,7 +12,7 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.emrapi.conditionlist.service;
+package org.openmrs.service;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -23,7 +23,7 @@ import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
-import org.openmrs.module.emrapi.conditionlist.domain.Condition;
+import org.openmrs.Condition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,7 +33,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@org.springframework.test.context.ContextConfiguration(locations = {"classpath:TestingApplicationContext.xml"}, inheritLocations = true)
 public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
 
     @Autowired

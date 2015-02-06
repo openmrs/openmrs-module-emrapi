@@ -4,7 +4,7 @@
 
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.openmrs.module.emrapi.conditionlist.domain.Condition" table="conditions">
+    <class name="org.openmrs.Condition" table="conditions">
         <id name="conditionId" type="int" column="condition_id" unsaved-value="0">
             <generator class="native">
                 <param name="sequence">conditions_condition_id_seq</param>
@@ -17,7 +17,7 @@
                   column="uuid" length="38" unique="true"/>
         <property name="status" column="status" length="255" not-null="true">
             <type name="org.openmrs.util.HibernateEnumType">
-                <param name="enumClassName">org.openmrs.module.emrapi.conditionlist.domain.Condition$Status</param>
+                <param name="enumClassName">org.openmrs.Condition$Status</param>
             </type>
         </property>
         <property name="conditionNonCoded" type="java.lang.String" column="condition_non_coded" length="1024"/>
@@ -30,7 +30,7 @@
         <property name="dateVoided" type="java.util.Date" column="date_voided"/>
         <property name="voidReason" type="java.lang.String" column="void_reason" length="255"/>
 
-        <many-to-one name="previousCondition" class="org.openmrs.module.emrapi.conditionlist.domain.Condition"
+        <many-to-one name="previousCondition" class="org.openmrs.Condition"
                      column="previous_condition_id"/>
         <many-to-one name="patient" column="patient_id" class="org.openmrs.Patient" not-null="true"/>
         <many-to-one name="concept" column="concept_id" class="org.openmrs.Concept" not-null="true"/>

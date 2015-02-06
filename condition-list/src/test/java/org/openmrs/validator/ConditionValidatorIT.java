@@ -11,7 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.conditionlist.validator;
+package org.openmrs.validator;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,8 +22,8 @@ import org.openmrs.User;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
-import org.openmrs.module.emrapi.conditionlist.domain.Condition;
-import org.openmrs.module.emrapi.conditionlist.service.ConditionService;
+import org.openmrs.Condition;
+import org.openmrs.service.ConditionService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;

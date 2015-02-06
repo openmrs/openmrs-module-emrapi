@@ -12,16 +12,16 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.module.emrapi.conditionlist.validator;
+package org.openmrs.validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.module.emrapi.conditionlist.domain.Condition;
-import org.openmrs.module.emrapi.conditionlist.service.ConditionService;
-import org.openmrs.module.emrapi.conditionlist.util.ConditionListConstants;
+import org.openmrs.Condition;
+import org.openmrs.service.ConditionService;
+import org.openmrs.util.ConditionListConstants;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;

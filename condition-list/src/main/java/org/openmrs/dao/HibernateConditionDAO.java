@@ -11,14 +11,14 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.conditionlist.dao;
+package org.openmrs.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Patient;
-import org.openmrs.module.emrapi.conditionlist.domain.Condition;
+import org.openmrs.Condition;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

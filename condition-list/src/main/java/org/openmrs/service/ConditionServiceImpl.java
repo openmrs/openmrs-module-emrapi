@@ -11,16 +11,16 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.conditionlist.service;
+package org.openmrs.service;
 
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.emrapi.conditionlist.dao.ConditionDAO;
-import org.openmrs.module.emrapi.conditionlist.domain.Condition;
-import org.openmrs.module.emrapi.conditionlist.util.ConditionListConstants;
+import org.openmrs.dao.ConditionDAO;
+import org.openmrs.Condition;
+import org.openmrs.util.ConditionListConstants;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 

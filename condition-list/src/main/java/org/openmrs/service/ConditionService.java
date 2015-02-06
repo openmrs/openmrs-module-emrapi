@@ -11,15 +11,31 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.conditionlist.dao;
+package org.openmrs.service;
 
+import org.openmrs.Concept;
 import org.openmrs.Patient;
-import org.openmrs.module.emrapi.conditionlist.domain.Condition;
+import org.openmrs.annotation.Authorized;
+import org.openmrs.api.OpenmrsService;
+import org.openmrs.Condition;
+import org.openmrs.util.PrivilegeConstants;
 
+import java.util.Date;
 import java.util.List;
 
-public interface ConditionDAO {
-    Condition saveOrUpdate(Condition condition);
+public interface ConditionService extends OpenmrsService {
+    @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
+    Condition save(Condition condition);
+
+    @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
+    Condition voidCondition(Condition condition, String voidReason);
+
+    @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
+    Condition endCondition(Condition condition, Date endDate, Concept endReason);
+
     Condition getConditionByUuid(String uuid);
+
     List<Condition> getConditionsByPatient(Patient patient);
+
+    List<Concept> getEndReasonConcepts();
 }
