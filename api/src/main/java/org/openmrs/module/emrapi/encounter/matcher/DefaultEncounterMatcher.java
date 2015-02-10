@@ -33,7 +33,7 @@ public class DefaultEncounterMatcher implements BaseEncounterMatcher {
 
         if(visit.getEncounters()!=null){
             for (Encounter encounter : visit.getEncounters()) {
-                if (encounterType.equals(encounter.getEncounterType())) {
+                if (!encounter.isVoided() && encounterType.equals(encounter.getEncounterType())) {
                     return encounter;
                 }
             }

@@ -16,6 +16,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
@@ -94,7 +95,7 @@ public class EmrEncounterServiceTest {
     public void shouldSaveEncounter() throws Exception {
         EncounterTransaction encounterTransaction = emrEncounterService.save(constructEncounterTransaction());
         assertNotNull(encounterTransaction);
-        assertEquals("visit-uuid",encounterTransaction.getVisitUuid());
+        assertEquals("visit-uuid", encounterTransaction.getVisitUuid());
         assertNotNull(encounterTransaction.getEncounterUuid());
     }
 
@@ -120,5 +121,27 @@ public class EmrEncounterServiceTest {
         verify(encounterTransactionMapper).map(encounter, false);
 
         assertNotNull(encounterTransaction);
+    }
+
+    @Test
+    public void shouldSaveNewEncounterWhenEarlierEncounterForSameTypeIsVoided() throws Exception {
+        EncounterType encounterType = new EncounterType(1);
+        encounterType.setUuid("encType-invsgtn-uuid");
+
+        Encounter voidedEncounter = new Encounter(1);
+        voidedEncounter.setEncounterType(encounterType);
+        voidedEncounter.setVoided(true);
+        voidedEncounter.setUuid("someRandomUUID");
+
+        Visit visit = new Visit(1);
+        visit.setUuid("visit-uuid");
+        visit.addEncounter(voidedEncounter);
+        when(visitService.getVisitByUuid("visit-uuid")).thenReturn(visit);
+
+
+        EncounterTransaction encounterTransaction = emrEncounterService.save(constructEncounterTransaction());
+        assertNotNull(encounterTransaction);
+        assertEquals("visit-uuid",encounterTransaction.getVisitUuid());
+        assertNotEquals("someRandomUUID", encounterTransaction.getEncounterUuid());
     }
 }
