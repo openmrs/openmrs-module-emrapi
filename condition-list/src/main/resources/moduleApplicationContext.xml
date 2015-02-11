@@ -8,13 +8,13 @@
 		 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 
-    <bean id="conditionDAO" class="org.openmrs.dao.HibernateConditionDAO">
+    <bean id="conditionDAO" class="org.openmrs.api.db.hibernate.HibernateConditionDAO">
         <property name="sessionFactory">
             <ref bean="sessionFactory"/>
         </property>
     </bean>
 
-    <bean id="conditionServiceTarget" class="org.openmrs.service.ConditionServiceImpl">
+    <bean id="conditionServiceTarget" class="org.openmrs.api.impl.ConditionServiceImpl">
         <constructor-arg index="0" ref="conditionDAO"/>
         <constructor-arg index="1" ref="conceptService"/>
         <constructor-arg index="2" ref="adminService"/>
@@ -35,7 +35,7 @@
         </property>
     </bean>
 
-    <bean id="conditionValidator" class="org.openmrs.validator.ConditionValidator">
+    <bean id="conditionValidator" class="org.openmrs.api.validator.ConditionValidator">
         <constructor-arg name="conditionService" ref="conditionService"/>
         <constructor-arg name="administrationService" ref="adminService"/>
     </bean>

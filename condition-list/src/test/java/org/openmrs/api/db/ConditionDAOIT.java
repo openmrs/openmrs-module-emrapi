@@ -12,7 +12,7 @@
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
-package org.openmrs.dao;
+package org.openmrs.api.db;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
-import org.openmrs.Condition;
+import org.openmrs.api.Condition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,7 +28,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class HibernateConditionDAOIT extends BaseModuleContextSensitiveTest {
+public class ConditionDAOIT extends BaseModuleContextSensitiveTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

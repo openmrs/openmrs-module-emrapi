@@ -11,7 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.util;
+package org.openmrs.api.util;
 
 import org.openmrs.annotation.AddOnStartup;
 

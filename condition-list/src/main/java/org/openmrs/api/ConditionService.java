@@ -11,14 +11,13 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.service;
+package org.openmrs.api;
 
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.annotation.Authorized;
-import org.openmrs.api.OpenmrsService;
-import org.openmrs.Condition;
-import org.openmrs.util.PrivilegeConstants;
+import org.openmrs.api.Condition;
+import org.openmrs.api.util.PrivilegeConstants;
 
 import java.util.Date;
 import java.util.List;

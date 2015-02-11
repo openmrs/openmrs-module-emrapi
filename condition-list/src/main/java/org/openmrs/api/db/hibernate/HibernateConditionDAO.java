@@ -11,14 +11,15 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.dao;
+package org.openmrs.api.db.hibernate;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Patient;
-import org.openmrs.Condition;
+import org.openmrs.api.Condition;
+import org.openmrs.api.db.ConditionDAO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

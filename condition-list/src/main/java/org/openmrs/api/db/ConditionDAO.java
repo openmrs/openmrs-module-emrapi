@@ -11,10 +11,10 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.dao;
+package org.openmrs.api.db;
 
 import org.openmrs.Patient;
-import org.openmrs.Condition;
+import org.openmrs.api.Condition;
 
 import java.util.List;
 

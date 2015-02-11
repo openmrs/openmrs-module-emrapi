@@ -11,11 +11,14 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs;
+package org.openmrs.api;
 
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.BaseOpenmrsData;
+import org.openmrs.Concept;
+import org.openmrs.Patient;
 import org.simpleframework.xml.Attribute;
 
 import java.util.Date;
