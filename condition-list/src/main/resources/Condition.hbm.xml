@@ -30,7 +30,7 @@
         <property name="dateVoided" type="java.util.Date" column="date_voided"/>
         <property name="voidReason" type="java.lang.String" column="void_reason" length="255"/>
 
-        <many-to-one name="previousCondition" class="org.openmrs.api.Condition"
+        <many-to-one name="previousCondition" class="org.openmrs.Condition"
                      column="previous_condition_id"/>
         <many-to-one name="patient" column="patient_id" class="org.openmrs.Patient" not-null="true"/>
         <many-to-one name="concept" column="concept_id" class="org.openmrs.Concept" not-null="true"/>
