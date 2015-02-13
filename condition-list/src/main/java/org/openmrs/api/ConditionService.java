@@ -14,9 +14,9 @@
 package org.openmrs.api;
 
 import org.openmrs.Concept;
+import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.annotation.Authorized;
-import org.openmrs.api.Condition;
 import org.openmrs.api.util.PrivilegeConstants;
 
 import java.util.Date;

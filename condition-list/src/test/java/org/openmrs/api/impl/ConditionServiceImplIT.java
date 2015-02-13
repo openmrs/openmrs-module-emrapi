@@ -19,12 +19,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openmrs.Concept;
+import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ConditionService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
-import org.openmrs.api.Condition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 

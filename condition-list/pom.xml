@@ -10,9 +10,9 @@
         <version>1.5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>condition-list</artifactId>
+    <artifactId>emrapi-condition-list</artifactId>
     <packaging>jar</packaging>
-    <name>EMR API Conditions List</name>
+    <name>EMR API Condition List</name>
 
     <properties>
         <openMRSVersion>1.9.8</openMRSVersion>

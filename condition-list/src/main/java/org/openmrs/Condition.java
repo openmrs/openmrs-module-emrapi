@@ -11,7 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.api;
+package org.openmrs;
 
 
 import org.apache.commons.logging.Log;

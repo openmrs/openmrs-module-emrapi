@@ -13,8 +13,8 @@
  */
 package org.openmrs.api.db;
 
+import org.openmrs.Condition;
 import org.openmrs.Patient;
-import org.openmrs.api.Condition;
 
 import java.util.List;
 

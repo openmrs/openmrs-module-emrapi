@@ -15,7 +15,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>condition-list</artifactId>
+			<artifactId>${project.parent.artifactId}-condition-list</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
         <dependency>

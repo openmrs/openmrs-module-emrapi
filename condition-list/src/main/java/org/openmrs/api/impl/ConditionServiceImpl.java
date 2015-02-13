@@ -14,10 +14,10 @@
 package org.openmrs.api.impl;
 
 import org.openmrs.Concept;
+import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.Condition;
 import org.openmrs.api.ConditionService;
 import org.openmrs.api.db.ConditionDAO;
 import org.openmrs.api.util.ConditionListConstants;
