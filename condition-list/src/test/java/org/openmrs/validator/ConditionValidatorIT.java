@@ -116,6 +116,14 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
         conditionValidator.validate(condition, errors);
         Assert.assertFalse(errors.hasErrors());
     }
+    @Test
+    public void shouldMandateEndReasonToEndCondition() {
+        Condition condition = conditionService.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
+        condition.setEndDate(new Date());
+        Errors errors = new BindException(condition, "condition");
+        conditionValidator.validate(condition, errors);
+        Assert.assertEquals("Condition.error.endReasonIsMandatory", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
+    }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {
         Condition condition = new Condition();
@@ -129,6 +137,7 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
         condition.setCreator(user);
         condition.setStatus(status);
         condition.setDateCreated(new Date());
+        condition.setVoided(false);
         condition.setConditionNonCoded(conditionNonCoded);
         condition.setUuid(uuid);
 

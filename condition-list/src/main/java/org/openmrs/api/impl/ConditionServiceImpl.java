@@ -31,24 +31,26 @@ import java.util.List;
 
 public class ConditionServiceImpl extends BaseOpenmrsService implements ConditionService {
 
-    private ConditionDAO conditionDao;
+    private ConditionDAO conditionDAO;
     private ConceptService conceptService;
     private AdministrationService administrationService;
 
-    public ConditionServiceImpl(ConditionDAO conditionDao, ConceptService conceptService, AdministrationService administrationService) {
-        this.conditionDao = conditionDao;
+    public ConditionServiceImpl(ConditionDAO conditionDAO, ConceptService conceptService, AdministrationService administrationService) {
+        this.conditionDAO = conditionDAO;
         this.conceptService = conceptService;
         this.administrationService = administrationService;
     }
 
     @Override
     public Condition save(Condition condition) {
-        return conditionDao.saveOrUpdate(condition);
+        if (condition.getEndReason() != null && condition.getEndDate() == null) {
+            condition.setEndDate(new Date());
+        }
+        return conditionDAO.saveOrUpdate(condition);
     }
 
-    @Override
-    public List<Condition> getConditionsByPatient(Patient patient) {
-        return conditionDao.getConditionsByPatient(patient);
+    public List<Condition> getConditionHistory(Patient patient) {
+        return conditionDAO.getConditionHistory(patient);
     }
 
     @Override
@@ -56,22 +58,17 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
         if (!StringUtils.hasLength(voidReason)) {
             throw new IllegalArgumentException("voidReason cannot be empty or null");
         }
-        return conditionDao.saveOrUpdate(condition);
+        return conditionDAO.saveOrUpdate(condition);
     }
 
     @Override
     public Condition getConditionByUuid(String uuid) {
-        return conditionDao.getConditionByUuid(uuid);
+        return conditionDAO.getConditionByUuid(uuid);
     }
 
     @Override
-    public Condition endCondition(Condition condition, Date endDate, Concept endReason) {
-        if (endDate == null) {
-            endDate = new Date();
-        }
-        condition.setEndDate(endDate);
-        condition.setEndReason(endReason);
-        return conditionDao.saveOrUpdate(condition);
+    public List<Condition> getActiveConditions(Patient patient) {
+        return conditionDAO.getActiveConditions(patient);
     }
 
     @Override

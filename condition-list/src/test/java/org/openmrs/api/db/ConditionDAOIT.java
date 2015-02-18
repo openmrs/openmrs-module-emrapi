@@ -46,15 +46,34 @@ public class ConditionDAOIT extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldGetConditionByUuid() {
         Condition condition = conditionDao.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
-        assertEquals(condition.getStatus(), Condition.Status.CONFIRMED);
-        assertEquals(condition.getConcept().getName().getName(), "Tuberculosis");
-        assertEquals(condition.getDateCreated().toString(), "2015-01-12 00:00:00.0");
+        assertEquals(Condition.Status.CONFIRMED, condition.getStatus());
+        assertEquals("Tuberculosis", condition.getConcept().getName().getName());
+        assertEquals("2015-01-12 00:00:00.0", condition.getDateCreated().toString());
     }
 
     @Test
-    public void shouldGetConditionsForPatient() {
-        Patient patient = patientService.getPatient(1);
-        List<Condition> conditionsForPatient = conditionDao.getConditionsByPatient(patient);
-        assertEquals(conditionsForPatient.size(), 4);
+    public void shouldGetConditionHistoryReturnOnlyNonVoidedConditionsForPatient() {
+        Patient patient = patientService.getPatient(3);
+        List<Condition> conditionsForPatient = conditionDao.getConditionHistory(patient);
+        assertEquals(5, conditionsForPatient.size());
     }
+
+    @Test
+    public void shouldGetConditionsInOrderedByDateAndConceptNameAndGroupedByConcepts() {
+        Patient patient = patientService.getPatient(3);
+        List<Condition> conditionsForPatient = conditionDao.getConditionHistory(patient);
+        assertEquals("c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7", conditionsForPatient.get(0).getUuid());
+        assertEquals("s84i840s-2h46-11e4-584s-g6cke4d22fb7", conditionsForPatient.get(1).getUuid());
+        assertEquals("j84i840j-2h46-11e4-5844-a6c5e4d22fb7", conditionsForPatient.get(2).getUuid());
+        assertEquals("p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7", conditionsForPatient.get(3).getUuid());
+        assertEquals("p84i8o0r-2n46-mse4-58f4-a6i5e4du2fb7", conditionsForPatient.get(4).getUuid());
+    }
+
+    @Test
+    public void shouldGetActiveConditionsForPatient() {
+        Patient patient = patientService.getPatient(3);
+        List<Condition> activeConditions = conditionDao.getActiveConditions(patient);
+        assertEquals(4, activeConditions.size());
+    }
+
 }
