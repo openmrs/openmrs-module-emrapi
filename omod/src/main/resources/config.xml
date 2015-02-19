@@ -6,7 +6,7 @@
     <id>${project.parent.artifactId}</id>
     <name>${project.parent.name}</name>
     <version>${project.parent.version}</version>
-    <package>org.openmrs</package>
+    <package>${project.parent.groupId}.${project.parent.artifactId}</package>
     <author>OpenMRS</author>
     <description>
         ${project.parent.description}
