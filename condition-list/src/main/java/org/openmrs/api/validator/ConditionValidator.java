@@ -60,7 +60,6 @@ public class ConditionValidator implements Validator {
         if (condition == null) {
             errors.reject("error.general");
         } else {
-            // for the following elements Condition.hbm.xml says: not-null="true"
             ValidationUtils.rejectIfEmpty(errors, "patient", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "status", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "creator", "error.null");
@@ -72,20 +71,10 @@ public class ConditionValidator implements Validator {
             validateNonCodedCondition(condition, errors);
             validateConcept(condition, errors);
             validateDuplicateConditions(condition, errors);
-//            validateEndReasonConceptAmongAllowedConcepts(condition, errors);
             validateEndReasonConcept(condition, errors);
         }
 
     }
-
-//    private void validateEndReasonConceptAmongAllowedConcepts(Condition condition, Errors errors) {
-//        if (condition.getEndReason() != null) {
-//            List<Concept> endReasonConcepts = conditionService.getEndReasonConcepts();
-//            if (!endReasonConcepts.contains(condition.getEndReason())) {
-//                errors.rejectValue("endReason", "Condition.error.notAmongAllowedConcepts");
-//            }
-//        }
-//    }
 
     private void validateEndReasonConcept(Condition condition, Errors errors) {
         if (condition.getEndReason() == null) {
