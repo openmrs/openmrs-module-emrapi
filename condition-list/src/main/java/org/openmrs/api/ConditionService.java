@@ -29,12 +29,12 @@ public interface ConditionService extends OpenmrsService {
     @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
     Condition voidCondition(Condition condition, String voidReason);
 
-    @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
-    Condition endCondition(Condition condition, Date endDate, Concept endReason);
-
     Condition getConditionByUuid(String uuid);
 
-    List<Condition> getConditionsByPatient(Patient patient);
+    List<Condition> getConditionHistory(Patient patient);
+
+    @Authorized({PrivilegeConstants.GET_CONDITIONS})
+    List<Condition> getActiveConditions(Patient patient);
 
     List<Concept> getEndReasonConcepts();
 }

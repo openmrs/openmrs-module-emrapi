@@ -21,6 +21,11 @@
                         identifier="GAN200584" identifier_type="3" creator="1"
                         uuid="58474fd1-128d-4584-842f-81d3535da584" preferred="1" voided="0"/>
 
+    <patient patient_id="3" creator="1" date_created="2015-01-01 00:00:00" voided="false"/>
+    <patient_identifier date_created="2005-09-22 00:00:00" patient_identifier_id="2" patient_id="2"
+                        identifier="GAN200584" identifier_type="3" creator="1"
+                        uuid="p8a7tfi1-128d-4584-842f-p1a35t5ia584" preferred="1" voided="0"/>
+
     <concept concept_id="408" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
              date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
              uuid="d102c80f-1yz9-4da3-bb88-8122ce8868df"/>
@@ -85,26 +90,48 @@
                   voided="false" uuid="fd9ac84f-1yz9-4da3-bb88-8122ce8868df"/>
 
     <conditions condition_id="1" patient_id="1" status="CONFIRMED" concept_id="409" creator="1"
-                date_created="2015-01-12 00:00:00" uuid="2cc6880e-2c46-11e4-9038-a6c5e4d22fb7"/>
+                date_created="2015-01-12 00:00:00" voided="false" uuid="2cc6880e-2c46-11e4-9038-a6c5e4d22fb7"/>
 
     <conditions condition_id="2" patient_id="1" status="PRESUMED" concept_id="408" creator="1"
                 date_created="2015-01-12 00:00:00" uuid="2cc5840e-2c84-11e4-9038-a6c5e4d22fb7"
-                previous_condition_id="1"/>
+                voided="false"/>
 
     <conditions condition_id="3" patient_id="1" status="CONFIRMED" concept_id="410" creator="1"
-                date_created="2015-01-12 00:00:00" uuid="2ss6880e-2c46-11e4-9038-a6c5e4d22fb7"/>
+                date_created="2015-01-12 00:00:00" voided="false" uuid="2ss6880e-2c46-11e4-9038-a6c5e4d22fb7"/>
 
     <conditions condition_id="4" patient_id="1" status="CONFIRMED" concept_id="411" creator="1"
                 date_created="2015-01-12 00:00:00" uuid="2ss6880e-2c46-11e4-5844-a6c5e4d22fb7"
                 voided="false" condition_non_coded="NON-CODED-CONDITION"/>
 
     <conditions condition_id="5" patient_id="2" status="CONFIRMED" concept_id="410" creator="1"
-                date_created="2015-01-12 00:00:00" uuid="9ff6880e-2c46-11e4-5844-a6c5e4d22fb7"
+                date_created="2015-01-12 00:00:00" voided="false" uuid="9ff6880e-2c46-11e4-5844-a6c5e4d22fb7"
                 condition_non_coded="pain"/>
 
     <conditions condition_id="6" patient_id="2" status="CONFIRMED" concept_id="410" creator="1"
-                date_created="2015-01-12 00:00:00" uuid="9845840e-2c46-11e4-5844-a6c5e4d22fb7"
+                date_created="2015-01-12 00:00:00" uuid="9845840e-2c46-11e4-5844-a6c5e4d22fb7" voided="false"
                 condition_non_coded="fracture"/>
+
+    <conditions condition_id="7" patient_id="3" status="HISTORY_OF" concept_id="410" creator="1"
+                date_created="2015-01-12 00:00:00" uuid="h84i840e-2h46-11e4-5844-a6c5e4d22fb7"
+                condition_non_coded="pregnancy" voided="true" date_voided="2015-01-13 00:00:00"
+                void_reason="voiding"/>
+
+    <conditions condition_id="8" patient_id="3" status="CONFIRMED" concept_id="408" creator="1"
+                date_created="2015-01-12 00:00:00" uuid="c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7"
+                voided="false"/>
+
+    <conditions condition_id="9" patient_id="3" status="PRESUMED" concept_id="409" creator="1"
+                date_created="2015-01-13 00:00:00" voided="false" uuid="p84i8o0r-2n46-mse4-58f4-a6i5e4du2fb7"
+                end_date="2015-01-12 00:00:00" end_reason="413"/>
+
+    <conditions condition_id="10" patient_id="3" status="PRESUMED" concept_id="410" creator="1"
+                date_created="2015-01-12 01:00:00" uuid="p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7"
+                condition_non_coded="pain" voided="false"/>
+
+    <conditions condition_id="11" patient_id="3" status="PRESUMED" concept_id="411" creator="1"
+                date_created="2015-01-12 00:00:00" uuid="z8qi8o0w-2e46-11g4-5df4-a6p5e4dh2fb7"
+                voided="true" date_voided="2015-01-13 00:00:00" void_reason="unknown" end_date="2015-01-12 00:00:00"
+                end_reason="413"/>
 
 
     <global_property property="conditionList.nonCodedUuid" property_value="s102c80f-1yz9-4da3-bb88-8122ce8868ss"

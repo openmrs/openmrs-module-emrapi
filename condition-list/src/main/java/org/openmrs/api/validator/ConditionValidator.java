@@ -60,23 +60,28 @@ public class ConditionValidator implements Validator {
         if (condition == null) {
             errors.reject("error.general");
         } else {
-            // for the following elements Condition.hbm.xml says: not-null="true"
             ValidationUtils.rejectIfEmpty(errors, "patient", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "status", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "creator", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "concept", "error.null");
+            ValidationUtils.rejectIfEmpty(errors, "voided", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "dateCreated", "error.null");
             ValidationUtils.rejectIfEmpty(errors, "uuid", "error.null");
 
             validateNonCodedCondition(condition, errors);
             validateConcept(condition, errors);
             validateDuplicateConditions(condition, errors);
-            validateEndReasonConceptAmongAllowedConcepts(condition, errors);
+            validateEndReasonConcept(condition, errors);
         }
+
     }
 
-    private void validateEndReasonConceptAmongAllowedConcepts(Condition condition, Errors errors) {
-        if (condition.getEndReason() != null) {
+    private void validateEndReasonConcept(Condition condition, Errors errors) {
+        if (condition.getEndReason() == null) {
+            if (condition.getEndDate() != null) {
+                errors.rejectValue("endReason", "Condition.error.endReasonIsMandatory");
+            }
+        } else {
             List<Concept> endReasonConcepts = conditionService.getEndReasonConcepts();
             if (!endReasonConcepts.contains(condition.getEndReason())) {
                 errors.rejectValue("endReason", "Condition.error.notAmongAllowedConcepts");
@@ -84,8 +89,9 @@ public class ConditionValidator implements Validator {
         }
     }
 
+
     private void validateDuplicateConditions(Condition condition, Errors errors) {
-        List<Condition> conditionsForPatient = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> conditionsForPatient = conditionService.getActiveConditions(condition.getPatient());
         if (condition.getConditionNonCoded() != null) {
             for (Condition eachCondition : conditionsForPatient) {
                 if (eachCondition.getConcept().equals(condition.getConcept())

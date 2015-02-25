@@ -14,6 +14,7 @@
 
 package org.openmrs.api.impl;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,8 +26,12 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.ConditionService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
+import org.openmrs.api.validator.ConditionValidator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindException;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 
 import java.util.Date;
 import java.util.List;
@@ -48,6 +53,9 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     @Autowired
     UserService userService;
 
+    @Autowired
+    ConditionValidator conditionValidator;
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -55,12 +63,11 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     public void setUp() throws Exception {
         executeDataSet("conditionListDataSet.xml");
     }
-
     @Test
     public void shouldCreateNewCondition() {
         Condition condition = createCondition(Condition.Status.PRESUMED, "Tuberculosis", 2, "3584c584-c291-46c8-8584-96dc33d19584", null);
         conditionService.save(condition);
-        List<Condition> allConditions = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> allConditions = conditionService.getConditionHistory(condition.getPatient());
         assertEquals(allConditions.size(), 3);
         assertTrue(condition.getId() > 0);
         assertEquals("3584c584-c291-46c8-8584-96dc33d19584", condition.getUuid());
@@ -72,7 +79,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     public void shouldNotCreateDuplicateCondition() {
         Condition condition = conditionService.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
         conditionService.save(condition);
-        List<Condition> conditionsList = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> conditionsList = conditionService.getConditionHistory(condition.getPatient());
         assertEquals(conditionsList.size(), 4);
     }
 
@@ -85,12 +92,12 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
         assertEquals("Angina", savedCondition.getConcept().getDisplayString());
         assertEquals(Condition.Status.HISTORY_OF, savedCondition.getStatus());
 
-        List<Condition> conditionsList = conditionService.getConditionsByPatient(condition.getPatient());
+        List<Condition> conditionsList = conditionService.getConditionHistory(condition.getPatient());
         assertEquals(conditionsList.size(), 4);
     }
 
     @Test
-    public void shouldVoidConditionSetVoidedAndVoidedReason() {
+    public void shouldVoidConditionSetVoidedAndVoidReason() {
         Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
         Condition voidedCondition = conditionService.voidCondition(condition, "voiding");
         assertTrue(voidedCondition.getVoided());
@@ -106,13 +113,13 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void shouldEndConditionSetEndDateAndEndReason() {
+    public void shouldEndConditionSetEndDateAsTodayIfNotSpecified() {
         Condition condition = conditionService.getConditionByUuid("2ss6880e-2c46-11e4-5844-a6c5e4d22fb7");
         Date endDate = new Date();
-        Concept endReason = conceptService.getConceptByUuid("cured84f-1yz9-4da3-bb88-8122ce8868df");
-        Condition savedCondition = conditionService.endCondition(condition, endDate, endReason);
-        assertEquals(savedCondition.getEndDate(), endDate);
-        assertEquals(savedCondition.getEndReason(), endReason);
+        Concept endReason = conceptService.getConceptByUuid("cured84f-1yz9-4da3-bb88-8122ce8868ss");
+        condition.setEndReason(endReason);
+        Condition savedCondition = conditionService.save(condition);
+        assertEquals(savedCondition.getEndDate().getDate(), endDate.getDate());
     }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {
