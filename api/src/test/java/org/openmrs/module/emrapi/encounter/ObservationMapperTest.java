@@ -98,6 +98,26 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
         assertEquals(obs.getConcept().getConceptClass().getName(), observation.getConcept().getConceptClass());
     }
 
+    @Test
+    public void shouldMapDateTime() {
+        when(conceptDatatype.isDateTime()).thenReturn(true);
+        Obs obs = obsBuilder.setValue("2015-02-01 03:45:09").get();
+
+        EncounterTransaction.Observation observation = observationMapper.map(obs);
+
+        assertEquals(observation.getValue(), obs.getValueDatetime());
+    }
+
+    @Test
+    public void shouldMapDate() {
+        when(conceptDatatype.isDate()).thenReturn(true);
+        Obs obs = obsBuilder.setValue("2015-02-01").get();
+
+        EncounterTransaction.Observation observation = observationMapper.map(obs);
+
+        assertEquals(observation.getValue(), obs.getValueDate());
+    }
+
     private ConceptClass getConceptClass(String conceptClassName) {
         ConceptClass conceptClass = new ConceptClass();
         conceptClass.setName(conceptClassName);

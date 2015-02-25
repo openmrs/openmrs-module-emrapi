@@ -52,10 +52,15 @@ public class ObservationMapper {
         // TODO: Remove this once openmrs date format issue is fixed
         // https://tickets.openmrs.org/browse/TRUNK-4280
         if (concept.getDatatype().isDate()) return getDateString(obs);
+        if (concept.getDatatype().isDateTime()) return getDatetimeString(obs);
         else return obs.getValueAsString(Context.getLocale());
     }
 
     private String getDateString(Obs obs) {
         return obs.getValueDate() != null ? new SimpleDateFormat("yyyy-MM-dd").format(obs.getValueDate()) : null;
+    }
+
+    private String getDatetimeString(Obs obs) {
+        return obs.getValueDatetime() != null ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(obs.getValueDatetime()) : null;
     }
 }
