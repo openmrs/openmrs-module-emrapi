@@ -89,7 +89,7 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
 
     @Test
     public void shouldNotAllowUpdatingConceptInCondition() {
-        Condition condition = createCondition(Condition.Status.CONFIRMED, "Tuberculosis", 1, "2cc6880e-2c46-11e4-9038-a6c5e4d22fb7", null);
+        Condition condition = createCondition(Condition.Status.CONFIRMED, "Angina", 1, "2cc6880e-2c46-11e4-9038-a6c5e4d22fb7", null);
         Errors errors = new BindException(condition, "condition");
         conditionValidator.validate(condition, errors);
         Assert.assertTrue(errors.hasErrors());
@@ -123,6 +123,15 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
         Errors errors = new BindException(condition, "condition");
         conditionValidator.validate(condition, errors);
         Assert.assertEquals("Condition.error.endReasonIsMandatory", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
+    }
+
+    @Test
+    public void shouldNotAllowUpdatingPatientInCondition() {
+        Condition condition = createCondition(Condition.Status.CONFIRMED, "Tuberculosis", 2, "2cc6880e-2c46-11e4-9038-a6c5e4d22fb7", null);
+        Errors errors = new BindException(condition, "condition");
+        conditionValidator.validate(condition, errors);
+        Assert.assertTrue(errors.hasErrors());
+        Assert.assertEquals("Condition.error.patientCannotBeUpdated", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
     }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {

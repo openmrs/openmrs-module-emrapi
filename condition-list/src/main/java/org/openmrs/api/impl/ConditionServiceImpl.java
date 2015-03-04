@@ -13,8 +13,10 @@
  */
 package org.openmrs.api.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.Concept;
 import org.openmrs.Condition;
+import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
@@ -24,6 +26,7 @@ import org.openmrs.api.util.ConditionListConstants;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -49,8 +52,46 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
         return conditionDAO.saveOrUpdate(condition);
     }
 
-    public List<Condition> getConditionHistory(Patient patient) {
-        return conditionDAO.getConditionHistory(patient);
+    public List<ConditionHistory> getConditionHistory(Patient patient) {
+        List<Condition> conditionList = conditionDAO.getConditionHistory(patient);
+        List<ConditionHistory> conditionHistoryList = new ArrayList<ConditionHistory>();
+
+        List<Condition> groupedConditions = new ArrayList<Condition>();
+
+        if (CollectionUtils.isEmpty(conditionList)) return new ArrayList<ConditionHistory>();
+
+        ConditionHistory conditionhistory = createConditionHistory(conditionList.get(0));
+        groupedConditions.add(conditionList.get(0));
+        for (int i = 1; i < conditionList.size(); i++) {
+            Condition condition = conditionList.get(i);
+            if (condition.getConcept().equals(conditionhistory.getCondition())) {
+                groupedConditions.add(condition);
+            } else {
+                conditionhistory.setConditions(groupedConditions);
+                conditionHistoryList.add(conditionhistory);
+                conditionhistory = createConditionHistory(condition);
+                groupedConditions = new ArrayList<Condition>();
+                groupedConditions.add(condition);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(groupedConditions)) {
+            updateConditionHistoryList(conditionHistoryList, groupedConditions, conditionhistory);
+        }
+        return conditionHistoryList;
+    }
+
+    private void updateConditionHistoryList(List<ConditionHistory> conditionHistoryList, List<Condition> groupedConditions, ConditionHistory conditionhistory) {
+        conditionhistory.setConditions(groupedConditions);
+        conditionHistoryList.add(conditionhistory);
+    }
+
+    private ConditionHistory createConditionHistory(Condition condition) {
+        ConditionHistory conditionHistory = new ConditionHistory();
+        conditionHistory.setCondition(condition.getConcept());
+        if (condition.getConcept().getUuid().equals(administrationService.getGlobalProperty(ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID))) {
+            conditionHistory.setNonCodedCondition(condition.getConditionNonCoded());
+        }
+        return conditionHistory;
     }
 
     @Override

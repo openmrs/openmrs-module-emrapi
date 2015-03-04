@@ -19,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openmrs.Condition;
+import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -52,28 +53,31 @@ public class ConditionDAOIT extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetConditionHistoryReturnOnlyNonVoidedConditionsForPatient() {
+    public void shouldGetConditionsReturnNonVoidedConditionsGroupedByConceptInReverseChronologicalOrder() {
         Patient patient = patientService.getPatient(3);
-        List<Condition> conditionsForPatient = conditionDao.getConditionHistory(patient);
-        assertEquals(5, conditionsForPatient.size());
-    }
-
-    @Test
-    public void shouldGetConditionsInOrderedByDateAndConceptNameAndGroupedByConcepts() {
-        Patient patient = patientService.getPatient(3);
-        List<Condition> conditionsForPatient = conditionDao.getConditionHistory(patient);
-        assertEquals("c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7", conditionsForPatient.get(0).getUuid());
-        assertEquals("s84i840s-2h46-11e4-584s-g6cke4d22fb7", conditionsForPatient.get(1).getUuid());
-        assertEquals("j84i840j-2h46-11e4-5844-a6c5e4d22fb7", conditionsForPatient.get(2).getUuid());
-        assertEquals("p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7", conditionsForPatient.get(3).getUuid());
-        assertEquals("p84i8o0r-2n46-mse4-58f4-a6i5e4du2fb7", conditionsForPatient.get(4).getUuid());
+        List<Condition> conditionHistoryForPatient = conditionDao.getConditionHistory(patient);
+        assertEquals(4, conditionHistoryForPatient.size());
+        assertEquals("wq4i8o0e-2n46-1zx4-58f4-a6i5trd22fb7", conditionHistoryForPatient.get(0).getUuid());
+        assertEquals("p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7", conditionHistoryForPatient.get(1).getUuid());
+        assertEquals("c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7", conditionHistoryForPatient.get(2).getUuid());
+        assertEquals("p84i8o0r-2n46-mse4-58f4-a6i5e4du2fb7", conditionHistoryForPatient.get(3).getUuid());
     }
 
     @Test
     public void shouldGetActiveConditionsForPatient() {
         Patient patient = patientService.getPatient(3);
         List<Condition> activeConditions = conditionDao.getActiveConditions(patient);
-        assertEquals(4, activeConditions.size());
+        assertEquals(3, activeConditions.size());
+    }
+
+    @Test
+    public void shouldGetActiveConditionsInReverseChronologicalOrderPatient() {
+        Patient patient = patientService.getPatient(3);
+        List<Condition> activeConditions = conditionDao.getActiveConditions(patient);
+        assertEquals(3, activeConditions.size());
+        assertEquals("wq4i8o0e-2n46-1zx4-58f4-a6i5trd22fb7", activeConditions.get(0).getUuid());
+        assertEquals("p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7", activeConditions.get(1).getUuid());
+        assertEquals("c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7", activeConditions.get(2).getUuid());
     }
 
 }

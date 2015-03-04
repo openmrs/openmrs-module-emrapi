@@ -21,11 +21,13 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openmrs.Concept;
 import org.openmrs.Condition;
+import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ConditionService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
+import org.openmrs.api.db.ConditionDAO;
 import org.openmrs.api.validator.ConditionValidator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,9 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     @Autowired
     ConditionValidator conditionValidator;
 
+    @Autowired
+    ConditionDAO conditionDAO;
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -67,8 +72,8 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     public void shouldCreateNewCondition() {
         Condition condition = createCondition(Condition.Status.PRESUMED, "Tuberculosis", 2, "3584c584-c291-46c8-8584-96dc33d19584", null);
         conditionService.save(condition);
-        List<Condition> allConditions = conditionService.getConditionHistory(condition.getPatient());
-        assertEquals(allConditions.size(), 3);
+        List<Condition> conditionsList = conditionDAO.getConditionHistory(condition.getPatient());
+        assertEquals(conditionsList.size(), 3);
         assertTrue(condition.getId() > 0);
         assertEquals("3584c584-c291-46c8-8584-96dc33d19584", condition.getUuid());
         assertEquals(Condition.Status.PRESUMED, condition.getStatus());
@@ -79,7 +84,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     public void shouldNotCreateDuplicateCondition() {
         Condition condition = conditionService.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
         conditionService.save(condition);
-        List<Condition> conditionsList = conditionService.getConditionHistory(condition.getPatient());
+        List<Condition> conditionsList = conditionDAO.getConditionHistory(condition.getPatient());
         assertEquals(conditionsList.size(), 4);
     }
 
@@ -92,7 +97,7 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
         assertEquals("Angina", savedCondition.getConcept().getDisplayString());
         assertEquals(Condition.Status.HISTORY_OF, savedCondition.getStatus());
 
-        List<Condition> conditionsList = conditionService.getConditionHistory(condition.getPatient());
+        List<Condition> conditionsList = conditionDAO.getConditionHistory(condition.getPatient());
         assertEquals(conditionsList.size(), 4);
     }
 
@@ -120,6 +125,20 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
         condition.setEndReason(endReason);
         Condition savedCondition = conditionService.save(condition);
         assertEquals(savedCondition.getEndDate().getDate(), endDate.getDate());
+    }
+
+    @Test
+    public void shouldGetConditionHistoryReturnListOfConditionHistoryGroupedByConceptForPatient() {
+        Patient patient = patientService.getPatient(3);
+        List<ConditionHistory> conditionHistoryForPatient = conditionService.getConditionHistory(patient);
+        assertEquals(3, conditionHistoryForPatient.size());
+
+        assertEquals(2, conditionHistoryForPatient.get(0).getConditions().size());
+        assertEquals(1, conditionHistoryForPatient.get(1).getConditions().size());
+
+        assertEquals("410", conditionHistoryForPatient.get(0).getConditions().get(0).getConcept().getId().toString());
+        assertEquals("410", conditionHistoryForPatient.get(0).getConditions().get(1).getConcept().getId().toString());
+
     }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {

@@ -72,6 +72,7 @@ public class ConditionValidator implements Validator {
             validateConcept(condition, errors);
             validateDuplicateConditions(condition, errors);
             validateEndReasonConcept(condition, errors);
+            validatePatient(condition, errors);
         }
 
     }
@@ -119,6 +120,13 @@ public class ConditionValidator implements Validator {
             if (condition.getConcept().getUuid().equals(nonCodedConditionUuid)) {
                 errors.rejectValue("conditionNonCoded", "Condition.error.conditionNonCodedValueNeededForNonCodedCondition");
             }
+        }
+    }
+
+    private void validatePatient(Condition condition, Errors errors) {
+        Condition existingCondition = conditionService.getConditionByUuid(condition.getUuid());
+        if (existingCondition != null && !condition.getPatient().equals(existingCondition.getPatient())) {
+            errors.rejectValue("concept", "Condition.error.patientCannotBeUpdated");
         }
     }
 }
