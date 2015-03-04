@@ -32,6 +32,7 @@
     <modules>
         <module>api</module>
         <module>omod</module>
+        <module>api-1.11</module>
         <module>api-1.10</module>
         <module>api-1.9</module>
         <module>condition-list</module>

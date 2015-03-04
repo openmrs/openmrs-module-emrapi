@@ -7,13 +7,13 @@
         <version>1.5-SNAPSHOT</version>
     </parent>
 
-    <artifactId>emrapi-api-1.10</artifactId>
+    <artifactId>emrapi-api-1.11</artifactId>
     <packaging>jar</packaging>
-    <name>EMR API Module API 1.10</name>
+    <name>EMR API Module API 1.11</name>
     <description>API project for EMRAPI</description>
 
     <properties>
-        <openMRSVersion>1.10.1</openMRSVersion>
+        <openMRSVersion>1.11.0</openMRSVersion>
     </properties>
 
     <dependencies>
