@@ -50,7 +50,7 @@ import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
 
-public class OpenMRSDrugOrderMapper1_10Test {
+public class OpenMRSDrugOrderMapper1_11Test {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DAY_DURATION_UNIT = "day";
