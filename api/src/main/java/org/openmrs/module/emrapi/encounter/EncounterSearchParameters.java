@@ -13,29 +13,88 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EncounterSearchParameters {
-    private String visitUuid;
-    private String encounterDate;
+    private List<String> visitUuids;
+
+    private String patientUuid;
+    private List<String> visitTypeUuids;
+    private Date encounterDatetimeStart;
+    private Date encounterDateTimeEnd;
+    private List<String> providerUuids;
+    private List<String> encounterTypeUuids;
+    private String locationUuid;
+
     private Boolean includeAll;
 
-    public String getVisitUuid() {
-        return visitUuid;
+    public List<String> getVisitUuids() {
+        return visitUuids == null ? new ArrayList<String>() : visitUuids;
     }
 
-    public void setVisitUuid(String visitUuid) {
-        this.visitUuid = visitUuid;
+    public void setVisitUuids(List<String> visitUuids) {
+        this.visitUuids = visitUuids;
     }
 
-    public String getEncounterDate() {
-        return encounterDate;
+    public String getPatientUuid() {
+        return patientUuid;
     }
 
-    public void setEncounterDate(String encounterDate) {
-        this.encounterDate = encounterDate;
+    public void setPatientUuid(String patientUuid) {
+        this.patientUuid = patientUuid;
+    }
+
+    public List<String> getVisitTypeUuids() {
+        return visitTypeUuids == null ? new ArrayList<String>() : visitTypeUuids;
+    }
+
+    public void setVisitTypeUuids(List<String> visitTypeUuids) {
+        this.visitTypeUuids = visitTypeUuids;
+    }
+
+    public Date getEncounterDatetimeStart() {
+        return encounterDatetimeStart;
+    }
+
+    public void setEncounterDatetimeStart(Date encounterDatetimeStart) {
+        this.encounterDatetimeStart = encounterDatetimeStart;
+    }
+
+    public Date getEncounterDateTimeEnd() {
+        return encounterDateTimeEnd;
+    }
+
+    public void setEncounterDateTimeEnd(Date endDate) {
+        this.encounterDateTimeEnd = endDate;
+    }
+
+    public List<String> getProviderUuids() {
+        return providerUuids == null ? new ArrayList<String>() : providerUuids;
+    }
+
+    public void setProviderUuids(List<String> providerUuids) {
+        this.providerUuids = providerUuids;
+    }
+
+    public List<String> getEncounterTypeUuids() {
+        return encounterTypeUuids == null? new ArrayList<String>() : encounterTypeUuids;
+    }
+
+    public void setEncounterTypeUuids(List<String> encounterTypeUuids) {
+        this.encounterTypeUuids = encounterTypeUuids;
+    }
+
+    public String getLocationUuid() {
+        return locationUuid;
+    }
+
+    public void setLocationUuid(String locationUuid) {
+        this.locationUuid = locationUuid;
     }
 
     public Boolean getIncludeAll() {
@@ -46,13 +105,4 @@ public class EncounterSearchParameters {
         this.includeAll = includeAll;
     }
 
-    public Date getEncounterDateAsDate() {
-        if (encounterDate == null) return null;
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd").parse(encounterDate);
-        } catch (ParseException e) {
-            // should never occur as web layer does the data checks.
-            return null;
-        }
-    }
 }

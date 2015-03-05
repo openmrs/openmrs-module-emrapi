@@ -14,24 +14,16 @@
 
 package org.openmrs.module.emrapi.web.controller;
 
-import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.emrapi.encounter.ActiveEncounterParameters;
 import org.openmrs.module.emrapi.encounter.EmrEncounterService;
 import org.openmrs.module.emrapi.encounter.EncounterSearchParameters;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.web.exception.InvalidInputException;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 @Controller
@@ -63,22 +55,6 @@ public class EmrEncounterController extends BaseRestController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters) {
-        checkForValidInput(encounterSearchParameters);
         return emrEncounterService.find(encounterSearchParameters);
-    }
-
-    private void checkForValidInput(EncounterSearchParameters encounterSearchParameters) {
-        String visitUuid = encounterSearchParameters.getVisitUuid();
-        if (StringUtils.isBlank(visitUuid))
-            throw new InvalidInputException("Visit UUID cannot be empty.");
-
-        String encounterDate = encounterSearchParameters.getEncounterDate();
-        if (StringUtils.isNotBlank(encounterDate)){
-            try {
-                new SimpleDateFormat("yyyy-MM-dd").parse(encounterDate);
-            } catch (ParseException e) {
-                throw new InvalidInputException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + encounterDate + ".", e);
-            }
-        }
     }
 }

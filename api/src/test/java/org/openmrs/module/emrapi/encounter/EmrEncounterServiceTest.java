@@ -2,22 +2,35 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
+import org.openmrs.Location;
 import org.openmrs.Patient;
+import org.openmrs.Provider;
 import org.openmrs.Visit;
-import org.openmrs.api.*;
+import org.openmrs.VisitType;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.EncounterService;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.verify;
@@ -143,5 +156,60 @@ public class EmrEncounterServiceTest {
         assertNotNull(encounterTransaction);
         assertEquals("visit-uuid",encounterTransaction.getVisitUuid());
         assertNotEquals("someRandomUUID", encounterTransaction.getEncounterUuid());
+    }
+
+
+    @Test
+    public void shouldDelegateDetailsFromEncounterSearchParametersToEncounterService() {
+        EncounterSearchParameters parameters = new EncounterSearchParameters();
+        Date startDate = new Date();
+        parameters.setEncounterDatetimeStart(startDate);
+        Date endDate = new Date();
+        parameters.setEncounterDateTimeEnd(endDate);
+        parameters.setEncounterTypeUuids(Arrays.asList("encounter-type-uuid"));
+        parameters.setIncludeAll(true);
+        parameters.setLocationUuid("location-uuid");
+        parameters.setPatientUuid("patient-uuid");
+        parameters.setProviderUuids(Arrays.asList("provider-uuid"));
+        parameters.setVisitTypeUuids(Arrays.asList("visit-type-uuid"));
+        parameters.setVisitUuids(Arrays.asList("visit-uuid"));
+
+        EncounterType encounterType = new EncounterType();
+        when(encounterService.getEncounterTypeByUuid("encounter-type-uuid")).thenReturn(encounterType);
+        Location location = new Location();
+        when(locationService.getLocationByUuid("location-uuid")).thenReturn(location);
+        Patient patient = new Patient();
+        when(patientService.getPatientByUuid("patient-uuid")).thenReturn(patient);
+        Provider provider = new Provider();
+        when(providerService.getProviderByUuid("provider-uuid")).thenReturn(provider);
+        VisitType visitType = new VisitType();
+        when(visitService.getVisitTypeByUuid("visit-type-uuid")).thenReturn(visitType);
+        Visit visit = new Visit();
+        when(visitService.getVisitByUuid("visit-uuid")).thenReturn(visit);
+
+        emrEncounterService.find(parameters);
+
+
+        ArgumentCaptor<Patient> patientArgument = ArgumentCaptor.forClass(Patient.class);
+        ArgumentCaptor<Location> locationArgument = ArgumentCaptor.forClass(Location.class);
+        ArgumentCaptor<Date> startDateArgument = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Date> endDateArgument = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Collection<EncounterType>> encounterTypesArgument = (ArgumentCaptor)ArgumentCaptor.forClass(Collection.class);
+        ArgumentCaptor<Collection<Provider>> providersArgument = (ArgumentCaptor)ArgumentCaptor.forClass(Collection.class);
+        ArgumentCaptor<Collection<VisitType>> visitTypesArgument = (ArgumentCaptor)ArgumentCaptor.forClass(Collection.class);
+        ArgumentCaptor<Collection<Visit>> visitsArgument = (ArgumentCaptor)ArgumentCaptor.forClass(Collection.class);
+        ArgumentCaptor<Boolean> includeAllArgument = ArgumentCaptor.forClass(Boolean.class);
+
+
+        verify(encounterService).getEncounters(patientArgument.capture(), locationArgument.capture(), startDateArgument.capture(),
+                endDateArgument.capture(), Matchers.<Collection<Form>>any(), encounterTypesArgument.capture(), providersArgument.capture(), visitTypesArgument.capture(),
+                visitsArgument.capture(), includeAllArgument.capture());
+
+        assertThat(patientArgument.getValue(), is(equalTo(patient)));
+        assertThat(locationArgument.getValue(), is(equalTo(location)));
+        assertThat(((List<EncounterType>)(encounterTypesArgument.getValue())).get(0), is(equalTo(encounterType)));
+        assertThat(((List<Provider>)(providersArgument.getValue())).get(0), is(equalTo(provider)));
+        assertThat(((List<VisitType>)(visitTypesArgument.getValue())).get(0), is(equalTo(visitType)));
+        assertThat(((List<Visit>)(visitsArgument.getValue())).get(0), is(equalTo(visit)));
     }
 }
