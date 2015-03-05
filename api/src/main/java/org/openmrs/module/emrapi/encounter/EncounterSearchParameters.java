@@ -31,7 +31,7 @@ public class EncounterSearchParameters {
     private List<String> encounterTypeUuids;
     private String locationUuid;
 
-    private Boolean includeAll;
+    private Boolean includeAll = false;
 
     public List<String> getVisitUuids() {
         return visitUuids == null ? new ArrayList<String>() : visitUuids;
