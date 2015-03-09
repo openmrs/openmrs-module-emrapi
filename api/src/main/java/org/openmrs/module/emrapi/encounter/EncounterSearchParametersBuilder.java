@@ -56,12 +56,12 @@ public class EncounterSearchParametersBuilder {
     }
 
     public Date getStartDate() {
-        return encounterSearchParameters.getEncounterDatetimeStart();
+        return encounterSearchParameters.getEncounterDateTimeFrom();
 
     }
 
     public Date getEndDate() {
-        return encounterSearchParameters.getEncounterDateTimeEnd();
+        return encounterSearchParameters.getEncounterDateTimeTo();
 
     }
     public Collection<EncounterType> getEncounterTypes() {

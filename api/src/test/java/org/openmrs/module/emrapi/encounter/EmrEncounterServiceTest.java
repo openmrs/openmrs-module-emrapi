@@ -163,9 +163,9 @@ public class EmrEncounterServiceTest {
     public void shouldDelegateDetailsFromEncounterSearchParametersToEncounterService() {
         EncounterSearchParameters parameters = new EncounterSearchParameters();
         Date startDate = new Date();
-        parameters.setEncounterDatetimeStart(startDate);
+        parameters.setEncounterDateTimeFrom(startDate);
         Date endDate = new Date();
-        parameters.setEncounterDateTimeEnd(endDate);
+        parameters.setEncounterDateTimeTo(endDate);
         parameters.setEncounterTypeUuids(Arrays.asList("encounter-type-uuid"));
         parameters.setIncludeAll(true);
         parameters.setLocationUuid("location-uuid");

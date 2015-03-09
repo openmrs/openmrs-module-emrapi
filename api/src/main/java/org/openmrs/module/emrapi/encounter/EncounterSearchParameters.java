@@ -14,6 +14,10 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.openmrs.module.emrapi.utils.CustomJsonDateDeserializer;
+import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,8 +29,8 @@ public class EncounterSearchParameters {
 
     private String patientUuid;
     private List<String> visitTypeUuids;
-    private Date encounterDatetimeStart;
-    private Date encounterDateTimeEnd;
+    private Date encounterDateTimeFrom;
+    private Date encounterDateTimeTo;
     private List<String> providerUuids;
     private List<String> encounterTypeUuids;
     private String locationUuid;
@@ -57,20 +61,24 @@ public class EncounterSearchParameters {
         this.visitTypeUuids = visitTypeUuids;
     }
 
-    public Date getEncounterDatetimeStart() {
-        return encounterDatetimeStart;
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    public Date getEncounterDateTimeFrom() {
+        return encounterDateTimeFrom;
     }
 
-    public void setEncounterDatetimeStart(Date encounterDatetimeStart) {
-        this.encounterDatetimeStart = encounterDatetimeStart;
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    public void setEncounterDateTimeFrom(Date encounterDateTimeFrom) {
+        this.encounterDateTimeFrom = encounterDateTimeFrom;
     }
 
-    public Date getEncounterDateTimeEnd() {
-        return encounterDateTimeEnd;
+    @JsonSerialize(using = CustomJsonDateSerializer.class)
+    public Date getEncounterDateTimeTo() {
+        return encounterDateTimeTo;
     }
 
-    public void setEncounterDateTimeEnd(Date endDate) {
-        this.encounterDateTimeEnd = endDate;
+    @JsonDeserialize(using = CustomJsonDateDeserializer.class)
+    public void setEncounterDateTimeTo(Date endDate) {
+        this.encounterDateTimeTo = endDate;
     }
 
     public List<String> getProviderUuids() {
