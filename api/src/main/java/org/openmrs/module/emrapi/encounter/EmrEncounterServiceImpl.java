@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.encounter;
 import org.apache.commons.lang.time.DateUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
+import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
@@ -33,9 +34,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -171,12 +170,12 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
     @Override
     public List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters) {
-        Visit visit = visitService.getVisitByUuid(encounterSearchParameters.getVisitUuid());
-        if (visit == null) return new ArrayList<EncounterTransaction>();
-
-        return getEncounterTransactions(
-                getEncountersForDate(encounterSearchParameters.getEncounterDateAsDate(), visit),
-                encounterSearchParameters.getIncludeAll());
+        EncounterSearchParametersBuilder searchParameters = new EncounterSearchParametersBuilder(encounterSearchParameters, patientService, encounterService, locationService, providerService, visitService);
+        List<Encounter> encounters = encounterService.getEncounters(searchParameters.getPatient(), searchParameters.getLocation(), searchParameters.getStartDate(),
+                searchParameters.getEndDate(), new ArrayList<Form>(), searchParameters.getEncounterTypes(),
+                searchParameters.getProviders(), searchParameters.getVisitTypes(), searchParameters.getVisits(),
+                searchParameters.getIncludeAll());
+        return getEncounterTransactions(encounters, encounterSearchParameters.getIncludeAll());
     }
 
     private List<EncounterTransaction> getEncounterTransactions(List<Encounter> encounters, boolean includeAll) {
@@ -191,7 +190,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         if (encounterDate == null) return new ArrayList<Encounter>(visit.getEncounters());
         ArrayList<Encounter> encounters = new ArrayList<Encounter>();
         for (Encounter encounter : visit.getEncounters()) {
-            if (DateUtils.isSameDay(encounter.getEncounterDatetime(), encounterDate)) {
+                if (DateUtils.isSameDay(encounter.getEncounterDatetime(), encounterDate)) {
                 encounters.add(encounter);
             }
         }
