@@ -110,6 +110,9 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      */
     @Attribute(required = true)
     public void setPatient(Patient patient) {
+        if(this.patient !=null && !this.patient.equals(patient)) {
+            throw new IllegalArgumentException("patient cannot be changed");
+        }
         this.patient = patient;
     }
 
@@ -151,6 +154,9 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      */
     @Attribute(required = true)
     public void setConcept(Concept concept) {
+        if(this.concept !=null && !this.concept.equals(concept)){
+            throw new IllegalArgumentException("concept cannot be updated");
+        }
         this.concept = concept;
     }
 
@@ -169,6 +175,10 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      */
     @Attribute(required = false)
     public void setConditionNonCoded(String conditionNonCoded) {
+        if(this.conditionNonCoded != null && !this.conditionNonCoded.equals(conditionNonCoded))
+        {
+            throw new IllegalArgumentException("Cannot change the condition non coded");
+        }
         this.conditionNonCoded = conditionNonCoded;
     }
 

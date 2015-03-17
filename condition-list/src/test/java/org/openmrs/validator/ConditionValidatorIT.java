@@ -21,9 +21,9 @@ import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.ConditionService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
-import org.openmrs.api.ConditionService;
 import org.openmrs.api.validator.ConditionValidator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,14 +87,6 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
         Assert.assertEquals("Condition.error.duplicatesNotAllowed", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
     }
 
-    @Test
-    public void shouldNotAllowUpdatingConceptInCondition() {
-        Condition condition = createCondition(Condition.Status.CONFIRMED, "Angina", 1, "2cc6880e-2c46-11e4-9038-a6c5e4d22fb7", null);
-        Errors errors = new BindException(condition, "condition");
-        conditionValidator.validate(condition, errors);
-        Assert.assertTrue(errors.hasErrors());
-        Assert.assertEquals("Condition.error.conceptsCannotBeUpdated", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
-    }
 
     @Test
     public void shouldNotAllowInValidEndReasonConcept() {
@@ -123,15 +115,6 @@ public class ConditionValidatorIT extends BaseModuleContextSensitiveTest {
         Errors errors = new BindException(condition, "condition");
         conditionValidator.validate(condition, errors);
         Assert.assertEquals("Condition.error.endReasonIsMandatory", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
-    }
-
-    @Test
-    public void shouldNotAllowUpdatingPatientInCondition() {
-        Condition condition = createCondition(Condition.Status.CONFIRMED, "Tuberculosis", 2, "2cc6880e-2c46-11e4-9038-a6c5e4d22fb7", null);
-        Errors errors = new BindException(condition, "condition");
-        conditionValidator.validate(condition, errors);
-        Assert.assertTrue(errors.hasErrors());
-        Assert.assertEquals("Condition.error.patientCannotBeUpdated", ((List<ObjectError>) errors.getAllErrors()).get(0).getCode());
     }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {

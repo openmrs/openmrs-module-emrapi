@@ -19,7 +19,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openmrs.Condition;
-import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -53,7 +52,7 @@ public class ConditionDAOIT extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetConditionsReturnNonVoidedConditionsGroupedByConceptInReverseChronologicalOrder() {
+    public void shouldGetConditionsReturnNonVoidedConditionsInReverseChronologicalOrder() {
         Patient patient = patientService.getPatient(3);
         List<Condition> conditionHistoryForPatient = conditionDao.getConditionHistory(patient);
         assertEquals(4, conditionHistoryForPatient.size());
@@ -79,5 +78,18 @@ public class ConditionDAOIT extends BaseModuleContextSensitiveTest {
         assertEquals("p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7", activeConditions.get(1).getUuid());
         assertEquals("c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7", activeConditions.get(2).getUuid());
     }
-
+    @Test
+    public void shouldThrowErrorWhenChangingConcept(){
+        Condition condition = conditionDao.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("concept cannot be updated");
+        condition.setConcept(conditionDao.getConditionByUuid("wq4i8o0e-2n46-1zx4-58f4-a6i5trd22fb7").getConcept());
+    }
+    @Test
+    public void shouldThrowErrorWhenChangingPatient(){
+        Condition condition = conditionDao.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("patient cannot be updated");
+        condition.setPatient(conditionDao.getConditionByUuid("wq4i8o0e-2n46-1zx4-58f4-a6i5trd22fb7").getPatient());
+    }
 }

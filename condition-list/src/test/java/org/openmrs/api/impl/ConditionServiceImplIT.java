@@ -37,6 +37,7 @@ import org.springframework.validation.ObjectError;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -130,14 +131,14 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldGetConditionHistoryReturnListOfConditionHistoryGroupedByConceptForPatient() {
         Patient patient = patientService.getPatient(3);
-        List<ConditionHistory> conditionHistoryForPatient = conditionService.getConditionHistory(patient);
-        assertEquals(3, conditionHistoryForPatient.size());
-
-        assertEquals(2, conditionHistoryForPatient.get(0).getConditions().size());
-        assertEquals(1, conditionHistoryForPatient.get(1).getConditions().size());
-
-        assertEquals("410", conditionHistoryForPatient.get(0).getConditions().get(0).getConcept().getId().toString());
-        assertEquals("410", conditionHistoryForPatient.get(0).getConditions().get(1).getConcept().getId().toString());
+        Map<String, ConditionHistory> conditionHistoryForPatient = conditionService.getConditionHistory(patient);
+        assertEquals(conditionHistoryForPatient.size(), 4);
+        assertTrue(conditionHistoryForPatient.containsKey("severe"));
+        assertTrue(conditionHistoryForPatient.containsKey("pain"));
+        assertTrue(conditionHistoryForPatient.containsKey("Angina"));
+        assertTrue(conditionHistoryForPatient.containsKey("Tuberculosis"));
+        assertEquals(conditionHistoryForPatient.get("severe").getConditions().size(), 1);
+        assertEquals(conditionHistoryForPatient.get("Angina").getConditions().size(),1);
 
     }
 

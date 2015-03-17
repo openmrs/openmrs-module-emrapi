@@ -13,7 +13,6 @@
  */
 package org.openmrs.api.impl;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.openmrs.Concept;
 import org.openmrs.Condition;
 import org.openmrs.ConditionHistory;
@@ -26,10 +25,7 @@ import org.openmrs.api.util.ConditionListConstants;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 public class ConditionServiceImpl extends BaseOpenmrsService implements ConditionService {
@@ -52,46 +48,32 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
         return conditionDAO.saveOrUpdate(condition);
     }
 
-    public List<ConditionHistory> getConditionHistory(Patient patient) {
+    public Map<String, ConditionHistory> getConditionHistory(Patient patient) {
         List<Condition> conditionList = conditionDAO.getConditionHistory(patient);
-        List<ConditionHistory> conditionHistoryList = new ArrayList<ConditionHistory>();
-
-        List<Condition> groupedConditions = new ArrayList<Condition>();
-
-        if (CollectionUtils.isEmpty(conditionList)) return new ArrayList<ConditionHistory>();
-
-        ConditionHistory conditionhistory = createConditionHistory(conditionList.get(0));
-        groupedConditions.add(conditionList.get(0));
-        for (int i = 1; i < conditionList.size(); i++) {
-            Condition condition = conditionList.get(i);
-            if (condition.getConcept().equals(conditionhistory.getCondition())) {
-                groupedConditions.add(condition);
+        Map<String, ConditionHistory> allConditions = new HashMap<String, ConditionHistory>();
+        for (Condition condition : conditionList) {
+            Concept concept = condition.getConcept();
+            ConditionHistory conditionHistory;
+            String nonCodedConceptUuid = administrationService.getGlobalProperty(ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID);
+            String key = concept.getUuid().equals(nonCodedConceptUuid) ? condition.getConditionNonCoded() : concept.getName().getName();
+            if (allConditions.containsKey(key)) {
+                conditionHistory = allConditions.get(key);
+                List<Condition> existingConditions = allConditions.get(condition.getConcept().getName().getName()).getConditions();
+                existingConditions.add(condition);
+                conditionHistory.setConditions(existingConditions);
             } else {
-                conditionhistory.setConditions(groupedConditions);
-                conditionHistoryList.add(conditionhistory);
-                conditionhistory = createConditionHistory(condition);
-                groupedConditions = new ArrayList<Condition>();
-                groupedConditions.add(condition);
+                conditionHistory = new ConditionHistory();
+                ArrayList<Condition> conditions = new ArrayList<Condition>();
+                conditions.add(condition);
+                conditionHistory.setConditions(conditions);
+                conditionHistory.setCondition(condition.getConcept());
+                if (concept.getUuid().equals(nonCodedConceptUuid)) {
+                    conditionHistory.setNonCodedCondition(condition.getConcept().getUuid());
+                }
             }
+            allConditions.put(key,conditionHistory);
         }
-        if (CollectionUtils.isNotEmpty(groupedConditions)) {
-            updateConditionHistoryList(conditionHistoryList, groupedConditions, conditionhistory);
-        }
-        return conditionHistoryList;
-    }
-
-    private void updateConditionHistoryList(List<ConditionHistory> conditionHistoryList, List<Condition> groupedConditions, ConditionHistory conditionhistory) {
-        conditionhistory.setConditions(groupedConditions);
-        conditionHistoryList.add(conditionhistory);
-    }
-
-    private ConditionHistory createConditionHistory(Condition condition) {
-        ConditionHistory conditionHistory = new ConditionHistory();
-        conditionHistory.setCondition(condition.getConcept());
-        if (condition.getConcept().getUuid().equals(administrationService.getGlobalProperty(ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID))) {
-            conditionHistory.setNonCodedCondition(condition.getConditionNonCoded());
-        }
-        return conditionHistory;
+        return allConditions;
     }
 
     @Override

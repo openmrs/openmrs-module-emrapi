@@ -69,10 +69,8 @@ public class ConditionValidator implements Validator {
             ValidationUtils.rejectIfEmpty(errors, "uuid", "error.null");
 
             validateNonCodedCondition(condition, errors);
-            validateConcept(condition, errors);
             validateDuplicateConditions(condition, errors);
             validateEndReasonConcept(condition, errors);
-            validatePatient(condition, errors);
         }
 
     }
@@ -103,13 +101,6 @@ public class ConditionValidator implements Validator {
         }
     }
 
-    private void validateConcept(Condition condition, Errors errors) {
-        Condition existingCondition = conditionService.getConditionByUuid(condition.getUuid());
-        if (existingCondition != null && !condition.getConcept().equals(existingCondition.getConcept())) {
-            errors.rejectValue("concept", "Condition.error.conceptsCannotBeUpdated");
-        }
-    }
-
     private void validateNonCodedCondition(Condition condition, Errors errors) {
         String nonCodedConditionUuid = administrationService.getGlobalProperty(ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID);
         if (condition.getConditionNonCoded() != null) {
@@ -120,13 +111,6 @@ public class ConditionValidator implements Validator {
             if (condition.getConcept().getUuid().equals(nonCodedConditionUuid)) {
                 errors.rejectValue("conditionNonCoded", "Condition.error.conditionNonCodedValueNeededForNonCodedCondition");
             }
-        }
-    }
-
-    private void validatePatient(Condition condition, Errors errors) {
-        Condition existingCondition = conditionService.getConditionByUuid(condition.getUuid());
-        if (existingCondition != null && !condition.getPatient().equals(existingCondition.getPatient())) {
-            errors.rejectValue("concept", "Condition.error.patientCannotBeUpdated");
         }
     }
 }
