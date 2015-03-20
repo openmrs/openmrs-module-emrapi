@@ -117,7 +117,7 @@
                 void_reason="voiding"/>
 
     <conditions condition_id="8" patient_id="3" status="CONFIRMED" concept_id="408" creator="1"
-                date_created="2015-01-12 00:00:00" uuid="c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7"
+                date_created="2015-02-12 00:00:00" uuid="c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7"
                 voided="false"/>
 
     <conditions condition_id="9" patient_id="3" status="PRESUMED" concept_id="409" creator="1"
@@ -125,13 +125,17 @@
                 end_date="2015-01-12 00:00:00" end_reason="413"/>
 
     <conditions condition_id="10" patient_id="3" status="PRESUMED" concept_id="410" creator="1"
-                date_created="2015-01-12 01:00:00" uuid="p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7"
+                date_created="2015-02-12 01:00:00" uuid="p8ri8o0s-2m46-11e4-5df4-a6p5e4dh2fb7"
                 condition_non_coded="pain" voided="false"/>
 
     <conditions condition_id="11" patient_id="3" status="PRESUMED" concept_id="411" creator="1"
                 date_created="2015-01-12 00:00:00" uuid="z8qi8o0w-2e46-11g4-5df4-a6p5e4dh2fb7"
                 voided="true" date_voided="2015-01-13 00:00:00" void_reason="unknown" end_date="2015-01-12 00:00:00"
                 end_reason="413"/>
+
+    <conditions condition_id="12" patient_id="3" status="CONFIRMED" concept_id="410" creator="1"
+                date_created="2015-02-14 00:00:00" uuid="wq4i8o0e-2n46-1zx4-58f4-a6i5trd22fb7"
+                condition_non_coded="severe" voided="false"/>
 
 
     <global_property property="conditionList.nonCodedUuid" property_value="s102c80f-1yz9-4da3-bb88-8122ce8868ss"

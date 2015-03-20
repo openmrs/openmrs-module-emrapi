@@ -15,12 +15,14 @@ package org.openmrs.api;
 
 import org.openmrs.Concept;
 import org.openmrs.Condition;
+import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.util.PrivilegeConstants;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface ConditionService extends OpenmrsService {
     @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
@@ -31,7 +33,7 @@ public interface ConditionService extends OpenmrsService {
 
     Condition getConditionByUuid(String uuid);
 
-    List<Condition> getConditionHistory(Patient patient);
+    Map<String, ConditionHistory> getConditionHistory(Patient patient);
 
     @Authorized({PrivilegeConstants.GET_CONDITIONS})
     List<Condition> getActiveConditions(Patient patient);

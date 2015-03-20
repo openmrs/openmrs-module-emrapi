@@ -69,7 +69,6 @@ public class ConditionValidator implements Validator {
             ValidationUtils.rejectIfEmpty(errors, "uuid", "error.null");
 
             validateNonCodedCondition(condition, errors);
-            validateConcept(condition, errors);
             validateDuplicateConditions(condition, errors);
             validateEndReasonConcept(condition, errors);
         }
@@ -99,13 +98,6 @@ public class ConditionValidator implements Validator {
                     errors.rejectValue("concept", "Condition.error.duplicatesNotAllowed");
                 }
             }
-        }
-    }
-
-    private void validateConcept(Condition condition, Errors errors) {
-        Condition existingCondition = conditionService.getConditionByUuid(condition.getUuid());
-        if (existingCondition != null && !condition.getConcept().equals(existingCondition.getConcept())) {
-            errors.rejectValue("concept", "Condition.error.conceptsCannotBeUpdated");
         }
     }
 
