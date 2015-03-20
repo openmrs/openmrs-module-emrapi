@@ -14,6 +14,8 @@
 
 package org.openmrs.api.impl;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +41,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
@@ -131,15 +135,34 @@ public class ConditionServiceImplIT extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldGetConditionHistoryReturnListOfConditionHistoryGroupedByConceptForPatient() {
         Patient patient = patientService.getPatient(3);
-        Map<String, ConditionHistory> conditionHistoryForPatient = conditionService.getConditionHistory(patient);
+        List<ConditionHistory> conditionHistoryForPatient = conditionService.getConditionHistory(patient);
         assertEquals(conditionHistoryForPatient.size(), 4);
-        assertTrue(conditionHistoryForPatient.containsKey("severe"));
-        assertTrue(conditionHistoryForPatient.containsKey("pain"));
-        assertTrue(conditionHistoryForPatient.containsKey("Angina"));
-        assertTrue(conditionHistoryForPatient.containsKey("Tuberculosis"));
-        assertEquals(conditionHistoryForPatient.get("severe").getConditions().size(), 1);
-        assertEquals(conditionHistoryForPatient.get("Angina").getConditions().size(),1);
+        
+        assertThat(conditionHistoryForPatient, contains(new ConditionHistoryMatcher("severe", 1),
+        	new ConditionHistoryMatcher("pain", 1), new ConditionHistoryMatcher("Angina", 1), 
+        	new ConditionHistoryMatcher("Tuberculosis", 1)));
+    }
+    
+    public static class ConditionHistoryMatcher extends TypeSafeMatcher<ConditionHistory> {
+    	private final String name;
+    	private final int count;
+    	
+        public ConditionHistoryMatcher(String name, int count) {
+        	this.name = name;
+        	this.count = count;
+        }
+    	
+		@Override
+        public void describeTo(Description description) {
+	        description.appendText("condition: ").appendValue(name).appendText("count: ").appendValue(count);
+        }
 
+		@Override
+        protected boolean matchesSafely(ConditionHistory item) {
+	        return (item.getCondition().getName().getName().equals(name) || item.getNonCodedCondition().equals(name))
+	        		&& count == item.getConditions().size();
+        }
+    	
     }
 
     private Condition createCondition(Condition.Status status, String conceptName, int patientId, String uuid, String conditionNonCoded) {

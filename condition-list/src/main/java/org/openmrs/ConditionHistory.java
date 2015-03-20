@@ -15,33 +15,47 @@ package org.openmrs;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class ConditionHistory {
-
-    private String nonCodedCondition;
-    private Concept condition;
-    private List<Condition> conditions;
-
-    public String getNonCodedCondition() {
-        return nonCodedCondition;
-    }
-
-    public void setNonCodedCondition(String nonCodedCondition) {
-        this.nonCodedCondition = nonCodedCondition;
-    }
-
-    public Concept getCondition() {
-        return condition;
-    }
-
-    public void setCondition(Concept condition) {
-        this.condition = condition;
-    }
-
-    public List<Condition> getConditions() {
-        return conditions;
-    }
-
-    public void setConditions(List<Condition> conditions) {
-        this.conditions = conditions;
-    }
+	
+	private String nonCodedCondition;
+	
+	private Concept condition;
+	
+	private List<Condition> conditions;
+	
+	public String getNonCodedCondition() {
+		return nonCodedCondition;
+	}
+	
+	public void setNonCodedCondition(String nonCodedCondition) {
+		this.nonCodedCondition = nonCodedCondition;
+	}
+	
+	public Concept getCondition() {
+		return condition;
+	}
+	
+	public void setCondition(Concept condition) {
+		this.condition = condition;
+	}
+	
+	public List<Condition> getConditions() {
+		return conditions;
+	}
+	
+	public void setConditions(List<Condition> conditions) {
+		this.conditions = conditions;
+	}
+	
+	@Override
+	public String toString() {
+		String name = nonCodedCondition;
+		if (name != null && condition != null && condition.getName() != null) {
+			name = condition.getName().getName();
+		}
+		
+		return new ToStringBuilder(this).append("condition", name).append("count", conditions.size()).build();
+	}
 }

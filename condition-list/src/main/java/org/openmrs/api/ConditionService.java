@@ -33,7 +33,7 @@ public interface ConditionService extends OpenmrsService {
 
     Condition getConditionByUuid(String uuid);
 
-    Map<String, ConditionHistory> getConditionHistory(Patient patient);
+    List<ConditionHistory> getConditionHistory(Patient patient);
 
     @Authorized({PrivilegeConstants.GET_CONDITIONS})
     List<Condition> getActiveConditions(Patient patient);
