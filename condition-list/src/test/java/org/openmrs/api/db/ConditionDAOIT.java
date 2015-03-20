@@ -82,14 +82,14 @@ public class ConditionDAOIT extends BaseModuleContextSensitiveTest {
     public void shouldThrowErrorWhenChangingConcept(){
         Condition condition = conditionDao.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("concept cannot be updated");
+        thrown.expectMessage("Concept cannot be changed");
         condition.setConcept(conditionDao.getConditionByUuid("wq4i8o0e-2n46-1zx4-58f4-a6i5trd22fb7").getConcept());
     }
     @Test
     public void shouldThrowErrorWhenChangingPatient(){
         Condition condition = conditionDao.getConditionByUuid("2cc6880e-2c46-11e4-9038-a6c5e4d22fb7");
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("patient cannot be updated");
+        thrown.expectMessage("Patient cannot be changed");
         condition.setPatient(conditionDao.getConditionByUuid("wq4i8o0e-2n46-1zx4-58f4-a6i5trd22fb7").getPatient());
     }
 }

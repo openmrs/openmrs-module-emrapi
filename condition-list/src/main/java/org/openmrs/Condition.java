@@ -110,8 +110,8 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      */
     @Attribute(required = true)
     public void setPatient(Patient patient) {
-        if(this.patient !=null && !this.patient.equals(patient)) {
-            throw new IllegalArgumentException("patient cannot be changed");
+        if(getConditionId() != null && getPatient() !=null && !getPatient().equals(patient)) {
+            throw new IllegalArgumentException("Patient cannot be changed");
         }
         this.patient = patient;
     }
@@ -154,8 +154,8 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      */
     @Attribute(required = true)
     public void setConcept(Concept concept) {
-        if(this.concept !=null && !this.concept.equals(concept)){
-            throw new IllegalArgumentException("concept cannot be updated");
+        if(getConditionId() != null && getConcept() !=null && !getConcept().equals(concept)){
+            throw new IllegalArgumentException("Concept cannot be changed");
         }
         this.concept = concept;
     }
@@ -175,9 +175,9 @@ public class Condition extends BaseOpenmrsData implements java.io.Serializable {
      */
     @Attribute(required = false)
     public void setConditionNonCoded(String conditionNonCoded) {
-        if(this.conditionNonCoded != null && !this.conditionNonCoded.equals(conditionNonCoded))
+        if(getConditionId() != null && getConditionNonCoded() != null && !getConditionNonCoded().equals(conditionNonCoded))
         {
-            throw new IllegalArgumentException("Cannot change the condition non coded");
+            throw new IllegalArgumentException("Condition non coded cannot be changed");
         }
         this.conditionNonCoded = conditionNonCoded;
     }
