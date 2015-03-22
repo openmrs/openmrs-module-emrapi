@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service(value = "emrOrderService")
-@OpenmrsProfile(openmrsVersion = "1.11")
+@OpenmrsProfile(openmrsVersion = "[1.11.* - 1.12.*]")
 public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
