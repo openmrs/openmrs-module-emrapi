@@ -32,7 +32,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.stereotype.Component;
 
 @Component(value = "orderMapper")
-@OpenmrsProfile(openmrsVersion = "1.11")
+@OpenmrsProfile(openmrsVersion = "[1.11.* - 1.12.*]")
 public class OrderMapper1_11 implements OrderMapper {
 
     private final ConceptMapper conceptMapper = new ConceptMapper();
