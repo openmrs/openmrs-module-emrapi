@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi.diagnosis;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.EmrApiConstants;
@@ -86,10 +87,31 @@ public class Diagnosis {
         }
         Diagnosis other = (Diagnosis) o;
         return OpenmrsUtil.nullSafeEquals(diagnosis, other.getDiagnosis()) &&
-                OpenmrsUtil.nullSafeEquals(order, other.getOrder());
+                OpenmrsUtil.nullSafeEquals(order, other.getOrder()) &&
+				OpenmrsUtil.nullSafeEquals(certainty, other.getCertainty());
     }
 
-    public enum Order {
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37).append(diagnosis).append(order).append(certainty).toHashCode();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder s = new StringBuilder();
+		if (diagnosis != null && diagnosis.getValue() != null) {
+			s.append(diagnosis.getValue().toString());
+		}
+		if (certainty != null) {
+			s.append(", " + certainty);
+		}
+		if (order != null) {
+			s.append(", " + order);
+		}
+		return s.toString();
+	}
+
+	public enum Order {
         PRIMARY(EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_ORDER_PRIMARY),
         SECONDARY(EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_ORDER_SECONDARY);
 

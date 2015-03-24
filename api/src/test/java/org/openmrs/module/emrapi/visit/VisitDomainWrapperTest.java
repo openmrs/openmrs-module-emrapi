@@ -634,6 +634,36 @@ public class VisitDomainWrapperTest {
 
     }
 
+	@Test
+	public void shouldReturnUniqueDiagnoses() {
+
+		Encounter encounter = new Encounter();
+		encounter.setEncounterDatetime(new DateTime(2012, 12, 12, 12, 12).toDate());
+
+		Set<Encounter> encounters = new HashSet<Encounter>();
+		encounters.add(encounter);
+		when(visit.getEncounters()).thenReturn(encounters);
+
+		String diagnosis1 = "Diagnosis 1";
+		String diagnosis2 = "Diagnosis 2";
+		String diagnosis3 = "Diagnosis 3";
+
+		// Only factor diagnosis into uniqueness
+		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis1), Diagnosis.Order.PRIMARY, Diagnosis.Certainty.CONFIRMED);
+		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis1), Diagnosis.Order.SECONDARY, Diagnosis.Certainty.PRESUMED);
+		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, false).size(), is(1));
+		assertThat(visitDomainWrapper.getUniqueDiagnoses(true, false).size(), is(1));
+		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis2), Diagnosis.Order.PRIMARY, Diagnosis.Certainty.CONFIRMED);
+		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, false).size(), is(2));
+
+		// Only return secondary or presumed if asked
+		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis3), Diagnosis.Order.SECONDARY, Diagnosis.Certainty.PRESUMED);
+		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, false).size(), is(3));
+		assertThat(visitDomainWrapper.getUniqueDiagnoses(true, false).size(), is(2));
+		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, true).size(), is(2));
+		assertThat(visitDomainWrapper.getUniqueDiagnoses(true, true).size(), is(2));
+	}
+
     @Test
     public void shouldReturnAllDiagnosesFromMostRecentEncounterWithAdmitDisposition() {
 
@@ -920,5 +950,13 @@ public class VisitDomainWrapperTest {
             return match;
         }
     }
+
+	private void addDiagnosis(Encounter encounter, CodedOrFreeTextAnswer diagnosis, Diagnosis.Order order, Diagnosis.Certainty certainty) {
+		Diagnosis primaryDiagnosis = new Diagnosis();
+		primaryDiagnosis.setDiagnosis(diagnosis);
+		primaryDiagnosis.setOrder(order);
+		primaryDiagnosis.setCertainty(certainty);
+		encounter.addObs(diagnosisMetadata.buildDiagnosisObsGroup(primaryDiagnosis));
+	}
 
 }

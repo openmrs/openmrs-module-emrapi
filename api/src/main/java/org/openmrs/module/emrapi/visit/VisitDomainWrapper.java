@@ -25,6 +25,7 @@ import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
+import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.Disposition;
@@ -47,7 +48,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.reverseOrder;
@@ -320,6 +323,28 @@ public class VisitDomainWrapper implements DomainWrapper {
         }
         return diagnoses;
     }
+
+	/**
+	 * @return the unique list of diagnoses recorded in this visit, where uniqueness is based only on
+	 * whether the CodedOrNonCoded diagnosis is the same, not on whether the order or certainty are the same
+	 * if the primaryOnly flag is true, return only primary diagnoses
+	 * if the confirmedOnly flag is true, return only confirmed diagnoses
+	 */
+	public List<Diagnosis> getUniqueDiagnoses(Boolean primaryOnly, Boolean confirmedOnly) {
+		Map<CodedOrFreeTextAnswer, Diagnosis> diagnoses = new LinkedHashMap<CodedOrFreeTextAnswer, Diagnosis>();
+		for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
+			for (Diagnosis d : getDiagnosesFromEncounter(encounter)) {
+				if (!primaryOnly || d.getOrder() == Diagnosis.Order.PRIMARY) {
+					if (!confirmedOnly || d.getCertainty() == Diagnosis.Certainty.CONFIRMED) {
+						if (!diagnoses.containsKey(d.getDiagnosis())) {
+							diagnoses.put(d.getDiagnosis(), d);
+						}
+					}
+				}
+			}
+		}
+		return new ArrayList<Diagnosis>(diagnoses.values());
+	}
 
     private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter) {
         return getDiagnosesFromEncounter(encounter, null);
