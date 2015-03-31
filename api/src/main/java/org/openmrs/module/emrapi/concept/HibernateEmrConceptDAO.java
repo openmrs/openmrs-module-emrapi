@@ -14,6 +14,18 @@
 
 package org.openmrs.module.emrapi.concept;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.Vector;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
@@ -31,18 +43,11 @@ import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSet;
 import org.openmrs.ConceptSource;
-import org.openmrs.ConceptWord;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.ModuleUtil;
+import org.openmrs.util.OpenmrsConstants;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 /**
  *
@@ -50,6 +55,8 @@ import java.util.Set;
 public class HibernateEmrConceptDAO implements EmrConceptDAO {
 
     SessionFactory sessionFactory;
+    
+    ConceptService conceptService;
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -67,7 +74,7 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
     @Override
     @Transactional(readOnly=true)
     public List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit) {
-        List<String> uniqueWords = ConceptWord.getUniqueWords(query, locale);
+        List<String> uniqueWords = getUniqueWords(query, locale);
         if (uniqueWords.size() == 0) {
             return Collections.emptyList();
         }
@@ -152,6 +159,54 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
         }
         return results;
     }
+    
+    /**
+     * Copied over from OpenMRS 1.9.8 to provide backwards compatibility.
+     * 
+     * It's no longer available in 1.11.
+     * 
+     * @param phrase
+     * @param locale
+     * @return
+     */
+    public static List<String> getUniqueWords(String phrase, Locale locale) {
+		String[] parts = splitPhrase(phrase);
+		List<String> uniqueParts = new Vector<String>();
+		
+		if (parts != null) {
+			List<String> conceptStopWords = Context.getConceptService().getConceptStopWords(locale);
+			for (String part : parts) {
+				if (!StringUtils.isBlank(part)) {
+					String upper = part.trim().toUpperCase();
+					if (!conceptStopWords.contains(upper) && !uniqueParts.contains(upper))
+						uniqueParts.add(upper);
+				}
+			}
+		}
+		
+		return uniqueParts;
+	}
+    
+    /**
+     * Copied over from OpenMRS 1.9.8 to provide backwards compatibility.
+     * 
+     * It's no longer available in 1.11.
+     * 
+     * @param phrase
+     * @return
+     */
+    public static String[] splitPhrase(String phrase) {
+		if (StringUtils.isBlank(phrase)) {
+			return null;
+		}
+		if (phrase.length() > 2) {
+			phrase = phrase.replaceAll(OpenmrsConstants.REGEX_LARGE, " ");
+		} else {
+			phrase = phrase.replaceAll(OpenmrsConstants.REGEX_SMALL, " ");
+		}
+		
+		return phrase.trim().replace('\n', ' ').split(" ");
+	}
 
     private Double calculateMatchScore(String query, ConceptMap matchedMapping) {
         // eventually consider weighting this by map type (e.g. same-as > narrower-than > others)
