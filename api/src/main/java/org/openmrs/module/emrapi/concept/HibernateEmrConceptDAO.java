@@ -55,8 +55,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class HibernateEmrConceptDAO implements EmrConceptDAO {
 
     SessionFactory sessionFactory;
-    
-    ConceptService conceptService;
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
