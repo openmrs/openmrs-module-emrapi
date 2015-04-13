@@ -4,6 +4,7 @@
 
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
+    <!-- Plural table name ("conditions") because "condition" is a MySQL reserved word -->
     <class name="org.openmrs.Condition" table="conditions">
         <id name="conditionId" type="int" column="condition_id" unsaved-value="0">
             <generator class="native">
