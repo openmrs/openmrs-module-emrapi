@@ -36,6 +36,14 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>emrapi-condition-list</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
             <groupId>org.openmrs.test</groupId>
             <artifactId>openmrs-test</artifactId>
             <version>${openMRSVersion}</version>

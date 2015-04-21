@@ -14,6 +14,8 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.openmrs.Concept;
+import org.openmrs.Condition;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -23,6 +25,7 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConditionService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
@@ -56,6 +59,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private final EncounterTransactionMapper encounterTransactionMapper;
     private PatientService patientService;
     private VisitService visitService;
+    private ConditionService conditionService;
     private EncounterService encounterService;
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
     private EncounterDispositionServiceHelper encounterDispositionServiceHelper;
@@ -69,12 +73,13 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
                                    LocationService locationService, ProviderService providerService,
-                                   @Qualifier(value = "adminService")AdministrationService administrationService,
+                                   AdministrationService administrationService,
                                    EncounterObservationServiceHelper encounterObservationServiceHelper,
                                    EncounterDispositionServiceHelper encounterDispositionServiceHelper,
                                    EncounterTransactionMapper encounterTransactionMapper,
                                    EncounterProviderServiceHelper encounterProviderServiceHelper,
-                                   @Qualifier(value = "emrOrderService") EmrOrderService emrOrderService) {
+                                   EmrOrderService emrOrderService,
+                                   ConditionService conditionService) {
         this.patientService = patientService;
         this.visitService = visitService;
         this.encounterService = encounterService;
@@ -86,6 +91,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         this.encounterTransactionMapper = encounterTransactionMapper;
         this.encounterProviderServiceHelper = encounterProviderServiceHelper;
         this.emrOrderService = emrOrderService;
+        this.conditionService = conditionService;
     }
 
     @Override
@@ -105,12 +111,15 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     public EncounterTransaction save(EncounterTransaction encounterTransaction) {
         Patient patient = patientService.getPatientByUuid(encounterTransaction.getPatientUuid());
         Visit visit = findOrCreateVisit(encounterTransaction, patient);
+        List<Condition> conditionList = encounterTransaction.getConditions();
         Encounter encounter = findOrCreateEncounter(encounterTransaction, patient, visit);
 
         encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations());
         encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses());
         encounterDispositionServiceHelper.update(encounter, encounterTransaction.getDisposition());
         encounterProviderServiceHelper.update(encounter, encounterTransaction.getProviders());
+
+        saveConditionList(conditionList);
 
         visitService.saveVisit(visit);
 
@@ -276,4 +285,17 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         return visit;
     }
 
+    private void saveConditionList(List<Condition> conditionList) {
+        for (Condition condition : conditionList) {
+            conditionService.save(condition);
+        }
+
+    }
+
+    public void addCondition(EncounterTransaction encounterTransaction, Condition condition) {
+        List<Condition> conditionList = encounterTransaction.getConditions();
+        conditionList.add(condition);
+        saveConditionList(conditionList);
+    }
+    
 }

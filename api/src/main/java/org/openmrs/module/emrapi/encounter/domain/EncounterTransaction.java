@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.encounter.domain;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.openmrs.Condition;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class EncounterTransaction {
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
+    private List<org.openmrs.Condition> conditions = new ArrayList<Condition>();
     private Set<Provider> providers = new HashSet<Provider>();
 
     public EncounterTransaction() {
@@ -46,6 +48,12 @@ public class EncounterTransaction {
     public EncounterTransaction(String visitUuid, String encounterUuid) {
         this.visitUuid = visitUuid;
         this.encounterUuid = encounterUuid;
+    }
+
+    public EncounterTransaction(String visitUuid, String encounterUuid, List<Condition> conditions) {
+        this.visitUuid = visitUuid;
+        this.encounterUuid = encounterUuid;
+        this.conditions = conditions;
     }
 
     public Disposition getDisposition() {
@@ -98,6 +106,14 @@ public class EncounterTransaction {
 
     public void setTestOrders(List<TestOrder> testOrders) {
         this.testOrders = testOrders;
+    }
+
+    public List<Condition> getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(List<Condition> conditions) {
+        this.conditions = conditions;
     }
 
     public List<DrugOrder> getDrugOrders() {

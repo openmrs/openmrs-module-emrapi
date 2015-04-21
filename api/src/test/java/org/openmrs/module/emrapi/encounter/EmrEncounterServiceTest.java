@@ -14,6 +14,7 @@ import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConditionService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
@@ -63,6 +64,9 @@ public class EmrEncounterServiceTest {
     @Mock
     private EmrOrderService orderService;
 
+    @Mock
+    private ConditionService conditionService;
+
     private EmrEncounterServiceImpl emrEncounterService;
     private Patient patient;
 
@@ -71,7 +75,7 @@ public class EmrEncounterServiceTest {
         initMocks(this);
         emrEncounterService = new EmrEncounterServiceImpl(patientService,visitService,encounterService,locationService,providerService,
                 administrationService,encounterObservationServiceHelper,
-                encounterDispositionServiceHelper,encounterTransactionMapper, encounterProviderServiceHelper, orderService);
+                encounterDispositionServiceHelper,encounterTransactionMapper, encounterProviderServiceHelper, orderService, conditionService);
 
         patient = new Patient(1);
         patient.setUuid("patient-uuid");
