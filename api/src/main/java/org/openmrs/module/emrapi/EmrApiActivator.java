@@ -60,7 +60,6 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
     @Override
     public void contextRefreshed() {
         super.contextRefreshed();    //To change body of overridden methods use File | Settings | File Templates.
-
         ensurePrivilegeLevelRoles();
     }
 
@@ -134,15 +133,26 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
     private void createUnknownProvider(AdministrationService adminService, ProviderService providerService, PersonService personService) {
 
         // see if the provider exists
-        Provider provider = null;
-        String providerUuid = adminService.getGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+        Provider unknownProvider = null;
 
-        if (StringUtils.isNotBlank(providerUuid)) {
-            provider = providerService.getProviderByUuid(providerUuid);
+        // both of these global properties should at least exist, because they are defined in the config.xml of this module
+        GlobalProperty emrApiUnknownProviderUuid = adminService.getGlobalPropertyObject(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+        GlobalProperty coreApiUnknownProviderUuid = adminService.getGlobalPropertyObject("provider.unknownProviderUuid"); // there's an OpenMRS constant for this, but it isn't available until 1.10
+
+        // first try to fetch based on the GP provided by the EMR API module
+        if (StringUtils.isNotBlank(emrApiUnknownProviderUuid.getPropertyValue())) {
+            unknownProvider = providerService.getProviderByUuid(emrApiUnknownProviderUuid.getPropertyValue());
         }
 
-        // create the unknown provider if necessary
-        if (provider == null) {
+        // next try to fetch based on the GP provided by core
+        if (unknownProvider == null) {
+            if (StringUtils.isNotBlank(coreApiUnknownProviderUuid.getPropertyValue())) {
+                unknownProvider = providerService.getProviderByUuid(coreApiUnknownProviderUuid.getPropertyValue());
+            }
+        }
+
+        // if we haven't found an unknown provider. create it
+        if (unknownProvider == null) {
             Person unknownPerson = new Person();
             unknownPerson.setGender("F");
             PersonName unknownPersonName = new PersonName();
@@ -152,23 +162,21 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
 
             personService.savePerson(unknownPerson);
 
-            Provider unknownProvider = new Provider();
+            unknownProvider = new Provider();
             unknownProvider.setPerson(unknownPerson);
             unknownProvider.setIdentifier("UNKNOWN");
             unknownProvider.setUuid("f9badd80-ab76-11e2-9e96-0800200c9a66");
 
             providerService.saveProvider(unknownProvider);
 
-            // also set global property
-            GlobalProperty unknownProviderUuid = adminService.getGlobalPropertyObject(EmrApiConstants.GP_UNKNOWN_PROVIDER);
-            if (unknownProviderUuid == null) {
-                unknownProviderUuid = new GlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
-            }
-            unknownProviderUuid.setPropertyValue("f9badd80-ab76-11e2-9e96-0800200c9a66");
-            adminService.saveGlobalProperty(unknownProviderUuid);
-
         }
 
+        // now make sure that both GPs are set to the proper value
+        coreApiUnknownProviderUuid.setPropertyValue(unknownProvider.getUuid());
+        adminService.saveGlobalProperty(coreApiUnknownProviderUuid);
+
+        emrApiUnknownProviderUuid.setPropertyValue(unknownProvider.getUuid());
+        adminService.saveGlobalProperty(emrApiUnknownProviderUuid);
     }
 
     /**

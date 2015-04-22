@@ -50,6 +50,12 @@
                            format="java.lang.String" searchable="false" creator="1" date_created="2008-08-15 15:53:36.0"
                            retired="false" uuid="a0f5521c-dbbd-4c10-81b2-1b7ab18330dz" sort_weight="2"/>
 
+    <global_property property="provider.unknownProviderUuid" property_value=""
+                     uuid="984628b0-e914-11e4-b571-0800200c9a66"/>
+
+    <global_property property="emr.unknownProvider" property_value=""
+                     uuid="a0351a90-e914-11e4-b571-0800200c9a66"/>
+
     <concept_reference_source concept_source_id="1001" name="org.openmrs.module.emrapi" description="EMR API Concept Source" creator="1" date_created="2009-06-03 13:41:25.0" retired="false" uuid="edd52713-8887-47b7-ba9e-6e1148824ca4"/>
 
     <!-- create some visits for patient 7 & 8 from the standardTestDataset to test merging visits -->

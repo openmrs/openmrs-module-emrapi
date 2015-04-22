@@ -16,11 +16,14 @@ package org.openmrs.module.emrapi;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.GlobalProperty;
 import org.openmrs.Provider;
 import org.openmrs.Role;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.UserService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -33,6 +36,10 @@ import static org.junit.Assert.assertThat;
 public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
+    @Qualifier("adminService")
+    private AdministrationService adminService;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -40,11 +47,7 @@ public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest
 
     @Before
     public void setUp() throws Exception {
-        EmrApiActivator activator = new EmrApiActivator();
-        activator.willRefreshContext();
-        activator.contextRefreshed();
-        activator.willStart();
-        activator.started();
+        executeDataSet("baseTestDataset.xml");
     }
 
     @Test
@@ -64,6 +67,7 @@ public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest
         EmrApiActivator activator = new EmrApiActivator();
         activator.willRefreshContext();
         activator.contextRefreshed();
+        activator.started();
 
         Provider unknownProvider = emrApiProperties.getUnknownProvider();
 
@@ -72,6 +76,62 @@ public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest
         assertThat(unknownProvider.getIdentifier(), is("UNKNOWN"));
         assertThat(unknownProvider.getPerson().getGivenName(), is("Unknown"));
         assertThat(unknownProvider.getPerson().getFamilyName(), is("Provider"));
+
+        // check that the global properties have been properly set
+        assertThat(adminService.getGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER),
+                is("f9badd80-ab76-11e2-9e96-0800200c9a66"));
+        assertThat(adminService.getGlobalProperty("provider.unknownProviderUuid"),
+                is("f9badd80-ab76-11e2-9e96-0800200c9a66"));
+    }
+
+    @Test
+    public void shouldSetCoreUnknownProviderGPIfProviderAlreadyExistsForEmrApiGlobalProperty() {
+
+        // setup, by setting the emr api global property
+        GlobalProperty emrApiUnknownProviderUuid = adminService.getGlobalPropertyObject(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+        emrApiUnknownProviderUuid.setPropertyValue("c2299800-cca9-11e0-9572-0800200c9a66");  // this uuid is provider #1 in the standard test dataset
+        adminService.saveGlobalProperty(emrApiUnknownProviderUuid);
+
+        EmrApiActivator activator = new EmrApiActivator();
+        activator.willRefreshContext();
+        activator.contextRefreshed();
+        activator.started();
+
+        Provider unknownProvider = emrApiProperties.getUnknownProvider();
+        assertNotNull(unknownProvider);
+        assertThat(unknownProvider.getIdentifier(), is("Test"));   // provider #1 from the standard test dataset
+
+        // check that the global properties have been properly set
+        assertThat(adminService.getGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER),
+                is("c2299800-cca9-11e0-9572-0800200c9a66"));
+        assertThat(adminService.getGlobalProperty("provider.unknownProviderUuid"),
+                is("c2299800-cca9-11e0-9572-0800200c9a66"));
+
+    }
+
+    @Test
+    public void shouldSetEmrApiUnknownProviderGPIfProviderAlreadyExistsForCoreGlobalProperty() {
+
+        // setup, by setting the emr api global property
+        GlobalProperty coreUnknownProviderUuid = adminService.getGlobalPropertyObject(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+        coreUnknownProviderUuid.setPropertyValue("c2299800-cca9-11e0-9572-0800200c9a66");  // this uuid is provider #1 in the standard test dataset
+        adminService.saveGlobalProperty(coreUnknownProviderUuid);
+
+        EmrApiActivator activator = new EmrApiActivator();
+        activator.willRefreshContext();
+        activator.contextRefreshed();
+        activator.started();
+
+        Provider unknownProvider = emrApiProperties.getUnknownProvider();
+        assertNotNull(unknownProvider);
+        assertThat(unknownProvider.getIdentifier(), is("Test"));   // provider #1 from the standard test dataset
+
+        // check that the global properties have been properly set
+        assertThat(adminService.getGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER),
+                is("c2299800-cca9-11e0-9572-0800200c9a66"));
+        assertThat(adminService.getGlobalProperty("provider.unknownProviderUuid"),
+                is("c2299800-cca9-11e0-9572-0800200c9a66"));
+
     }
 
 }

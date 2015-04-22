@@ -208,5 +208,16 @@
         </description>
     </globalProperty>
 
+
+    <!-- this core global property will eventually replace emr.unknownProvider -->
+    <!-- currently, at module startup, the activator should make sure both properties are set to the same value -->
+    <globalProperty>
+        <property>provider.unknownProviderUuid</property>
+        <defaultValue></defaultValue>
+        <description>
+            Specifies the uuid of the Unknown Provider account
+        </description>
+    </globalProperty>
+
 </module>
 
