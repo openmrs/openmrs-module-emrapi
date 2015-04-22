@@ -169,12 +169,6 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
 
         }
 
-        // also update to set name field of provider to Unknown Provider, added Apr 22 2015
-        if (provider.getName() == null) {
-            provider.setName("Unknown Provider");
-            providerService.saveProvider(provider);
-        }
-
     }
 
     /**
