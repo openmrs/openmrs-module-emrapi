@@ -13,11 +13,12 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import java.util.List;
 import org.openmrs.Encounter;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component(value = "emrOrderService")
 @OpenmrsProfile(openmrsVersion = "1.9.*")
@@ -25,5 +26,9 @@ public class DefaultOrderServiceImpl implements EmrOrderService{
 
     @Override
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
+    }
+
+    @Override
+    public void saveTestOrders(List<EncounterTransaction.TestOrder> testOrders, Encounter encounter) {
     }
 }

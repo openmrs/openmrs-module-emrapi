@@ -464,6 +464,7 @@ public class EncounterTransaction {
     public static class TestOrder {
         private Concept concept;
         private String orderTypeUuid;
+        private String orderType;
         private String instructions;
         private String uuid;
         private boolean voided;
@@ -471,6 +472,8 @@ public class EncounterTransaction {
         private Date dateCreated;
         private Date dateChanged;
         private String orderNumber;
+        private String careSetting;
+        private String action;
 
         @JsonIgnore
         public String getConceptUuid() {
@@ -532,6 +535,15 @@ public class EncounterTransaction {
             return this;
         }
 
+        public String getOrderType() {
+            return orderType;
+        }
+
+        public TestOrder setOrderType(String orderType) {
+            this.orderType = orderType;
+            return this;
+        }
+
         @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getDateCreated() {
             return dateCreated;
@@ -556,6 +568,22 @@ public class EncounterTransaction {
 
         public String getOrderNumber() {
             return orderNumber;
+        }
+
+        public void setCareSetting(String careSetting) {
+            this.careSetting = careSetting;
+        }
+
+        public String getCareSetting() {
+            return careSetting;
+        }
+
+        public void setAction(String action) {
+            this.action = action;
+        }
+
+        public String getAction() {
+            return action;
         }
     }
 
