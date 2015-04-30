@@ -14,10 +14,15 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.Provider;
+import org.openmrs.TestOrder;
+import org.openmrs.EncounterProvider;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
+import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.Date;
@@ -47,6 +52,7 @@ public class OpenMRSTestOrderMapper {
             openMRSTestOrder.setConcept(getConceptFrom(testOrder, openMRSTestOrder));
             openMRSTestOrder.setEncounter(encounter);
             openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
+            openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
         }
         else{
             openMRSTestOrder = getOrderByUuid(testOrder);
@@ -55,7 +61,6 @@ public class OpenMRSTestOrderMapper {
 
         openMRSTestOrder.setVoided(testOrder.isVoided());
         openMRSTestOrder.setVoidReason(testOrder.getVoidReason());
-        openMRSTestOrder.setDateCreated(testOrder.getDateCreated());
 
         return  openMRSTestOrder;
     }
@@ -93,7 +98,7 @@ public class OpenMRSTestOrderMapper {
             return providers.next().getProvider();
         }
 
-        throw new APIException("Encounter doesn't have atleast a single provider.");
+        throw new APIException("Encounter doesn't have a provider.");
     }
 
 
