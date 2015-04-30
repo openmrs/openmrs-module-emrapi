@@ -63,7 +63,6 @@ public class OpenMRSTestOrderMapper1_10Test {
         Assert.assertEquals(mrsBloodConcept, testOrder.getConcept());
         Assert.assertEquals(false,testOrder.getVoided());
         Assert.assertEquals("", testOrder.getVoidReason());
-        Assert.assertEquals(currentDate, testOrder.getDateCreated());
         Assert.assertEquals(provider,testOrder.getOrderer());
     }
 
