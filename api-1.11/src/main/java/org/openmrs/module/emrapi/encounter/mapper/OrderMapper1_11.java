@@ -13,11 +13,6 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
@@ -30,6 +25,11 @@ import org.openmrs.module.emrapi.encounter.ConceptMapper;
 import org.openmrs.module.emrapi.encounter.OrderMapper;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Component(value = "orderMapper")
 @OpenmrsProfile(openmrsVersion = "[1.11.* - 1.12.*]")
@@ -134,6 +134,7 @@ public class OrderMapper1_11 implements OrderMapper {
         emrTestOrder.setConcept(conceptMapper.map(order.getConcept()));
         emrTestOrder.setInstructions(order.getInstructions());
         emrTestOrder.setOrderTypeUuid(order.getOrderType() != null ? order.getOrderType().getUuid() : null);
+        emrTestOrder.setOrderType(order.getOrderType() != null ? order.getOrderType().getName() : "");
         emrTestOrder.setVoided(order.getVoided());
         emrTestOrder.setVoidReason(order.getVoidReason());
         emrTestOrder.setDateCreated(order.getDateCreated());
