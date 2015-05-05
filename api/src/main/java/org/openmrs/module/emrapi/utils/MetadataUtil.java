@@ -233,7 +233,6 @@ public class MetadataUtil {
                 belongsToPackages = new TreeSet<String>();
                 itemToPackages.put(key, belongsToPackages);
             }
-            belongsToPackages.add(filename);
 
             Date existing = lastModifiedMap.get(key);
             if (existing == null) {
@@ -241,9 +240,10 @@ public class MetadataUtil {
             }
             else {
                 if (!existing.equals(lastModified)) {
-                    throw new IllegalStateException("Found inconsistent versions of " + key + " in " + belongsToPackages);
+                    throw new IllegalStateException("Found inconsistent versions of " + key + " in " + filename + " (" + lastModified + ") vs " + belongsToPackages + " (" + existing + ")");
                 }
             }
+            belongsToPackages.add(filename);
         }
 
         private Date getLastModified(Object object) {
