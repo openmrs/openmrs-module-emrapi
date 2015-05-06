@@ -20,6 +20,7 @@ import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +33,13 @@ import java.util.List;
 public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
+    private final OpenMRSOrderMapper openMRSOrderMapper;
 
     @Autowired
-    public EmrOrderServiceImpl_1_10(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService) {
+    public EmrOrderServiceImpl_1_10(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSOrderMapper openMRSOrderMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
+        this.openMRSOrderMapper = openMRSOrderMapper;
     }
 
     @Override
@@ -45,6 +48,15 @@ public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
             encounter.addOrder(omrsDrugOrder);
+        }
+        encounterService.saveEncounter(encounter);
+    }
+
+    @Override
+    public void saveOrders(List<EncounterTransaction.Order> orders, Encounter encounter) {
+        for (EncounterTransaction.Order order : orders) {
+            Order omrsOrder = openMRSOrderMapper.map(order, encounter);
+            encounter.addOrder(omrsOrder);
         }
         encounterService.saveEncounter(encounter);
     }

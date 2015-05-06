@@ -35,6 +35,7 @@ public class EncounterTransaction {
     private Date encounterDateTime;
     private Disposition disposition;
     private List<Observation> observations = new ArrayList<Observation>();
+    private List<Order> orders = new ArrayList<Order>();
     private List<TestOrder> testOrders = new ArrayList<TestOrder>();
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
@@ -90,6 +91,14 @@ public class EncounterTransaction {
 
     public List<Observation> getObservations() {
         return observations;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     public List<TestOrder> getTestOrders() {
@@ -153,6 +162,10 @@ public class EncounterTransaction {
 
     public void addObservation(Observation observation) {
         observations.add(observation);
+    }
+
+    public void addOrder(Order order) {
+        orders.add(order);
     }
 
     public void addTestOrder(TestOrder testOrder) {
@@ -459,6 +472,133 @@ public class EncounterTransaction {
         }
     }
 
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Order {
+        private Concept concept;
+        private String orderTypeUuid;
+        private String orderType;
+        private String instructions;
+        private String uuid;
+        private boolean voided;
+        private String voidReason;
+        private Date dateCreated;
+        private Date dateChanged;
+        private String orderNumber;
+        private String careSetting;
+        private String action;
+
+        @JsonIgnore
+        public String getConceptUuid() {
+            return concept.getUuid();
+        }
+
+        public Concept getConcept() {
+            return concept;
+        }
+
+        public Order setConcept(Concept concept) {
+            this.concept = concept;
+            return this;
+        }
+
+        public String getInstructions() {
+            return instructions;
+        }
+
+        public Order setInstructions(String instructions) {
+            this.instructions = instructions;
+            return this;
+        }
+
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public Order setUuid(String uuid) {
+            this.uuid = uuid;
+            return this;
+        }
+
+        public Order setVoided(boolean voided) {
+            this.voided = voided;
+            return this;
+        }
+
+        public boolean isVoided() {
+            return voided;
+        }
+
+        public String getVoidReason() {
+            return voidReason;
+        }
+
+        public Order setVoidReason(String voidReason) {
+            this.voidReason = voidReason;
+            return this;
+        }
+
+        public String getOrderTypeUuid() {
+            return orderTypeUuid;
+        }
+
+        public Order setOrderTypeUuid(String orderTypeUuid) {
+            this.orderTypeUuid = orderTypeUuid;
+            return this;
+        }
+
+        public String getOrderType() {
+            return orderType;
+        }
+
+        public Order setOrderType(String orderType) {
+            this.orderType = orderType;
+            return this;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateCreated() {
+            return dateCreated;
+        }
+
+        public void setDateCreated(Date dateCreated) {
+            this.dateCreated = dateCreated;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateChanged() {
+            return dateChanged;
+        }
+
+        public void setDateChanged(Date dateChanged) {
+            this.dateChanged = dateChanged;
+        }
+
+        public void setOrderNumber(String orderNumber) {
+            this.orderNumber = orderNumber;
+        }
+
+        public String getOrderNumber() {
+            return orderNumber;
+        }
+
+        public void setCareSetting(String careSetting) {
+            this.careSetting = careSetting;
+        }
+
+        public String getCareSetting() {
+            return careSetting;
+        }
+
+        public void setAction(String action) {
+            this.action = action;
+        }
+
+        public String getAction() {
+            return action;
+        }
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TestOrder {

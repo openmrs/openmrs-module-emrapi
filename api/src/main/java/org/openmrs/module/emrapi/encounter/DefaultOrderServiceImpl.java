@@ -26,4 +26,8 @@ public class DefaultOrderServiceImpl implements EmrOrderService{
     @Override
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
     }
+
+    @Override
+    public void saveOrders(List<EncounterTransaction.Order> orders, Encounter encounter) {
+    }
 }

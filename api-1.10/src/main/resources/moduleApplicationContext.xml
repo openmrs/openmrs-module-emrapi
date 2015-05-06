@@ -19,4 +19,9 @@
         <constructor-arg name="orderMetadataService" ref="orderMetadataService"/>
         <constructor-arg name="orderService" ref="orderService"/>
     </bean>
+
+    <bean id="openMRSOrderMapper" class="org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+        <constructor-arg name="orderService" ref="orderService"/>
+    </bean>
 </beans>
