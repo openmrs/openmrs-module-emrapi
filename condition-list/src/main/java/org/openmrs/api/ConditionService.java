@@ -22,7 +22,6 @@ import org.openmrs.api.util.PrivilegeConstants;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public interface ConditionService extends OpenmrsService {
     @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
@@ -30,6 +29,8 @@ public interface ConditionService extends OpenmrsService {
 
     @Authorized({PrivilegeConstants.EDIT_CONDITIONS})
     Condition voidCondition(Condition condition, String voidReason);
+
+    Condition endCondition(Condition condition, Date endDate, Concept endReason);
 
     Condition getConditionByUuid(String uuid);
 

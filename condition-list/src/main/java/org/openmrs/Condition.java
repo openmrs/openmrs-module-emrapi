@@ -16,9 +16,6 @@ package org.openmrs;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.BaseOpenmrsData;
-import org.openmrs.Concept;
-import org.openmrs.Patient;
 import org.simpleframework.xml.Attribute;
 
 import java.util.Date;

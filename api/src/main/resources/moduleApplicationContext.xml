@@ -240,6 +240,7 @@
         <constructor-arg name="providerService" ref="providerService"/>
         <constructor-arg name="visitService" ref="visitService"/>
         <constructor-arg name="emrOrderService" ref="emrOrderService"/>
+        <constructor-arg name="conditionService" ref="conditionService"/>
     </bean>
 
     <bean id="encounterObservationServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterObservationServiceHelper">
@@ -323,7 +324,7 @@
             </list>
         </property>
     </bean>
-
+    
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">

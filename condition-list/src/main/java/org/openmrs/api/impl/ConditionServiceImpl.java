@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.openmrs.Concept;
 import org.openmrs.Condition;
+import org.openmrs.Condition.Status;
 import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.api.AdministrationService;
@@ -31,7 +32,6 @@ import org.openmrs.api.db.ConditionDAO;
 import org.openmrs.api.util.ConditionListConstants;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 
 public class ConditionServiceImpl extends BaseOpenmrsService implements ConditionService {
 
@@ -85,6 +85,18 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
         if (!StringUtils.hasLength(voidReason)) {
             throw new IllegalArgumentException("voidReason cannot be empty or null");
         }
+        return conditionDAO.saveOrUpdate(condition);
+    }
+
+    @Override
+    public Condition endCondition(Condition condition, Date endDate, Concept endReason) {
+        if(conditionDAO.getConditionByUuid(condition.getUuid()) == null)
+        {
+            throw new IllegalArgumentException("condition doesn't exist");
+        };
+        condition.setEndDate(endDate);
+        condition.setEndReason(endReason);
+        condition.setStatus(Status.HISTORY_OF);
         return conditionDAO.saveOrUpdate(condition);
     }
 
