@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.encounter.builder;
 
+import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.Calendar;
@@ -11,8 +12,7 @@ public class TestOrderBuilder {
 
     public TestOrderBuilder() {
         testOrder = new EncounterTransaction.TestOrder();
-        testOrder.setCareSetting("OUTPATIENT");
-        testOrder.setOrderType("Lab Orders");
+        testOrder.setCareSetting(CareSettingType.OUTPATIENT);
         withConceptUuid(UUID.randomUUID().toString());
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, 1);

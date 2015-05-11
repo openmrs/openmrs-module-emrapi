@@ -53,6 +53,7 @@ public class OpenMRSTestOrderMapper {
             openMRSTestOrder.setEncounter(encounter);
             openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
             openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
+            openMRSTestOrder.setAutoExpireDate(new Date(new Date().getTime()));
         }
         else{
             openMRSTestOrder = getOrderByUuid(testOrder);

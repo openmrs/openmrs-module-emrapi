@@ -133,8 +133,6 @@ public class OrderMapper1_11 implements OrderMapper {
         emrTestOrder.setUuid(order.getUuid());
         emrTestOrder.setConcept(conceptMapper.map(order.getConcept()));
         emrTestOrder.setInstructions(order.getInstructions());
-        emrTestOrder.setOrderTypeUuid(order.getOrderType() != null ? order.getOrderType().getUuid() : null);
-        emrTestOrder.setOrderType(order.getOrderType() != null ? order.getOrderType().getName() : "");
         emrTestOrder.setVoided(order.getVoided());
         emrTestOrder.setVoidReason(order.getVoidReason());
         emrTestOrder.setDateCreated(order.getDateCreated());
