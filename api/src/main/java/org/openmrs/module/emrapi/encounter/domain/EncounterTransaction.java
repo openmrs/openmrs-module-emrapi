@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.encounter.domain;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
@@ -463,7 +464,6 @@ public class EncounterTransaction {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TestOrder {
         private Concept concept;
-        private String orderTypeUuid;
         private String instructions;
         private String uuid;
         private boolean voided;
@@ -471,6 +471,8 @@ public class EncounterTransaction {
         private Date dateCreated;
         private Date dateChanged;
         private String orderNumber;
+        private CareSettingType careSetting;
+        private String action;
 
         @JsonIgnore
         public String getConceptUuid() {
@@ -523,15 +525,6 @@ public class EncounterTransaction {
             return this;
         }
 
-        public String getOrderTypeUuid() {
-            return orderTypeUuid;
-        }
-
-        public TestOrder setOrderTypeUuid(String orderTypeUuid) {
-            this.orderTypeUuid = orderTypeUuid;
-            return this;
-        }
-
         @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getDateCreated() {
             return dateCreated;
@@ -556,6 +549,22 @@ public class EncounterTransaction {
 
         public String getOrderNumber() {
             return orderNumber;
+        }
+
+        public void setCareSetting(CareSettingType careSetting) {
+            this.careSetting = careSetting;
+        }
+
+        public CareSettingType getCareSetting() {
+            return careSetting;
+        }
+
+        public void setAction(String action) {
+            this.action = action;
+        }
+
+        public String getAction() {
+            return action;
         }
     }
 

@@ -13,37 +13,51 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
+import org.openmrs.TestOrder;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.OpenMRSTestOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashSet;
+import java.util.List;
 
 @Service(value = "emrOrderService")
 @OpenmrsProfile(openmrsVersion = "[1.11.* - 1.12.*]")
 public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
+    private final OpenMRSTestOrderMapper openMRSTestOrderMapper;
 
     @Autowired
-    public EmrOrderServiceImpl_1_11(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService) {
+    public EmrOrderServiceImpl_1_11(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSTestOrderMapper openMRSTestOrderMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
+        this.openMRSTestOrderMapper = openMRSTestOrderMapper;
     }
 
     @Override
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
+        //TODO: setOrders method can be removed.
         encounter.setOrders(new LinkedHashSet<Order>(encounter.getOrders()));
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
             encounter.addOrder(omrsDrugOrder);
+        }
+        encounterService.saveEncounter(encounter);
+    }
+
+    @Override
+    public void saveTestOrders(List<EncounterTransaction.TestOrder> testOrders, Encounter encounter) {
+        for (EncounterTransaction.TestOrder testOrder : testOrders) {
+            TestOrder omrsTestOrder = openMRSTestOrderMapper.map(testOrder, encounter);
+            encounter.addOrder(omrsTestOrder);
         }
         encounterService.saveEncounter(encounter);
     }
