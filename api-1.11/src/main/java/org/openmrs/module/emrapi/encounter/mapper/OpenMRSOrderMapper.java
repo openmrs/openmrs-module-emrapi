@@ -100,5 +100,4 @@ public class OpenMRSOrderMapper {
 
         throw new APIException("Encounter doesn't have a provider.");
     }
-
 }

@@ -13,6 +13,19 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,18 +44,6 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSTestOrderMapper;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 public class EmrOrderServiceImpl_1_11Test {
 
