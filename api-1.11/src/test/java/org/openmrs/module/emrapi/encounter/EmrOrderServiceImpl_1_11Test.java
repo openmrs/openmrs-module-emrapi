@@ -25,9 +25,11 @@ import org.openmrs.TestOrder;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
+import org.openmrs.module.emrapi.encounter.builder.OrderBuilder;
 import org.openmrs.module.emrapi.encounter.builder.TestOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSTestOrderMapper;
 
 import java.text.ParseException;
@@ -51,6 +53,9 @@ public class EmrOrderServiceImpl_1_11Test {
     private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
 
     @Mock
+    private OpenMRSOrderMapper openMRSOrderMapper;
+
+    @Mock
     private OpenMRSTestOrderMapper openMRSTestOrderMapper;
 
     @Mock
@@ -63,7 +68,7 @@ public class EmrOrderServiceImpl_1_11Test {
 
     @Test
     public void shouldSaveNewDrugOrdersInTheSequenceOfOrdering() throws ParseException {
-        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSTestOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, openMRSTestOrderMapper);
         EncounterTransaction.DrugOrder drugOrder1 = new DrugOrderBuilder().withDrugUuid("drug-uuid1").build();
         EncounterTransaction.DrugOrder drugOrder2 = new DrugOrderBuilder().withDrugUuid("drug-uuid2").build();
         DrugOrder mappedDrugOrder1 = new DrugOrder();
@@ -85,7 +90,7 @@ public class EmrOrderServiceImpl_1_11Test {
 
     @Test
     public void shouldSaveNewDrugOrdersInTheSequenceOfOrderingToAnEncounterWithExistingOrders() throws ParseException {
-        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSTestOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, openMRSTestOrderMapper);
         EncounterTransaction.DrugOrder drugOrder3 = new DrugOrderBuilder().withDrugUuid("drug-uuid3").build();
         EncounterTransaction.DrugOrder drugOrder4 = new DrugOrderBuilder().withDrugUuid("drug-uuid4").build();
         DrugOrder existingDrugOrder1 = new DrugOrder();
@@ -111,7 +116,7 @@ public class EmrOrderServiceImpl_1_11Test {
 
     @Test
     public void shouldSaveNewTestOrders() throws ParseException {
-        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSTestOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, openMRSTestOrderMapper);
         EncounterTransaction.TestOrder testOrder1 = new TestOrderBuilder().withConceptUuid("concept-uuid1").build();
         EncounterTransaction.TestOrder testOrder2 = new TestOrderBuilder().withConceptUuid("concept-uuid2").build();
 
@@ -136,13 +141,13 @@ public class EmrOrderServiceImpl_1_11Test {
         Encounter savedEncounter = encounterArgumentCaptor.getValue();
         ArrayList<Order> savedOrders = new ArrayList<Order>(savedEncounter.getOrders());
         assertThat(savedOrders.size(), is(2));
-        assertTrue(existsInOrdersList(mappedTestOrder1, savedOrders));
-        assertTrue(existsInOrdersList(mappedTestOrder2, savedOrders));
+        assertTrue(testOrderExistsInOrdersList(mappedTestOrder1, savedOrders));
+        assertTrue(testOrderExistsInOrdersList(mappedTestOrder2, savedOrders));
     }
 
     @Test
     public void shouldSaveNewTestOrdersToEncounterWithExistingOrders() throws ParseException {
-        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSTestOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, openMRSTestOrderMapper);
         EncounterTransaction.TestOrder testOrder1 = new TestOrderBuilder().withConceptUuid("concept-uuid1").build();
         EncounterTransaction.TestOrder testOrder2 = new TestOrderBuilder().withConceptUuid("concept-uuid2").build();
 
@@ -173,13 +178,89 @@ public class EmrOrderServiceImpl_1_11Test {
         Encounter savedEncounter = encounterArgumentCaptor.getValue();
         ArrayList<Order> savedOrders = new ArrayList<Order>(savedEncounter.getOrders());
         assertThat(savedOrders.size(), is(4));
-        assertTrue(existsInOrdersList(mappedTestOrder1, savedOrders));
-        assertTrue(existsInOrdersList(mappedTestOrder2, savedOrders));
+        assertTrue(testOrderExistsInOrdersList(mappedTestOrder1, savedOrders));
+        assertTrue(testOrderExistsInOrdersList(mappedTestOrder2, savedOrders));
     }
 
-    private boolean existsInOrdersList(TestOrder testOrder, ArrayList<Order> orderArrayList) {
+    @Test
+    public void shouldSaveNewOrders() throws ParseException {
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, openMRSTestOrderMapper);
+        EncounterTransaction.Order order1 = new OrderBuilder().withConceptUuid("concept-uuid1").build();
+        EncounterTransaction.Order order2 = new OrderBuilder().withConceptUuid("concept-uuid2").build();
+
+        Order mappedOrder1 = new Order();
+        Concept concept = new Concept();
+        concept.setUuid("concept-uuid1");
+        mappedOrder1.setConcept(concept);
+
+        Order mappedOrder2 = new Order();
+        concept = new Concept();
+        concept.setUuid("concept-uuid2");
+        mappedOrder2.setConcept(concept);
+
+        Encounter encounter = new Encounter();
+        when(openMRSOrderMapper.map(order1,encounter)).thenReturn(mappedOrder1);
+        when(openMRSOrderMapper.map(order2,encounter)).thenReturn(mappedOrder2);
+
+        emrOrderService.saveOrders(Arrays.asList(order1, order2), encounter);
+
+        ArgumentCaptor<Encounter> encounterArgumentCaptor = ArgumentCaptor.forClass(Encounter.class);
+        verify(encounterService).saveEncounter(encounterArgumentCaptor.capture());
+        Encounter savedEncounter = encounterArgumentCaptor.getValue();
+        ArrayList<Order> savedOrders = new ArrayList<Order>(savedEncounter.getOrders());
+        assertThat(savedOrders.size(), is(2));
+        assertTrue(orderExistsInOrdersList(mappedOrder1, savedOrders));
+        assertTrue(orderExistsInOrdersList(mappedOrder2, savedOrders));
+    }
+
+    @Test
+    public void shouldSaveNewOrdersToEncounterWithExistingOrders() throws ParseException {
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, openMRSTestOrderMapper);
+        EncounterTransaction.Order testOrder1 = new OrderBuilder().withConceptUuid("concept-uuid1").build();
+        EncounterTransaction.Order testOrder2 = new OrderBuilder().withConceptUuid("concept-uuid2").build();
+
+        Order mappedOrder1 = new Order();
+        Concept concept = new Concept();
+        concept.setUuid("concept-uuid1");
+        mappedOrder1.setConcept(concept);
+
+        Order mappedOrder2 = new Order();
+        concept = new Concept();
+        concept.setUuid("concept-uuid2");
+        mappedOrder2.setConcept(concept);
+
+        Order existingOrder1 = new Order();
+        Order existingOrder2 = new Order();
+
+        Encounter encounter = new Encounter();
+        encounter.addOrder(existingOrder1);
+        encounter.addOrder(existingOrder2);
+
+        when(openMRSOrderMapper.map(testOrder1,encounter)).thenReturn(mappedOrder1);
+        when(openMRSOrderMapper.map(testOrder2,encounter)).thenReturn(mappedOrder2);
+
+        emrOrderService.saveOrders(Arrays.asList(testOrder1, testOrder2), encounter);
+
+        ArgumentCaptor<Encounter> encounterArgumentCaptor = ArgumentCaptor.forClass(Encounter.class);
+        verify(encounterService).saveEncounter(encounterArgumentCaptor.capture());
+        Encounter savedEncounter = encounterArgumentCaptor.getValue();
+        ArrayList<Order> savedOrders = new ArrayList<Order>(savedEncounter.getOrders());
+        assertThat(savedOrders.size(), is(4));
+        assertTrue(orderExistsInOrdersList(mappedOrder1, savedOrders));
+        assertTrue(orderExistsInOrdersList(mappedOrder2, savedOrders));
+    }
+
+    private boolean testOrderExistsInOrdersList(TestOrder testOrder, ArrayList<Order> orderArrayList) {
         for(Order order : orderArrayList) {
             if(order.getConcept()!=null && order.getConcept().getUuid().equals(testOrder.getConcept().getUuid()) )
+                return true;
+        }
+        return false;
+    }
+
+    private boolean orderExistsInOrdersList(Order orderToCheck, ArrayList<Order> orderArrayList) {
+        for(Order order : orderArrayList) {
+            if(order.getConcept()!=null && order.getConcept().getUuid().equals(orderToCheck.getConcept().getUuid()) )
                 return true;
         }
         return false;

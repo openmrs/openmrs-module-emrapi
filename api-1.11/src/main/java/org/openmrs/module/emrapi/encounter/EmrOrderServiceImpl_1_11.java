@@ -21,6 +21,7 @@ import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSTestOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,12 +34,14 @@ import java.util.List;
 public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
+    private final OpenMRSOrderMapper openMRSOrderMapper;
     private final OpenMRSTestOrderMapper openMRSTestOrderMapper;
 
     @Autowired
-    public EmrOrderServiceImpl_1_11(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSTestOrderMapper openMRSTestOrderMapper) {
+    public EmrOrderServiceImpl_1_11(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSOrderMapper openMRSOrderMapper, OpenMRSTestOrderMapper openMRSTestOrderMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
+        this.openMRSOrderMapper = openMRSOrderMapper;
         this.openMRSTestOrderMapper = openMRSTestOrderMapper;
     }
 
@@ -49,6 +52,15 @@ public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
             encounter.addOrder(omrsDrugOrder);
+        }
+        encounterService.saveEncounter(encounter);
+    }
+
+    @Override
+    public void saveOrders(List<EncounterTransaction.Order> orders, Encounter encounter) {
+        for (EncounterTransaction.Order order : orders) {
+            Order omrsOrder = openMRSOrderMapper.map(order, encounter);
+            encounter.addOrder(omrsOrder);
         }
         encounterService.saveEncounter(encounter);
     }

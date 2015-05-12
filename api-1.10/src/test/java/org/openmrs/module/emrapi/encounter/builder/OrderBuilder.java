@@ -20,40 +20,42 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
-public class TestOrderBuilder {
-    private final EncounterTransaction.TestOrder testOrder;
+public class OrderBuilder {
 
-    public TestOrderBuilder() {
-        testOrder = new EncounterTransaction.TestOrder();
-        testOrder.setCareSetting(CareSettingType.OUTPATIENT);
+    private final EncounterTransaction.Order order;
+
+    public OrderBuilder() {
+        order = new EncounterTransaction.Order();
+        order.setCareSetting(CareSettingType.OUTPATIENT);
         withConceptUuid(UUID.randomUUID().toString());
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, 1);
-        testOrder.setDateCreated(calendar.getTime());
+        order.setDateCreated(calendar.getTime());
         calendar.add(Calendar.MONTH, 1);
         EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
         provider.setUuid("331c6bf8-7846-11e3-a96a-0800271c1b75");
-        testOrder.setAction("NEW");
+        order.setAction("NEW");
     }
 
-    public EncounterTransaction.TestOrder build() {
-        return testOrder;
+    public EncounterTransaction.Order build() {
+        return order;
     }
 
-    public TestOrderBuilder withConceptUuid(String conceptUuid) {
+    public OrderBuilder withConceptUuid(String conceptUuid) {
         EncounterTransaction.Concept concept = new EncounterTransaction.Concept();
         concept.setUuid(conceptUuid);
-        testOrder.setConcept(concept);
+        order.setConcept(concept);
         return this;
     }
 
-    public TestOrderBuilder withScheduledDate(Date createdDate) {
-        testOrder.setDateCreated(createdDate);
+    public OrderBuilder withScheduledDate(Date createdDate) {
+        order.setDateCreated(createdDate);
         return this;
     }
 
-    public TestOrderBuilder withAction(String action) {
-        testOrder.setAction(action);
+    public OrderBuilder withAction(String action) {
+        order.setAction(action);
         return this;
     }
+
 }
