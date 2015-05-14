@@ -19,7 +19,11 @@ import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterProvider;
+import org.openmrs.Provider;
+import org.openmrs.Order;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
@@ -32,7 +36,7 @@ import java.util.Set;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class OpenMRSTestOrderMapper1_10Test {
+public class OpenMRSOrderMapper1_11Test {
 
     @Mock
     private OrderService orderService;
@@ -49,9 +53,8 @@ public class OpenMRSTestOrderMapper1_10Test {
         MockitoAnnotations.initMocks(this);
     }
 
-
     @Test
-    public void createNewTestOrderFromEtTestOrder() throws Exception {
+    public void createNewOrderFromEtOrder() throws Exception {
         Provider provider = mock(Provider.class);
         handleEncounterProvider(provider);
 
@@ -62,53 +65,52 @@ public class OpenMRSTestOrderMapper1_10Test {
 
         EncounterTransaction.Concept blood = new EncounterTransaction.Concept("bloodConceptUuid","blood");
 
-        EncounterTransaction.TestOrder etTestOrder = new EncounterTransaction.TestOrder();
-        etTestOrder.setConcept(blood);
-        etTestOrder.setVoided(false);
-        etTestOrder.setVoidReason("");
-        etTestOrder.setDateCreated(currentDate);
+        EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
+        etOrder.setConcept(blood);
+        etOrder.setVoided(false);
+        etOrder.setVoidReason("");
+        etOrder.setDateCreated(currentDate);
 
-        OpenMRSTestOrderMapper testOrderMapper = new OpenMRSTestOrderMapper(orderService,conceptService);
+        OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
 
-        TestOrder testOrder = testOrderMapper.map(etTestOrder, encounter);
+        Order order = orderMapper.map(etOrder, encounter);
 
-        Assert.assertEquals(encounter,testOrder.getEncounter());
-        Assert.assertEquals(mrsBloodConcept, testOrder.getConcept());
-        Assert.assertEquals(false,testOrder.getVoided());
-        Assert.assertEquals("", testOrder.getVoidReason());
-        Assert.assertEquals(provider,testOrder.getOrderer());
+        Assert.assertEquals(encounter,order.getEncounter());
+        Assert.assertEquals(mrsBloodConcept, order.getConcept());
+        Assert.assertEquals(false,order.getVoided());
+        Assert.assertEquals("", order.getVoidReason());
+        Assert.assertEquals(provider,order.getOrderer());
     }
 
     @Test
-    public void updateExistingTestOrderFromEtTestOrder() throws Exception {
+    public void updateExistingOrderFromEtOrder() throws Exception {
         Provider provider = mock(Provider.class);
         handleEncounterProvider(provider);
 
-        TestOrder mrsOrder = new TestOrder();
+        Order mrsOrder = new Order();
         when(orderService.getOrderByUuid("orderUuid")).thenReturn(mrsOrder);
 
         Date createdDate = new Date();
         EncounterTransaction.Concept blood = new EncounterTransaction.Concept("bloodConceptUuid","blood");
 
-        EncounterTransaction.TestOrder etTestOrder = new EncounterTransaction.TestOrder();
-        etTestOrder.setUuid("orderUuid")
-        .setConcept(blood)
-        .setVoided(true)
-        .setVoidReason("Some problem")
-        .setDateCreated(createdDate);
+        EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
+        etOrder.setUuid("orderUuid")
+                .setConcept(blood)
+                .setVoided(true)
+                .setVoidReason("Some problem")
+                .setDateCreated(createdDate);
 
 
-        OpenMRSTestOrderMapper testOrderMapper = new OpenMRSTestOrderMapper(orderService,conceptService);
-        TestOrder testOrder = testOrderMapper.map(etTestOrder, encounter);
+        OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
+        Order order = orderMapper.map(etOrder, encounter);
 
-        Assert.assertEquals(true,testOrder.getVoided());
-        Assert.assertEquals("Some problem", testOrder.getVoidReason());
-        Assert.assertNotNull(testOrder.getDateChanged());
+        Assert.assertEquals(true,order.getVoided());
+        Assert.assertEquals("Some problem", order.getVoidReason());
+        Assert.assertNotNull(order.getDateChanged());
     }
 
-
     @Test(expected = APIException.class)
-    public void handleTestOrderWithInvalidUuid() throws Exception {
+    public void handleOrderWithInvalidUuid() throws Exception {
         Provider provider = mock(Provider.class);
         handleEncounterProvider(provider);
 
@@ -117,16 +119,16 @@ public class OpenMRSTestOrderMapper1_10Test {
         Date createdDate = new Date();
         EncounterTransaction.Concept blood = new EncounterTransaction.Concept("bloodConceptUuid","blood");
 
-        EncounterTransaction.TestOrder etTestOrder = new EncounterTransaction.TestOrder();
-        etTestOrder.setUuid("orderUuid")
+        EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
+        etOrder.setUuid("orderUuid")
                 .setConcept(blood)
                 .setVoided(true)
                 .setVoidReason("Some problem")
                 .setDateCreated(createdDate);
 
 
-        OpenMRSTestOrderMapper testOrderMapper = new OpenMRSTestOrderMapper(orderService,conceptService);
-        testOrderMapper.map(etTestOrder, encounter);
+        OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
+        Order order = orderMapper.map(etOrder, encounter);
     }
 
     private void handleEncounterProvider(Provider provider){
@@ -138,7 +140,4 @@ public class OpenMRSTestOrderMapper1_10Test {
 
         when(encounter.getEncounterProviders()).thenReturn(providerSet);
     }
-
-
-
-    }
+}
