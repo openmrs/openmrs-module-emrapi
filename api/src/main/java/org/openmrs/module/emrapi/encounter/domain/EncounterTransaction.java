@@ -466,6 +466,7 @@ public class EncounterTransaction {
         private Concept concept;
         private String instructions;
         private String uuid;
+        private String orderType;
         private boolean voided;
         private String voidReason;
         private Date dateCreated;
@@ -565,6 +566,14 @@ public class EncounterTransaction {
 
         public String getAction() {
             return action;
+        }
+
+        public String getOrderType() {
+            return orderType;
+        }
+
+        public void setOrderType(String orderType) {
+            this.orderType = orderType;
         }
     }
 
