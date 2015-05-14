@@ -132,6 +132,7 @@ public class OrderMapper1_10 implements OrderMapper {
         EncounterTransaction.TestOrder emrTestOrder = new EncounterTransaction.TestOrder();
         emrTestOrder.setUuid(order.getUuid());
         emrTestOrder.setConcept(conceptMapper.map(order.getConcept()));
+        emrTestOrder.setOrderType(order.getOrderType().getName());
         emrTestOrder.setInstructions(order.getInstructions());
         emrTestOrder.setVoided(order.getVoided());
         emrTestOrder.setVoidReason(order.getVoidReason());
