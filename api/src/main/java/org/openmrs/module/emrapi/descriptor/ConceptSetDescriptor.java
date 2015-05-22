@@ -39,7 +39,7 @@ public abstract class ConceptSetDescriptor {
             String primaryConceptCode = primaryConceptField.getConceptCode();
             Concept primaryConcept = conceptService.getConceptByMapping(primaryConceptCode, conceptSourceName);
             if (primaryConcept == null) {
-                throw new IllegalStateException("Couldn't find primary concept for " + getClass().getSimpleName() + " which should be mapped as " + conceptSourceName + ":" + primaryConceptCode);
+                throw new MissingConceptException("Couldn't find primary concept for " + getClass().getSimpleName() + " which should be mapped as " + conceptSourceName + ":" + primaryConceptCode);
             }
             PropertyUtils.setProperty(this, primaryConceptField.getName(), primaryConcept);
             for (ConceptSetDescriptorField conceptSetDescriptorField : memberConceptFields) {
@@ -48,7 +48,7 @@ public abstract class ConceptSetDescriptor {
                 Concept childConcept = conceptService.getConceptByMapping(mappingCode, conceptSourceName);
                 if(conceptSetDescriptorField.isRequired()) {
                     if (childConcept == null) {
-                        throw new IllegalStateException("Couldn't find " + propertyName + " concept for " + getClass().getSimpleName() + " which should be mapped as " + conceptSourceName + ":" + mappingCode);
+                        throw new MissingConceptException("Couldn't find " + propertyName + " concept for " + getClass().getSimpleName() + " which should be mapped as " + conceptSourceName + ":" + mappingCode);
                     }
                     if (!primaryConcept.getSetMembers().contains(childConcept)) {
                         throw new IllegalStateException("Concept mapped as " + conceptSourceName + ":" + mappingCode + " needs to be a set member of concept " + primaryConcept.getConceptId() + " which is mapped as " + conceptSourceName + ":" + primaryConceptCode);

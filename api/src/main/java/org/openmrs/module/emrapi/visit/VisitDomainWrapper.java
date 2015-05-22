@@ -25,6 +25,7 @@ import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
+import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
@@ -329,11 +330,18 @@ public class VisitDomainWrapper implements DomainWrapper {
 	 * whether the CodedOrNonCoded diagnosis is the same, not on whether the order or certainty are the same
 	 * if the primaryOnly flag is true, return only primary diagnoses
 	 * if the confirmedOnly flag is true, return only confirmed diagnoses
+     * will return null if diagnosis support not currently configured
 	 */
 	public List<Diagnosis> getUniqueDiagnoses(Boolean primaryOnly, Boolean confirmedOnly) {
 		Map<CodedOrFreeTextAnswer, Diagnosis> diagnoses = new LinkedHashMap<CodedOrFreeTextAnswer, Diagnosis>();
 		for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
-			for (Diagnosis d : getDiagnosesFromEncounter(encounter)) {
+
+            List<Diagnosis> diagnosesFromEncounter = getDiagnosesFromEncounter(encounter);
+            if (diagnosesFromEncounter == null) {
+                return null;
+            }
+
+			for (Diagnosis d : diagnosesFromEncounter) {
 				if (!primaryOnly || d.getOrder() == Diagnosis.Order.PRIMARY) {
 					if (!confirmedOnly || d.getCertainty() == Diagnosis.Certainty.CONFIRMED) {
 						if (!diagnoses.containsKey(d.getDiagnosis())) {
@@ -342,6 +350,7 @@ public class VisitDomainWrapper implements DomainWrapper {
 					}
 				}
 			}
+
 		}
 		return new ArrayList<Diagnosis>(diagnoses.values());
 	}
@@ -351,7 +360,18 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter, List<Diagnosis.Order> diagnosisOrders) {
-        DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+
+        DiagnosisMetadata diagnosisMetadata;
+
+        try {
+            diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+        }
+        catch (MissingConceptException ex) {
+            // this isn't a hard error, because some implementations will not be using diagnoses functionality
+            log.warn("Diagnosis metadata not configured", ex);
+            return null;
+        }
+
         List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
 
         for (Obs obs : encounter.getObsAtTopLevel(false)) {
