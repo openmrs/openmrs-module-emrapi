@@ -368,7 +368,7 @@ public class VisitDomainWrapper implements DomainWrapper {
         }
         catch (MissingConceptException ex) {
             // this isn't a hard error, because some implementations will not be using diagnoses functionality
-            log.warn("Diagnosis metadata not configured", ex);
+            log.info("Diagnosis metadata not configured", ex);
             return null;
         }
 
