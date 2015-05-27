@@ -17,6 +17,13 @@ public interface DispositionService {
     void setDispositionConfig(String dispositionConfig);
 
     /**
+     * True/false whether dispositions are currently configured and supported
+     *
+     * @return
+     */
+    boolean dispositionsSupported();
+
+    /**
      * Fetch a copy of the Disposition Descriptor, which describes the concepts necessary (and optional,
      * like admission location, transfer location, and date of death) for recording a Disposition concept set
      *

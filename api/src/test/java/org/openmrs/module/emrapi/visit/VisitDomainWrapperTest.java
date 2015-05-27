@@ -72,6 +72,7 @@ public class VisitDomainWrapperTest {
         diagnosisMetadata = MockMetadataTestUtil.setupDiagnosisMetadata(emrApiProperties, conceptService);
         dispositionDescriptor = MockMetadataTestUtil.setupDispositionDescriptor(conceptService);
         when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+        when(dispositionService.dispositionsSupported()).thenReturn(true);
         visitDomainWrapper = new VisitDomainWrapper(visit, emrApiProperties, dispositionService);
     }
 

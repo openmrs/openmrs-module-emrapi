@@ -39,7 +39,6 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
-import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
@@ -140,20 +139,15 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             return false;  // already closed
         }
 
-        try {
-            VisitDomainWrapper visitDomainWrapper = domainWrapperFactory.newVisitDomainWrapper(visit);
+        VisitDomainWrapper visitDomainWrapper = domainWrapperFactory.newVisitDomainWrapper(visit);
 
-            if (visitDomainWrapper.isAdmitted() || visitDomainWrapper.isAwaitingAdmission()) {
-                return false;  // don't close the visit if patient is admitted or waiting admission
-            }
-
-            Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();
-            if (mostRecentDisposition != null && mostRecentDisposition.getKeepsVisitOpen() != null && mostRecentDisposition.getKeepsVisitOpen()) {
-                return false; // don't close the visit if the most recent disposition is one that keeps visit opens
-            }
+        if (visitDomainWrapper.isAdmitted() || visitDomainWrapper.isAwaitingAdmission()) {
+            return false;  // don't close the visit if patient is admitted or waiting admission
         }
-        catch (MissingConceptException ex) {
-            // we don't want to fail if dispositions aren't configured
+
+        Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();
+        if (mostRecentDisposition != null && mostRecentDisposition.getKeepsVisitOpen() != null && mostRecentDisposition.getKeepsVisitOpen()) {
+            return false; // don't close the visit if the most recent disposition is one that keeps visit opens
         }
 
         Date now = new Date();

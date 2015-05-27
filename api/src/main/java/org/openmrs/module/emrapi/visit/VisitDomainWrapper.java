@@ -280,12 +280,14 @@ public class VisitDomainWrapper implements DomainWrapper {
     // also, if encounter has multiple disposition (is this possible?) it just returns the first one it finds
     public Disposition getMostRecentDisposition() {
 
-        DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
+        if (dispositionService.dispositionsSupported()) {   // prevents against stace trace if dispositions are supported
+            DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
 
-        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
-            for (Obs obs : encounter.getObsAtTopLevel(false)) {
-                if (dispositionDescriptor.isDisposition(obs)) {
-                    return dispositionService.getDispositionFromObsGroup(obs);
+            for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
+                for (Obs obs : encounter.getObsAtTopLevel(false)) {
+                    if (dispositionDescriptor.isDisposition(obs)) {
+                        return dispositionService.getDispositionFromObsGroup(obs);
+                    }
                 }
             }
         }
@@ -303,13 +305,15 @@ public class VisitDomainWrapper implements DomainWrapper {
      */
     public List<Diagnosis> getDiagnosesFromMostRecentDispositionByType(DispositionType type) {
 
-        DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
+        if (dispositionService.dispositionsSupported()) {   // prevents against stack trace if dispositions not configured
+            DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
 
-        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {  // getSortedEncounters already excludes voided encounters
-            for (Obs obs : encounter.getObsAtTopLevel(false)) {
-                if (dispositionDescriptor.isDisposition(obs)
-                        && dispositionService.getDispositionFromObsGroup(obs).getType() == type) {
-                    return getDiagnosesFromEncounter(encounter);
+            for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {  // getSortedEncounters already excludes voided encounters
+                for (Obs obs : encounter.getObsAtTopLevel(false)) {
+                    if (dispositionDescriptor.isDisposition(obs)
+                            && dispositionService.getDispositionFromObsGroup(obs).getType() == type) {
+                        return getDiagnosesFromEncounter(encounter);
+                    }
                 }
             }
         }
@@ -460,7 +464,7 @@ public class VisitDomainWrapper implements DomainWrapper {
 
     public boolean isAwaitingAdmission() {
 
-        if (!isActive()) {
+        if (!isActive() || !dispositionService.dispositionsSupported()) {  // prevents a stack trace if dispositions are supported
             return false;
         }
 

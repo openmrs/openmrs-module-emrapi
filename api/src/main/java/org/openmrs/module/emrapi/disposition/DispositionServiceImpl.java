@@ -7,6 +7,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
+import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -32,6 +33,19 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
     public DispositionServiceImpl(ConceptService conceptService, EmrConceptService emrConceptService) {
         this.conceptService = conceptService;
         this.emrConceptService = emrConceptService;
+    }
+
+    @Override
+    public boolean dispositionsSupported() {
+        try {
+            if (getDispositionDescriptor() == null) {
+                return false;
+            }
+        }
+        catch (MissingConceptException ex) {
+            return false;
+        }
+        return true;
     }
 
     @Override
