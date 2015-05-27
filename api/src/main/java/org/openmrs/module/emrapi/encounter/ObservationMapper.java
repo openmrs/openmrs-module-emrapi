@@ -14,14 +14,23 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Concept;
+import org.openmrs.Drug;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 
 public class ObservationMapper {
-    private final ConceptMapper conceptMapper = new ConceptMapper();
+    private ConceptMapper conceptMapper;
+    private DrugMapper drugMapper;
+
+    @Autowired(required = false)
+    public ObservationMapper(ConceptMapper conceptMapper, DrugMapper drugMapper) {
+        this.conceptMapper = conceptMapper;
+        this.drugMapper = drugMapper;
+    }
 
     public EncounterTransaction.Observation map(Obs obs) {
         Concept concept = obs.getConcept();
@@ -47,7 +56,10 @@ public class ObservationMapper {
 
     private Object getValue(Obs obs, Concept concept) {
         if (concept.getDatatype().isNumeric()) return obs.getValueNumeric();
-        if (concept.getDatatype().isCoded()) return conceptMapper.map(obs.getValueCoded());
+        if (concept.getDatatype().isCoded()) {
+            Drug valueDrug = obs.getValueDrug();
+            return valueDrug == null ? conceptMapper.map(obs.getValueCoded()) : drugMapper.map(valueDrug);
+        }
         if (concept.getDatatype().isBoolean()) return obs.getValueBoolean();
         // TODO: Remove this once openmrs date format issue is fixed
         // https://tickets.openmrs.org/browse/TRUNK-4280

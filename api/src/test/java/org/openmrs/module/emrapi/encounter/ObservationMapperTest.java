@@ -23,7 +23,9 @@ import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Obs;
+import org.openmrs.Drug;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 
@@ -40,13 +42,15 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     private ConceptNumeric conceptNumeric;
     @Mock
     private ConceptDatatype conceptDatatype;
+    @Mock
+    private DrugMapper drugMapper;
     private ObservationMapper observationMapper;
     private ObsBuilder obsBuilder;
 
     @Before
     public void setUp(){
         MockitoAnnotations.initMocks(this);
-        observationMapper = new ObservationMapper();
+        observationMapper = new ObservationMapper(new ConceptMapper(), drugMapper);
         obsBuilder = new ObsBuilder();
         obsBuilder.setUuid(UUID.randomUUID().toString()).setConcept(concept);
         when(concept.getName()).thenReturn(new ConceptName());
@@ -63,6 +67,33 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
         assertEquals(obs.getUuid(), observation.getUuid());
         assertEquals(100.0, observation.getValue());
+    }
+
+    @Test
+    public void shouldMapObservationWithCodedValue(){
+        when(conceptDatatype.isCoded()).thenReturn(true);
+        Concept concept = new ConceptBuilder(null, new ConceptDatatype(2), null).addName("concept-name").get();
+        Obs obs = obsBuilder.setValue(concept).get();
+
+        EncounterTransaction.Observation observation = observationMapper.map(obs);
+
+        assertEquals(obs.getUuid(), observation.getUuid());
+        EncounterTransaction.Concept answer = (EncounterTransaction.Concept) observation.getValue();
+        assertEquals(concept.getName().getName(), answer.getName());
+    }
+
+    @Test
+    public void shouldMapObservationWithValueAsDrug(){
+        when(conceptDatatype.isCoded()).thenReturn(true);
+        Drug drug = new Drug(2);
+        Obs obs = obsBuilder.setValue(drug).get();
+        EncounterTransaction.Drug mappedDrug = new EncounterTransaction.Drug();
+        when(drugMapper.map(drug)).thenReturn(mappedDrug);
+
+        EncounterTransaction.Observation observation = observationMapper.map(obs);
+
+        assertEquals(obs.getUuid(), observation.getUuid());
+        assertEquals(mappedDrug, observation.getValue());
     }
 
     @Test
