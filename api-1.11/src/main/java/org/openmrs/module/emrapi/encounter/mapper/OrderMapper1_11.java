@@ -87,7 +87,7 @@ public class OrderMapper1_11 implements OrderMapper {
             drugOrder.setPreviousOrderUuid(previousOrder.getUuid());
         }
 
-        EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper().map(openMRSDrugOrder.getDrug());
+        EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper1_11().map(openMRSDrugOrder.getDrug());
         drugOrder.setDrug(encounterTransactionDrug);
 
         drugOrder.setDosingInstructionType(openMRSDrugOrder.getDosingType().getName());

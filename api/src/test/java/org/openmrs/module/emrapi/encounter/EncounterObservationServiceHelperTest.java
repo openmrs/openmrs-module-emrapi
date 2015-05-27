@@ -23,6 +23,7 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.Patient;
+import org.openmrs.Drug;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.OrderService;
@@ -124,6 +125,32 @@ public class EncounterObservationServiceHelperTest {
         assertEquals(1, encounter.getObs().size());
         Obs codedObservation = encounter.getObs().iterator().next();
         assertEquals(answerConcept, codedObservation.getValueCoded());
+        assertEquals("e-uuid", codedObservation.getEncounter().getUuid());
+    }
+
+    @Test
+    public void shouldAddDrugObservation() throws ParseException {
+        newConcept(new ConceptDataTypeBuilder().coded(), CODED_CONCEPT_UUID);
+        Concept drugConcept = newConcept(new ConceptDataTypeBuilder().text(), "drug-concept-uuid");
+        Drug drug = new Drug();
+        drug.setUuid("drug-uuid");
+        drug.setConcept(drugConcept);
+        when(conceptService.getDrugByUuid("drug-uuid")).thenReturn(drug);
+        List<EncounterTransaction.Observation> observations = asList(
+                new EncounterTransaction.Observation().setConcept(getConcept(CODED_CONCEPT_UUID)).setValue("drug-uuid")
+        );
+
+        Patient patient = new Patient();
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        encounter.setPatient(patient);
+
+        encounterObservationServiceHelper.update(encounter, observations);
+
+        assertEquals(1, encounter.getObs().size());
+        Obs codedObservation = encounter.getObs().iterator().next();
+        assertEquals(drugConcept, codedObservation.getValueCoded());
+        assertEquals(drug, codedObservation.getValueDrug());
         assertEquals("e-uuid", codedObservation.getEncounter().getUuid());
     }
 

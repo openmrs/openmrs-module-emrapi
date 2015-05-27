@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.test.builder;
 
 import org.openmrs.Concept;
+import org.openmrs.Drug;
 import org.openmrs.Obs;
 import org.openmrs.Person;
 import org.openmrs.api.context.Context;
@@ -45,6 +46,11 @@ public class ObsBuilder {
 
     public ObsBuilder setValue(Concept valueCoded) {
         obs.setValueCoded(valueCoded);
+        return this;
+    }
+
+    public ObsBuilder setValue(Drug drug) {
+        obs.setValueDrug(drug);
         return this;
     }
 

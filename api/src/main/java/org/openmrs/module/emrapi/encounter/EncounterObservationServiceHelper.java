@@ -22,6 +22,7 @@ import org.openmrs.ConceptDatatype;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Order;
+import org.openmrs.Drug;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.OrderService;
@@ -92,7 +93,15 @@ public class EncounterObservationServiceHelper {
         observation.setComment(observationData.getComment());
         if (observationData.getValue() != null) {
             if (observation.getConcept().getDatatype().isCoded()) {
-                observation.setValueCoded(conceptService.getConceptByUuid(getConceptUuidOfCodeObservationValue(observationData.getValue())));
+                String uuid = getUuidOfCodedObservationValue(observationData.getValue());
+                Concept conceptByUuid = conceptService.getConceptByUuid(uuid);
+                if (conceptByUuid == null) {
+                    Drug drug = conceptService.getDrugByUuid(uuid);
+                    observation.setValueDrug(drug);
+                    observation.setValueCoded(drug.getConcept());
+                } else {
+                    observation.setValueCoded(conceptByUuid);
+                }
             } else if (observation.getConcept().isComplex()) {
                 observation.setValueComplex(observationData.getValue().toString());
                 Concept conceptComplex = observation.getConcept();
@@ -111,7 +120,7 @@ public class EncounterObservationServiceHelper {
         observation.setObsDatetime(getCurrentDateIfNull(observationData.getObservationDateTime()));
     }
 
-    private String getConceptUuidOfCodeObservationValue(Object codeObsVal) {
+    private String getUuidOfCodedObservationValue(Object codeObsVal) {
         if (codeObsVal instanceof LinkedHashMap) return (String) ((LinkedHashMap) codeObsVal).get("uuid");
         return (String) codeObsVal;
     }

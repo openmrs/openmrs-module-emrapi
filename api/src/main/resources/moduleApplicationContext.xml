@@ -291,7 +291,11 @@
         <constructor-arg name="observationTypeMatcher" ref="observationTypeMatcher"/>
     </bean>
 
+    <bean id="conceptMapper" class="org.openmrs.module.emrapi.encounter.ConceptMapper"/>
+
     <bean id="observationMapper" class="org.openmrs.module.emrapi.encounter.ObservationMapper">
+        <constructor-arg name="conceptMapper" ref="conceptMapper"/>
+        <constructor-arg name="drugMapper" ref="drugMapper"/>
     </bean>
 
     <bean id="diagnosisMapper" class="org.openmrs.module.emrapi.encounter.DiagnosisMapper">
