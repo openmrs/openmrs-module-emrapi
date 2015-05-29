@@ -14,16 +14,13 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.Concept;
-import org.openmrs.Encounter;
-import org.openmrs.Provider;
-import org.openmrs.TestOrder;
-import org.openmrs.EncounterProvider;
+import org.openmrs.*;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.utils.HibernateLazyLoader;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -67,11 +64,12 @@ public class OpenMRSTestOrderMapper {
     }
 
     private TestOrder getOrderByUuid(EncounterTransaction.TestOrder testOrder){
-        TestOrder openMRSTestOrder = (TestOrder) orderService.getOrderByUuid(testOrder.getUuid());
-        if(openMRSTestOrder == null) {
+        Order order = orderService.getOrderByUuid(testOrder.getUuid());
+        order = new HibernateLazyLoader().load(order);
+        if(order == null || !(order instanceof TestOrder)) {
             throw new APIException("No test order with uuid : " + testOrder.getUuid());
         }
-        return openMRSTestOrder;
+        return (TestOrder) order;
     }
 
     private Concept getConceptFrom(EncounterTransaction.TestOrder testOrder, TestOrder openMRSTestOrder) {
