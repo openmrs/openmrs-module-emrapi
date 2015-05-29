@@ -14,7 +14,12 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterProvider;
+import org.openmrs.Order;
+import org.openmrs.Provider;
+import org.openmrs.TestOrder;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
