@@ -13,7 +13,6 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -26,6 +25,7 @@ import org.openmrs.module.emrapi.encounter.matcher.ObservationTypeMatcher;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -70,8 +70,22 @@ public class EncounterObservationsMapperTest {
 
         encounterObservationsMapper.update(encounterTransaction, allObs);
 
-        Assert.assertEquals(2, encounterTransaction.getDiagnoses().size());
-        Assert.assertEquals(disposition, encounterTransaction.getDisposition());
-        Assert.assertEquals(1, encounterTransaction.getObservations().size());
+        assertEquals(2, encounterTransaction.getDiagnoses().size());
+        assertEquals(disposition, encounterTransaction.getDisposition());
+        assertEquals(1, encounterTransaction.getObservations().size());
+    }
+
+    @Test
+    public void updateShouldNotMapVoidedDiagnosis() throws Exception {
+        EncounterTransaction encounterTransaction = new EncounterTransaction();
+        Obs obs1 = new Obs();
+        Obs obs2 = new Obs();
+        obs2.setVoided(Boolean.TRUE);
+        HashSet<Obs> allObs = new HashSet<Obs>(Arrays.asList(obs1, obs2));
+        when(observationTypeMatcher.getObservationType(obs1)).thenReturn(ObservationTypeMatcher.ObservationType.DIAGNOSIS);
+        when(observationTypeMatcher.getObservationType(obs2)).thenReturn(ObservationTypeMatcher.ObservationType.DIAGNOSIS);
+        encounterObservationsMapper.update(encounterTransaction, allObs);
+
+        assertEquals(1, encounterTransaction.getDiagnoses().size());
     }
 }

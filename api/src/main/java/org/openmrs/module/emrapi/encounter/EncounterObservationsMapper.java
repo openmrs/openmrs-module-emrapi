@@ -42,7 +42,9 @@ public class EncounterObservationsMapper {
             ObservationTypeMatcher.ObservationType observationType = observationTypeMatcher.getObservationType(obs);
             switch (observationType) {
                 case DIAGNOSIS:
-                    encounterTransaction.addDiagnosis(diagnosisMapper.map(obs, getDiagnosisMetadata()));
+                    if (!obs.isVoided()) {
+                        encounterTransaction.addDiagnosis(diagnosisMapper.map(obs, getDiagnosisMetadata()));
+                    }
                     break;
                 case DISPOSITION:
                     encounterTransaction.setDisposition(dispositionMapper.getDisposition(obs));
