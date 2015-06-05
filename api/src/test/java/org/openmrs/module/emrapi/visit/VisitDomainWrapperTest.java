@@ -941,6 +941,18 @@ public class VisitDomainWrapperTest {
         assertThat(visitDomainWrapper.getStopDate(), is(new DateMidnight().toDate()));
     }
 
+    @Test
+    public void shouldNotFailIfStartDatetimeNull() {
+        when(visit.getStartDatetime()).thenReturn(null);
+        assertNull(visitDomainWrapper.getStartDate());
+    }
+
+    @Test
+    public void shouldNotFailIfStopDatetimeNull() {
+        when(visit.getStopDatetime()).thenReturn(null);
+        assertNull(visitDomainWrapper.getStopDate());
+    }
+
     private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
 
         private Diagnosis expectedDiagnosis;

@@ -17,6 +17,7 @@ package org.openmrs.module.emrapi.visit;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateMidnight;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -507,25 +508,11 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     public Date getStartDate() {
-        Date startDatetime = visit.getStartDatetime();
-        Calendar startDateCalendar = Calendar.getInstance();
-        startDateCalendar.setTime(startDatetime);
-        startDateCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        startDateCalendar.set(Calendar.MINUTE, 0);
-        startDateCalendar.set(Calendar.SECOND, 0);
-        startDateCalendar.set(Calendar.MILLISECOND,0);
-        return startDateCalendar.getTime();
+        return visit.getStartDatetime() != null ? new DateMidnight(visit.getStartDatetime()).toDate() : null;
     }
 
     public Date getStopDate() {
-        Date stopDatetime = visit.getStopDatetime();
-        Calendar stopDateCalendar = Calendar.getInstance();
-        stopDateCalendar.setTime(stopDatetime);
-        stopDateCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        stopDateCalendar.set(Calendar.MINUTE, 0);
-        stopDateCalendar.set(Calendar.SECOND, 0);
-        stopDateCalendar.set(Calendar.MILLISECOND,0);
-        return stopDateCalendar.getTime();
+        return visit.getStopDatetime() != null ? new DateMidnight(visit.getStopDatetime()).toDate() : null;
     }
 
 
