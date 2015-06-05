@@ -268,11 +268,11 @@ public class VisitDomainWrapper implements DomainWrapper {
     public int getDifferenceInDaysBetweenCurrentDateAndStartDate() {
         Date today = Calendar.getInstance().getTime();
 
-        Calendar startDateVisit = getStartDateVisit();
+        Date startDateVisit = getStartDate();
 
         int millisecondsInADay = 1000 * 60 * 60 * 24;
 
-        return (int) ((today.getTime() - startDateVisit.getTimeInMillis()) / millisecondsInADay);
+        return (int) ((today.getTime() - startDateVisit.getTime()) / millisecondsInADay);
     }
 
     // note that the disposition must be on the top level for this to pick it up
@@ -393,16 +393,6 @@ public class VisitDomainWrapper implements DomainWrapper {
         return diagnoses;
     }
 
-    private Calendar getStartDateVisit() {
-        Date startDatetime = visit.getStartDatetime();
-        Calendar startDateCalendar = Calendar.getInstance();
-        startDateCalendar.setTime(startDatetime);
-        startDateCalendar.set(Calendar.HOUR_OF_DAY, 0);
-        startDateCalendar.set(Calendar.MINUTE, 0);
-        startDateCalendar.set(Calendar.SECOND, 0);
-        return startDateCalendar;
-    }
-
     public boolean hasEncounters(){
         List<Encounter> encounters = getSortedEncounters(SortOrder.MOST_RECENT_FIRST);
         if (encounters != null && encounters.size() > 0){
@@ -515,6 +505,29 @@ public class VisitDomainWrapper implements DomainWrapper {
     public Date getStopDatetime() {
         return visit.getStopDatetime();
     }
+
+    public Date getStartDate() {
+        Date startDatetime = visit.getStartDatetime();
+        Calendar startDateCalendar = Calendar.getInstance();
+        startDateCalendar.setTime(startDatetime);
+        startDateCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        startDateCalendar.set(Calendar.MINUTE, 0);
+        startDateCalendar.set(Calendar.SECOND, 0);
+        startDateCalendar.set(Calendar.MILLISECOND,0);
+        return startDateCalendar.getTime();
+    }
+
+    public Date getStopDate() {
+        Date stopDatetime = visit.getStopDatetime();
+        Calendar stopDateCalendar = Calendar.getInstance();
+        stopDateCalendar.setTime(stopDatetime);
+        stopDateCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        stopDateCalendar.set(Calendar.MINUTE, 0);
+        stopDateCalendar.set(Calendar.SECOND, 0);
+        stopDateCalendar.set(Calendar.MILLISECOND,0);
+        return stopDateCalendar.getTime();
+    }
+
 
     /**
      * @param encounter

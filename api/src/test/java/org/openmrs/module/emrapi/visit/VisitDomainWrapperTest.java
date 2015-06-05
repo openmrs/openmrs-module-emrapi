@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.visit;
 
 
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -928,6 +929,17 @@ public class VisitDomainWrapperTest {
         assertThat(wrapper.getEarliestCheckInEncounter(), is(firstNonVoidedCheckin));
     }
 
+    @Test
+    public void shouldReturnStartDateWithTimeComponentRemoved() {
+        when(visit.getStartDatetime()).thenReturn(new Date());
+        assertThat(visitDomainWrapper.getStartDate(), is(new DateMidnight().toDate()));
+    }
+
+    @Test
+    public void shouldReturnStopDateWithTimeComponentRemoved() {
+        when(visit.getStopDatetime()).thenReturn(new Date());
+        assertThat(visitDomainWrapper.getStopDate(), is(new DateMidnight().toDate()));
+    }
 
     private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
 
