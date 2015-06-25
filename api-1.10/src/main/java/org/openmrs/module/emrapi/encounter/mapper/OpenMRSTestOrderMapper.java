@@ -55,10 +55,18 @@ public class OpenMRSTestOrderMapper {
             openMRSTestOrder.setEncounter(encounter);
             openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
             openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
-            openMRSTestOrder.setAutoExpireDate(new Date(new Date().getTime()));
+            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
+            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
+        }
+        else if(isRevisedTestOrder(testOrder)){
+            openMRSTestOrder = getOrderByUuid(testOrder.getPreviousOrderUuid()).cloneForRevision();
+            openMRSTestOrder.setEncounter(encounter);
+            openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
+            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
+            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
         }
         else{
-            openMRSTestOrder = getOrderByUuid(testOrder);
+            openMRSTestOrder = getOrderByUuid(testOrder.getUuid());
             openMRSTestOrder.setDateChanged(new Date());
         }
 
@@ -68,11 +76,15 @@ public class OpenMRSTestOrderMapper {
         return  openMRSTestOrder;
     }
 
-    private TestOrder getOrderByUuid(EncounterTransaction.TestOrder testOrder){
-        Order order = orderService.getOrderByUuid(testOrder.getUuid());
+    private boolean isRevisedTestOrder(EncounterTransaction.TestOrder testOrder) {
+        return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isNotBlank(testOrder.getPreviousOrderUuid());
+    }
+
+    private TestOrder getOrderByUuid(String testOrderUuid){
+        Order order = orderService.getOrderByUuid(testOrderUuid);
         order = new HibernateLazyLoader().load(order);
         if(order == null || !(order instanceof TestOrder)) {
-            throw new APIException("No test order with uuid : " + testOrder.getUuid());
+            throw new APIException("No test order with uuid : " + testOrderUuid);
         }
         return (TestOrder) order;
     }
@@ -92,7 +104,7 @@ public class OpenMRSTestOrderMapper {
 
 
     private boolean isNewTestOrder(EncounterTransaction.TestOrder testOrder) {
-        return StringUtils.isBlank(testOrder.getUuid());
+        return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isBlank(testOrder.getPreviousOrderUuid());
     }
 
     private Provider getProviderForTestOrders(Encounter encounter){

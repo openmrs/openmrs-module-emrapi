@@ -110,20 +110,22 @@ public class EmrOrderServiceImpl_1_10Test {
     }
 
     @Test
-    public void shouldSaveNewTestOrders() throws ParseException {
+    public void shouldSaveTestOrders() throws ParseException {
         EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService, openMRSTestOrderMapper);
-        EncounterTransaction.TestOrder testOrder1 = new TestOrderBuilder().withConceptUuid("concept-uuid1").build();
-        EncounterTransaction.TestOrder testOrder2 = new TestOrderBuilder().withConceptUuid("concept-uuid2").build();
+        EncounterTransaction.TestOrder testOrder1 = new TestOrderBuilder().withConceptUuid("concept-uuid1").withComment("Comment").build();
+        EncounterTransaction.TestOrder testOrder2 = new TestOrderBuilder().withConceptUuid("concept-uuid2").withComment("Comment").build();
 
         TestOrder mappedTestOrder1 = new TestOrder();
         Concept concept = new Concept();
         concept.setUuid("concept-uuid1");
         mappedTestOrder1.setConcept(concept);
+        mappedTestOrder1.setCommentToFulfiller("Comment");
 
         TestOrder mappedTestOrder2 = new TestOrder();
         concept = new Concept();
         concept.setUuid("concept-uuid2");
         mappedTestOrder2.setConcept(concept);
+        mappedTestOrder2.setCommentToFulfiller("Comment");
 
         Encounter encounter = new Encounter();
         when(openMRSTestOrderMapper.map(testOrder1,encounter)).thenReturn(mappedTestOrder1);
@@ -141,20 +143,24 @@ public class EmrOrderServiceImpl_1_10Test {
     }
 
     @Test
-    public void shouldSaveNewTestOrdersToEncounterWithExistingOrders() throws ParseException {
+    public void shouldSaveTestOrdersToEncounterWithExistingOrders() throws ParseException {
         EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService, openMRSTestOrderMapper);
-        EncounterTransaction.TestOrder testOrder1 = new TestOrderBuilder().withConceptUuid("concept-uuid1").build();
-        EncounterTransaction.TestOrder testOrder2 = new TestOrderBuilder().withConceptUuid("concept-uuid2").build();
+        EncounterTransaction.TestOrder testOrder1 = new TestOrderBuilder().withConceptUuid("concept-uuid1").withComment("Comment").build();
+        EncounterTransaction.TestOrder testOrder2 = new TestOrderBuilder().withConceptUuid("concept-uuid2").withComment("Comment").build();
 
         TestOrder mappedTestOrder1 = new TestOrder();
         Concept concept = new Concept();
         concept.setUuid("concept-uuid1");
         mappedTestOrder1.setConcept(concept);
+        mappedTestOrder1.setCommentToFulfiller("Comment");
+
 
         TestOrder mappedTestOrder2 = new TestOrder();
         concept = new Concept();
         concept.setUuid("concept-uuid2");
         mappedTestOrder2.setConcept(concept);
+        mappedTestOrder2.setCommentToFulfiller("Comment");
+
 
         TestOrder existingTestOrder1 = new TestOrder();
         TestOrder existingTestOrder2 = new TestOrder();
@@ -179,7 +185,8 @@ public class EmrOrderServiceImpl_1_10Test {
 
     private boolean existsInOrdersList(TestOrder testOrder, ArrayList<Order> orderArrayList) {
         for(Order order : orderArrayList) {
-            if(order.getConcept()!=null && order.getConcept().getUuid().equals(testOrder.getConcept().getUuid()) )
+            if(order.getConcept()!=null && order.getConcept().getUuid().equals(testOrder.getConcept().getUuid()) &&
+                    order.getCommentToFulfiller().equals(testOrder.getCommentToFulfiller()))
                 return true;
         }
         return false;

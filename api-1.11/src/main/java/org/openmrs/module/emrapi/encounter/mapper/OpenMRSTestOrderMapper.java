@@ -54,6 +54,15 @@ public class OpenMRSTestOrderMapper {
             openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
             openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
             openMRSTestOrder.setAutoExpireDate(new Date(new Date().getTime()));
+            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
+            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
+        }
+        else if(isRevisedTestOrder(testOrder)){
+            openMRSTestOrder =  (TestOrder) orderService.getOrderByUuid(testOrder.getPreviousOrderUuid()).cloneForRevision();
+            openMRSTestOrder.setEncounter(encounter);
+            openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
+            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
+            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
         }
         else{
             openMRSTestOrder = getOrderByUuid(testOrder);
@@ -62,8 +71,13 @@ public class OpenMRSTestOrderMapper {
 
         openMRSTestOrder.setVoided(testOrder.isVoided());
         openMRSTestOrder.setVoidReason(testOrder.getVoidReason());
+        openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
 
         return  openMRSTestOrder;
+    }
+
+    private boolean isRevisedTestOrder(EncounterTransaction.TestOrder testOrder) {
+        return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isNotBlank(testOrder.getPreviousOrderUuid());
     }
 
     private TestOrder getOrderByUuid(EncounterTransaction.TestOrder testOrder){
@@ -89,7 +103,7 @@ public class OpenMRSTestOrderMapper {
 
 
     private boolean isNewTestOrder(EncounterTransaction.TestOrder testOrder) {
-        return StringUtils.isBlank(testOrder.getUuid());
+        return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isBlank(testOrder.getPreviousOrderUuid());
     }
 
     private Provider getProviderForTestOrders(Encounter encounter){
