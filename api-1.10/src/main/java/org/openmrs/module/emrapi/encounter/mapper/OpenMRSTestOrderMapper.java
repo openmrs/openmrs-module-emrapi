@@ -3,12 +3,10 @@
  * Version 1.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
  * http://license.openmrs.org
- *
  * Software distributed under the License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
  * License for the specific language governing rights and limitations
  * under the License.
- *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 package org.openmrs.module.emrapi.encounter.mapper;
@@ -55,24 +53,34 @@ public class OpenMRSTestOrderMapper {
             openMRSTestOrder.setEncounter(encounter);
             openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
             openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
-            openMRSTestOrder.setAutoExpireDate(new Date(new Date().getTime()));
-        }
-        else{
-            openMRSTestOrder = getOrderByUuid(testOrder);
+            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
+            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
+        } else if (isRevisedTestOrder(testOrder)) {
+            openMRSTestOrder = getOrderByUuid(testOrder.getPreviousOrderUuid()).cloneForRevision();
+            openMRSTestOrder.setEncounter(encounter);
+            openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
+            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
+            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
+        } else {
+            openMRSTestOrder = getOrderByUuid(testOrder.getUuid());
             openMRSTestOrder.setDateChanged(new Date());
         }
 
         openMRSTestOrder.setVoided(testOrder.isVoided());
         openMRSTestOrder.setVoidReason(testOrder.getVoidReason());
 
-        return  openMRSTestOrder;
+        return openMRSTestOrder;
     }
 
-    private TestOrder getOrderByUuid(EncounterTransaction.TestOrder testOrder){
-        Order order = orderService.getOrderByUuid(testOrder.getUuid());
+    private boolean isRevisedTestOrder(EncounterTransaction.TestOrder testOrder) {
+        return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isNotBlank(testOrder.getPreviousOrderUuid());
+    }
+
+    private TestOrder getOrderByUuid(String testOrderUuid) {
+        Order order = orderService.getOrderByUuid(testOrderUuid);
         order = new HibernateLazyLoader().load(order);
-        if(order == null || !(order instanceof TestOrder)) {
-            throw new APIException("No test order with uuid : " + testOrder.getUuid());
+        if (order == null || !(order instanceof TestOrder)) {
+            throw new APIException("No test order with uuid : " + testOrderUuid);
         }
         return (TestOrder) order;
     }
@@ -84,7 +92,7 @@ public class OpenMRSTestOrderMapper {
 
         EncounterTransaction.Concept concept = testOrder.getConcept();
         Concept conceptByUuid = conceptService.getConceptByUuid(concept.getUuid());
-        if(conceptByUuid == null){
+        if (conceptByUuid == null) {
             throw new APIException("No such Concept : " + testOrder.getConcept().getName());
         }
         return conceptByUuid;
@@ -92,13 +100,13 @@ public class OpenMRSTestOrderMapper {
 
 
     private boolean isNewTestOrder(EncounterTransaction.TestOrder testOrder) {
-        return StringUtils.isBlank(testOrder.getUuid());
+        return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isBlank(testOrder.getPreviousOrderUuid());
     }
 
-    private Provider getProviderForTestOrders(Encounter encounter){
+    private Provider getProviderForTestOrders(Encounter encounter) {
         Iterator<EncounterProvider> providers = encounter.getEncounterProviders().iterator();
 
-        if(providers.hasNext()){
+        if (providers.hasNext()) {
             return providers.next().getProvider();
         }
 
