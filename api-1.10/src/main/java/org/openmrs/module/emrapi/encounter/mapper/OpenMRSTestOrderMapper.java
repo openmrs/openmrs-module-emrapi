@@ -57,15 +57,13 @@ public class OpenMRSTestOrderMapper {
             openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
             openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
             openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
-        }
-        else if(isRevisedTestOrder(testOrder)){
+        } else if (isRevisedTestOrder(testOrder)) {
             openMRSTestOrder = getOrderByUuid(testOrder.getPreviousOrderUuid()).cloneForRevision();
             openMRSTestOrder.setEncounter(encounter);
             openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
             openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
             openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
-        }
-        else{
+        } else {
             openMRSTestOrder = getOrderByUuid(testOrder.getUuid());
             openMRSTestOrder.setDateChanged(new Date());
         }
@@ -73,17 +71,17 @@ public class OpenMRSTestOrderMapper {
         openMRSTestOrder.setVoided(testOrder.isVoided());
         openMRSTestOrder.setVoidReason(testOrder.getVoidReason());
 
-        return  openMRSTestOrder;
+        return openMRSTestOrder;
     }
 
     private boolean isRevisedTestOrder(EncounterTransaction.TestOrder testOrder) {
         return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isNotBlank(testOrder.getPreviousOrderUuid());
     }
 
-    private TestOrder getOrderByUuid(String testOrderUuid){
+    private TestOrder getOrderByUuid(String testOrderUuid) {
         Order order = orderService.getOrderByUuid(testOrderUuid);
         order = new HibernateLazyLoader().load(order);
-        if(order == null || !(order instanceof TestOrder)) {
+        if (order == null || !(order instanceof TestOrder)) {
             throw new APIException("No test order with uuid : " + testOrderUuid);
         }
         return (TestOrder) order;
@@ -96,7 +94,7 @@ public class OpenMRSTestOrderMapper {
 
         EncounterTransaction.Concept concept = testOrder.getConcept();
         Concept conceptByUuid = conceptService.getConceptByUuid(concept.getUuid());
-        if(conceptByUuid == null){
+        if (conceptByUuid == null) {
             throw new APIException("No such Concept : " + testOrder.getConcept().getName());
         }
         return conceptByUuid;
@@ -107,10 +105,10 @@ public class OpenMRSTestOrderMapper {
         return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isBlank(testOrder.getPreviousOrderUuid());
     }
 
-    private Provider getProviderForTestOrders(Encounter encounter){
+    private Provider getProviderForTestOrders(Encounter encounter) {
         Iterator<EncounterProvider> providers = encounter.getEncounterProviders().iterator();
 
-        if(providers.hasNext()){
+        if (providers.hasNext()) {
             return providers.next().getProvider();
         }
 
