@@ -59,6 +59,9 @@ public class OpenMRSDrugOrderMapper {
         if (drug == null) {
             throw new APIException("No such drug : " + drugOrder.getDrug().getName());
         }
+        if(drug.isRetired() && !isDiscontinuationDrugOrder(drugOrder)){
+            throw new APIException("Drug has been retired : " + drugOrder.getDrug().getName());
+        }
         openMRSDrugOrder.setDrug(drug);
         openMRSDrugOrder.setEncounter(encounter);
 
