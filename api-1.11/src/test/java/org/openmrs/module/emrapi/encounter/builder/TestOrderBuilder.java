@@ -39,6 +39,11 @@ public class TestOrderBuilder {
         return this;
     }
 
+    public TestOrderBuilder withComment(String comment) {
+        testOrder.setCommentToFulfiller(comment);
+        return this;
+    }
+
     public TestOrderBuilder withAction(String action) {
         testOrder.setAction(action);
         return this;
