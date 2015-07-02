@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import org.joda.time.DateTime;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
@@ -57,8 +58,21 @@ public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
     public void saveTestOrders(List<EncounterTransaction.TestOrder> testOrders, Encounter encounter) {
         for (EncounterTransaction.TestOrder testOrder : testOrders) {
             TestOrder omrsTestOrder = openMRSTestOrderMapper.map(testOrder, encounter);
+            setVoidedRelatedTestOrders(omrsTestOrder);
             encounter.addOrder(omrsTestOrder);
         }
         encounterService.saveEncounter(encounter);
+    }
+
+    private void setVoidedRelatedTestOrders(Order testOrder) {
+        if (testOrder.isVoided()) {
+            Order currentOrderToBeVoided = testOrder.getPreviousOrder();
+            while (currentOrderToBeVoided != null) {
+                currentOrderToBeVoided.setVoided(true);
+                currentOrderToBeVoided.setVoidReason(testOrder.getVoidReason());
+                currentOrderToBeVoided.setDateVoided(DateTime.now().toDate());
+                currentOrderToBeVoided = currentOrderToBeVoided.getPreviousOrder();
+            }
+        }
     }
 }
