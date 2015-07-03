@@ -16,14 +16,11 @@ package org.openmrs.module.emrapi.encounter.domain;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.openmrs.ConceptMap;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EncounterTransaction {
@@ -186,8 +183,9 @@ public class EncounterTransaction {
         @JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
         private String units;
         private String conceptClass;
+        private Collection<ConceptMap> conceptMaps;
 
-        public Concept(String uuid, String name, boolean isSet, String dataType, String units, String conceptClass, String shortName) {
+        public Concept(String uuid, String name, boolean isSet, String dataType, String units, String conceptClass, String shortName, Collection<ConceptMap> conceptMaps) {
             this.uuid = uuid;
             this.name = name;
             this.dataType = dataType;
@@ -195,13 +193,14 @@ public class EncounterTransaction {
             this.units = units;
             this.conceptClass = conceptClass;
             this.shortName = shortName;
+            this.conceptMaps = conceptMaps;
         }
 
         public Concept() {
         }
 
         public Concept(String uuid, String name, boolean isSet) {
-            this(uuid, name, isSet, null, null, null, null);
+            this(uuid, name, isSet, null, null, null, null, null);
         }
 
         public Concept(String uuid, String name) {
@@ -266,6 +265,18 @@ public class EncounterTransaction {
 
         public void setConceptClass(String conceptClass) {
             this.conceptClass = conceptClass;
+        }
+
+        public List<Map<String, Object>> getMappings() {
+            List<Map<String,Object>> mappings = new ArrayList<Map<String, Object>>();
+            for (ConceptMap conceptMap : conceptMaps) {
+                Map<String,Object> mappingInfo = new HashMap<String, Object>();
+                mappingInfo.put("source", conceptMap.getConceptReferenceTerm().getConceptSource().getName());
+                mappingInfo.put("code", conceptMap.getConceptReferenceTerm().getCode());
+                mappingInfo.put("name", conceptMap.getConceptReferenceTerm().getName());
+                mappings.add(mappingInfo);
+            }
+            return mappings;
         }
     }
 
