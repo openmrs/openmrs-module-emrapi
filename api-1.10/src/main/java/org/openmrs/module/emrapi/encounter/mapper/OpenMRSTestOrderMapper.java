@@ -23,9 +23,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.utils.HibernateLazyLoader;
 
-import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -45,44 +43,32 @@ public class OpenMRSTestOrderMapper {
 
     public TestOrder map(EncounterTransaction.TestOrder testOrder, Encounter encounter) {
 
-        TestOrder openMRSTestOrder = null;
+        TestOrder openMRSTestOrder = createTestOrder(testOrder);
+        openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
 
-        if (isNewTestOrder(testOrder)) {
-            openMRSTestOrder = new TestOrder();
-            openMRSTestOrder.setConcept(getConceptFrom(testOrder, openMRSTestOrder));
-            openMRSTestOrder.setEncounter(encounter);
-            openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
-            openMRSTestOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
-            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
-            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
-        } else if (isRevisedTestOrder(testOrder)) {
-            openMRSTestOrder = getOrderByUuid(testOrder.getPreviousOrderUuid()).cloneForRevision();
-            openMRSTestOrder.setEncounter(encounter);
-            openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
-            openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
-            openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
-        } else {
-            openMRSTestOrder = getOrderByUuid(testOrder.getUuid());
-            openMRSTestOrder.setDateChanged(new Date());
-        }
-
+        openMRSTestOrder.setEncounter(encounter);
+        openMRSTestOrder.setAutoExpireDate(testOrder.getAutoExpireDate());
+        openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
+        openMRSTestOrder.setConcept(getConceptFrom(testOrder, openMRSTestOrder));
+        openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
         openMRSTestOrder.setVoided(testOrder.isVoided());
         openMRSTestOrder.setVoidReason(testOrder.getVoidReason());
 
         return openMRSTestOrder;
     }
 
-    private boolean isRevisedTestOrder(EncounterTransaction.TestOrder testOrder) {
-        return StringUtils.isBlank(testOrder.getUuid()) && StringUtils.isNotBlank(testOrder.getPreviousOrderUuid());
+    private TestOrder createTestOrder(EncounterTransaction.TestOrder testOrder) {
+        if (isNewTestOrder(testOrder)) {
+            return new TestOrder();
+        } else if (isDiscontinuationTestOrder(testOrder)) {
+            return (TestOrder) orderService.getOrderByUuid(testOrder.getPreviousOrderUuid()).cloneForDiscontinuing();
+        } else {
+            return (TestOrder) orderService.getOrderByUuid(testOrder.getPreviousOrderUuid()).cloneForRevision();
+        }
     }
 
-    private TestOrder getOrderByUuid(String testOrderUuid) {
-        Order order = orderService.getOrderByUuid(testOrderUuid);
-        order = new HibernateLazyLoader().load(order);
-        if (order == null || !(order instanceof TestOrder)) {
-            throw new APIException("No test order with uuid : " + testOrderUuid);
-        }
-        return (TestOrder) order;
+    private boolean isDiscontinuationTestOrder(EncounterTransaction.TestOrder testOrder) {
+        return testOrder.getAction() != null && Order.Action.valueOf(testOrder.getAction()) == Order.Action.DISCONTINUE;
     }
 
     private Concept getConceptFrom(EncounterTransaction.TestOrder testOrder, TestOrder openMRSTestOrder) {
