@@ -187,6 +187,7 @@
             <bean class="org.openmrs.module.emrapi.patient.EmrPatientProfileServiceImpl">
                 <property name="patientService" ref="patientService"/>
                 <property name="emrPersonImageService" ref="emrPersonImageService"/>
+                <property name="personService" ref="personService"/>
             </bean>
         </property>
         <property name="preInterceptors">
