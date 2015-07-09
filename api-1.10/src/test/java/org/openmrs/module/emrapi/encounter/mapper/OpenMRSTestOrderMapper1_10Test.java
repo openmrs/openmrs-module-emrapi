@@ -34,7 +34,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 public class OpenMRSTestOrderMapper1_10Test {
 
@@ -68,8 +71,6 @@ public class OpenMRSTestOrderMapper1_10Test {
 
         EncounterTransaction.TestOrder etTestOrder = new EncounterTransaction.TestOrder();
         etTestOrder.setConcept(blood);
-        etTestOrder.setVoided(false);
-        etTestOrder.setVoidReason("");
         etTestOrder.setDateCreated(currentDate);
 
         OpenMRSTestOrderMapper testOrderMapper = new OpenMRSTestOrderMapper(orderService, conceptService);
@@ -78,8 +79,6 @@ public class OpenMRSTestOrderMapper1_10Test {
 
         Assert.assertEquals(encounter, testOrder.getEncounter());
         Assert.assertEquals(mrsBloodConcept, testOrder.getConcept());
-        Assert.assertEquals(false, testOrder.getVoided());
-        Assert.assertEquals("", testOrder.getVoidReason());
         Assert.assertEquals(provider, testOrder.getOrderer());
     }
 
