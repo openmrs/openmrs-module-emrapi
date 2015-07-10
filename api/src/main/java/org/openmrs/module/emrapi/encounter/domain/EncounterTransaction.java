@@ -20,7 +20,14 @@ import org.openmrs.ConceptMap;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collection;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EncounterTransaction {
