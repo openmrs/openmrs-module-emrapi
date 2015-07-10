@@ -467,10 +467,9 @@ public class EncounterTransaction {
         private String instructions;
         private String uuid;
         private String orderType;
-        private boolean voided;
-        private String voidReason;
         private Date dateCreated;
         private Date dateChanged;
+        private Date dateStopped;
         private String orderNumber;
         private CareSettingType careSetting;
         private String action;
@@ -533,24 +532,6 @@ public class EncounterTransaction {
             return this;
         }
 
-        public TestOrder setVoided(boolean voided) {
-            this.voided = voided;
-            return this;
-        }
-
-        public boolean isVoided() {
-            return voided;
-        }
-
-        public String getVoidReason() {
-            return voidReason;
-        }
-
-        public TestOrder setVoidReason(String voidReason) {
-            this.voidReason = voidReason;
-            return this;
-        }
-
         @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getDateCreated() {
             return dateCreated;
@@ -603,6 +584,16 @@ public class EncounterTransaction {
 
         public String getPreviousOrderUuid() {
             return previousOrderUuid;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateStopped() {
+            return dateStopped;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public void setDateStopped(Date dateStopped) {
+            this.dateStopped = dateStopped;
         }
     }
 
