@@ -29,7 +29,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 @org.springframework.test.context.ContextConfiguration(locations = {"classpath:moduleApplicationContext.xml"}, inheritLocations = true)
-public class EmrEncounterController_1_9_Test extends BaseEmrControllerTest {
+public class EmrEncounterController_1_111_Test extends BaseEmrControllerTest {
 
     @Autowired
     private VisitService visitService;
