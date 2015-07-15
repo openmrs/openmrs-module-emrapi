@@ -467,6 +467,8 @@ public class EncounterTransaction {
         private String instructions;
         private String uuid;
         private String orderType;
+        private boolean voided;
+        private String voidReason;
         private Date dateCreated;
         private Date dateChanged;
         private Date dateStopped;
@@ -529,6 +531,24 @@ public class EncounterTransaction {
 
         public TestOrder setUuid(String uuid) {
             this.uuid = uuid;
+            return this;
+        }
+
+        public TestOrder setVoided(boolean voided) {
+            this.voided = voided;
+            return this;
+        }
+
+        public boolean isVoided() {
+            return voided;
+        }
+
+        public String getVoidReason() {
+            return voidReason;
+        }
+
+        public TestOrder setVoidReason(String voidReason) {
+            this.voidReason = voidReason;
             return this;
         }
 
