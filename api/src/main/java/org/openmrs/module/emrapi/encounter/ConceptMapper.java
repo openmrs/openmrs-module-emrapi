@@ -32,7 +32,7 @@ public class ConceptMapper {
 
         EncounterTransaction.Concept encounterTransactionConcept = new EncounterTransaction.Concept(concept.getUuid(),
                 concept.getName().getName(), concept.isSet(), concept.getDatatype().getName(), null,
-                conceptClassName, shortName);
+                conceptClassName, shortName, concept.getConceptMappings());
         if(concept.isNumeric() && ((ConceptNumeric) concept).getUnits() != null) {
             encounterTransactionConcept.setUnits(((ConceptNumeric) concept).getUnits());
         }
