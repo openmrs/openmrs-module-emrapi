@@ -138,6 +138,7 @@ public class OrderMapper1_11 implements OrderMapper {
         emrTestOrder.setVoidReason(order.getVoidReason());
         emrTestOrder.setDateCreated(order.getDateCreated());
         emrTestOrder.setDateChanged(order.getDateChanged());
+        emrTestOrder.setDateStopped(order.getDateStopped());
         emrTestOrder.setOrderNumber(order.getOrderNumber());
         emrTestOrder.setCommentToFulfiller(order.getCommentToFulfiller());
         emrTestOrder.setAction(order.getAction().name());

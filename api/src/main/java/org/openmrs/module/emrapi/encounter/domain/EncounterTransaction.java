@@ -471,6 +471,7 @@ public class EncounterTransaction {
         private String voidReason;
         private Date dateCreated;
         private Date dateChanged;
+        private Date dateStopped;
         private String orderNumber;
         private CareSettingType careSetting;
         private String action;
@@ -603,6 +604,16 @@ public class EncounterTransaction {
 
         public String getPreviousOrderUuid() {
             return previousOrderUuid;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public Date getDateStopped() {
+            return dateStopped;
+        }
+
+        @JsonSerialize(using = CustomJsonDateSerializer.class)
+        public void setDateStopped(Date dateStopped) {
+            this.dateStopped = dateStopped;
         }
     }
 
