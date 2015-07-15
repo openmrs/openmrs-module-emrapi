@@ -14,12 +14,10 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.hamcrest.Matchers;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.mockito.Matchers.isNull;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -32,12 +30,12 @@ import org.openmrs.EncounterProvider;
 import org.openmrs.Order;
 import org.openmrs.OrderType;
 import org.openmrs.SimpleDosingInstructions;
+import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
-import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -47,6 +45,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -73,6 +72,9 @@ public class OpenMRSDrugOrderMapper1_10Test {
 
     @Mock
     private OrderMetadataService orderMetadataService;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private Encounter encounter;
@@ -188,6 +190,37 @@ public class OpenMRSDrugOrderMapper1_10Test {
         assertThat(revisedOpenMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
         assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
         verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
+    }
+
+    @Test
+    public void shouldNotReviseDrugOrderWithRetiredDrug(){
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
+        DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+        openMrsDrugOrder.getDrug().setRetired(true);
+        drugOrder.setAction(Order.Action.REVISE.name());
+        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
+        drugOrder.getDrug().setName("Paracetamol");
+        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
+
+        expectedException.expect(APIException.class);
+        expectedException.expectMessage("Drug has been retired : Paracetamol");
+
+        DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+    }
+
+    @Test
+    public void shouldDiscontinueDrugOrderWithRetiredDrug(){
+        EncounterTransaction.DrugOrder drugOrder = new DrugOrderBuilder().withDrugUuid(DRUG_UUID).withDurationUnits(DAY_DURATION_UNIT).build();
+        DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+        openMrsDrugOrder.getDrug().setRetired(true);
+        drugOrder.setAction(Order.Action.DISCONTINUE.name());
+        drugOrder.setPreviousOrderUuid(openMrsDrugOrder.getUuid());
+        drugOrder.getDrug().setName("Paracetamol");
+        when(orderService.getOrderByUuid(openMrsDrugOrder.getUuid())).thenReturn(openMrsDrugOrder);
+
+        DrugOrder discontinuedDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
+
+        assertNotNull(discontinuedDrugOrder);
     }
 
     private Answer<DrugOrder> argumentAt(final int arg) {
