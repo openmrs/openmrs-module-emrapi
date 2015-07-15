@@ -48,24 +48,4 @@ public class TestOrderBuilder {
         testOrder.setAction(action);
         return this;
     }
-
-    public TestOrderBuilder withUuid(String orderUuid) {
-        testOrder.setUuid(orderUuid);
-        return this;
-    }
-
-    public TestOrderBuilder withConcept(EncounterTransaction.Concept concept) {
-        testOrder.setConcept(concept);
-        return this;
-    }
-
-    public TestOrderBuilder withPreviousOrderUuid(String previousOrderUuid) {
-        testOrder.setPreviousOrderUuid(previousOrderUuid);
-        return this;
-    }
-
-    public TestOrderBuilder withDateCreated(Date createdDate) {
-        testOrder.setDateCreated(createdDate);
-        return this;
-    }
 }
