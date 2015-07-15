@@ -51,8 +51,6 @@ public class OpenMRSTestOrderMapper {
         openMRSTestOrder.setCommentToFulfiller(testOrder.getCommentToFulfiller());
         openMRSTestOrder.setConcept(getConceptFrom(testOrder, openMRSTestOrder));
         openMRSTestOrder.setOrderer(getProviderForTestOrders(encounter));
-        openMRSTestOrder.setVoided(testOrder.isVoided());
-        openMRSTestOrder.setVoidReason(testOrder.getVoidReason());
 
         return openMRSTestOrder;
     }
