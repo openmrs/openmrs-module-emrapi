@@ -276,9 +276,6 @@ public class EncounterTransaction {
 
         public List<Map<String, Object>> getMappings() {
             List<Map<String,Object>> mappings = new ArrayList<Map<String, Object>>();
-            if (conceptMaps == null) {
-                return mappings;
-            }
             for (ConceptMap conceptMap : conceptMaps) {
                 Map<String,Object> mappingInfo = new HashMap<String, Object>();
                 mappingInfo.put("source", conceptMap.getConceptReferenceTerm().getConceptSource().getName());
