@@ -474,31 +474,6 @@ public class EncounterTransaction {
         private String orderNumber;
         private CareSettingType careSetting;
         private String action;
-        private String commentToFulfiller;
-        private Date autoExpireDate;
-
-        public Date getAutoExpireDate() {
-            return autoExpireDate;
-        }
-
-        public void setAutoExpireDate(Date autoExpireDate) {
-            this.autoExpireDate = autoExpireDate;
-        }
-
-        public void setPreviousOrderUuid(String previousOrderUuid) {
-            this.previousOrderUuid = previousOrderUuid;
-        }
-
-        private String previousOrderUuid;
-
-        public String getCommentToFulfiller() {
-            return commentToFulfiller;
-        }
-
-        public void setCommentToFulfiller(String commentToFulfiller) {
-            this.commentToFulfiller = commentToFulfiller;
-        }
-
 
         @JsonIgnore
         public String getConceptUuid() {
@@ -600,11 +575,9 @@ public class EncounterTransaction {
         public void setOrderType(String orderType) {
             this.orderType = orderType;
         }
-
-        public String getPreviousOrderUuid() {
-            return previousOrderUuid;
-        }
     }
+
+
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Diagnosis {

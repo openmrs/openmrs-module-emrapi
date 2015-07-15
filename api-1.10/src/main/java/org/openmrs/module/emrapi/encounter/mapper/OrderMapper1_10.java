@@ -139,12 +139,6 @@ public class OrderMapper1_10 implements OrderMapper {
         emrTestOrder.setDateCreated(order.getDateCreated());
         emrTestOrder.setDateChanged(order.getDateChanged());
         emrTestOrder.setOrderNumber(order.getOrderNumber());
-        emrTestOrder.setCommentToFulfiller(order.getCommentToFulfiller());
-        emrTestOrder.setAction(order.getAction().name());
-        Order previousOrder = order.getPreviousOrder();
-        if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())){
-            emrTestOrder.setPreviousOrderUuid(previousOrder.getUuid());
-        }
         return emrTestOrder;
     }
 

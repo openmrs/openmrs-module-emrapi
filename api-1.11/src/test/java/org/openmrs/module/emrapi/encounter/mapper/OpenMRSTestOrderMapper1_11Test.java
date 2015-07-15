@@ -21,8 +21,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
-import org.openmrs.Provider;
 import org.openmrs.EncounterProvider;
+import org.openmrs.Provider;
 import org.openmrs.TestOrder;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class OpenMRSTestOrderMapper1_11Test {
@@ -85,7 +84,7 @@ public class OpenMRSTestOrderMapper1_11Test {
     }
 
     @Test
-    public void voidExistingTestOrderFromEtTestOrder() throws Exception {
+    public void updateExistingTestOrderFromEtTestOrder() throws Exception {
         Provider provider = mock(Provider.class);
         handleEncounterProvider(provider);
 
@@ -132,36 +131,6 @@ public class OpenMRSTestOrderMapper1_11Test {
 
         OpenMRSTestOrderMapper testOrderMapper = new OpenMRSTestOrderMapper(orderService,conceptService);
         TestOrder testOrder = testOrderMapper.map(etTestOrder, encounter);
-    }
-
-
-    @Test
-    public void createRevisedTestOrderFromEtTestOrder(){
-        Provider provider = mock(Provider.class);
-        handleEncounterProvider(provider);
-
-        TestOrder originalTestOrder = new TestOrder();
-        when(orderService.getOrderByUuid("previousOrderUuid")).thenReturn(originalTestOrder);
-
-
-        Date currentDate = new Date();
-
-
-        EncounterTransaction.TestOrder etTestOrder = new EncounterTransaction.TestOrder();
-        etTestOrder.setUuid(null);
-        etTestOrder.setPreviousOrderUuid("previousOrderUuid");
-        etTestOrder.setAutoExpireDate(currentDate);
-        etTestOrder.setCommentToFulfiller("Comment");
-
-        OpenMRSTestOrderMapper testOrderMapper = new OpenMRSTestOrderMapper(orderService,conceptService);
-
-        TestOrder testOrder = testOrderMapper.map(etTestOrder, encounter);
-
-        verify(orderService).getOrderByUuid("previousOrderUuid");
-        Assert.assertEquals(encounter, testOrder.getEncounter());
-        Assert.assertEquals("Comment", testOrder.getCommentToFulfiller());
-        Assert.assertEquals(currentDate, testOrder.getAutoExpireDate());
-        Assert.assertEquals(provider,testOrder.getOrderer());
     }
 
     private void handleEncounterProvider(Provider provider){
