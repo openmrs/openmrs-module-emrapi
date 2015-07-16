@@ -55,7 +55,7 @@ public class EncounterTransactionMapper {
 
         if (orderMapper != null) {
             encounterTransaction.setDrugOrders(orderMapper.mapDrugOrders(encounter));
-            encounterTransaction.setTestOrders(orderMapper.mapTestOrders(encounter));
+            encounterTransaction.setOrders(orderMapper.mapOrders(encounter));
         }
 
         return encounterTransaction;

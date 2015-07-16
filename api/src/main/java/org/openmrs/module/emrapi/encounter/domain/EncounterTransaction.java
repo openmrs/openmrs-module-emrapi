@@ -40,7 +40,7 @@ public class EncounterTransaction {
     private Date encounterDateTime;
     private Disposition disposition;
     private List<Observation> observations = new ArrayList<Observation>();
-    private List<TestOrder> testOrders = new ArrayList<TestOrder>();
+    private List<Order> orders = new ArrayList<Order>();
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
     private Set<Provider> providers = new HashSet<Provider>();
@@ -97,12 +97,12 @@ public class EncounterTransaction {
         return observations;
     }
 
-    public List<TestOrder> getTestOrders() {
-        return testOrders;
+    public List<Order> getOrders() {
+        return orders;
     }
 
-    public void setTestOrders(List<TestOrder> testOrders) {
-        this.testOrders = testOrders;
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     public List<DrugOrder> getDrugOrders() {
@@ -111,6 +111,7 @@ public class EncounterTransaction {
 
     public void setDrugOrders(List<DrugOrder> drugOrders) {
         this.drugOrders = drugOrders;
+
     }
 
     @JsonSerialize(using = CustomJsonDateSerializer.class)
@@ -160,8 +161,8 @@ public class EncounterTransaction {
         observations.add(observation);
     }
 
-    public void addTestOrder(TestOrder testOrder) {
-        testOrders.add(testOrder);
+    public void addOrder(Order order) {
+        orders.add(order);
     }
 
     public void addDrugOrder(DrugOrder drugOrder) {
@@ -483,7 +484,7 @@ public class EncounterTransaction {
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class TestOrder {
+    public static class Order {
         private Concept concept;
         private String instructions;
         private String uuid;
@@ -529,7 +530,7 @@ public class EncounterTransaction {
             return concept;
         }
 
-        public TestOrder setConcept(Concept concept) {
+        public Order setConcept(Concept concept) {
             this.concept = concept;
             return this;
         }
@@ -538,7 +539,7 @@ public class EncounterTransaction {
             return instructions;
         }
 
-        public TestOrder setInstructions(String instructions) {
+        public Order setInstructions(String instructions) {
             this.instructions = instructions;
             return this;
         }
@@ -548,7 +549,7 @@ public class EncounterTransaction {
             return uuid;
         }
 
-        public TestOrder setUuid(String uuid) {
+        public Order setUuid(String uuid) {
             this.uuid = uuid;
             return this;
         }
@@ -616,6 +617,8 @@ public class EncounterTransaction {
         public void setDateStopped(Date dateStopped) {
             this.dateStopped = dateStopped;
         }
+
+
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -711,46 +714,20 @@ public class EncounterTransaction {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DrugOrder {
-        private String uuid;
-        private String careSetting;
-        private String orderType;
+    public static class DrugOrder extends Order {
         private Drug drug;
         private String dosingInstructionType;
         private DosingInstructions dosingInstructions;
         private Date dateActivated;
         private Date scheduledDate;
         private Date effectiveStartDate;
-        private Date autoExpireDate;
         private Date effectiveStopDate;
-        private Date dateStopped;
-        private String action;
         private String previousOrderUuid;
-        private Concept orderReasonConcept;
         private String orderReasonText;
-        private String instructions;
-        private String commentToFulfiller;
         private Integer duration;
         private String durationUnits;
         private Boolean voided;
         private String voidReason;
-        private String orderNumber;
-
-        public String getUuid() {
-            return uuid;
-        }
-
-        public void setUuid(String uuid) {
-            this.uuid = uuid;
-        }
-
-        public String getCareSetting() {
-            return careSetting;
-        }
-
-        public void setCareSetting(String careSetting) {
-            this.careSetting = careSetting;
-        }
 
         public Drug getDrug() {
             return drug;
@@ -783,15 +760,6 @@ public class EncounterTransaction {
         public void setScheduledDate(Date scheduledDate) {
             this.scheduledDate = scheduledDate;
         }
-
-        public String getAction() {
-            return action;
-        }
-
-        public void setAction(String action) {
-            this.action = action;
-        }
-
         public String getPreviousOrderUuid() {
             return previousOrderUuid;
         }
@@ -800,28 +768,12 @@ public class EncounterTransaction {
             this.previousOrderUuid = previousOrderUuid;
         }
 
-        public Concept getOrderReasonConcept() {
-            return orderReasonConcept;
-        }
-
-        public void setOrderReasonConcept(Concept orderReasonConcept) {
-            this.orderReasonConcept = orderReasonConcept;
-        }
-
         public String getOrderReasonText() {
             return orderReasonText;
         }
 
         public void setOrderReasonText(String orderReasonText) {
             this.orderReasonText = orderReasonText;
-        }
-
-        public String getInstructions() {
-            return instructions;
-        }
-
-        public void setInstructions(String instructions) {
-            this.instructions = instructions;
         }
 
         public Integer getDuration() {
@@ -840,14 +792,6 @@ public class EncounterTransaction {
             this.durationUnits = durationUnits;
         }
 
-        public String getCommentToFulfiller() {
-            return commentToFulfiller;
-        }
-
-        public void setCommentToFulfiller(String commentToFulfiller) {
-            this.commentToFulfiller = commentToFulfiller;
-        }
-
         public Date getDateActivated() {
             return dateActivated;
         }
@@ -864,36 +808,12 @@ public class EncounterTransaction {
             this.effectiveStartDate = effectiveStartDate;
         }
 
-        public Date getAutoExpireDate() {
-            return autoExpireDate;
-        }
-
-        public void setAutoExpireDate(Date autoExpireDate) {
-            this.autoExpireDate = autoExpireDate;
-        }
-
         public Date getEffectiveStopDate() {
             return effectiveStopDate;
         }
 
         public void setEffectiveStopDate(Date effectiveStopDate) {
             this.effectiveStopDate = effectiveStopDate;
-        }
-
-        public void setDateStopped(Date dateStopped) {
-            this.dateStopped = dateStopped;
-        }
-
-        public Date getDateStopped() {
-            return dateStopped;
-        }
-
-        public String getOrderType() {
-            return orderType;
-        }
-
-        public void setOrderType(String orderType) {
-            this.orderType = orderType;
         }
 
         public void setVoided(Boolean voided) {
@@ -910,14 +830,6 @@ public class EncounterTransaction {
 
         public String getVoidReason() {
             return voidReason;
-        }
-
-        public String getOrderNumber() {
-            return orderNumber;
-        }
-
-        public void setOrderNumber(String orderNumber) {
-            this.orderNumber = orderNumber;
         }
     }
 
