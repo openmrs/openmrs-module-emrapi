@@ -34,6 +34,7 @@ import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.Encounter;
 import org.openmrs.SimpleDosingInstructions;
+import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.util.LocaleUtility;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -57,7 +58,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @PrepareForTest(LocaleUtility.class)
 public class DrugOrderMapper1_10Test {
 
-    public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
+    public static final CareSettingType OUT_PATIENT_CARE_SETTING = CareSettingType.OUTPATIENT;
     public static final String DRUG_ORDER_TYPE = "Drug Order";
     public static final String DAY_DURATION_UNIT = "day";
     public static final String DRUG_UUID = "drug-uuid";

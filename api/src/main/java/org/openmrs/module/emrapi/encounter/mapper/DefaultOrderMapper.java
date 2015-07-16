@@ -13,14 +13,15 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import java.util.List;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
-import org.openmrs.TestOrder;
+import org.openmrs.Order;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.encounter.OrderMapper;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @OpenmrsProfile(openmrsVersion = "1.9.*")
@@ -31,7 +32,7 @@ public class DefaultOrderMapper implements OrderMapper{
     }
 
     @Override
-    public List<EncounterTransaction.TestOrder> mapTestOrders(Encounter encounter) {
+    public List<EncounterTransaction.Order> mapOrders(Encounter encounter) {
         return null;
     }
 
@@ -41,7 +42,7 @@ public class DefaultOrderMapper implements OrderMapper{
     }
 
     @Override
-    public EncounterTransaction.TestOrder mapTestOrder(TestOrder order) {
+    public EncounterTransaction.Order mapOrder(Order order) {
         return null;
     }
 }

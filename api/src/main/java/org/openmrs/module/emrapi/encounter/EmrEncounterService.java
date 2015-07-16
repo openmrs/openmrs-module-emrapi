@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * <pre>
- * Handy service to create/update an {@link org.openmrs.Encounter}. Use this to add {@link org.openmrs.Obs}, {@link org.openmrs.TestOrder} to an Encounter.
+ * Handy service to create/update an {@link org.openmrs.Encounter}. Use this to add {@link org.openmrs.Obs}, {@link org.openmrs.Order} to an Encounter.
  * The encounter is saved against the latest active visit of the {@link org.openmrs.Patient} if one exists, else a new visit is created.
  *
  * A strategy can be specified to choose which Encounter to update
