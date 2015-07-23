@@ -13,16 +13,14 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.joda.time.DateTime;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
-import org.openmrs.TestOrder;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
-import org.openmrs.module.emrapi.encounter.mapper.OpenMRSTestOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,19 +32,19 @@ import java.util.List;
 public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
-    private final OpenMRSTestOrderMapper openMRSTestOrderMapper;
+    private final OpenMRSOrderMapper openMRSOrderMapper;
 
     @Autowired
-    public EmrOrderServiceImpl_1_11(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSTestOrderMapper openMRSTestOrderMapper) {
+    public EmrOrderServiceImpl_1_11(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSOrderMapper openMRSOrderMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
-        this.openMRSTestOrderMapper = openMRSTestOrderMapper;
+        this.openMRSOrderMapper = openMRSOrderMapper;
     }
 
     @Override
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
         //TODO: setOrders method can be removed.
-        encounter.setOrders(new LinkedHashSet<Order>(encounter.getOrders()));
+        encounter.setOrders(new LinkedHashSet<org.openmrs.Order>(encounter.getOrders()));
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
             encounter.addOrder(omrsDrugOrder);
@@ -55,24 +53,11 @@ public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
     }
 
     @Override
-    public void saveTestOrders(List<EncounterTransaction.TestOrder> testOrders, Encounter encounter) {
-        for (EncounterTransaction.TestOrder testOrder : testOrders) {
-            TestOrder omrsTestOrder = openMRSTestOrderMapper.map(testOrder, encounter);
-            setVoidedRelatedTestOrders(omrsTestOrder);
-            encounter.addOrder(omrsTestOrder);
+    public void saveOrders(List<EncounterTransaction.Order> orders, Encounter encounter) {
+        for (EncounterTransaction.Order order : orders) {
+            Order omrsOrder = openMRSOrderMapper.map(order, encounter);
+            encounter.addOrder(omrsOrder);
         }
         encounterService.saveEncounter(encounter);
-    }
-
-    private void setVoidedRelatedTestOrders(Order testOrder) {
-        if (testOrder.isVoided()) {
-            Order currentOrderToBeVoided = testOrder.getPreviousOrder();
-            while (currentOrderToBeVoided != null) {
-                currentOrderToBeVoided.setVoided(true);
-                currentOrderToBeVoided.setVoidReason(testOrder.getVoidReason());
-                currentOrderToBeVoided.setDateVoided(DateTime.now().toDate());
-                currentOrderToBeVoided = currentOrderToBeVoided.getPreviousOrder();
-            }
-        }
     }
 }

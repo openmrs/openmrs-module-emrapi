@@ -18,9 +18,9 @@ import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
-import org.openmrs.TestOrder;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.db.hibernate.HibernateUtil;
+import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.ConceptMapper;
 import org.openmrs.module.emrapi.encounter.OrderMapper;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -41,7 +41,7 @@ public class OrderMapper1_10 implements OrderMapper {
     public List<EncounterTransaction.DrugOrder> mapDrugOrders(Encounter encounter) {
 
         List<EncounterTransaction.DrugOrder> orders = new ArrayList<EncounterTransaction.DrugOrder>();
-        for (Order order : encounter.getOrders()) {
+        for (org.openmrs.Order order : encounter.getOrders()) {
             order = HibernateUtil.getRealObjectFromProxy(order);
             if (DrugOrder.class.equals(order.getClass())) {
                 orders.add(mapDrugOrder((DrugOrder) order));
@@ -61,15 +61,15 @@ public class OrderMapper1_10 implements OrderMapper {
     }
 
     @Override
-    public List<EncounterTransaction.TestOrder> mapTestOrders(Encounter encounter) {
-        List<EncounterTransaction.TestOrder> testOrders = new ArrayList<EncounterTransaction.TestOrder>();
-        for (Order order : encounter.getOrders()) {
+    public List<EncounterTransaction.Order> mapOrders(Encounter encounter) {
+        List<EncounterTransaction.Order> orders = new ArrayList<EncounterTransaction.Order>();
+        for (org.openmrs.Order order : encounter.getOrders()) {
             order = HibernateUtil.getRealObjectFromProxy(order);
-            if (TestOrder.class.equals(order.getClass())) {
-                testOrders.add(mapTestOrder((TestOrder) order));
+            if (Order.class.equals(order.getClass())) {
+                orders.add(mapOrder(order));
             }
         }
-        return testOrders;
+        return orders;
     }
 
     @Override
@@ -77,12 +77,12 @@ public class OrderMapper1_10 implements OrderMapper {
         EncounterTransaction.DrugOrder drugOrder = new EncounterTransaction.DrugOrder();
         drugOrder.setUuid(openMRSDrugOrder.getUuid());
         if (openMRSDrugOrder.getCareSetting() != null) {
-            drugOrder.setCareSetting(openMRSDrugOrder.getCareSetting().getName());
+            drugOrder.setCareSetting(CareSettingType.valueOf(openMRSDrugOrder.getCareSetting().getCareSettingType().toString()));
         }
         drugOrder.setAction(openMRSDrugOrder.getAction().name());
         drugOrder.setOrderType(openMRSDrugOrder.getOrderType().getName());
 
-        Order previousOrder = openMRSDrugOrder.getPreviousOrder();
+        org.openmrs.Order previousOrder = openMRSDrugOrder.getPreviousOrder();
         if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())){
             drugOrder.setPreviousOrderUuid(previousOrder.getUuid());
         }
@@ -128,23 +128,23 @@ public class OrderMapper1_10 implements OrderMapper {
     }
 
     @Override
-    public EncounterTransaction.TestOrder mapTestOrder(TestOrder order) {
-        EncounterTransaction.TestOrder emrTestOrder = new EncounterTransaction.TestOrder();
-        emrTestOrder.setUuid(order.getUuid());
-        emrTestOrder.setConcept(conceptMapper.map(order.getConcept()));
-        emrTestOrder.setOrderType(order.getOrderType().getName());
-        emrTestOrder.setInstructions(order.getInstructions());
-        emrTestOrder.setDateCreated(order.getDateCreated());
-        emrTestOrder.setDateChanged(order.getDateChanged());
-        emrTestOrder.setDateStopped(order.getDateStopped());
-        emrTestOrder.setOrderNumber(order.getOrderNumber());
-        emrTestOrder.setCommentToFulfiller(order.getCommentToFulfiller());
-        emrTestOrder.setAction(order.getAction().name());
-        Order previousOrder = order.getPreviousOrder();
+    public EncounterTransaction.Order mapOrder(Order order) {
+        EncounterTransaction.Order emrOrder = new EncounterTransaction.Order();
+        emrOrder.setUuid(order.getUuid());
+        emrOrder.setConcept(conceptMapper.map(order.getConcept()));
+        emrOrder.setOrderType(order.getOrderType().getName());
+        emrOrder.setInstructions(order.getInstructions());
+        emrOrder.setDateCreated(order.getDateCreated());
+        emrOrder.setDateChanged(order.getDateChanged());
+        emrOrder.setDateStopped(order.getDateStopped());
+        emrOrder.setOrderNumber(order.getOrderNumber());
+        emrOrder.setCommentToFulfiller(order.getCommentToFulfiller());
+        emrOrder.setAction(order.getAction().name());
+        org.openmrs.Order previousOrder = order.getPreviousOrder();
         if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())){
-            emrTestOrder.setPreviousOrderUuid(previousOrder.getUuid());
+            emrOrder.setPreviousOrderUuid(previousOrder.getUuid());
         }
-        return emrTestOrder;
+        return emrOrder;
     }
 
     private String getConceptName(Concept concept) {

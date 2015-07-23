@@ -109,7 +109,7 @@ public class OpenMRSDrugOrderMapper {
         if (!isNewDrugOrder(drugOrder)) {
             return openMRSDrugOrder.getCareSetting();
         }
-        return orderService.getCareSettingByName(drugOrder.getCareSetting());
+        return orderService.getCareSettingByName(drugOrder.getCareSetting().toString());
     }
 
     private Drug getDrugFrom(EncounterTransaction.DrugOrder drugOrder, DrugOrder openMRSDrugOrder) {
