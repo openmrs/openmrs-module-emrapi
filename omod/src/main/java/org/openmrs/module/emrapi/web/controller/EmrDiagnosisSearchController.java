@@ -48,7 +48,7 @@ public class EmrDiagnosisSearchController {
         Patient patient = patientService.getPatientByUuid(patientUuid);
         Date fromDate;
         try {
-            fromDate = new DateMapper().toDate(date);
+            fromDate = date!=null ? new DateMapper().toDate(date) : new Date(0);
         } catch (Exception e) {
             throw new InvalidInputException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + date + ".", e);
         }
