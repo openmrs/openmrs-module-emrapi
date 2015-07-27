@@ -17,7 +17,9 @@ import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 public class DateMapper {
     public Date toDate(String date) {
@@ -28,6 +30,20 @@ public class DateMapper {
                 return simpleDateFormat.parse(date);
             } catch (ParseException e) {
                 throw new RuntimeException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + date + ".", e);
+            }
+        }
+        return null;
+    }
+
+    public Date convertUTCToDate(String date) {
+        if (!StringUtils.isBlank(date)) {
+            try {
+                DateFormat utcFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                return utcFormat.parse(date);
+            } catch (ParseException e) {
+                throw new RuntimeException("Date format needs to be in UTC format. Incorrect Date:" + date + ".", e);
             }
         }
         return null;
