@@ -30,6 +30,6 @@ public class DateMapper {
                 throw new RuntimeException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + date + ".", e);
             }
         }
-        return new Date(0);
+        return null;
     }
 }
