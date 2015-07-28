@@ -25,7 +25,7 @@ public interface DiagnosisService extends OpenmrsService {
     List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses);
 
 	/**
-	 * Gets diagnoses since date.
+	 * Gets diagnoses since date, sorted in reverse chronological order
 	 *
 	 * @param patient
 	 * @param fromDate
@@ -49,7 +49,7 @@ public interface DiagnosisService extends OpenmrsService {
     boolean  hasDiagnosis(Encounter encounter, Diagnosis diagnosis);
 
 	/**
-	 * Gets unique diagnoses since date.
+	 * Gets unique diagnoses since date, sorted in reverse chronological order
 	 *
 	 * @param patient
 	 * @param fromDate

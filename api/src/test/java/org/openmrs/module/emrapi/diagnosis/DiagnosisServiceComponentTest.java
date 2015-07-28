@@ -23,10 +23,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -134,25 +132,42 @@ public class DiagnosisServiceComponentTest extends BaseModuleContextSensitiveTes
 		assertThat(diagnoses, contains(hasObs(obs)));
 	}
 
+    @Test
+    public void getDiagnosesShouldReturnDiagnosesInReverseChronologicalOrder() {
+        Patient patient = patientService.getPatient(2);
+
+        // don't create them in the "right" order
+        Obs expectedSecondObs =  buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded allergy").save().get();
+        Obs expectedThirdObs =  buildDiagnosis(patient, "2013-07-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded disease").save().get();
+        Obs expectedFirstObs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
+
+        List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, DateUtil.parseDate("2001-09-01", "yyyy-MM-dd"));
+        assertThat(diagnoses.get(0).getExistingObs(), is(expectedFirstObs));
+        assertThat(diagnoses.get(1).getExistingObs(), is(expectedSecondObs));
+        assertThat(diagnoses.get(2).getExistingObs(), is(expectedThirdObs));
+    }
+
 	@Test
 	public void getUniqueDiagnosesShouldReturnNoTextDuplicates() {
 		Patient patient = patientService.getPatient(2);
-		Obs obs1 = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
-		buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
+        Obs olderObs = buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
+		Obs mostRecentObs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
 
 		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, DateUtil.parseDate("2013-01-01", "yyyy-MM-dd"));
-		assertThat(diagnoses, contains(hasObs(obs1)));
+        assertThat(diagnoses.size(), is(1));
+		assertThat(diagnoses.get(0).getExistingObs(), is(mostRecentObs));
 	}
 
 	@Test
 	public void getUniqueDiagnosesShouldReturnNoCodedDuplicates() {
 		Patient patient = patientService.getPatient(2);
 		Concept malaria = conceptService.getConcept(11);
-		Obs obs1 = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
-		buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
+		Obs olderObs = buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
+        Obs mostRecentObs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
 
 		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, DateUtil.parseDate("2013-01-01", "yyyy-MM-dd"));
-		assertThat(diagnoses, contains(hasObs(obs1)));
+        assertThat(diagnoses.size(), is(1));
+        assertThat(diagnoses.get(0).getExistingObs(), is(mostRecentObs));
 	}
 
 
