@@ -14,12 +14,6 @@ import static org.junit.Assert.assertNull;
 public class DateMapperTest {
 
     @Test
-    public void shouldReturnNullIfDateStringIsNull() throws Exception {
-        Date actualDate = new DateMapper().toDate(null);
-        assertNull(actualDate);
-    }
-
-    @Test
     public void shouldConvertUTCformatToDate() throws Exception {
         String utcDateString = "2015-07-30T18:30:00.000Z";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyy");

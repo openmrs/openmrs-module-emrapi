@@ -22,18 +22,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class DateMapper {
-    public Date toDate(String date) {
-        if (!StringUtils.isBlank(date)) {
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                simpleDateFormat.setLenient(false);
-                return simpleDateFormat.parse(date);
-            } catch (ParseException e) {
-                throw new RuntimeException("Date format needs to be 'yyyy-MM-dd'. Incorrect Date:" + date + ".", e);
-            }
-        }
-        return null;
-    }
 
     public Date convertUTCToDate(String date) {
         if (!StringUtils.isBlank(date)) {
