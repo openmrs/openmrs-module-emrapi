@@ -132,7 +132,7 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
         Relationship relationship = new Relationship(currentPerson,
                 getPerson((Map<String, Object>) relationshipJson.get("personB")),
                 getRelationshipType((Map<String, Object>) relationshipJson.get("relationshipType")));
-        relationship.setEndDate(new DateMapper().toDate(getValueFromMap(relationshipJson, "endDate")));
+        relationship.setEndDate(new DateMapper().convertUTCToDate(getValueFromMap(relationshipJson, "endDate")));
 
         return relationship;
     }
