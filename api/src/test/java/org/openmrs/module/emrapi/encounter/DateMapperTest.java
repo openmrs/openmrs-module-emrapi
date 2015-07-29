@@ -15,13 +15,13 @@ public class DateMapperTest {
     @Test
     public void shouldConvertUTCformatToDate() throws Exception {
         String utcDateString = "2015-07-30T18:30:00.000Z";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("IST"));
 
         Date actualDate = new DateMapper().convertUTCToDate(utcDateString);
 
         assertNotNull(actualDate);
-        assertEquals("31/07/2015", simpleDateFormat.format(actualDate));
+        assertEquals("2015-07-31", simpleDateFormat.format(actualDate));
 
     }
 
