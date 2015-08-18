@@ -35,7 +35,7 @@ import java.util.List;
 public class LastViewedPatientsSearchHandler implements SearchHandler {
 
     private final SearchConfig searchConfig = new SearchConfig("default", RestConstants.VERSION_1 + "/patient", Arrays.asList(
-            "1.8.*", "1.9.*", "1.10.*"), new SearchQuery.Builder("Allows you to find last viewed patients").withRequiredParameters("lastviewed")
+            "1.8.*", "1.9.*", "1.10.*", "1.11.*"), new SearchQuery.Builder("Allows you to find last viewed patients").withRequiredParameters("lastviewed")
             .build());
 
     /**
