@@ -87,13 +87,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>appframework-api</artifactId>
-            <type>jar</type>
-        </dependency>
-
-
-        <dependency>
             <groupId>org.openmrs</groupId>
             <artifactId>event-api</artifactId>
             <type>jar</type>
