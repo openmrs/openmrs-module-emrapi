@@ -213,7 +213,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         EncounterParameters encounterParameters = EncounterParameters.instance()
                 .setLocation(location).setEncounterType(encounterType)
                 .setProviders(providers).setEncounterDateTime(encounterDateTime)
-                .setPatient(patient);
+                .setPatient(patient)
+                .setEncounterUuid(encounterTransaction.getEncounterUuid());
 
         Encounter encounter = findEncounter(visit, encounterParameters);
 
