@@ -47,6 +47,7 @@ public class EncounterTransactionMapper {
         encounterTransaction.setPatientUuid(encounter.getPatient().getUuid());
         encounterTransaction.setEncounterTypeUuid(encounter.getEncounterType() != null ? encounter.getEncounterType().getUuid() : null);
         encounterTransaction.setLocationUuid(encounter.getLocation() != null ? encounter.getLocation().getUuid() : null);
+        encounterTransaction.setLocationName(encounter.getLocation() != null ? encounter.getLocation().getName() : null);
         encounterTransaction.setVisitTypeUuid(encounter.getVisit().getVisitType().getUuid());
         encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());
 
