@@ -34,6 +34,7 @@ public class EncounterTransaction {
     private String visitUuid;
     private String encounterUuid;
     private String locationUuid;
+    private String locationName;
     private String patientUuid;
     private String visitTypeUuid;
     private String encounterTypeUuid;
@@ -90,6 +91,15 @@ public class EncounterTransaction {
 
     public EncounterTransaction setObservations(List<Observation> observations) {
         this.observations = observations;
+        return this;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public EncounterTransaction setLocationName(String locationName) {
+        this.locationName = locationName;
         return this;
     }
 
