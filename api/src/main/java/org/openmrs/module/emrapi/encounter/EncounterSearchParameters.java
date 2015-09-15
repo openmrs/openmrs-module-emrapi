@@ -127,5 +127,4 @@ public class EncounterSearchParameters {
     public void setIncludeAll(Boolean includeAll) {
         this.includeAll = includeAll;
     }
-
 }

@@ -68,6 +68,4 @@ public class ActiveEncounterParameters {
     public void setIncludeAll(Boolean includeAll) {
         this.includeAll = includeAll;
     }
-
-
 }
