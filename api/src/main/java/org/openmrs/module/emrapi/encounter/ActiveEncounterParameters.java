@@ -20,6 +20,7 @@ public class ActiveEncounterParameters {
     String providerUuid;
     Boolean includeAll;
     String locationUuid;
+    String userUuid;
 
     public String getLocationUuid() {
         return locationUuid;
@@ -69,5 +70,11 @@ public class ActiveEncounterParameters {
         this.includeAll = includeAll;
     }
 
+    public String getUserUuid() {
+        return userUuid;
+    }
 
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
+    }
 }

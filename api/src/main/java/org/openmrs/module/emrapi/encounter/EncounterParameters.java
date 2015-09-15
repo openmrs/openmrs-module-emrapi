@@ -30,6 +30,7 @@ public class EncounterParameters {
     private Date encounterDateTime;
     private Patient patient;
     private String encounterUuid;
+    private String userUuid;
 
     private EncounterParameters(){
 
@@ -91,5 +92,13 @@ public class EncounterParameters {
 
     public String getEncounterUuid() {
         return encounterUuid;
+    }
+
+    public String getUserUuid() {
+        return userUuid;
+    }
+
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
     }
 }

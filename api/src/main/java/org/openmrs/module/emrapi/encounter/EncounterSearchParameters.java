@@ -34,6 +34,7 @@ public class EncounterSearchParameters {
     private List<String> encounterTypeUuids;
     private String locationUuid;
     private Boolean includeAll = false;
+    private String userUuid;
 
     public EncounterSearchParameters() {
     }
@@ -128,4 +129,11 @@ public class EncounterSearchParameters {
         this.includeAll = includeAll;
     }
 
+    public String getUserUuid() {
+        return userUuid;
+    }
+
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
+    }
 }
