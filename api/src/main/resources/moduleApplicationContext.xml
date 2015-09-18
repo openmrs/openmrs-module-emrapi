@@ -248,6 +248,7 @@
         <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
         <constructor-arg name="obsService" ref="obsService"/>
         <constructor-arg name="orderService" ref="orderService"/>
+        <constructor-arg name="obsMapper" ref="obsMapper"/>
     </bean>
 
     <bean id="encounterDispositionServiceHelper" class="org.openmrs.module.emrapi.encounter.EncounterDispositionServiceHelper">
