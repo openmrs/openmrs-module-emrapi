@@ -43,13 +43,13 @@ public class EmrEncounterController extends BaseRestController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/active")
     @ResponseBody
-    public EncounterTransaction getActiveEncounter(ActiveEncounterParameters activeEncounterParameters) {
+    public EncounterTransaction getActiveEncounter(@ModelAttribute("activeEncounterParameters") ActiveEncounterParameters activeEncounterParameters) {
         return emrEncounterService.getActiveEncounter(activeEncounterParameters);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{uuid}")
     @ResponseBody
-    public EncounterTransaction get(@PathVariable("uuid") String uuid, Boolean includeAll) {
+    public EncounterTransaction get(@PathVariable("uuid") String uuid, @RequestParam(value="includeAll", required = false) Boolean includeAll) {
         return emrEncounterService.getEncounterTransaction(uuid, includeAll);
     }
 
