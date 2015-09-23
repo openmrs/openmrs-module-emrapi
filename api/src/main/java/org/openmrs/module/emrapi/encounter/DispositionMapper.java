@@ -54,6 +54,7 @@ public class DispositionMapper {
                 observation.setVoided(groupMember.getVoided());
                 observation.setComment(groupMember.getComment());
                 observation.setUuid(groupMember.getUuid());
+                observation.setCreator(groupMember.getCreator());
                 additionalObservations.add(observation);
             }
         }

@@ -17,6 +17,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.openmrs.ConceptMap;
+import org.openmrs.User;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
@@ -312,6 +313,7 @@ public class EncounterTransaction {
         private List<Observation> groupMembers = new ArrayList<Observation>();
         private String orderUuid;
         private Date observationDateTime;
+        private User creator;
 
         public String getUuid() {
             return uuid;
@@ -396,6 +398,14 @@ public class EncounterTransaction {
         public Observation setObservationDateTime(Date observationDateTime) {
             this.observationDateTime = observationDateTime;
             return this;
+        }
+
+        public User getCreator() {
+            return creator;
+        }
+
+        public void setCreator(User creator) {
+            this.creator = creator;
         }
 
         @JsonSerialize(using = CustomJsonDateSerializer.class)

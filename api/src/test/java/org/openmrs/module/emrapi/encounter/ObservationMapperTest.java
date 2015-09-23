@@ -24,6 +24,7 @@ import org.openmrs.ConceptName;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Obs;
 import org.openmrs.Drug;
+import org.openmrs.User;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
@@ -147,6 +148,17 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
         EncounterTransaction.Observation observation = observationMapper.map(obs);
 
         assertEquals(observation.getValue(), obs.getValueDate());
+    }
+
+    @Test
+    public void shouldMapCreator() {
+        User creator = new User();
+        when(conceptDatatype.isDate()).thenReturn(true);
+        Obs obs = obsBuilder.setCreator(creator).setValue("2015-02-01").get();
+
+        EncounterTransaction.Observation observation = observationMapper.map(obs);
+
+        assertEquals(observation.getCreator(), creator);
     }
 
     private ConceptClass getConceptClass(String conceptClassName) {
