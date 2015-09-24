@@ -3,7 +3,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>emrapi</artifactId>
-    <version>1.12-SNAPSHOT</version>
+    <version>1.11.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>EMR API Module</name>
     <description>Higher-level APIs to support building EMR functionality in OpenMRS, to supplement the data-level APIs
@@ -44,6 +44,11 @@
         <distro.groupId>org.openmrs.distro</distro.groupId>
         <distro.artifactId>referenceapplication</distro.artifactId>
         <distro.version>2.3-SNAPSHOT</distro.version>
+        <reportingModuleVersion>0.9.6</reportingModuleVersion>
+        <providermanagementModuleVersion>2.3</providermanagementModuleVersion>
+        <metadatasharingVersion>1.1.9</metadatasharingVersion>
+        <eventVersion>2.2.1</eventVersion>
+        <webservicesRestModuleVersion>2.12</webservicesRestModuleVersion>
     </properties>
 
     <dependencyManagement>
