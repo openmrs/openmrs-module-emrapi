@@ -18,6 +18,7 @@ import org.openmrs.Drug;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
@@ -25,11 +26,13 @@ import java.text.SimpleDateFormat;
 public class ObservationMapper {
     private ConceptMapper conceptMapper;
     private DrugMapper drugMapper;
+    private UserMapper userMapper;
 
     @Autowired(required = false)
-    public ObservationMapper(ConceptMapper conceptMapper, DrugMapper drugMapper) {
+    public ObservationMapper(ConceptMapper conceptMapper, DrugMapper drugMapper, UserMapper userMapper) {
         this.conceptMapper = conceptMapper;
         this.drugMapper = drugMapper;
+        this.userMapper = userMapper;
     }
 
     public EncounterTransaction.Observation map(Obs obs) {
@@ -43,7 +46,7 @@ public class ObservationMapper {
         observation.setVoidReason(obs.getVoidReason());
         observation.setObservationDateTime(obs.getObsDatetime());
         observation.setComment(obs.getComment());
-        observation.setCreator(obs.getCreator());
+        observation.setCreator(userMapper.map(obs.getCreator()));
         if (obs.getOrder() != null) {
             observation.setOrderUuid(obs.getOrder().getUuid());
         }

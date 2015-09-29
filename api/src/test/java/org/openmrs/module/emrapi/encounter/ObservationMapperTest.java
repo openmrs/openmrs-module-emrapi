@@ -25,7 +25,9 @@ import org.openmrs.ConceptNumeric;
 import org.openmrs.Obs;
 import org.openmrs.Drug;
 import org.openmrs.User;
+import org.openmrs.PersonName;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.mapper.UserMapper;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -33,6 +35,7 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
@@ -50,10 +53,15 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
     @Before
     public void setUp(){
+        User creator = mock(User.class);
+        when(creator.getUuid()).thenReturn("uuid");
+        PersonName mockPersonName = mock(PersonName.class);
+        when(mockPersonName.toString()).thenReturn("superman");
+        when(creator.getPersonName()).thenReturn(mockPersonName);
         MockitoAnnotations.initMocks(this);
-        observationMapper = new ObservationMapper(new ConceptMapper(), drugMapper);
+        observationMapper = new ObservationMapper(new ConceptMapper(), drugMapper, new UserMapper());
         obsBuilder = new ObsBuilder();
-        obsBuilder.setUuid(UUID.randomUUID().toString()).setConcept(concept);
+        obsBuilder.setUuid(UUID.randomUUID().toString()).setConcept(concept).setCreator(creator);
         when(concept.getName()).thenReturn(new ConceptName());
         when(concept.getDatatype()).thenReturn(conceptDatatype);
         when(concept.getConceptClass()).thenReturn(getConceptClass("conceptClassName"));
@@ -152,13 +160,13 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void shouldMapCreator() {
-        User creator = new User();
         when(conceptDatatype.isDate()).thenReturn(true);
-        Obs obs = obsBuilder.setCreator(creator).setValue("2015-02-01").get();
+        Obs obs = obsBuilder.setValue("2015-02-01").get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
 
-        assertEquals(observation.getCreator(), creator);
+        assertEquals("uuid", observation.getCreator().getUuid());
+        assertEquals("superman", observation.getCreator().getPersonName());
     }
 
     private ConceptClass getConceptClass(String conceptClassName) {

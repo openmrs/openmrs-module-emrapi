@@ -17,7 +17,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.openmrs.ConceptMap;
-import org.openmrs.User;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
@@ -60,7 +59,7 @@ public class EncounterTransaction {
     }
 
     public void setDisposition(Disposition disposition) {
-        this.disposition = disposition; 
+        this.disposition = disposition;
     }
 
     public String getPatientUuid() {
@@ -301,6 +300,28 @@ public class EncounterTransaction {
             return mappings;
         }
     }
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class User {
+        private String uuid;
+        private String personName;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getPersonName() {
+            return personName;
+        }
+
+        public void setPersonName(String personName) {
+            this.personName = personName;
+        }
+    }
+
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observation {

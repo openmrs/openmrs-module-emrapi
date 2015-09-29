@@ -21,6 +21,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
+import org.openmrs.module.emrapi.encounter.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,9 +30,11 @@ import java.util.Set;
 
 public class DispositionMapper {
     private final ConceptService conceptService;
+    private final UserMapper userMapper;
 
-    public DispositionMapper(ConceptService conceptService) {
+    public DispositionMapper(ConceptService conceptService, UserMapper userMapper) {
         this.conceptService = conceptService;
+        this.userMapper = userMapper;
     }
 
     public EncounterTransaction.Disposition getDisposition(Obs obs) {
@@ -54,7 +57,7 @@ public class DispositionMapper {
                 observation.setVoided(groupMember.getVoided());
                 observation.setComment(groupMember.getComment());
                 observation.setUuid(groupMember.getUuid());
-                observation.setCreator(groupMember.getCreator());
+                observation.setCreator(userMapper.map(groupMember.getCreator()));
                 additionalObservations.add(observation);
             }
         }
