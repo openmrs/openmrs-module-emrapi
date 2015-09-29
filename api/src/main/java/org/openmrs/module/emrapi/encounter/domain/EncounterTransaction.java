@@ -59,7 +59,7 @@ public class EncounterTransaction {
     }
 
     public void setDisposition(Disposition disposition) {
-        this.disposition = disposition; 
+        this.disposition = disposition;
     }
 
     public String getPatientUuid() {
@@ -300,6 +300,28 @@ public class EncounterTransaction {
             return mappings;
         }
     }
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class User {
+        private String uuid;
+        private String personName;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getPersonName() {
+            return personName;
+        }
+
+        public void setPersonName(String personName) {
+            this.personName = personName;
+        }
+    }
+
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Observation {
@@ -312,6 +334,7 @@ public class EncounterTransaction {
         private List<Observation> groupMembers = new ArrayList<Observation>();
         private String orderUuid;
         private Date observationDateTime;
+        private User creator;
 
         public String getUuid() {
             return uuid;
@@ -396,6 +419,14 @@ public class EncounterTransaction {
         public Observation setObservationDateTime(Date observationDateTime) {
             this.observationDateTime = observationDateTime;
             return this;
+        }
+
+        public User getCreator() {
+            return creator;
+        }
+
+        public void setCreator(User creator) {
+            this.creator = creator;
         }
 
         @JsonSerialize(using = CustomJsonDateSerializer.class)

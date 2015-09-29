@@ -18,6 +18,7 @@ import org.openmrs.Concept;
 import org.openmrs.Drug;
 import org.openmrs.Obs;
 import org.openmrs.Person;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 
 import java.util.Date;
@@ -115,6 +116,11 @@ public class ObsBuilder {
 
     public ObsBuilder setVoidedReason(String reason) {
         obs.setVoidReason(reason);
+        return this;
+    }
+
+    public ObsBuilder setCreator(User creator){
+        obs.setCreator(creator);
         return this;
     }
 }
