@@ -57,26 +57,11 @@ public class EncounterObservationServiceHelper {
         this.orderService = orderService;
     }
 
-    public void update(Encounter encounter, List<EncounterTransaction.Observation> observations) {
-        try {
-            Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
-            for (EncounterTransaction.Observation observationData : observations) {
-                updateObservation(encounter, null, existingObservations, observationData);
-            }
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
+    public Obs transformEtObs(Obs observation, EncounterTransaction.Observation observationData){
+        if(observation == null){
+            observation = newObservation(observationData);
         }
-    }
 
-    private void updateObservation(Encounter encounter, Obs parentObs, Set<Obs> existingObservations, EncounterTransaction.Observation observationData) throws ParseException {
-        Obs observation = getMatchingObservation(existingObservations, observationData.getUuid());
-        if (observation == null) {
-            observation = newObservation(encounter, observationData);
-            if (parentObs == null) {
-                encounter.addObs(observation);
-            }
-            else parentObs.addGroupMember(observation);
-        }
         if (observationData.getVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());
@@ -85,11 +70,45 @@ public class EncounterObservationServiceHelper {
         }
 
         for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
-            updateObservation(encounter, observation, observation.getGroupMembers(), member);
+            Obs nextLevelObs = getMatchingObservation(observation.getGroupMembers(),member.getUuid());
+            observation.addGroupMember(transformEtObs(nextLevelObs, member));
         }
+
+        return observation;
     }
 
-    private void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) throws ParseException {
+    public void update(Encounter encounter, List<EncounterTransaction.Observation> observations) {
+
+            Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
+            for (EncounterTransaction.Observation observationData : observations) {
+                Obs obsFound = getMatchingObservation(existingObservations,observationData.getUuid());
+                encounter.addObs(transformEtObs(obsFound,observationData));
+            }
+
+    }
+
+//    private void updateObservation(Encounter encounter, Obs parentObs, Set<Obs> existingObservations, EncounterTransaction.Observation observationData) throws ParseException {
+//        Obs observation = getMatchingObservation(existingObservations, observationData.getUuid());
+//        if (observation == null) {
+//            observation = newObservation(encounter, observationData);
+//            if (parentObs == null) {
+//                encounter.addObs(observation);
+//            }
+//            else parentObs.addGroupMember(observation);
+//        }
+//        if (observationData.getVoided()) {
+//            observation.setVoided(true);
+//            observation.setVoidReason(observationData.getVoidReason());
+//        } else {
+//            mapObservationProperties(observationData, observation);
+//        }
+//
+//        for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
+//            updateObservation(encounter, observation, observation.getGroupMembers(), member);
+//        }
+//    }
+
+    private void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation){
         observation.setComment(observationData.getComment());
         if (observationData.getValue() != null) {
             if (observation.getConcept().getDatatype().isCoded()) {
@@ -111,7 +130,11 @@ public class EncounterObservationServiceHelper {
                 }
                 obsService.getHandler(((ConceptComplex) conceptComplex).getHandler()).saveObs(observation);
             } else if (!observation.getConcept().getDatatype().getUuid().equals(ConceptDatatype.N_A_UUID)) {
-                observation.setValueAsString(observationData.getValue().toString());
+                try {
+                    observation.setValueAsString(observationData.getValue().toString());
+                }catch(ParseException pe){
+                    throw new IllegalArgumentException("Obs value for the concept uuid ["+observationData.getConceptUuid()+"] cannot be parsed");
+                }
             }
         }
         if(observationData.getOrderUuid() != null && !observationData.getOrderUuid().isEmpty()){
@@ -129,7 +152,7 @@ public class EncounterObservationServiceHelper {
         return orderService.getOrderByUuid(orderUuid);
     }
 
-    private Obs newObservation(Encounter encounter, EncounterTransaction.Observation observationData) {
+    private Obs newObservation(EncounterTransaction.Observation observationData) {
         Obs observation;
         observation = new Obs();
         if(!StringUtils.isBlank(observationData.getUuid())){
@@ -140,8 +163,6 @@ public class EncounterObservationServiceHelper {
         if (concept == null) {
             throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
         }
-        observation.setPerson(encounter.getPatient());
-        observation.setEncounter(encounter);
         observation.setConcept(concept);
         observation.setObsDatetime(observationDateTime);
         return observation;
