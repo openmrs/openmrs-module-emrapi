@@ -157,10 +157,15 @@ public abstract class ConceptSetDescriptor {
     }
 
     protected Concept findAnswer(Concept concept, String codeForAnswer) {
+        return findAnswer(concept,EmrApiConstants.EMR_CONCEPT_SOURCE_NAME,codeForAnswer);
+    }
+
+
+    protected Concept findAnswer(Concept concept, String conceptSource, String codeForAnswer) {
         for (ConceptAnswer conceptAnswer : concept.getAnswers()) {
             Concept answerConcept = conceptAnswer.getAnswerConcept();
             if (answerConcept != null) {
-                if (hasConceptMapping(answerConcept, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME, codeForAnswer)) {
+                if (hasConceptMapping(answerConcept, conceptSource, codeForAnswer)) {
                     return answerConcept;
                 }
             }

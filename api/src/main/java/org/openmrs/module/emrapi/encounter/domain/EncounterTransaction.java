@@ -45,6 +45,7 @@ public class EncounterTransaction {
     private List<DrugOrder> drugOrders = new ArrayList<DrugOrder>();
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
     private Set<Provider> providers = new HashSet<Provider>();
+    private Map<String,Object> extensions = new HashMap<String,Object>();
 
     public EncounterTransaction() {
     }
@@ -52,6 +53,14 @@ public class EncounterTransaction {
     public EncounterTransaction(String visitUuid, String encounterUuid) {
         this.visitUuid = visitUuid;
         this.encounterUuid = encounterUuid;
+    }
+
+    public Map<String, Object> getExtensions() {
+        return extensions;
+    }
+
+    public void setExtensions(Map<String, Object> extensions) {
+        this.extensions = extensions;
     }
 
     public Disposition getDisposition() {

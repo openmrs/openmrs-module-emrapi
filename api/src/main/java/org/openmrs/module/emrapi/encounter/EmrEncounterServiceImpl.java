@@ -34,6 +34,7 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.matcher.DefaultEncounterMatcher;
+import org.openmrs.module.emrapi.encounter.postprocessor.EncounterTransactionHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,6 +67,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private AdministrationService administrationService;
 
     private Map<String, BaseEncounterMatcher> encounterMatcherMap = new HashMap<String, BaseEncounterMatcher>();
+    private List<EncounterTransactionHandler> encounterTransactionHandlers;
 
     public EmrEncounterServiceImpl(PatientService patientService, VisitService visitService, EncounterService encounterService,
                                    LocationService locationService, ProviderService providerService,
@@ -96,6 +98,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             for (BaseEncounterMatcher encounterMatcher : encounterMatchers) {
                 encounterMatcherMap.put(encounterMatcher.getClass().getCanonicalName(), encounterMatcher);
             }
+            encounterTransactionHandlers = Context.getRegisteredComponents(EncounterTransactionHandler.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,6 +114,12 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses());
         encounterDispositionServiceHelper.update(encounter, encounterTransaction.getDisposition());
         encounterProviderServiceHelper.update(encounter, encounterTransaction.getProviders());
+
+        if(encounterTransactionHandlers != null){
+            for(EncounterTransactionHandler encounterTransactionHandler: encounterTransactionHandlers){
+                encounterTransactionHandler.forSave(encounter, encounterTransaction);
+            }
+        }
 
         visitService.saveVisit(visit);
 
@@ -150,14 +159,29 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
             encounter = newEncounter(visit, encounterParameters);
         }
 
-        return encounterTransactionMapper.map(encounter, activeEncounterParameters.getIncludeAll());
+        EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, activeEncounterParameters.getIncludeAll());
+
+        postProcessEncounter(encounter, encounterTransaction);
+
+        return encounterTransaction;
+    }
+
+    private void postProcessEncounter(Encounter encounter,EncounterTransaction encounterTransaction){
+        if(encounterTransactionHandlers != null){
+            for(EncounterTransactionHandler encounterTransactionHandler: encounterTransactionHandlers){
+                encounterTransactionHandler.forRead(encounter, encounterTransaction);
+            }
+        }
     }
 
     @Override
     public EncounterTransaction getEncounterTransaction(String uuid, Boolean includeAll) {
         includeAll = includeAll != null ? includeAll : false;
         Encounter encounter = encounterService.getEncounterByUuid(uuid);
-        return encounterTransactionMapper.map(encounter, includeAll);
+        EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
+        postProcessEncounter(encounter,encounterTransaction);
+        return encounterTransaction;
+
     }
 
     private Encounter newEncounter(Visit visit, EncounterParameters encounterParameters) {
@@ -182,7 +206,10 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private List<EncounterTransaction> getEncounterTransactions(List<Encounter> encounters, boolean includeAll) {
         List<EncounterTransaction> encounterTransactions = new ArrayList<EncounterTransaction>();
         for (Encounter encounter : encounters) {
-            encounterTransactions.add(encounterTransactionMapper.map(encounter, includeAll));
+            EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
+            postProcessEncounter(encounter,encounterTransaction);
+            encounterTransactions.add(encounterTransaction);
+
         }
         return encounterTransactions;
     }
