@@ -15,9 +15,14 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Concept;
 import org.openmrs.ConceptClass;
+import org.openmrs.ConceptName;
 import org.openmrs.ConceptNumeric;
+import org.openmrs.User;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.utils.HibernateLazyLoader;
+import org.openmrs.util.LocaleUtility;
+import org.openmrs.util.OpenmrsConstants;
 
 public class ConceptMapper {
     public EncounterTransaction.Concept map(Concept concept) {
@@ -28,14 +33,35 @@ public class ConceptMapper {
         ConceptClass conceptClass = concept.getConceptClass();
         String conceptClassName = (conceptClass != null) ? conceptClass.getName() : null;
 
-        String shortName = concept.getShortNames() != null && concept.getShortNames().size() > 0 ? concept.getShortNames().iterator().next().getName() : null;
-
-        EncounterTransaction.Concept encounterTransactionConcept = new EncounterTransaction.Concept(concept.getUuid(),
-                concept.getName().getName(), concept.isSet(), concept.getDatatype().getName(), null,
-                conceptClassName, shortName, concept.getConceptMappings());
+        EncounterTransaction.Concept encounterTransactionConcept = new EncounterTransaction.Concept(
+                concept.getUuid(),
+                concept.getName().getName(),
+                concept.isSet(),
+                concept.getDatatype().getName(),
+                null,
+                conceptClassName,
+                getShortName(concept),
+                concept.getConceptMappings());
         if(concept.isNumeric() && ((ConceptNumeric) concept).getUnits() != null) {
             encounterTransactionConcept.setUnits(((ConceptNumeric) concept).getUnits());
         }
         return encounterTransactionConcept;
+    }
+
+    private String getShortName(Concept concept) {
+        User authenticatedUser = Context.getAuthenticatedUser();
+        String shortName = null;
+        if(authenticatedUser != null) {
+            String defaultLocale = authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE);
+            ConceptName shortNameInLocale = concept.getShortNameInLocale(LocaleUtility.fromSpecification(defaultLocale));
+            if(shortNameInLocale != null) {
+                shortName = shortNameInLocale.getName();
+            }
+        }
+        if(shortName == null) {
+            shortName = concept.getShortNames() != null && concept.getShortNames().size() > 0 ? concept.getShortNames().iterator().next().getName() : null;
+        }
+
+        return shortName;
     }
 }
