@@ -292,7 +292,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <openMRSVersion>1.11.0</openMRSVersion>
+                <openMRSVersion>1.11.4</openMRSVersion>
             </properties>
 
             <build>

@@ -13,16 +13,15 @@
  */
 package org.openmrs.api.db.hibernate;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
-import org.hibernate.SessionFactory;
 import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.api.db.ConditionDAO;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 public class HibernateConditionDAO implements ConditionDAO {
 
@@ -31,14 +30,14 @@ public class HibernateConditionDAO implements ConditionDAO {
      * Hibernate session factory
      */
 
-    private SessionFactory sessionFactory;
+    private DbSessionFactory sessionFactory;
 
     /**
      * Set session factory
      *
      * @param sessionFactory
      */
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public void setSessionFactory(DbSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

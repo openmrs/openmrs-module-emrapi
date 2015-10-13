@@ -1,22 +1,22 @@
 package org.openmrs.module.emrapi.db;
 
+import java.util.List;
+
 import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
-
-import java.util.List;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 
 public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
 
-    private SessionFactory sessionFactory;
+    private DbSessionFactory sessionFactory;
 
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
+	public void setSessionFactory(DbSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

@@ -105,7 +105,7 @@
                 <property name="dao">
                     <bean class="${project.parent.groupId}.${project.parent.artifactId}.concept.HibernateEmrConceptDAO">
                         <property name="sessionFactory">
-                            <ref bean="sessionFactory"/>
+                            <ref bean="dbSessionFactory"/>
                         </property>
                     </bean>
                 </property>
@@ -130,7 +130,7 @@
                 <property name="dao">
                     <bean class="${project.parent.groupId}.${project.parent.artifactId}.patient.HibernateEmrPatientDAO">
                         <property name="sessionFactory">
-                            <ref bean="sessionFactory"/>
+                            <ref bean="dbSessionFactory"/>
                         </property>
                     </bean>
                 </property>
@@ -370,7 +370,7 @@
 
     <bean id="emrEncounterDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrEncounterDAO">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref bean="dbSessionFactory"/>
         </property>
     </bean>
 
