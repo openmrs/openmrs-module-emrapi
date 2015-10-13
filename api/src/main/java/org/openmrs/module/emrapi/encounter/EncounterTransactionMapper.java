@@ -15,12 +15,15 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.postprocessor.EncounterTransactionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -29,10 +32,12 @@ public class EncounterTransactionMapper {
     private EncounterObservationsMapper encounterObservationsMapper;
     private EncounterProviderMapper encounterProviderMapper;
     private OrderMapper orderMapper;
+    private List<EncounterTransactionHandler> encounterTransactionHandlers;
 
     @Autowired(required = false)
     public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper) {
         this(encounterObservationsMapper, encounterProviderMapper, null);
+        encounterTransactionHandlers = Context.getRegisteredComponents(EncounterTransactionHandler.class);
     }
 
     @Autowired(required = false)
@@ -40,6 +45,7 @@ public class EncounterTransactionMapper {
         this.encounterObservationsMapper = encounterObservationsMapper;
         this.encounterProviderMapper = encounterProviderMapper;
         this.orderMapper = orderMapper;
+        encounterTransactionHandlers = Context.getRegisteredComponents(EncounterTransactionHandler.class);
     }
 
     public EncounterTransaction map(Encounter encounter, Boolean includeAll) {
@@ -59,8 +65,19 @@ public class EncounterTransactionMapper {
             encounterTransaction.setOrders(orderMapper.mapOrders(encounter));
         }
 
+        postProcessEncounter(encounter,encounterTransaction);
+
         return encounterTransaction;
     }
+
+    private void postProcessEncounter(Encounter encounter,EncounterTransaction encounterTransaction){
+        if(encounterTransactionHandlers != null){
+            for(EncounterTransactionHandler encounterTransactionHandler: encounterTransactionHandlers){
+                encounterTransactionHandler.forRead(encounter, encounterTransaction);
+            }
+        }
+    }
+
 
     private Set<Obs> getSortedTopLevelObservations(Encounter encounter, Boolean includeAll) {
         TreeSet<Obs> sortedObservations = new TreeSet<Obs>(new Comparator<Obs>() {

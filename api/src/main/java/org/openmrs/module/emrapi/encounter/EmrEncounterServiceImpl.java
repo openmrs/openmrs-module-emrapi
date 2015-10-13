@@ -160,18 +160,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         }
 
         EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, activeEncounterParameters.getIncludeAll());
-
-        postProcessEncounter(encounter, encounterTransaction);
-
         return encounterTransaction;
-    }
-
-    private void postProcessEncounter(Encounter encounter,EncounterTransaction encounterTransaction){
-        if(encounterTransactionHandlers != null){
-            for(EncounterTransactionHandler encounterTransactionHandler: encounterTransactionHandlers){
-                encounterTransactionHandler.forRead(encounter, encounterTransaction);
-            }
-        }
     }
 
     @Override
@@ -179,7 +168,6 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         includeAll = includeAll != null ? includeAll : false;
         Encounter encounter = encounterService.getEncounterByUuid(uuid);
         EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
-        postProcessEncounter(encounter,encounterTransaction);
         return encounterTransaction;
 
     }
@@ -207,7 +195,6 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         List<EncounterTransaction> encounterTransactions = new ArrayList<EncounterTransaction>();
         for (Encounter encounter : encounters) {
             EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
-            postProcessEncounter(encounter,encounterTransaction);
             encounterTransactions.add(encounterTransaction);
 
         }

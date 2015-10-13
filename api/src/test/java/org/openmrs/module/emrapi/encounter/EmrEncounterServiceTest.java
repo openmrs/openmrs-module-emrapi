@@ -281,12 +281,7 @@ public class EmrEncounterServiceTest {
                 any(Date.class), Matchers.<Collection<Form>>any(), Matchers.<Collection<EncounterType>>any(), Matchers.<Collection<Provider>>any(), Matchers.<Collection<VisitType>>any(),
                 Matchers.<Collection<Visit>>any(), any(Boolean.class))).thenReturn(Arrays.asList(encounter));
 
-        encounterTransactionHandler = mock(EncounterTransactionHandler.class);
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
-                Arrays.asList(encounterTransactionHandler));
-
         emrEncounterService.onStartup();
         emrEncounterService.find(parameters);
-        verify(encounterTransactionHandler).forRead(eq(encounter), any(EncounterTransaction.class));
     }
 }
