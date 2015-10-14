@@ -19,11 +19,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
+import org.openmrs.Drug;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.Patient;
-import org.openmrs.Drug;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.OrderService;
@@ -31,6 +31,7 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
+import org.openmrs.module.emrapi.encounter.mapper.ObsMapper;
 import org.openmrs.module.emrapi.test.builder.ConceptDataTypeBuilder;
 
 import java.text.ParseException;
@@ -58,6 +59,7 @@ public class EncounterObservationServiceHelperTest {
     public static final String NUMERIC_CONCEPT_UUID = "numeric-concept-uuid";
     @Mock
     private ConceptService conceptService;
+
     @Mock
     private ObsService obsService;
     @Mock
@@ -68,13 +70,17 @@ public class EncounterObservationServiceHelperTest {
     @Mock
     private OrderService orderService;
 
+    private ObsMapper obsMapper = null;
+
     private EncounterObservationServiceHelper encounterObservationServiceHelper;
+
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
+        obsMapper = new ObsMapper(conceptService,emrApiProperties,obsService,orderService);
         when(emrApiProperties.getDiagnosisMetadata()).thenReturn(diagnosisMetadata);
-        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties, obsService, orderService);
+        encounterObservationServiceHelper = new EncounterObservationServiceHelper(conceptService, emrApiProperties, obsService, orderService, obsMapper);
 
     }
 
@@ -182,7 +188,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldHandleNullValueObservationWhileSaving() throws Exception {
-        newConcept(new ConceptDataTypeBuilder().text(), TEXT_CONCEPT_UUID);
+        Concept concept = newConcept(new ConceptDataTypeBuilder().text(), TEXT_CONCEPT_UUID);
 
         List<EncounterTransaction.Observation> observations = asList(
                 new EncounterTransaction.Observation().setConcept(getConcept(TEXT_CONCEPT_UUID)).setValue(null).setComment("overweight")
@@ -218,6 +224,7 @@ public class EncounterObservationServiceHelperTest {
         encounter.addObs(obs);
 
         Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+
         encounterObservationServiceHelper.update(encounter, observations);
 
         assertEquals(0, encounter.getObs().size());

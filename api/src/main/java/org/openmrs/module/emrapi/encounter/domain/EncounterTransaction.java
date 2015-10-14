@@ -345,6 +345,27 @@ public class EncounterTransaction {
         private Date observationDateTime;
         private User creator;
 
+        private String formNamespace;
+        private String formFieldPath;
+
+        public String getFormNamespace() {
+            return formNamespace;
+        }
+
+        public Observation setFormNamespace(String formNamespace) {
+            this.formNamespace = formNamespace;
+            return this;
+        }
+
+        public String getFormFieldPath() {
+            return formFieldPath;
+        }
+
+        public Observation setFormFieldPath(String formFieldPath) {
+            this.formFieldPath = formFieldPath;
+            return this;
+        }
+
         public String getUuid() {
             return uuid;
         }
