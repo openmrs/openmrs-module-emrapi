@@ -10,7 +10,7 @@
 
     <bean id="conditionDAO" class="org.openmrs.api.db.hibernate.HibernateConditionDAO">
         <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
+            <ref bean="dbSessionFactory"/>
         </property>
     </bean>
 
