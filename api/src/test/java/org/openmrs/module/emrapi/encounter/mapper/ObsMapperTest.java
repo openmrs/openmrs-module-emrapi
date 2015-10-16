@@ -7,7 +7,9 @@ import org.mockito.Mock;
 import org.mockito.internal.util.collections.Sets;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.OrderService;
@@ -40,6 +42,12 @@ public class ObsMapperTest {
     @Mock
     private OrderService orderService;
 
+    @Mock
+    private Encounter encounter;
+
+    @Mock
+    private Patient patient;
+
     private ObsMapper obsMapper = null;
 
     @Before
@@ -47,6 +55,7 @@ public class ObsMapperTest {
         initMocks(this);
         obsMapper = new ObsMapper(conceptService, emrApiProperties, obsService, orderService);
         when(emrApiProperties.getDiagnosisMetadata()).thenReturn(diagnosisMetadata);
+        when(encounter.getPatient()).thenReturn(patient);
     }
 
     @Test
@@ -58,12 +67,13 @@ public class ObsMapperTest {
         when(conceptService.getConceptByUuid(etObs.getConceptUuid())).thenReturn(numericConcept);
 
         //act
-        Obs obs = this.obsMapper.transformEtObs(null, etObs);
+        Obs obs = this.obsMapper.transformEtObs(encounter,null, etObs);
 
         //assert
         assertEquals(new Double(35.0), obs.getValueNumeric());
         assertEquals("overweight", obs.getComment());
         assertEquals(observationDateTime, obs.getObsDatetime());
+        assertEquals(patient, obs.getPerson());
     }
 
 

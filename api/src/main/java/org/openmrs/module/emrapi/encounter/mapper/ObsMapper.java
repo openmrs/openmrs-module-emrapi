@@ -7,6 +7,7 @@ import org.openmrs.Concept;
 import org.openmrs.ConceptComplex;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.Drug;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.annotation.OpenmrsProfile;
@@ -45,21 +46,21 @@ public class ObsMapper {
         this.orderService = orderService;
     }
 
-    public Obs transformEtObs(Obs observation, EncounterTransaction.Observation observationData) {
+    public Obs transformEtObs(Encounter encounter,Obs observation, EncounterTransaction.Observation observationData) {
         if (observation == null) {
-            observation = newObservation(observationData);
+            observation = newObservation(encounter,observationData);
         }
 
         mapObservationProperties(observationData, observation);
 
         for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
             Obs nextLevelObs = getMatchingObservation(observation.getGroupMembers(), member.getUuid());
-            observation.addGroupMember(transformEtObs(nextLevelObs, member));
+            observation.addGroupMember(transformEtObs(encounter,nextLevelObs, member));
         }
         return observation;
     }
 
-    protected Obs newObservation(EncounterTransaction.Observation observationData) {
+    protected Obs newObservation(Encounter encounter,EncounterTransaction.Observation observationData) {
         Obs observation = new Obs();
         if (!StringUtils.isBlank(observationData.getUuid())) {
             observation.setUuid(observationData.getUuid());
@@ -70,6 +71,7 @@ public class ObsMapper {
             throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
         }
         observation.setConcept(concept);
+        observation.setPerson(encounter.getPatient());
         observation.setObsDatetime(observationDateTime);
         setVoidedObs(observationData, observation);
 

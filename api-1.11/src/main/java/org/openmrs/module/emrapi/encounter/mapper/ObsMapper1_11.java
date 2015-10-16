@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.ConceptService;
@@ -22,8 +23,8 @@ public class ObsMapper1_11 extends ObsMapper {
     }
 
     @Override
-    protected Obs newObservation(EncounterTransaction.Observation observationData) {
-        Obs obs = super.newObservation(observationData);
+    protected Obs newObservation(Encounter encounter,EncounterTransaction.Observation observationData) {
+        Obs obs = super.newObservation(encounter,observationData);
         obs.setFormField(observationData.getFormNamespace(),observationData.getFormFieldPath());
         return obs;
     }

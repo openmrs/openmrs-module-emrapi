@@ -60,7 +60,7 @@ public class EncounterObservationServiceHelper {
             Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
             for (EncounterTransaction.Observation observationData : observations) {
                 Obs obsFound = this.obsMapper.getMatchingObservation(existingObservations,observationData.getUuid());
-                encounter.addObs(this.obsMapper.transformEtObs(obsFound, observationData));
+                encounter.addObs(this.obsMapper.transformEtObs(encounter,obsFound, observationData));
             }
     }
 
