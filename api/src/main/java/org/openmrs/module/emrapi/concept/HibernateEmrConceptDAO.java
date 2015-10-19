@@ -28,7 +28,7 @@ import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
+import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
@@ -54,9 +54,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class HibernateEmrConceptDAO implements EmrConceptDAO {
 
-    SessionFactory sessionFactory;
+	DbSessionFactory sessionFactory;
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public void setSessionFactory(DbSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

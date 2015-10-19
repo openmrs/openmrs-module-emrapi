@@ -7,3 +7,4 @@ activemq-data/
 *.iml
 *.sass-cache
 *.DS_Store
+/bin/

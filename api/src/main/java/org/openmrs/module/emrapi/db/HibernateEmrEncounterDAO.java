@@ -1,7 +1,7 @@
 package org.openmrs.module.emrapi.db;
 
 import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
+import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Concept;
@@ -13,10 +13,10 @@ import java.util.List;
 
 public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
 
-    private SessionFactory sessionFactory;
+    private DbSessionFactory sessionFactory;
 
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public void setSessionFactory(DbSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

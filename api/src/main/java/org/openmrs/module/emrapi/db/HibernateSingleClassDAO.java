@@ -1,13 +1,13 @@
 package org.openmrs.module.emrapi.db;
 
-import org.hibernate.SessionFactory;
+import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public abstract class HibernateSingleClassDAO<T> implements SingleClassDAO<T> {
 
-    protected SessionFactory sessionFactory;
+    protected DbSessionFactory sessionFactory;
 
     protected Class<T> mappedClass;
 
@@ -29,7 +29,7 @@ public abstract class HibernateSingleClassDAO<T> implements SingleClassDAO<T> {
         this.mappedClass = mappedClass;
     }
 
-    public void setSessionFactory(SessionFactory sessionFactory) {
+    public void setSessionFactory(DbSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
