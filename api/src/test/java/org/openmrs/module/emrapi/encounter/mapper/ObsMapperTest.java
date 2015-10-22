@@ -76,6 +76,22 @@ public class ObsMapperTest {
         assertEquals(patient, obs.getPerson());
     }
 
+    @Test
+    public void shouldVoidObs() throws ParseException {
+        //arrange
+        Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), "numeric-concept-uuid");
+        Date observationDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+        EncounterTransaction.Observation etObs = new EncounterTransaction.Observation().setUuid("o-uuid").setVoided(true).setValue("").setComment("overweight").setObservationDateTime(observationDateTime).setConcept(newEtConcept("ET_CONCEPT"));
+        when(conceptService.getConceptByUuid(etObs.getConceptUuid())).thenReturn(numericConcept);
+
+        //act
+        Obs obs = this.obsMapper.transformEtObs(encounter,null, etObs);
+
+        //assert
+        assertEquals(true, obs.getVoided());
+        assertEquals(patient, obs.getPerson());
+    }
+
 
     @Test
     public void shouldReturnMatchingObs() {
