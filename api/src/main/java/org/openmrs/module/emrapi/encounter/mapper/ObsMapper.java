@@ -79,15 +79,17 @@ public class ObsMapper {
     }
 
 
-    private void setVoidedObs(EncounterTransaction.Observation observationData, Obs observation) {
+    private boolean setVoidedObs(EncounterTransaction.Observation observationData, Obs observation) {
         if (observationData.getVoided()) {
             observation.setVoided(true);
             observation.setVoidReason(observationData.getVoidReason());
         }
+        return observationData.getVoided();
     }
 
     private void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) {
-        setVoidedObs(observationData, observation);
+        if(setVoidedObs(observationData, observation))
+            return;
         observation.setComment(observationData.getComment());
         if (observationData.getValue() != null) {
             if (observation.getConcept().getDatatype().isCoded()) {
