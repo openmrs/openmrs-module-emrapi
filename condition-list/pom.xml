@@ -13,7 +13,7 @@
     <name>EMR API Condition List</name>
 
     <properties>
-        <openMRSVersion>1.9.8</openMRSVersion>
+        <openMRSVersion>1.10.2</openMRSVersion>
     </properties>
 
     <dependencies>
