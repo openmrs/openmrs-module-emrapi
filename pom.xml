@@ -42,7 +42,7 @@
         <openmrsTestutilsVersion>1.3</openmrsTestutilsVersion>
         <distro.groupId>org.openmrs.distro</distro.groupId>
         <distro.artifactId>referenceapplication</distro.artifactId>
-        <distro.version>2.3</distro.version>
+        <distro.version>2.4-SNAPSHOT</distro.version>
         <reportingModuleVersion>0.9.6</reportingModuleVersion>
         <providermanagementModuleVersion>2.3</providermanagementModuleVersion>
         <metadatasharingVersion>1.1.9</metadatasharingVersion>
