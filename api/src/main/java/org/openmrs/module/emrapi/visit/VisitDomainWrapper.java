@@ -24,6 +24,7 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.User;
 import org.openmrs.Visit;
+import org.openmrs.VisitAttribute;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
 import org.openmrs.module.emrapi.descriptor.MissingConceptException;
@@ -556,6 +557,17 @@ public class VisitDomainWrapper implements DomainWrapper {
 
     public boolean verifyIfUserIsTheCreatorOfVisit(User currentUser) {
         return visit.getCreator().equals(currentUser);
+    }
+
+    public Object getVisitAttribute(String uuidOrName) {
+        for (VisitAttribute attribute : visit.getActiveAttributes()) {
+            if (attribute.getAttributeType().getUuid().equals(uuidOrName) ||
+                    attribute.getAttributeType().getName().equals(uuidOrName)) {
+                // note the assumption of this method is that there is only one attribute
+                return attribute.getValue();
+            }
+        }
+        return null;
     }
 
     private class EncounterTypePredicate implements Predicate {

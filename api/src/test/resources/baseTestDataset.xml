@@ -65,5 +65,8 @@
     <visit visit_id="1002" patient_id="8" visit_type_id="1" date_started="2013-04-01 00:00:00.0" date_stopped="2013-04-10 00:00:00.0" location_id="1" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="4e663896-6b78-11e0-93c3-18a905e044dc" />
     <encounter encounter_id="1002" visit_id="1002" encounter_type="2" patient_id="8" location_id="1" form_id="1" encounter_datetime="2013-04-02 00:00:00.0" creator="1" date_created="2008-08-18 14:09:05.0" voided="false" uuid="7779d653-444b-4118-9c83-a3715b82d4ac"/>
 
+    <!-- visit attribute type and visit attribute for VisitDomainWrapperComponentTest -->
+    <visit_attribute_type visit_attribute_type_id="100" name="Visit Template" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" min_occurs="0" max_occurs="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="0" uuid="f7b07c80-27c3-49de-8830-cb9e3e805eeb" />
+    <visit_attribute visit_attribute_id="100" visit_id="2" value_reference="pedsInitialOutpatient" attribute_type_id="100" creator="1" date_created="2008-08-15 15:46:47.0" voided="false" uuid="e37d58a0-7e59-11e5-a837-0800200c9a66"/>
 
 </dataset>

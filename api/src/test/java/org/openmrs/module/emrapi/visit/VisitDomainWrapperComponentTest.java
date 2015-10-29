@@ -1,11 +1,13 @@
 package org.openmrs.module.emrapi.visit;
 
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.VisitService;
 import org.openmrs.contrib.testdata.TestDataManager;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -21,6 +23,7 @@ import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
@@ -42,6 +45,9 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
 
     @Autowired
     private DomainWrapperFactory factory;
+
+    @Autowired
+    private VisitService visitService;
 
     private DispositionDescriptor dispositionDescriptor;
 
@@ -121,4 +127,29 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(false));
     }
+
+    @Test
+    public void getVisitAttribute_shouldReturnNullIfNoVisitAttributes() {
+        Visit visit = visitService.getVisit(1); // from standard test dataset
+        assertNull(factory.newVisitDomainWrapper(visit).getVisitAttribute("Visit Template"));
+    }
+
+    @Test
+    public void getVisitTemplate_shouldReturnVisitAttributeMatchedByName() {
+        Visit visit = visitService.getVisit(2); // from standard test dataset
+         assertThat(factory.newVisitDomainWrapper(visit).getVisitAttribute("Visit Template").toString(), is("pedsInitialOutpatient"));
+    }
+
+    @Test
+    public void getVisitTemplate_shouldReturnVisitAttributeMatchedByUuid() {
+        Visit visit = visitService.getVisit(2); // from standard test dataset
+        assertThat(factory.newVisitDomainWrapper(visit).getVisitAttribute("f7b07c80-27c3-49de-8830-cb9e3e805eeb").toString(), is("pedsInitialOutpatient"));
+    }
+
+    @Test
+    public void getVisitTemplate_shouldReturnNullIfNoMatchingVisitAttributes() {
+        Visit visit = visitService.getVisit(2); // from standard test dataset
+        assertNull(factory.newVisitDomainWrapper(visit).getVisitAttribute("Non-existent attribute"));
+    }
+
 }
