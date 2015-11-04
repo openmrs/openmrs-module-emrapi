@@ -14,14 +14,10 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>${project.parent.artifactId}-condition-list</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-        <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>${project.parent.artifactId}-api-1.9</artifactId>
+            <artifactId>${project.parent.artifactId}-api</artifactId>
             <version>${project.parent.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -31,55 +27,55 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>${project.parent.artifactId}-api-1.11</artifactId>
+            <artifactId>${project.parent.artifactId}-condition-list</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>${project.parent.artifactId}-api</artifactId>
+            <artifactId>${project.parent.artifactId}-api-1.11</artifactId>
             <version>${project.parent.version}</version>
+            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>${project.parent.artifactId}-api</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>test</scope>
-        </dependency>
+        
         <dependency>
             <groupId>org.openmrs.web</groupId>
             <artifactId>openmrs-web</artifactId>
             <type>jar</type>
             <version>${openMRSVersion}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.web</groupId>
             <artifactId>openmrs-web</artifactId>
             <type>test-jar</type>
             <version>${openMRSVersion}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod-common</artifactId>
             <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.test</groupId>
             <artifactId>openmrs-test</artifactId>
             <version>${openMRSVersion}</version>
-            <scope>test</scope>
             <type>pom</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
             <version>${openMRSVersion}</version>
-            <scope>test</scope>
             <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -233,7 +229,7 @@
             <dependencies>
                 <dependency>
                     <groupId>${project.parent.groupId}</groupId>
-                    <artifactId>${project.parent.artifactId}-api-1.9</artifactId>
+                    <artifactId>${project.parent.artifactId}-api</artifactId>
                     <version>${project.parent.version}</version>
                 </dependency>
             </dependencies>
@@ -246,7 +242,7 @@
                         <configuration>
                             <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
                             <includes>
-                                <include>**/*_1_9_Test.java</include>
+                                <include>**/*Test.java</include>
                             </includes>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>

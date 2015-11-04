@@ -23,24 +23,24 @@
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
             <version>${openMRSVersion}</version>
-            <scope>provided</scope>
             <type>jar</type>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
             <version>${openMRSVersion}</version>
-            <scope>test</scope>
             <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.test</groupId>
             <artifactId>openmrs-test</artifactId>
             <version>${openMRSVersion}</version>
-            <scope>test</scope>
             <type>pom</type>
+            <scope>test</scope>
         </dependency>
 
         <!-- End OpenMRS core -->

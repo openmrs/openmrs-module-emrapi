@@ -30,11 +30,10 @@
 
     <modules>
         <module>api</module>
-        <module>omod</module>
-        <module>api-1.11</module>
         <module>api-1.10</module>
-        <module>api-1.9</module>
+        <module>api-1.11</module>
         <module>condition-list</module>
+        <module>omod</module>
     </modules>
 
     <properties>
@@ -64,38 +63,41 @@
 
     <dependencies>
         <!-- Begin OpenMRS modules -->
-
        <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>reporting-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>serialization.xstream-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>calculation-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>providermanagement-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>metadatasharing-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs</groupId>
             <artifactId>event-api</artifactId>
-            <type>jar</type>
+            <scope>provided</scope>
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

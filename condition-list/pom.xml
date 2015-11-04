@@ -21,6 +21,7 @@
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
             <version>${openMRSVersion}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
