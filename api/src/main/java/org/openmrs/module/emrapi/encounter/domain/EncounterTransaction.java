@@ -787,6 +787,7 @@ public class EncounterTransaction {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DrugOrder extends Order {
         private Drug drug;
+        private String drugNonCoded;
         private String dosingInstructionType;
         private DosingInstructions dosingInstructions;
         private Date dateActivated;
@@ -806,6 +807,14 @@ public class EncounterTransaction {
 
         public void setDrug(Drug drug) {
             this.drug = drug;
+        }
+
+        public String getDrugNonCoded() {
+            return drugNonCoded;
+        }
+
+        public void setDrugNonCoded(String drugNonCoded) {
+            this.drugNonCoded = drugNonCoded;
         }
 
         public String getDosingInstructionType() {

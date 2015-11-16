@@ -56,32 +56,74 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LocaleUtility.class)
-public class DrugOrderMapper1_11Test {
+public class OrderMapper1_12Test {
 
-    public static final CareSettingType OUT_PATIENT_CARE_SETTING = CareSettingType.OUTPATIENT;
-    public static final String DRUG_ORDER_TYPE = "Drug Order";
-    public static final String DAY_DURATION_UNIT = "day";
-    public static final String DRUG_UUID = "drug-uuid";
-    public static final String CAPSULE_DOSE_UNIT = "Capsule";
-    public static final String TABLET_DOSAGE_FORM = "TABLET";
-    public static final String MOUTH_ROUTE = "mouth";
-    public static final String TABLET_QUANTITY_UNIT = "TABLET";
-    public static final String TWICE_A_DAY_FREQUENCY = "Twice a day";
+    private static final CareSettingType OUT_PATIENT_CARE_SETTING = CareSettingType.OUTPATIENT;
+    private static final String DRUG_ORDER_TYPE = "Drug Order";
+    private static final String ORDER_TYPE = "Order";
+    private static final String DAY_DURATION_UNIT = "day";
+    private static final String DRUG_UUID = "drug-uuid";
+    private static final String ORDER_UUID = "order-uuid";
+    private static final String CAPSULE_DOSE_UNIT = "Capsule";
+    private static final String TABLET_DOSAGE_FORM = "TABLET";
+    private static final String MOUTH_ROUTE = "mouth";
+    private static final String TABLET_QUANTITY_UNIT = "TABLET";
+    private static final String TWICE_A_DAY_FREQUENCY = "Twice a day";
+    private static final String FREE_TEXT_DRUG_NAME = "Free Text Drug";
 
-    private OrderMapper1_11 drugOrderMapper111;
+    private OrderMapper1_12 orderMapper1_12;
 
     @Before
     public void setup() {
         mockStatic(LocaleUtility.class);
 
-        drugOrderMapper111 = new OrderMapper1_11();
+        orderMapper1_12 = new OrderMapper1_12();
+    }
+
+    @Test
+    public void shouldMapNewOrder() throws ParseException, NoSuchFieldException, IllegalAccessException {
+
+        Order openMrsOrder = order("boil in water", "comments", "ORD-99", "ORD-100", ORDER_TYPE);
+        openMrsOrder.setUuid(ORDER_UUID);
+        EncounterTransaction.Order order = orderMapper1_12.mapOrder(openMrsOrder);
+
+        assertThat(order.getAction(), is(equalTo(Order.Action.NEW.name())));
+        assertThat(order.getUuid(), is(equalTo(ORDER_UUID)));
+        assertThat(order.getOrderType(), is(equalTo(ORDER_TYPE)));
+        assertThat(order.getInstructions(), is(equalTo("boil in water")));
+        assertThat(order.getCommentToFulfiller(), is(equalTo("comments")));
+        assertThat(order.getOrderNumber(), is(equalTo("ORD-100")));
+        assertThat(order.getDateCreated(), is(equalTo(new LocalDate().toDate())));
+        assertThat(order.getDateChanged(), is(equalTo(new LocalDate().toDate())));
+        assertThat(order.getOrderNumber(), is(equalTo("ORD-100")));
+    }
+
+    @Test
+    public void shouldSetPreviousOrder() throws NoSuchFieldException, IllegalAccessException {
+        Order openMrsOrder = order("boil in water", "comments", "Previous Order Uuid", "ORD-100", ORDER_TYPE);
+        EncounterTransaction.Order order = orderMapper1_12.mapOrder(openMrsOrder);
+
+        assertThat(order.getPreviousOrderUuid(), is(equalTo("Previous Order Uuid")));
+    }
+
+    @Test
+    public void shouldMapMultipleOrders() throws NoSuchFieldException, IllegalAccessException {
+        Order order100 = order("before meals", "boil in water", null, "ORD-100", ORDER_TYPE);
+        Order order201 = order("before meals", "boil in water", null, "ORD-201", ORDER_TYPE);
+        Order order350 = order("before meals", "boil in water", null, "ORD-350", ORDER_TYPE);
+
+        Encounter encounter = new Encounter();
+        encounter.setOrders(new HashSet<Order>(Arrays.asList(order350, order100, order201)));
+        List<EncounterTransaction.Order> ordersList = orderMapper1_12.mapOrders(encounter);
+
+        assertEquals(3, ordersList.size());
     }
 
     @Test
     public void shouldMapNewDrugOrder() throws ParseException, NoSuchFieldException, IllegalAccessException {
 
         DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-100");
-        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper111.mapDrugOrder(openMrsDrugOrder);
+        EncounterTransaction.DrugOrder drugOrder = orderMapper1_12.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
         assertThat(drugOrder.getAction(), is(equalTo(Order.Action.NEW.name())));
@@ -114,26 +156,75 @@ public class DrugOrderMapper1_11Test {
     }
 
     @Test
-    public void shouldSetPreviousOrder() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldMapNewNonCodedDrugOrder() throws ParseException, NoSuchFieldException, IllegalAccessException {
+
+        DrugOrder nonCodedDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-100");
+        nonCodedDrugOrder.setDrugNonCoded(FREE_TEXT_DRUG_NAME);
+        nonCodedDrugOrder.setDrug(null);
+        EncounterTransaction.DrugOrder drugOrder = orderMapper1_12.mapDrugOrder(nonCodedDrugOrder);
+
+        assertThat(drugOrder.getDrugNonCoded(), is(equalTo(FREE_TEXT_DRUG_NAME)));
+        assertThat(drugOrder.getDrug(), is(equalTo(null)));
+    }
+
+    @Test
+    public void shouldSetPreviousDrugOrder() throws NoSuchFieldException, IllegalAccessException {
         DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", "previousOrderUuid", "ORD-100");
-        EncounterTransaction.DrugOrder drugOrder = drugOrderMapper111.mapDrugOrder(openMrsDrugOrder);
+        EncounterTransaction.DrugOrder drugOrder = orderMapper1_12.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getPreviousOrderUuid(), is(equalTo("previousOrderUuid")));
     }
 
     @Test
-    public void shouldReturnOrdersSortedByOrderNumber() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldReturnDrugOrdersSortedByOrderNumber() throws NoSuchFieldException, IllegalAccessException {
         DrugOrder drugOrder100 = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-100");
         DrugOrder drugOrder201 = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-201");
         DrugOrder drugOrder350 = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-350");
 
         Encounter encounter = new Encounter();
         encounter.setOrders(new HashSet<Order>(Arrays.asList(drugOrder350, drugOrder100, drugOrder201)));
-        List<EncounterTransaction.DrugOrder> sortedDrugOrders = drugOrderMapper111.mapDrugOrders(encounter);
+        List<EncounterTransaction.DrugOrder> sortedDrugOrders = orderMapper1_12.mapDrugOrders(encounter);
 
         assertEquals("ORD-100", sortedDrugOrders.get(0).getOrderNumber());
         assertEquals("ORD-201", sortedDrugOrders.get(1).getOrderNumber());
         assertEquals("ORD-350", sortedDrugOrders.get(2).getOrderNumber());
+    }
+
+    private Order order(String instructions, String commentToFulfiller, String previousOrderUuid, String orderNumber, String orderType) throws NoSuchFieldException, IllegalAccessException {
+        Order order = new Order();
+        order.setPatient(new Patient());
+        order.setAction(Order.Action.NEW);
+
+        OrderType ordertype = new OrderType();
+        ordertype.setName(orderType);
+        order.setOrderType(ordertype);
+
+        Concept durationConcept = concept(DAY_DURATION_UNIT);
+        ConceptSource durationConceptSource = new ConceptSource();
+        durationConceptSource.setUuid(Duration.SNOMED_CT_CONCEPT_SOURCE_HL7_CODE);
+        durationConcept.addConceptMapping(new ConceptMap(new ConceptReferenceTerm(durationConceptSource, "D", "Day"), new ConceptMapType()));
+
+        order.setDateCreated(new LocalDate().toDate());
+        order.setDateChanged(new LocalDate().toDate());
+
+        OrderFrequency orderFrequency = new OrderFrequency();
+        orderFrequency.setFrequencyPerDay(2.0);
+        orderFrequency.setConcept(concept("Order_Concept"));
+
+        order.setInstructions(instructions);
+        order.setCommentToFulfiller(commentToFulfiller);
+
+        Field field = Order.class.getDeclaredField("orderNumber");
+        field.setAccessible(true);
+        field.set(order, orderNumber);
+
+        if (StringUtils.isNotBlank(previousOrderUuid)) {
+            Order previousOrder = new Order();
+            previousOrder.setUuid(previousOrderUuid);
+            order.setPreviousOrder(previousOrder);
+        }
+
+        return order;
     }
 
     private DrugOrder drugOrder(CareSetting.CareSettingType careSettingType, int daysToStartAfter, String dosingInstructions,

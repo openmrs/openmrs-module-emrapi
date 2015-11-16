@@ -28,14 +28,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service(value = "emrOrderService")
-@OpenmrsProfile(openmrsVersion = "1.11.*")
-public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
+@OpenmrsProfile(openmrsVersion = "1.12.*")
+public class EmrOrderServiceImpl_1_12 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
     private final OpenMRSOrderMapper openMRSOrderMapper;
 
     @Autowired
-    public EmrOrderServiceImpl_1_11(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSOrderMapper openMRSOrderMapper) {
+    public EmrOrderServiceImpl_1_12(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSOrderMapper openMRSOrderMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
         this.openMRSOrderMapper = openMRSOrderMapper;
@@ -44,7 +44,7 @@ public class EmrOrderServiceImpl_1_11 implements EmrOrderService {
     @Override
     public void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter) {
         //TODO: setOrders method can be removed.
-        encounter.setOrders(new LinkedHashSet<org.openmrs.Order>(encounter.getOrders()));
+        encounter.setOrders(new LinkedHashSet<Order>(encounter.getOrders()));
         for (EncounterTransaction.DrugOrder drugOrder : drugOrders) {
             DrugOrder omrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
             encounter.addOrder(omrsDrugOrder);
