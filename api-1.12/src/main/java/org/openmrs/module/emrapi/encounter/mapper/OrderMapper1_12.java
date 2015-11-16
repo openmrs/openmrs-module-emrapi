@@ -3,12 +3,12 @@
  * Version 1.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
  * http://license.openmrs.org
- *
+ * <p/>
  * Software distributed under the License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
  * License for the specific language governing rights and limitations
  * under the License.
- *
+ * <p/>
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 package org.openmrs.module.emrapi.encounter.mapper;
@@ -32,8 +32,8 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component(value = "orderMapper")
-@OpenmrsProfile(openmrsVersion = "1.11.*")
-public class OrderMapper1_11 implements OrderMapper {
+@OpenmrsProfile(openmrsVersion = "1.12.*")
+public class OrderMapper1_12 implements OrderMapper {
 
     private final ConceptMapper conceptMapper = new ConceptMapper();
 
@@ -41,7 +41,7 @@ public class OrderMapper1_11 implements OrderMapper {
     public List<EncounterTransaction.DrugOrder> mapDrugOrders(Encounter encounter) {
 
         List<EncounterTransaction.DrugOrder> orders = new ArrayList<EncounterTransaction.DrugOrder>();
-        for (org.openmrs.Order order : encounter.getOrders()) {
+        for (Order order : encounter.getOrders()) {
             order = HibernateUtil.getRealObjectFromProxy(order);
             if (DrugOrder.class.equals(order.getClass())) {
                 orders.add(mapDrugOrder((DrugOrder) order));
@@ -63,7 +63,7 @@ public class OrderMapper1_11 implements OrderMapper {
     @Override
     public List<EncounterTransaction.Order> mapOrders(Encounter encounter) {
         List<EncounterTransaction.Order> orders = new ArrayList<EncounterTransaction.Order>();
-        for (org.openmrs.Order order : encounter.getOrders()) {
+        for (Order order : encounter.getOrders()) {
             order = HibernateUtil.getRealObjectFromProxy(order);
             if (Order.class.equals(order.getClass())) {
                 orders.add(mapOrder(order));
@@ -82,13 +82,16 @@ public class OrderMapper1_11 implements OrderMapper {
         drugOrder.setAction(openMRSDrugOrder.getAction().name());
         drugOrder.setOrderType(openMRSDrugOrder.getOrderType().getName());
 
-        org.openmrs.Order previousOrder = openMRSDrugOrder.getPreviousOrder();
-        if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())){
+        Order previousOrder = openMRSDrugOrder.getPreviousOrder();
+        if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())) {
             drugOrder.setPreviousOrderUuid(previousOrder.getUuid());
         }
 
-        EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper1_11().map(openMRSDrugOrder.getDrug());
-        drugOrder.setDrug(encounterTransactionDrug);
+        drugOrder.setDrugNonCoded(openMRSDrugOrder.getDrugNonCoded());
+        if (openMRSDrugOrder.getDrug() != null){
+            EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper1_12().map(openMRSDrugOrder.getDrug());
+            drugOrder.setDrug(encounterTransactionDrug);
+        }
 
         drugOrder.setDosingInstructionType(openMRSDrugOrder.getDosingType().getName());
         drugOrder.setDuration(openMRSDrugOrder.getDuration());
@@ -107,7 +110,7 @@ public class OrderMapper1_11 implements OrderMapper {
         dosingInstructions.setDoseUnits(getConceptName(openMRSDrugOrder.getDoseUnits()));
         dosingInstructions.setRoute(getConceptName(openMRSDrugOrder.getRoute()));
         dosingInstructions.setAsNeeded(openMRSDrugOrder.getAsNeeded());
-        if(openMRSDrugOrder.getFrequency() != null) {
+        if (openMRSDrugOrder.getFrequency() != null) {
             dosingInstructions.setFrequency(openMRSDrugOrder.getFrequency().getName());
         }
         if (openMRSDrugOrder.getQuantity() != null) {
@@ -140,8 +143,8 @@ public class OrderMapper1_11 implements OrderMapper {
         emrOrder.setOrderNumber(order.getOrderNumber());
         emrOrder.setCommentToFulfiller(order.getCommentToFulfiller());
         emrOrder.setAction(order.getAction().name());
-        org.openmrs.Order previousOrder = order.getPreviousOrder();
-        if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())){
+        Order previousOrder = order.getPreviousOrder();
+        if (previousOrder != null && StringUtils.isNotBlank(previousOrder.getUuid())) {
             emrOrder.setPreviousOrderUuid(previousOrder.getUuid());
         }
         return emrOrder;

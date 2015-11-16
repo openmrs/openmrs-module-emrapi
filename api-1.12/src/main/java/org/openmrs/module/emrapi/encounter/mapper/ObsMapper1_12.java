@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component(value = "obsMapper")
-@OpenmrsProfile(openmrsVersion = "1.11.*")
-public class ObsMapper1_11 extends ObsMapper {
+@OpenmrsProfile(openmrsVersion = "1.12.*")
+public class ObsMapper1_12 extends ObsMapper {
 
     @Autowired
-    public ObsMapper1_11(ConceptService conceptService,
-                            EmrApiProperties emrApiProperties,
-                            ObsService obsService, OrderService orderService) {
+    public ObsMapper1_12(ConceptService conceptService,
+                         EmrApiProperties emrApiProperties,
+                         ObsService obsService, OrderService orderService) {
         super(conceptService,emrApiProperties,obsService,orderService);
     }
 

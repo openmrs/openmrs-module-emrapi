@@ -30,8 +30,12 @@
     <!-- Conditional Resources -->
     <conditionalResources>
     	<conditionalResource>
+            <path>/lib/emrapi-api-1.12-${project.parent.version}.jar</path>
+            <openmrsVersion>1.12.*</openmrsVersion>
+        </conditionalResource>
+        <conditionalResource>
             <path>/lib/emrapi-api-1.11-${project.parent.version}.jar</path>
-            <openmrsVersion>1.11.* - 1.12.*</openmrsVersion>
+            <openmrsVersion>1.11.*</openmrsVersion>
         </conditionalResource>
         <conditionalResource>
             <path>/lib/emrapi-api-1.10-${project.parent.version}.jar</path>
