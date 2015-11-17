@@ -17,8 +17,8 @@ import org.openmrs.Order;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
-import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.EncounterTransactionDrugOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.EncounterTransactionOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +26,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service(value = "emrOrderService")
-@OpenmrsProfile(openmrsVersion = "1.10.*")
+@OpenmrsProfile(openmrsVersion = "1.10")
 public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
-    private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
+    private final EncounterTransactionDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
-    private final OpenMRSOrderMapper openMRSOrderMapper;
+    private final EncounterTransactionOrderMapper openMRSOrderMapper;
 
     @Autowired
-    public EmrOrderServiceImpl_1_10(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, OpenMRSOrderMapper openMRSOrderMapper) {
+    public EmrOrderServiceImpl_1_10(EncounterTransactionDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService, EncounterTransactionOrderMapper openMRSOrderMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
         this.openMRSOrderMapper = openMRSOrderMapper;

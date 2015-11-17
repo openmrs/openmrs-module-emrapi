@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.encounter.service;
 
 import org.openmrs.Concept;
 import org.openmrs.OrderFrequency;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@OpenmrsProfile(openmrsVersion = "1.10")
 public class OrderMetadataService {
     private OrderService orderService;
 

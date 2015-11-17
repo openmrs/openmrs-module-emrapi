@@ -13,6 +13,14 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,22 +30,15 @@ import org.mockito.MockitoAnnotations;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
-import org.openmrs.Provider;
 import org.openmrs.Order;
+import org.openmrs.Provider;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.builder.OrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-public class OpenMRSOrderMapper1_11Test {
+public class EncounterTransactionOrderMapper1_10Test {
 
     @Mock
     private OrderService orderService;
@@ -45,7 +46,7 @@ public class OpenMRSOrderMapper1_11Test {
     @Mock
     private ConceptService conceptService;
 
-    @Mock(answer=Answers.RETURNS_DEEP_STUBS)
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Encounter encounter;
 
 
@@ -65,13 +66,13 @@ public class OpenMRSOrderMapper1_11Test {
 
         Date currentDate = new Date();
 
-        EncounterTransaction.Concept blood = new EncounterTransaction.Concept("bloodConceptUuid","blood");
+        EncounterTransaction.Concept blood = new EncounterTransaction.Concept("bloodConceptUuid", "blood");
 
         EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
         etOrder.setConcept(blood);
         etOrder.setDateCreated(currentDate);
 
-        OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService,conceptService);
+        EncounterTransactionOrderMapper orderMapper = new EncounterTransactionOrderMapper(orderService, conceptService);
 
         Order order = orderMapper.map(etOrder, encounter);
 
@@ -94,14 +95,14 @@ public class OpenMRSOrderMapper1_11Test {
         EncounterTransaction.Order etOrder = new OrderBuilder().withAction(org.openmrs.Order.Action.DISCONTINUE.toString()).
                 withUuid("orderUuid").withConcept(blood).withPreviousOrderUuid("previous order uuid").withDateCreated(createdDate).build();
 
-        OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
+        EncounterTransactionOrderMapper orderMapper = new EncounterTransactionOrderMapper(orderService, conceptService);
         Order order = orderMapper.map(etOrder, encounter);
 
         Assert.assertEquals(org.openmrs.Order.Action.DISCONTINUE, order.getAction());
     }
 
     @Test
-    public void createRevisedOrderFromEtOrder(){
+    public void createRevisedOrderFromEtOrder() {
         Provider provider = mock(Provider.class);
         handleEncounterProvider(provider);
 
@@ -118,7 +119,7 @@ public class OpenMRSOrderMapper1_11Test {
         etOrder.setAutoExpireDate(currentDate);
         etOrder.setCommentToFulfiller("Comment");
 
-        OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService,conceptService);
+        EncounterTransactionOrderMapper orderMapper = new EncounterTransactionOrderMapper(orderService,conceptService);
 
         Order order = orderMapper.map(etOrder, encounter);
 

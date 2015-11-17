@@ -15,14 +15,20 @@ package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
+@OpenmrsProfile(openmrsVersion = "1.10")
 public class DosingInstructionsMapper {
     private ConceptService conceptService;
     private OrderMetadataService orderMetadataService;
 
+    @Autowired
     public DosingInstructionsMapper(ConceptService conceptService, OrderMetadataService orderMetadataService) {
         this.conceptService = conceptService;
         this.orderMetadataService = orderMetadataService;

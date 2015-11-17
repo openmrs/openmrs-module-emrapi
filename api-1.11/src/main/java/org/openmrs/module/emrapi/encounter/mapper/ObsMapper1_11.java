@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component(value = "obsMapper")
-@OpenmrsProfile(openmrsVersion = "1.11.*")
+@OpenmrsProfile(openmrsVersion = "1.11")
 public class ObsMapper1_11 extends ObsMapper {
 
     @Autowired

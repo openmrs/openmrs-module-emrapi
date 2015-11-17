@@ -26,8 +26,8 @@ import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.builder.OrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
-import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.EncounterTransactionDrugOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.EncounterTransactionOrderMapper;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -47,10 +47,10 @@ public class EmrOrderServiceImpl_1_10Test {
     private EncounterService encounterService;
 
     @Mock
-    private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
+    private EncounterTransactionDrugOrderMapper openMRSDrugOrderMapper;
 
     @Mock
-    private OpenMRSOrderMapper openMRSOrderMapper;
+    private EncounterTransactionOrderMapper openMRSOrderMapper;
 
     @Mock
     private OrderService orderService;
