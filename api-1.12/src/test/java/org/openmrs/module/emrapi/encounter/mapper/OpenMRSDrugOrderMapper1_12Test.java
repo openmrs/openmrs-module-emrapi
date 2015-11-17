@@ -91,7 +91,6 @@ public class OpenMRSDrugOrderMapper1_12Test {
         when(orderService.getOrderTypeByConcept(any(Concept.class))).thenReturn(orderType);
 
         when(orderMetadataService.getDurationUnitsConceptByName(DAY_DURATION_UNIT)).thenReturn(DAY_DURATION_CONCEPT);
-        when(conceptService.getConceptByUuid(DRUG_CONCEPT_UUID)).thenReturn(new Concept());
 
         CareSetting outPatientCareSetting = new CareSetting(OUT_PATIENT_CARE_SETTING, OUT_PATIENT_CARE_SETTING, CareSetting.CareSettingType.OUTPATIENT);
         when(orderService.getCareSettingByName(OUT_PATIENT_CARE_SETTING)).thenReturn(outPatientCareSetting);
@@ -132,11 +131,14 @@ public class OpenMRSDrugOrderMapper1_12Test {
     @Test
     public void shouldMapNewNonCodedDrugOrders() throws ParseException {
         Date autoExpireDate = new Date();
+        when(conceptService.getConceptByUuid(DRUG_CONCEPT_UUID)).thenReturn(new Concept());
         EncounterTransaction.DrugOrder nonCodedDrugOrder = new DrugOrderBuilder()
                 .withNonCodedDrug(FREE_TEXT_DRUG_NAME)
                 .withDurationUnits(DAY_DURATION_UNIT)
                 .withAutoExpireDate(autoExpireDate)
                 .build();
+
+        nonCodedDrugOrder.setConcept(new EncounterTransaction.Concept("drug-concept-uuid"));
         nonCodedDrugOrder.setConcept(new EncounterTransaction.Concept(DRUG_CONCEPT_UUID));
 
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(nonCodedDrugOrder, encounter);

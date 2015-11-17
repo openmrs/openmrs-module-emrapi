@@ -41,7 +41,6 @@ public class DrugOrderBuilder {
         drugOrder.setAction("NEW");
         drugOrder.setDuration(2);
         drugOrder.setDurationUnits("Day");
-        drugOrder.setConcept(new EncounterTransaction.Concept("drug-concept-uuid"));
     }
 
     public EncounterTransaction.DrugOrder build() {

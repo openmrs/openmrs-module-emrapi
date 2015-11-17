@@ -58,7 +58,10 @@ public class OpenMRSDrugOrderMapper {
         Drug drug = getDrugFrom(drugOrder, openMRSDrugOrder);
         openMRSDrugOrder.setDrug(drug);
         openMRSDrugOrder.setDrugNonCoded(drugOrder.getDrugNonCoded());
-        openMRSDrugOrder.setConcept(getConceptFrom(drugOrder, openMRSDrugOrder));
+        Concept concept = getConceptFrom(drugOrder, openMRSDrugOrder);
+        if (concept != null) {
+            openMRSDrugOrder.setConcept(concept);
+        }
         openMRSDrugOrder.setEncounter(encounter);
 
         openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated());
@@ -127,10 +130,16 @@ public class OpenMRSDrugOrderMapper {
             return openMRSDrugOrder.getConcept();
         }
 
+        Concept conceptByUuid;
         EncounterTransaction.Concept concept = drugOrder.getConcept();
-        Concept conceptByUuid = conceptService.getConceptByUuid(concept.getUuid());
-        if (conceptByUuid == null) {
-            throw new APIException("No such Concept : " + drugOrder.getConcept().getName());
+        if (concept == null) {
+            conceptByUuid = null;
+        }
+        else {
+            conceptByUuid = conceptService.getConceptByUuid(concept.getUuid());
+            if (conceptByUuid == null) {
+                throw new APIException("No such Concept : " + drugOrder.getConcept().getName());
+            }
         }
         return conceptByUuid;
     }
