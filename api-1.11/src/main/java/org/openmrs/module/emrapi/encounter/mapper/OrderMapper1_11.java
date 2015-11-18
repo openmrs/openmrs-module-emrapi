@@ -32,8 +32,8 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component(value = "orderMapper")
-@OpenmrsProfile(openmrsVersion = "1.10.*")
-public class OrderMapper1_10 implements OrderMapper {
+@OpenmrsProfile(openmrsVersion = "1.11.*")
+public class OrderMapper1_11 implements OrderMapper {
 
     private final ConceptMapper conceptMapper = new ConceptMapper();
 
@@ -87,7 +87,7 @@ public class OrderMapper1_10 implements OrderMapper {
             drugOrder.setPreviousOrderUuid(previousOrder.getUuid());
         }
 
-        EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper1_10().map(openMRSDrugOrder.getDrug());
+        EncounterTransaction.Drug encounterTransactionDrug = new DrugMapper1_11().map(openMRSDrugOrder.getDrug());
         drugOrder.setDrug(encounterTransactionDrug);
 
         drugOrder.setDosingInstructionType(openMRSDrugOrder.getDosingType().getName());

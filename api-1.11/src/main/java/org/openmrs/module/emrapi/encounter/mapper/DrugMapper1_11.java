@@ -21,8 +21,8 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.springframework.stereotype.Component;
 
 @Component(value = "drugMapper")
-@OpenmrsProfile(openmrsVersion = "1.10.*")
-public class DrugMapper1_10 implements DrugMapper {
+@OpenmrsProfile(openmrsVersion = "1.11.*")
+public class DrugMapper1_11 implements DrugMapper {
 
     public EncounterTransaction.Drug map(Drug drug){
         EncounterTransaction.Drug encounterTransactionDrug = new EncounterTransaction.Drug();

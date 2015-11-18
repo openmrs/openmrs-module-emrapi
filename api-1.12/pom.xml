@@ -7,13 +7,13 @@
         <version>1.13-SNAPSHOT</version>
     </parent>
 
-    <artifactId>emrapi-api-1.11</artifactId>
+    <artifactId>emrapi-api-1.12</artifactId>
     <packaging>jar</packaging>
-    <name>EMR API Module API 1.11</name>
+    <name>EMR API Module API 1.12</name>
     <description>API project for EMRAPI</description>
 
     <properties>
-        <openMRSVersion>1.11.3</openMRSVersion>
+        <openMRSVersion>1.12.0-SNAPSHOT</openMRSVersion>
     </properties>
 
     <dependencies>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
-            <type>test-jar</type>            
+            <type>test-jar</type>
             <version>${openMRSVersion}</version>
             <scope>test</scope>
         </dependency>

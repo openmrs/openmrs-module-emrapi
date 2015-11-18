@@ -13,6 +13,23 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
+import static org.powermock.api.mockito.PowerMockito.when;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.UUID;
+
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,24 +54,7 @@ import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
 
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static org.powermock.api.mockito.PowerMockito.when;
-
-public class EncounterTransactionDrugOrderMapper1_10Test {
+public class OpenMRSDrugOrderMapper1_11Test {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DAY_DURATION_UNIT = "day";
@@ -76,14 +76,14 @@ public class EncounterTransactionDrugOrderMapper1_10Test {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private EncounterTransactionDrugOrderMapper openMRSDrugOrderMapper;
+    private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private Encounter encounter;
 
     @Before
     public void setup() {
         initMocks(this);
 
-        openMRSDrugOrderMapper = new EncounterTransactionDrugOrderMapper(orderService,conceptService, dosingInstructionsMapper, orderMetadataService);
+        openMRSDrugOrderMapper = new OpenMRSDrugOrderMapper(orderService,conceptService, dosingInstructionsMapper, orderMetadataService);
 
         Drug drug = new Drug();
         drug.setUuid(DRUG_UUID);
@@ -166,7 +166,7 @@ public class EncounterTransactionDrugOrderMapper1_10Test {
 
         DrugOrder revisedOpenMrsDrugOrder = openMRSDrugOrderMapper.map(revisedDrugOrder, encounter);
 
-        assertThat(revisedOpenMrsDrugOrder.getUrgency(), is(equalTo(EncounterTransactionDrugOrderMapper.DEFAULT_URGENCY)));
+        assertThat(revisedOpenMrsDrugOrder.getUrgency(), is(equalTo(OpenMRSDrugOrderMapper.DEFAULT_URGENCY)));
         assertNull(revisedOpenMrsDrugOrder.getScheduledDate());
     }
 
@@ -191,6 +191,7 @@ public class EncounterTransactionDrugOrderMapper1_10Test {
         assertThat(revisedOpenMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
         verify(dosingInstructionsMapper, times(2)).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
     }
+
 
     @Test
     public void shouldNotReviseDrugOrderWithRetiredDrug(){

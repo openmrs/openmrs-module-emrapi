@@ -12,15 +12,16 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openmrs.*;
-import org.openmrs.annotation.OpenmrsProfile;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterProvider;
+import org.openmrs.Order;
+import org.openmrs.Provider;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 
@@ -30,14 +31,11 @@ import java.util.Iterator;
  * <p/>
  * Version 1.0
  */
-@Component
-@OpenmrsProfile(openmrsVersion = "1.10")
-public class EncounterTransactionOrderMapper {
+public class OpenMRSOrderMapper {
     private OrderService orderService;
     private ConceptService conceptService;
 
-    @Autowired
-    public EncounterTransactionOrderMapper(OrderService orderService, ConceptService conceptService) {
+    public OpenMRSOrderMapper(OrderService orderService, ConceptService conceptService) {
         this.orderService = orderService;
         this.conceptService = conceptService;
     }
@@ -67,7 +65,7 @@ public class EncounterTransactionOrderMapper {
     }
 
     private boolean isDiscontinuationOrder(EncounterTransaction.Order order) {
-        return order.getAction() != null && org.openmrs.Order.Action.valueOf(order.getAction()) == org.openmrs.Order.Action.DISCONTINUE;
+        return order.getAction() != null && Order.Action.valueOf(order.getAction()) == Order.Action.DISCONTINUE;
     }
 
     private Concept getConceptFrom(EncounterTransaction.Order order, Order openMRSOrder) {

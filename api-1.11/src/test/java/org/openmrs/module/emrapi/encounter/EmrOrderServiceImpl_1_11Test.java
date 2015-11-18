@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-public class EmrOrderServiceImpl_1_10Test {
+public class EmrOrderServiceImpl_1_11Test {
 
     @Mock
     private EncounterService encounterService;
@@ -62,7 +62,7 @@ public class EmrOrderServiceImpl_1_10Test {
 
     @Test
     public void shouldSaveNewDrugOrdersInTheSequenceOfOrdering() throws ParseException {
-        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
         EncounterTransaction.DrugOrder drugOrder1 = new DrugOrderBuilder().withDrugUuid("drug-uuid1").build();
         EncounterTransaction.DrugOrder drugOrder2 = new DrugOrderBuilder().withDrugUuid("drug-uuid2").build();
         DrugOrder mappedDrugOrder1 = new DrugOrder();
@@ -84,7 +84,7 @@ public class EmrOrderServiceImpl_1_10Test {
 
     @Test
     public void shouldSaveNewDrugOrdersInTheSequenceOfOrderingToAnEncounterWithExistingOrders() throws ParseException {
-        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
         EncounterTransaction.DrugOrder drugOrder3 = new DrugOrderBuilder().withDrugUuid("drug-uuid3").build();
         EncounterTransaction.DrugOrder drugOrder4 = new DrugOrderBuilder().withDrugUuid("drug-uuid4").build();
         DrugOrder existingDrugOrder1 = new DrugOrder();
@@ -110,7 +110,7 @@ public class EmrOrderServiceImpl_1_10Test {
 
     @Test
     public void shouldSaveOrders() throws ParseException {
-        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
         EncounterTransaction.Order order1 = new OrderBuilder().withConceptUuid("concept-uuid1").withComment("Comment").build();
         EncounterTransaction.Order order2 = new OrderBuilder().withConceptUuid("concept-uuid2").withComment("Comment").build();
 
@@ -143,7 +143,7 @@ public class EmrOrderServiceImpl_1_10Test {
 
     @Test
     public void shouldSaveOrdersToEncounterWithExistingOrders() throws ParseException {
-        EmrOrderServiceImpl_1_10 emrOrderService = new EmrOrderServiceImpl_1_10(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_11 emrOrderService = new EmrOrderServiceImpl_1_11(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
         EncounterTransaction.Order order1 = new OrderBuilder().withConceptUuid("concept-uuid1").withComment("Comment").build();
         EncounterTransaction.Order order2 = new OrderBuilder().withConceptUuid("concept-uuid2").withComment("Comment").build();
 

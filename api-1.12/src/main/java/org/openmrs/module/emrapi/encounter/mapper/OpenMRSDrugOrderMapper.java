@@ -3,33 +3,31 @@
  * Version 1.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
  * http://license.openmrs.org
- *
+ * <p/>
  * Software distributed under the License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
  * License for the specific language governing rights and limitations
  * under the License.
- *
+ * <p/>
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.CareSetting;
+import org.openmrs.Concept;
 import org.openmrs.DosingInstructions;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.Provider;
-import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * OpenMRSDrugOrderMapper.
@@ -37,9 +35,7 @@ import org.springframework.stereotype.Component;
  * <p/>
  * Version 1.0
  */
-@Component
-@OpenmrsProfile(openmrsVersion = "1.10")
-public class EncounterTransactionDrugOrderMapper {
+public class OpenMRSDrugOrderMapper {
 
     private OrderService orderService;
     private ConceptService conceptService;
@@ -47,8 +43,7 @@ public class EncounterTransactionDrugOrderMapper {
     private OrderMetadataService orderMetadataService;
     public static final Order.Urgency DEFAULT_URGENCY = Order.Urgency.ROUTINE;
 
-    @Autowired
-    public EncounterTransactionDrugOrderMapper(OrderService orderService, ConceptService conceptService,
+    public OpenMRSDrugOrderMapper(OrderService orderService, ConceptService conceptService,
                                   DosingInstructionsMapper dosingInstructionsMapper, OrderMetadataService orderMetadataService) {
         this.orderService = orderService;
         this.conceptService = conceptService;
@@ -61,14 +56,12 @@ public class EncounterTransactionDrugOrderMapper {
         openMRSDrugOrder.setCareSetting(getCareSettingFrom(drugOrder, openMRSDrugOrder));
 
         Drug drug = getDrugFrom(drugOrder, openMRSDrugOrder);
-
-        if (drug == null) {
-            throw new APIException("No such drug : " + drugOrder.getDrug().getName());
-        }
-        if(drug.isRetired() && !isDiscontinuationDrugOrder(drugOrder)){
-            throw new APIException("Drug has been retired : " + drugOrder.getDrug().getName());
-        }
         openMRSDrugOrder.setDrug(drug);
+        openMRSDrugOrder.setDrugNonCoded(drugOrder.getDrugNonCoded());
+        Concept concept = getConceptFrom(drugOrder, openMRSDrugOrder);
+        if (concept != null) {
+            openMRSDrugOrder.setConcept(concept);
+        }
         openMRSDrugOrder.setEncounter(encounter);
 
         openMRSDrugOrder.setDateActivated(drugOrder.getDateActivated());
@@ -123,9 +116,31 @@ public class EncounterTransactionDrugOrderMapper {
             return openMRSDrugOrder.getDrug();
         }
         EncounterTransaction.Drug drug = drugOrder.getDrug();
+        if (drug == null) {
+            return null;
+        }
         if (drug.getUuid() == null || drug.getUuid().isEmpty()) {
             return conceptService.getDrug(drug.getName());
         }
         return conceptService.getDrugByUuid(drug.getUuid());
+    }
+
+    private Concept getConceptFrom(EncounterTransaction.DrugOrder drugOrder, DrugOrder openMRSDrugOrder) {
+        if (!isNewDrugOrder(drugOrder)) {
+            return openMRSDrugOrder.getConcept();
+        }
+
+        Concept conceptByUuid;
+        EncounterTransaction.Concept concept = drugOrder.getConcept();
+        if (concept == null) {
+            conceptByUuid = null;
+        }
+        else {
+            conceptByUuid = conceptService.getConceptByUuid(concept.getUuid());
+            if (conceptByUuid == null) {
+                throw new APIException("No such Concept : " + drugOrder.getConcept().getName());
+            }
+        }
+        return conceptByUuid;
     }
 }
