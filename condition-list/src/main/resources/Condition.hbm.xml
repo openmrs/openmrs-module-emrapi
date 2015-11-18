@@ -17,8 +17,9 @@
         <property name="uuid" type="java.lang.String"
                   column="uuid" length="38" unique="true"/>
         <property name="status" column="status" length="255" not-null="true">
-            <type name="org.openmrs.util.HibernateEnumType">
-                <param name="enumClassName">org.openmrs.Condition$Status</param>
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">org.openmrs.Condition$Status</param>
+                <param name="type">12</param>
             </type>
         </property>
         <property name="conditionNonCoded" type="java.lang.String" column="condition_non_coded" length="1024"/>
