@@ -28,7 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 @Service(value = "emrOrderService")
-@OpenmrsProfile(openmrsVersion = "1.12.*")
+@OpenmrsProfile(openmrsVersion = "1.12.0 - 2.*")
 public class EmrOrderServiceImpl_1_12 implements EmrOrderService {
     private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
     private final EncounterService encounterService;
