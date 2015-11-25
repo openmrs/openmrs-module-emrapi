@@ -52,6 +52,7 @@ public class OpenMRSDrugOrderMapper {
     }
 
     public DrugOrder map(EncounterTransaction.DrugOrder drugOrder, Encounter encounter) {
+        Concept conceptByUuid;
         DrugOrder openMRSDrugOrder = createDrugOrder(drugOrder);
         openMRSDrugOrder.setCareSetting(getCareSettingFrom(drugOrder, openMRSDrugOrder));
 
@@ -70,6 +71,11 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
         openMRSDrugOrder.setDurationUnits(orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits()));
         openMRSDrugOrder.setAutoExpireDate(drugOrder.getAutoExpireDate());
+        if(drugOrder.getOrderReasonConcept() != null) {
+            conceptByUuid = conceptService.getConceptByUuid(drugOrder.getOrderReasonConcept().getUuid());
+            openMRSDrugOrder.setOrderReason(conceptByUuid);
+        }
+        openMRSDrugOrder.setOrderReasonNonCoded(drugOrder.getOrderReasonText());
 
         try {
             if (drugOrder.getDosingInstructionType() != null) {

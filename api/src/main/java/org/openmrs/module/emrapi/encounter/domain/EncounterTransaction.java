@@ -800,6 +800,7 @@ public class EncounterTransaction {
         private String durationUnits;
         private Boolean voided;
         private String voidReason;
+        private EncounterTransaction.Concept orderReasonConcept;
 
         public Drug getDrug() {
             return drug;
@@ -854,6 +855,14 @@ public class EncounterTransaction {
 
         public void setOrderReasonText(String orderReasonText) {
             this.orderReasonText = orderReasonText;
+        }
+
+        public Concept getOrderReasonConcept() {
+            return orderReasonConcept;
+        }
+
+        public void setOrderReasonConcept(Concept orderReasonConcept) {
+            this.orderReasonConcept = orderReasonConcept;
         }
 
         public Integer getDuration() {

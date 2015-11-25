@@ -123,6 +123,8 @@ public class OrderMapper1_11 implements OrderMapper {
         drugOrder.setVoided(openMRSDrugOrder.getVoided());
         drugOrder.setVoidReason(openMRSDrugOrder.getVoidReason());
         drugOrder.setOrderNumber(openMRSDrugOrder.getOrderNumber());
+        drugOrder.setOrderReasonConcept(conceptMapper.map(openMRSDrugOrder.getOrderReason()));
+        drugOrder.setOrderReasonText(openMRSDrugOrder.getOrderReasonNonCoded());
 
         return drugOrder;
     }
