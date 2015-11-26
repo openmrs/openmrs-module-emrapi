@@ -8,4 +8,5 @@ import java.util.*;
 public interface EmrOrderService {
     void save(List<EncounterTransaction.DrugOrder> drugOrders, Encounter encounter);
     void saveOrders(List<EncounterTransaction.Order> orders, Encounter encounter);
+    /*void saveOrderGroups(List<EncounterTransaction.OrderGroup> orderGroups, Encounter encounter);*/
 }

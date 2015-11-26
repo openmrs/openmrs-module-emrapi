@@ -68,4 +68,14 @@ public class OrderBuilder {
         order.setDateCreated(createdDate);
         return this;
     }
+
+    public OrderBuilder withOrderGroup(String orderSetUuid) {
+        EncounterTransaction.OrderSet orderSet = new EncounterTransaction.OrderSet();
+        orderSet.setUuid(orderSetUuid);
+
+        EncounterTransaction.OrderGroup orderGroup = new EncounterTransaction.OrderGroup();
+        orderGroup.setOrderSet(orderSet);
+        order.setOrderGroup(orderGroup);
+        return this;
+    }
 }

@@ -125,6 +125,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         emrOrderService.save(encounterTransaction.getDrugOrders(), encounter);
         emrOrderService.saveOrders(encounterTransaction.getOrders(), encounter);
+        /*emrOrderService.saveOrderGroups(encounterTransaction.getOrderGroups(), encounter);*/
 
         return new EncounterTransaction(visit.getUuid(), encounter.getUuid());
     }

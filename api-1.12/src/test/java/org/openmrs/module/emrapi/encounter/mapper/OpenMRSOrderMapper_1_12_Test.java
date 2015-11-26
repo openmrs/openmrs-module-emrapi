@@ -139,6 +139,4 @@ public class OpenMRSOrderMapper_1_12_Test {
         when(encounter.getEncounterProviders()).thenReturn(providerSet);
     }
 
-
-
     }
