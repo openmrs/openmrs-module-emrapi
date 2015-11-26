@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -60,6 +61,8 @@ public class OpenMRSDrugOrderMapper1_11Test {
     public static final String DAY_DURATION_UNIT = "day";
     public static final String DRUG_UUID = "drug-uuid";
     private final Concept DAY_DURATION_CONCEPT = new Concept();
+    private final String ORDER_REASON_TEXT = "has multiple side effects";
+    private static final String ORDER_REASON_CONCEPT_NAME = "Side effects";
 
     @Mock
     private OrderService orderService;
@@ -115,6 +118,13 @@ public class OpenMRSDrugOrderMapper1_11Test {
                 .withDurationUnits(DAY_DURATION_UNIT)
                 .withAutoExpireDate(autoExpireDate)
                 .build();
+        EncounterTransaction.Concept orderReasonConcept = mock(EncounterTransaction.Concept.class);
+        Concept concept = new Concept();
+        when(orderReasonConcept.getUuid()).thenReturn("123");
+        when(conceptService.getConceptByUuid("123")).thenReturn(concept);
+        orderReasonConcept.setName(ORDER_REASON_CONCEPT_NAME);
+        drugOrder.setOrderReasonConcept(orderReasonConcept);
+        drugOrder.setOrderReasonText(ORDER_REASON_TEXT);
 
         DrugOrder openMrsDrugOrder = openMRSDrugOrderMapper.map(drugOrder, encounter);
 
@@ -127,6 +137,8 @@ public class OpenMRSDrugOrderMapper1_11Test {
         assertThat(openMrsDrugOrder.getDuration(), is(equalTo(drugOrder.getDuration())));
         assertThat(openMrsDrugOrder.getDurationUnits(), is(equalTo(DAY_DURATION_CONCEPT)));
         assertThat(openMrsDrugOrder.getAutoExpireDate(), is(equalTo(autoExpireDate)));
+        assertThat(openMrsDrugOrder.getOrderReason(), is(equalTo(concept)));
+        assertThat(openMrsDrugOrder.getOrderReasonNonCoded(),is(equalTo(ORDER_REASON_TEXT)));
         verify(dosingInstructionsMapper).map(any(EncounterTransaction.DosingInstructions.class), any(DrugOrder.class));
     }
 

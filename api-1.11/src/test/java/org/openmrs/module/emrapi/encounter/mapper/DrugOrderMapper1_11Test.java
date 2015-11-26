@@ -37,8 +37,10 @@ import org.openmrs.SimpleDosingInstructions;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.util.LocaleUtility;
+import org.openmrs.ConceptDatatype;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.openmrs.api.context.Context;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -55,7 +57,7 @@ import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(LocaleUtility.class)
+@PrepareForTest({LocaleUtility.class,Context.class})
 public class DrugOrderMapper1_11Test {
 
     public static final CareSettingType OUT_PATIENT_CARE_SETTING = CareSettingType.OUTPATIENT;
@@ -67,13 +69,15 @@ public class DrugOrderMapper1_11Test {
     public static final String MOUTH_ROUTE = "mouth";
     public static final String TABLET_QUANTITY_UNIT = "TABLET";
     public static final String TWICE_A_DAY_FREQUENCY = "Twice a day";
+    public static final String HAS_SIDE_EFFECTS= "Has side effects";
+    private final String ORDER_REASON_NON_CODED = "has multiple side effects";
 
     private OrderMapper1_11 drugOrderMapper111;
 
     @Before
     public void setup() {
         mockStatic(LocaleUtility.class);
-
+        mockStatic(Context.class);
         drugOrderMapper111 = new OrderMapper1_11();
     }
 
@@ -111,6 +115,9 @@ public class DrugOrderMapper1_11Test {
         assertThat(drugOrder.getInstructions(), is(equalTo("before meals")));
         assertThat(drugOrder.getCommentToFulfiller(), is(equalTo("boil in water")));
         assertThat(drugOrder.getOrderNumber(), is(equalTo("ORD-100")));
+
+        assertThat(drugOrder.getOrderReasonConcept().getName(), is(HAS_SIDE_EFFECTS));
+        assertThat(drugOrder.getOrderReasonText(),is(equalTo(ORDER_REASON_NON_CODED)));
     }
 
     @Test
@@ -183,6 +190,14 @@ public class DrugOrderMapper1_11Test {
 
         order.setInstructions(instructions);
         order.setCommentToFulfiller(commentToFulfiller);
+
+        Concept openMrsConcept ;
+        openMrsConcept = concept(HAS_SIDE_EFFECTS);
+        openMrsConcept.setDatatype(new ConceptDatatype());
+        openMrsConcept.setShortName(new ConceptName(HAS_SIDE_EFFECTS, Locale.FRENCH));
+
+        order.setOrderReason(openMrsConcept);
+        order.setOrderReasonNonCoded(ORDER_REASON_NON_CODED);
 
         Field field = Order.class.getDeclaredField("orderNumber");
         field.setAccessible(true);
