@@ -21,6 +21,7 @@ import org.openmrs.module.emrapi.encounter.postprocessor.EncounterTransactionHan
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +38,6 @@ public class EncounterTransactionMapper {
     @Autowired(required = false)
     public EncounterTransactionMapper(EncounterObservationsMapper encounterObservationsMapper, EncounterProviderMapper encounterProviderMapper) {
         this(encounterObservationsMapper, encounterProviderMapper, null);
-        encounterTransactionHandlers = Context.getRegisteredComponents(EncounterTransactionHandler.class);
     }
 
     @Autowired(required = false)
@@ -45,7 +45,6 @@ public class EncounterTransactionMapper {
         this.encounterObservationsMapper = encounterObservationsMapper;
         this.encounterProviderMapper = encounterProviderMapper;
         this.orderMapper = orderMapper;
-        encounterTransactionHandlers = Context.getRegisteredComponents(EncounterTransactionHandler.class);
     }
 
     public EncounterTransaction map(Encounter encounter, Boolean includeAll) {
@@ -71,10 +70,8 @@ public class EncounterTransactionMapper {
     }
 
     private void postProcessEncounter(Encounter encounter,EncounterTransaction encounterTransaction){
-        if(encounterTransactionHandlers != null){
-            for(EncounterTransactionHandler encounterTransactionHandler: encounterTransactionHandlers){
-                encounterTransactionHandler.forRead(encounter, encounterTransaction);
-            }
+        for(EncounterTransactionHandler encounterTransactionHandler: getEncounterTransactionHandlers()){
+            encounterTransactionHandler.forRead(encounter, encounterTransaction);
         }
     }
 
@@ -103,5 +100,15 @@ public class EncounterTransactionMapper {
 
     private boolean shouldNotCompareOnCreatedDates(Date secondDate, Date firstDate) {
         return firstDate == null || secondDate == null || secondDate.equals(firstDate);
+    }
+
+    private List<EncounterTransactionHandler> getEncounterTransactionHandlers() {
+        if (encounterTransactionHandlers == null) {
+            encounterTransactionHandlers = Context.getRegisteredComponents(EncounterTransactionHandler.class);
+            if (encounterTransactionHandlers == null) {
+                encounterTransactionHandlers = new ArrayList<EncounterTransactionHandler>();
+            }
+        }
+        return encounterTransactionHandlers;
     }
 }
