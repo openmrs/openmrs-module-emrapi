@@ -11,6 +11,7 @@ import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptSource;
+import org.openmrs.ConceptNumeric;
 import org.openmrs.User;
 import org.openmrs.api.ConceptNameType;
 import org.openmrs.api.context.Context;
@@ -96,5 +97,33 @@ public class ConceptMapperTest {
         EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(conceptBuilder.get());
 
         Assert.assertEquals("English Test Name", encounterTransactionConcept.getShortName());
+    }
+
+    @Test
+    public void should_set_hiNormal_and_lowNormal_properties_for_numeric_concept() throws Exception {
+        Mockito.when(authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE)).thenReturn("fr");
+
+        ConceptNumeric concept = new ConceptNumeric();
+
+        ConceptName conceptName = new ConceptName();
+        conceptName.setName("Temperature Data");
+        concept.addName(conceptName);
+
+        ConceptDatatype conceptDatatype = new ConceptDatatype();
+        conceptDatatype.setName("Numeric");
+        concept.setDatatype(conceptDatatype);
+
+        ConceptClass conceptClass = new ConceptClass();
+        conceptClass.setName("Concept Details");
+        concept.setConceptClass(conceptClass);
+
+        concept.setHiNormal((double) 20);
+        concept.setLowNormal((double) 15);
+
+        ConceptMapper conceptMapper = new ConceptMapper();
+        EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(concept);
+
+        Assert.assertEquals((double) 20, encounterTransactionConcept.getHiNormal(), 0.0);
+        Assert.assertEquals((double) 15, encounterTransactionConcept.getLowNormal(), 0.0);
     }
 }

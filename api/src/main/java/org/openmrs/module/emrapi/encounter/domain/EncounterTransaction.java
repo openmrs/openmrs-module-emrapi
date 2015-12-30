@@ -211,6 +211,8 @@ public class EncounterTransaction {
         private String units;
         private String conceptClass;
         private Collection<ConceptMap> conceptMaps;
+        private Double hiNormal;
+        private Double lowNormal;
 
         public Concept(String uuid, String name, boolean isSet, String dataType, String units, String conceptClass, String shortName, Collection<ConceptMap> conceptMaps) {
             this.uuid = uuid;
@@ -307,6 +309,22 @@ public class EncounterTransaction {
                 mappings.add(mappingInfo);
             }
             return mappings;
+        }
+
+        public void setHiNormal(Double hiNormal) {
+            this.hiNormal = hiNormal;
+        }
+
+        public void setLowNormal(Double lowNormal) {
+            this.lowNormal = lowNormal;
+        }
+
+        public Double getLowNormal() {
+            return lowNormal;
+        }
+
+        public Double getHiNormal() {
+            return hiNormal;
         }
     }
     @JsonIgnoreProperties(ignoreUnknown = true)

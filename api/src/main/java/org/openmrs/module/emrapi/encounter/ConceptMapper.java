@@ -42,8 +42,10 @@ public class ConceptMapper {
                 conceptClassName,
                 getShortName(concept),
                 concept.getConceptMappings());
-        if(concept.isNumeric() && ((ConceptNumeric) concept).getUnits() != null) {
+        if(concept.isNumeric()) {
             encounterTransactionConcept.setUnits(((ConceptNumeric) concept).getUnits());
+            encounterTransactionConcept.setHiNormal(((ConceptNumeric) concept).getHiNormal());
+            encounterTransactionConcept.setLowNormal(((ConceptNumeric) concept).getLowNormal());
         }
         return encounterTransactionConcept;
     }
