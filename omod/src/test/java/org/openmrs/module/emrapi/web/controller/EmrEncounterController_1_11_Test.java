@@ -259,7 +259,11 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         assertNotEquals(encounter1Response.getEncounterUuid(), encounter2Response.getEncounterUuid());
 
         List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter",
-                new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("encounterDate", "2005-01-01"), new Parameter("includeAll", "false")})), new TypeReference<List<EncounterTransaction>>() {});
+                new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("encounterDate", "2005-01-01"), 
+                		new Parameter("patientUuid", "a76e8d23-0c38-408c-b2a8-ea5540f01b51"),
+                		new Parameter("visitTypeUuids", "b45ca846-c79a-11e2-b0c0-8e397087571c"),
+                		new Parameter("encounterTypeUuids", "2b377dba-62c3-4e53-91ef-b51c68899891"),
+                		new Parameter("includeAll", "false")})), new TypeReference<List<EncounterTransaction>>() {});
 
 
         assertEquals(1, encounterTransactions.size());
@@ -363,7 +367,9 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         String visitUuid = encounter1Response.getVisitUuid();
 
         List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter",
-                new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("includeAll", "true")})), new TypeReference<List<EncounterTransaction>>() {});
+                new Parameter[]{new Parameter("visitUuid", visitUuid), 
+                		new Parameter("patientUuid", "a76e8d23-0c38-408c-b2a8-ea5540f01b51"),
+                		new Parameter("includeAll", "true")})), new TypeReference<List<EncounterTransaction>>() {});
 
         assertEquals(1, encounterTransactions.size());
     }

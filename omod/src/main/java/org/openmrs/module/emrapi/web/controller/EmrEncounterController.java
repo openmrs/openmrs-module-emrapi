@@ -55,12 +55,12 @@ public class EmrEncounterController extends BaseRestController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public List<EncounterTransaction> find(@RequestParam List<String> visitUuids, @RequestParam String patientUuid,
-                                           @RequestParam List<String> vistiTypeUuids, @RequestParam Date encounterDateTimeFrom,
-                                           @RequestParam Date encounterDateTimeTo, @RequestParam List<String> providerUuids,
-                                           @RequestParam List<String> encounterTypeUuids, @RequestParam String locationUuid,
+    public List<EncounterTransaction> find(@RequestParam(required = false) List<String> visitUuids, @RequestParam String patientUuid,
+                                           @RequestParam(required = false) List<String> visitTypeUuids, @RequestParam(required = false) Date encounterDateTimeFrom,
+                                           @RequestParam(required = false) Date encounterDateTimeTo, @RequestParam(required = false) List<String> providerUuids,
+                                           @RequestParam(required = false) List<String> encounterTypeUuids, @RequestParam(required = false) String locationUuid,
                                            @RequestParam Boolean includeAll) {
-        EncounterSearchParameters encounterSearchParameters = new EncounterSearchParameters(visitUuids, patientUuid, vistiTypeUuids, encounterDateTimeFrom,
+        EncounterSearchParameters encounterSearchParameters = new EncounterSearchParameters(visitUuids, patientUuid, visitTypeUuids, encounterDateTimeFrom,
                 encounterDateTimeTo, providerUuids, encounterTypeUuids, locationUuid, includeAll);
         return emrEncounterService.find(encounterSearchParameters);
     }
