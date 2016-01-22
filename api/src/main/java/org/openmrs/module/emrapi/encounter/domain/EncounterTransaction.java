@@ -21,13 +21,13 @@ import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collection;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EncounterTransaction {
@@ -944,6 +944,7 @@ public class EncounterTransaction {
     public static class Provider {
         private String uuid;
         private String name;
+        private String encounterRole;
 
         public String getUuid() {
             return uuid;
@@ -959,6 +960,14 @@ public class EncounterTransaction {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public String getEncounterRole() {
+            return encounterRole;
+        }
+
+        public void setEncounterRole(String encounterRole) {
+            this.encounterRole = encounterRole;
         }
     }
 
