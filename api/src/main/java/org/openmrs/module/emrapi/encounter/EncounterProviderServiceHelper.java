@@ -34,13 +34,13 @@ public class EncounterProviderServiceHelper {
 
     public void update(Encounter encounter, Set<EncounterTransaction.Provider> providers) {
         for (EncounterTransaction.Provider provider : providers) {
-            EncounterProvider encounterProvider = findProvider(encounter, provider.getUuid(), provider.getEncounterRole());
+            EncounterProvider encounterProvider = findProvider(encounter, provider.getUuid(), provider.getEncounterRoleUuid());
             if(encounterProvider == null) {
 
                 EncounterRole encounterRole = null;
 
-                if (StringUtils.isNotEmpty(provider.getEncounterRole())) {
-                    encounterRole = encounterService.getEncounterRoleByUuid(provider.getEncounterRole());
+                if (StringUtils.isNotEmpty(provider.getEncounterRoleUuid())) {
+                    encounterRole = encounterService.getEncounterRoleByUuid(provider.getEncounterRoleUuid());
                 }
 
                 if (encounterRole == null) {

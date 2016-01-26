@@ -18,7 +18,7 @@ public class EncounterProviderMapper {
             EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
             provider.setName(encounterProvider.getProvider().getName());
             provider.setUuid(encounterProvider.getProvider().getUuid());
-            provider.setEncounterRole(encounterProvider.getEncounterRole().getUuid());
+            provider.setEncounterRoleUuid(encounterProvider.getEncounterRole().getUuid());
             providers.add(provider);
         }
         return providers;

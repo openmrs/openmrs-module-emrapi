@@ -77,7 +77,7 @@ public class EncounterProviderServiceHelperTest {
         EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
         provider.setUuid("provider-uuid");
         provider.setName("provider-name");
-        provider.setEncounterRole("role-uuid");
+        provider.setEncounterRoleUuid("role-uuid");
 
         encounterProviderServiceHelper.update(encounter, Collections.singleton(provider));
 
@@ -120,7 +120,7 @@ public class EncounterProviderServiceHelperTest {
 
         EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
         encounterTransactionProvider.setUuid("another-provider-uuid");
-        encounterTransactionProvider.setEncounterRole("role-uuid");
+        encounterTransactionProvider.setEncounterRoleUuid("role-uuid");
 
         // sanity check
         assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
@@ -154,7 +154,7 @@ public class EncounterProviderServiceHelperTest {
 
         EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
         encounterTransactionProvider.setUuid("provider-uuid");
-        encounterTransactionProvider.setEncounterRole("role-uuid");
+        encounterTransactionProvider.setEncounterRoleUuid("role-uuid");
 
         // sanity check
         assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
@@ -182,7 +182,7 @@ public class EncounterProviderServiceHelperTest {
 
         EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
         encounterTransactionProvider.setUuid(provider.getUuid());
-        encounterTransactionProvider.setEncounterRole("another-role-uuid");
+        encounterTransactionProvider.setEncounterRoleUuid("another-role-uuid");
 
         // sanity check
         assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));

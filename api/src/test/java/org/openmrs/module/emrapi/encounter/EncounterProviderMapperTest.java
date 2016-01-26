@@ -34,6 +34,6 @@ public class EncounterProviderMapperTest {
         assertThat(mappedProviders.size(), is(1));
         EncounterTransaction.Provider provider = mappedProviders.iterator().next();
         assertThat(provider.getName(), is(equalTo(encounterProvider.getProvider().getName())));
-        assertThat(provider.getEncounterRole(), is(equalTo(encounterProvider.getEncounterRole().getUuid())));
+        assertThat(provider.getEncounterRoleUuid(), is(equalTo(encounterProvider.getEncounterRole().getUuid())));
     }
 }

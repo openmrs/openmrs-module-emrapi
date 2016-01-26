@@ -944,7 +944,7 @@ public class EncounterTransaction {
     public static class Provider {
         private String uuid;
         private String name;
-        private String encounterRole;
+        private String encounterRoleUuid;
 
         public String getUuid() {
             return uuid;
@@ -962,12 +962,12 @@ public class EncounterTransaction {
             this.name = name;
         }
 
-        public String getEncounterRole() {
-            return encounterRole;
+        public String getEncounterRoleUuid() {
+            return encounterRoleUuid;
         }
 
-        public void setEncounterRole(String encounterRole) {
-            this.encounterRole = encounterRole;
+        public void setEncounterRoleUuid(String encounterRoleUuid) {
+            this.encounterRoleUuid = encounterRoleUuid;
         }
     }
 
