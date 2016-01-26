@@ -34,17 +34,31 @@ public class EncounterProviderServiceHelper {
 
     public void update(Encounter encounter, Set<EncounterTransaction.Provider> providers) {
         for (EncounterTransaction.Provider provider : providers) {
-            EncounterProvider encounterProvider = findProvider(encounter, provider.getUuid());
+            EncounterProvider encounterProvider = findProvider(encounter, provider.getUuid(), provider.getEncounterRoleUuid());
             if(encounterProvider == null) {
-                encounter.addProvider(encounterService.getEncounterRoleByUuid(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID), providerService.getProviderByUuid(provider.getUuid()));
+
+                EncounterRole encounterRole = null;
+
+                if (StringUtils.isNotEmpty(provider.getEncounterRoleUuid())) {
+                    encounterRole = encounterService.getEncounterRoleByUuid(provider.getEncounterRoleUuid());
+                }
+
+                if (encounterRole == null) {
+                    encounterRole = encounterService.getEncounterRoleByUuid(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID);
+                }
+
+                encounter.addProvider(encounterRole, providerService.getProviderByUuid(provider.getUuid()));
             }
         }
     }
 
-    private EncounterProvider findProvider(Encounter encounter, String providerUuid) {
+    // returns first matching provider by providerUuid and encounterRoleUuid; if encounterRoleUuid is null, just match on provider
+    private EncounterProvider findProvider(Encounter encounter, String providerUuid, String encounterRoleUuid) {
         for (EncounterProvider encounterProvider : encounter.getEncounterProviders()) {
-            if(StringUtils.equals(encounterProvider.getProvider().getUuid(), providerUuid))
+            if (StringUtils.equals(encounterProvider.getProvider().getUuid(), providerUuid)  &&
+                (StringUtils.isEmpty(encounterRoleUuid) || (StringUtils.equals(encounterProvider.getEncounterRole().getUuid(), encounterRoleUuid)))) {
                 return encounterProvider;
+            }
         }
         return null;
     }
