@@ -46,6 +46,7 @@ public class EncounterTransaction {
     private List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
     private Set<Provider> providers = new HashSet<Provider>();
     private Map<String,Object> extensions = new HashMap<String,Object>();
+    private Map<String, Object> context = new HashMap<String, Object>();
 
     public EncounterTransaction() {
     }
@@ -174,6 +175,14 @@ public class EncounterTransaction {
 
     public void setEncounterUuid(String encounterUuid) {
         this.encounterUuid = encounterUuid;
+    }
+
+    public Map<String, Object> getContext() {
+        return context;
+    }
+
+    public void setContext(Map<String, Object> context) {
+        this.context = context;
     }
 
     public void addObservation(Observation observation) {

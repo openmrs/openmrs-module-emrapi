@@ -20,6 +20,7 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 public class EncounterParameters {
@@ -30,6 +31,7 @@ public class EncounterParameters {
     private Date encounterDateTime;
     private Patient patient;
     private String encounterUuid;
+    private Map<String, Object> context;
 
     private EncounterParameters(){
 
@@ -69,6 +71,11 @@ public class EncounterParameters {
         return this;
     }
 
+    public EncounterParameters setContext(Map<String, Object> context) {
+        this.context = context;
+        return this;
+    }
+
     public Location getLocation() {
         return location;
     }
@@ -91,5 +98,9 @@ public class EncounterParameters {
 
     public String getEncounterUuid() {
         return encounterUuid;
+    }
+
+    public Map<String, Object> getContext() {
+        return context;
     }
 }

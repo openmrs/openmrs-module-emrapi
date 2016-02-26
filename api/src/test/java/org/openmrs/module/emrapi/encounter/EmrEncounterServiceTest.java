@@ -23,6 +23,7 @@ import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.postprocessor.EncounterTransactionHandler;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -31,6 +32,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -245,6 +247,30 @@ public class EmrEncounterServiceTest {
 
         emrEncounterService.onStartup();
         emrEncounterService.save(encounterTransaction);
+        verify(encounterTransactionHandler).forSave(any(Encounter.class), eq(encounterTransaction));
+    }
+
+    @Test
+    public void shouldPassInEncounterParametersToEncounterMatcheronSave() {
+        EncounterTransaction encounterTransaction = constructEncounterTransaction();
+        HashMap<String, Object> context = new HashMap<String, Object>();
+        context.put("patientProgramUuid", "17ca76b4-dbb2-11e5-b5d2-0a1d41d68578");
+        encounterTransaction.setContext(context);
+
+        BaseEncounterMatcher mockEncounterMatcher = mock(BaseEncounterMatcher.class);
+        when(administrationService.getGlobalProperty("emr.encounterMatcher")).thenReturn(mockEncounterMatcher.getClass().getCanonicalName());
+        when(Context.getRegisteredComponents(BaseEncounterMatcher.class)).thenReturn(Arrays.asList(mockEncounterMatcher));
+
+        encounterTransactionHandler = mock(EncounterTransactionHandler.class);
+        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+                Arrays.asList(encounterTransactionHandler));
+
+        emrEncounterService.onStartup();
+        emrEncounterService.save(encounterTransaction);
+
+        ArgumentCaptor<EncounterParameters> encounterParametersArguments = ArgumentCaptor.forClass(EncounterParameters.class);
+        verify(mockEncounterMatcher).findEncounter(any(Visit.class), encounterParametersArguments.capture());
+        assertThat(encounterParametersArguments.getValue().getContext().get("patientProgramUuid"), is(equalTo((Object)"17ca76b4-dbb2-11e5-b5d2-0a1d41d68578")));
         verify(encounterTransactionHandler).forSave(any(Encounter.class), eq(encounterTransaction));
     }
 
