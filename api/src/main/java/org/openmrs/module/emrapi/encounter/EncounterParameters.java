@@ -20,6 +20,7 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public class EncounterParameters {
     private Date encounterDateTime;
     private Patient patient;
     private String encounterUuid;
-    private Map<String, Object> context;
+    private Map<String, Object> context = new HashMap<String, Object>();
 
     private EncounterParameters(){
 
