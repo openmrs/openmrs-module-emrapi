@@ -18,6 +18,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Auditable;
+import org.openmrs.Concept;
+import org.openmrs.OpenmrsMetadata;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.metadata.MetadataPackageConfig;
 import org.openmrs.module.emrapi.metadata.MetadataPackagesConfig;
@@ -177,6 +179,7 @@ public class MetadataUtil {
      */
     public static void verifyNoMdsPackagesWithInconsistentVersionsOfTheSameItem(ClassLoader classLoader) throws Exception, IllegalStateException {
         ItemToDateMap itemToDateMap = new ItemToDateMap();
+        boolean metadataConsistent = true;
 
         MetadataPackagesConfig allConfigs = MetadataUtil.getMetadataPackagesForModule(classLoader);
         for (MetadataPackageConfig config : allConfigs.getPackages()) {
@@ -191,9 +194,9 @@ public class MetadataUtil {
             for (int i = 0; i < metadataImporter.getPartsCount(); ++i) {
                 Collection<ImportedItem> items = metadataImporter.getImportedItems(i);
                 for (ImportedItem item : items) {
-                    itemToDateMap.addItem(item, filenameBase);
+                    metadataConsistent = itemToDateMap.addItem(item, filenameBase) && metadataConsistent;
                     for (ImportedItem related : item.getRelatedItems()) {
-                        itemToDateMap.addItem(related, filenameBase);
+                        metadataConsistent = itemToDateMap.addItem(related, filenameBase) && metadataConsistent;
                     }
                 }
             }
@@ -216,6 +219,11 @@ public class MetadataUtil {
             log.info("Number of distinct items in multiple packages: " + repeated.size());
             log.info("Total number of distinct items: " + itemToDateMap.size());
         }
+
+        if (!metadataConsistent) {
+            throw new IllegalStateException("Found inconsistent metadata");
+        }
+
     }
 
     static class ItemToDateMap {
@@ -224,7 +232,8 @@ public class MetadataUtil {
         Map<String, Date> lastModifiedMap = new HashMap<String, Date>();
         Map<String, Set<String>> itemToPackages = new HashMap<String, Set<String>>();
 
-        public void addItem(ImportedItem item, String filename) {
+        public boolean addItem(ImportedItem item, String filename) {
+
             String key = getKey(item);
             Date lastModified = getLastModified(item.getIncoming());
 
@@ -240,10 +249,22 @@ public class MetadataUtil {
             }
             else {
                 if (!existing.equals(lastModified)) {
-                    throw new IllegalStateException("Found inconsistent versions of " + key + " in " + filename + " (" + lastModified + ") vs " + belongsToPackages + " (" + existing + ")");
+                    String name;
+                    if (item.getIncoming() instanceof Concept) {
+                        name = key + " " + ((Concept) item.getIncoming()).getName();
+                    }
+                    else if (item.getIncoming() instanceof OpenmrsMetadata) {
+                        name = key + " " + ((OpenmrsMetadata) item.getIncoming()).getName();
+                    }
+                    else  {
+                        name = key;
+                    }
+                    log.error(("Found inconsistent versions of " + name + " in " + filename + " (" + lastModified + ") vs " + belongsToPackages + " (" + existing + ")"));
+                    return false;
                 }
             }
             belongsToPackages.add(filename);
+            return true;
         }
 
         private Date getLastModified(Object object) {
