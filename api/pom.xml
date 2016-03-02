@@ -25,6 +25,12 @@
             <version>${openMRSVersion}</version>
             <type>jar</type>
             <scope>provided</scope>
+            <exclusions>
+                 <exclusion>
+                     <groupId>javassist</groupId>
+                     <artifactId>javassist</artifactId>
+                 </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -33,6 +39,12 @@
             <version>${openMRSVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
+            <exclusions>
+                 <exclusion>
+                     <groupId>javassist</groupId>
+                     <artifactId>javassist</artifactId>
+                 </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
