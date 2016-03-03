@@ -99,6 +99,18 @@
             <artifactId>event-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>org.openmrs</groupId>
+            <artifactId>event-api-1.x</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.openmrs</groupId>
+            <artifactId>event-api-2.x</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
