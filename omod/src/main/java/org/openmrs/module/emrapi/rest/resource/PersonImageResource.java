@@ -88,7 +88,7 @@ public class PersonImageResource extends DelegatingCrudResource<PersonImage> {
 
     @Override
     public void purge(PersonImage delegate, RequestContext context) throws ResponseException {
-        throw new ResourceDoesNotSupportOperationException("purge of person image not supported");
+        throw new ResourceDoesNotSupportOperationException("delete forever of person image not supported");
     }
 
 }
