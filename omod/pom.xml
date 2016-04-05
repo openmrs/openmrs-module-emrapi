@@ -265,6 +265,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
@@ -274,7 +275,7 @@
         <profile>
             <id>MRS1.10</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <openMRSVersion>1.10.0</openMRSVersion>
@@ -294,6 +295,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
@@ -323,6 +325,37 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
+                            </classpathDependencyExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>MRS1.12</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openMRSVersion>1.12.0-SNAPSHOT</openMRSVersion>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.6</version>
+                        <configuration>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <includes>
+                                <include>**/*_1_12_Test.java</include>
+                            </includes>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
