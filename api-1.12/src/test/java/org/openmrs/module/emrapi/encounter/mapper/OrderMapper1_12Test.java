@@ -34,6 +34,8 @@ import org.openmrs.OrderType;
 import org.openmrs.Patient;
 import org.openmrs.Encounter;
 import org.openmrs.SimpleDosingInstructions;
+import org.openmrs.ConceptDatatype;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.util.LocaleUtility;
@@ -55,7 +57,7 @@ import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(LocaleUtility.class)
+@PrepareForTest({LocaleUtility.class, Context.class})
 public class OrderMapper1_12Test {
 
     private static final CareSettingType OUT_PATIENT_CARE_SETTING = CareSettingType.OUTPATIENT;
@@ -76,6 +78,7 @@ public class OrderMapper1_12Test {
     @Before
     public void setup() {
         mockStatic(LocaleUtility.class);
+        mockStatic(Context.class);
 
         orderMapper1_12 = new OrderMapper1_12();
     }
@@ -123,6 +126,9 @@ public class OrderMapper1_12Test {
     public void shouldMapNewDrugOrder() throws ParseException, NoSuchFieldException, IllegalAccessException {
 
         DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-100");
+        Concept concept = concept("newConcept", "newConceptDataType", "newConceptUuid");
+
+        openMrsDrugOrder.setConcept(concept);
         EncounterTransaction.DrugOrder drugOrder = orderMapper1_12.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
@@ -153,6 +159,8 @@ public class OrderMapper1_12Test {
         assertThat(drugOrder.getInstructions(), is(equalTo("before meals")));
         assertThat(drugOrder.getCommentToFulfiller(), is(equalTo("boil in water")));
         assertThat(drugOrder.getOrderNumber(), is(equalTo("ORD-100")));
+        assertThat(drugOrder.getConcept().getName(), is(equalTo("newConcept")));
+        assertThat(drugOrder.getConcept().getUuid(), is(equalTo("newConceptUuid")));
     }
 
     @Test
@@ -292,6 +300,17 @@ public class OrderMapper1_12Test {
         Concept doseUnitsConcept = new Concept();
         doseUnitsConcept.setFullySpecifiedName(new ConceptName(name, Locale.ENGLISH));
         return doseUnitsConcept;
+    }
+
+    private Concept concept(String name, String dataType, String conceptUuid) {
+        Concept concept = concept(name);
+
+        ConceptDatatype conceptDataType = new ConceptDatatype();
+        conceptDataType.setName(dataType);
+
+        concept.setDatatype(conceptDataType);
+        concept.setUuid(conceptUuid);
+        return concept;
     }
 
 }
