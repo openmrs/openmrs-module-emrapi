@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.encounter.mapper;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
+import org.openmrs.OrderGroup;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.annotation.OpenmrsProfile;
@@ -97,6 +98,7 @@ public class OrderMapper1_12 implements OrderMapper {
         drugOrder.setDuration(openMRSDrugOrder.getDuration());
         drugOrder.setDurationUnits(getConceptName(openMRSDrugOrder.getDurationUnits()));
 
+        drugOrder.setConcept(conceptMapper.map(openMRSDrugOrder.getConcept()));
         drugOrder.setScheduledDate(openMRSDrugOrder.getScheduledDate());
         drugOrder.setDateActivated(openMRSDrugOrder.getDateActivated());
         drugOrder.setEffectiveStartDate(openMRSDrugOrder.getEffectiveStartDate());
@@ -110,6 +112,7 @@ public class OrderMapper1_12 implements OrderMapper {
         dosingInstructions.setDoseUnits(getConceptName(openMRSDrugOrder.getDoseUnits()));
         dosingInstructions.setRoute(getConceptName(openMRSDrugOrder.getRoute()));
         dosingInstructions.setAsNeeded(openMRSDrugOrder.getAsNeeded());
+
         if (openMRSDrugOrder.getFrequency() != null) {
             dosingInstructions.setFrequency(openMRSDrugOrder.getFrequency().getName());
         }
@@ -129,7 +132,13 @@ public class OrderMapper1_12 implements OrderMapper {
 
         drugOrder.setOrderReasonConcept(conceptMapper.map(openMRSDrugOrder.getOrderReason()));
         drugOrder.setOrderReasonText(openMRSDrugOrder.getOrderReasonNonCoded());
-
+        OrderGroup openMRSOrderGroup = openMRSDrugOrder.getOrderGroup();
+        if(openMRSOrderGroup != null) {
+            EncounterTransaction.OrderGroup orderGroup = new EncounterTransaction.OrderGroup(openMRSOrderGroup.getUuid());
+            EncounterTransaction.OrderSet orderSet = new EncounterTransaction.OrderSet(openMRSOrderGroup.getOrderSet().getUuid());
+            orderGroup.setOrderSet(orderSet);
+            drugOrder.setOrderGroup(orderGroup);
+        }
         return drugOrder;
     }
 

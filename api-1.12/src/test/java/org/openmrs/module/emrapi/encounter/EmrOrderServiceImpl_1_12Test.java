@@ -21,20 +21,26 @@ import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
+import org.openmrs.OrderGroup;
+import org.openmrs.OrderSet;
+import org.openmrs.Patient;
 import org.openmrs.api.EncounterService;
-import org.openmrs.api.OrderService;
+import org.openmrs.api.OrderSetService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
 import org.openmrs.module.emrapi.encounter.builder.OrderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
+import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderGroupMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
@@ -53,7 +59,10 @@ public class EmrOrderServiceImpl_1_12Test {
     private OpenMRSOrderMapper openMRSOrderMapper;
 
     @Mock
-    private OrderService orderService;
+    private OrderSetService orderSetService;
+
+    @Mock
+    private OpenMRSOrderGroupMapper openMRSOrderGroupMapper;
 
     @Before
     public void setup() {
@@ -62,7 +71,7 @@ public class EmrOrderServiceImpl_1_12Test {
 
     @Test
     public void shouldSaveNewDrugOrdersInTheSequenceOfOrdering() throws ParseException {
-        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, orderSetService, openMRSOrderGroupMapper);
         EncounterTransaction.DrugOrder drugOrder1 = new DrugOrderBuilder().withDrugUuid("drug-uuid1").build();
         EncounterTransaction.DrugOrder drugOrder2 = new DrugOrderBuilder().withDrugUuid("drug-uuid2").build();
         DrugOrder mappedDrugOrder1 = new DrugOrder();
@@ -84,7 +93,7 @@ public class EmrOrderServiceImpl_1_12Test {
 
     @Test
     public void shouldSaveNewDrugOrdersInTheSequenceOfOrderingToAnEncounterWithExistingOrders() throws ParseException {
-        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, orderSetService, openMRSOrderGroupMapper);
         EncounterTransaction.DrugOrder drugOrder3 = new DrugOrderBuilder().withDrugUuid("drug-uuid3").build();
         EncounterTransaction.DrugOrder drugOrder4 = new DrugOrderBuilder().withDrugUuid("drug-uuid4").build();
         DrugOrder existingDrugOrder1 = new DrugOrder();
@@ -110,7 +119,7 @@ public class EmrOrderServiceImpl_1_12Test {
 
     @Test
     public void shouldSaveOrders() throws ParseException {
-        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, orderSetService, openMRSOrderGroupMapper);
         EncounterTransaction.Order order1 = new OrderBuilder().withConceptUuid("concept-uuid1").withComment("Comment").build();
         EncounterTransaction.Order order2 = new OrderBuilder().withConceptUuid("concept-uuid2").withComment("Comment").build();
 
@@ -142,8 +151,83 @@ public class EmrOrderServiceImpl_1_12Test {
     }
 
     @Test
+    public void shouldSaveOrdersWithOrderGroups() throws ParseException {
+        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, orderSetService, openMRSOrderGroupMapper);
+
+        EncounterTransaction.Order order1 = new OrderBuilder().withConceptUuid("concept-uuid1").withComment("Comment").withOrderGroup("orderSet-uuid1").build();
+        EncounterTransaction.Order order2 = new OrderBuilder().withConceptUuid("concept-uuid2").withComment("Comment").withOrderGroup("orderSet-uuid1").build();
+        EncounterTransaction.Order order3 = new OrderBuilder().withConceptUuid("concept-uuid3").withComment("Comment").withOrderGroup("orderSet-uuid2").build();
+
+        Encounter encounter = new Encounter();
+        Patient patient = new Patient();
+
+        OrderGroup mappedOrderGroup1 = new OrderGroup();
+        mappedOrderGroup1.setEncounter(encounter);
+        mappedOrderGroup1.setPatient(patient);
+        OrderSet orderSet1 = new OrderSet();
+        mappedOrderGroup1.setOrderSet(orderSet1);
+
+        OrderGroup mappedOrderGroup2 = new OrderGroup();
+        mappedOrderGroup2.setEncounter(encounter);
+        mappedOrderGroup2.setPatient(patient);
+        OrderSet orderSet2 = new OrderSet();
+        mappedOrderGroup2.setOrderSet(orderSet2);
+
+        Order mappedOrder1 = new Order();
+        Concept concept = new Concept();
+        concept.setUuid("concept-uuid1");
+        mappedOrder1.setConcept(concept);
+        mappedOrder1.setOrderGroup(mappedOrderGroup1);
+        mappedOrder1.setCommentToFulfiller("Comment");
+
+        Order mappedOrder2 = new Order();
+        concept = new Concept();
+        concept.setUuid("concept-uuid2");
+        mappedOrder2.setConcept(concept);
+        mappedOrder2.setOrderGroup(mappedOrderGroup1);
+        mappedOrder2.setCommentToFulfiller("Comment");
+
+        Order mappedOrder3 = new Order();
+        concept = new Concept();
+        concept.setUuid("concept-uuid3");
+        mappedOrder2.setConcept(concept);
+        mappedOrder3.setOrderGroup(mappedOrderGroup2);
+        mappedOrder2.setCommentToFulfiller("Comment");
+
+        when(openMRSOrderMapper.map(order1,encounter)).thenReturn(mappedOrder1);
+        when(openMRSOrderMapper.map(order2,encounter)).thenReturn(mappedOrder2);
+        when(openMRSOrderMapper.map(order3,encounter)).thenReturn(mappedOrder3);
+
+        when(openMRSOrderGroupMapper.map(order1.getOrderGroup(), encounter)).thenReturn(mappedOrderGroup1);
+        when(openMRSOrderGroupMapper.map(order2.getOrderGroup(), encounter)).thenReturn(mappedOrderGroup1);
+        when(openMRSOrderGroupMapper.map(order3.getOrderGroup(), encounter)).thenReturn(mappedOrderGroup2);
+
+        when(orderSetService.getOrderSetByUuid(order1.getOrderGroup().getOrderSet().getUuid())).thenReturn(mappedOrder1.getOrderGroup().getOrderSet());
+        when(orderSetService.getOrderSetByUuid(order2.getOrderGroup().getOrderSet().getUuid())).thenReturn(mappedOrder2.getOrderGroup().getOrderSet());
+        when(orderSetService.getOrderSetByUuid(order3.getOrderGroup().getOrderSet().getUuid())).thenReturn(mappedOrder3.getOrderGroup().getOrderSet());
+
+        emrOrderService.saveOrders(Arrays.asList(order1, order2, order3), encounter);
+
+        ArgumentCaptor<Encounter> encounterArgumentCaptor = ArgumentCaptor.forClass(Encounter.class);
+        verify(encounterService).saveEncounter(encounterArgumentCaptor.capture());
+        Encounter savedEncounter = encounterArgumentCaptor.getValue();
+        ArrayList<Order> savedOrders = new ArrayList<Order>(savedEncounter.getOrders());
+        assertThat(savedOrders.size(), is(3));
+
+        HashMap<String, OrderGroup> orderGroups = new HashMap<String, OrderGroup>();
+
+        for (Order savedOrder : savedOrders) {
+            if (savedOrder.getOrderGroup() != null) {
+                orderGroups.put(savedOrder.getOrderGroup().getOrderSet().getUuid(), savedOrder.getOrderGroup());
+            }
+        }
+
+        assertEquals(2, orderGroups.size());
+    }
+
+    @Test
     public void shouldSaveOrdersToEncounterWithExistingOrders() throws ParseException {
-        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper);
+        EmrOrderServiceImpl_1_12 emrOrderService = new EmrOrderServiceImpl_1_12(openMRSDrugOrderMapper, encounterService, openMRSOrderMapper, orderSetService, openMRSOrderGroupMapper);
         EncounterTransaction.Order order1 = new OrderBuilder().withConceptUuid("concept-uuid1").withComment("Comment").build();
         EncounterTransaction.Order order2 = new OrderBuilder().withConceptUuid("concept-uuid2").withComment("Comment").build();
 

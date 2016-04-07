@@ -562,15 +562,6 @@ public class EncounterTransaction {
             this.dispositionDateTime = date;
         }
 
-      /*  public String getDispositionNote() {
-            return dispositionNote;
-        }
-
-        public Disposition setDispositionNote(String dispositionNote) {
-            this.dispositionNote = dispositionNote;
-            return this;
-        }*/
-
         public String getConceptName() {
             return conceptName;
         }
@@ -582,11 +573,39 @@ public class EncounterTransaction {
 
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class OrderGroup {
+        private String uuid;
+        private OrderSet orderSet;
+
+        public OrderGroup(){
+        }
+
+        public OrderGroup(String uuid){
+            this.uuid = uuid;
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public OrderSet getOrderSet() {
+            return orderSet;
+        }
+
+        public void setOrderSet(OrderSet orderSet) { this.orderSet = orderSet; }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Order {
         private Concept concept;
         private String instructions;
         private String uuid;
         private String orderType;
+        private OrderGroup orderGroup;
         private Date dateCreated;
         private Date dateChanged;
         private Date dateStopped;
@@ -702,6 +721,14 @@ public class EncounterTransaction {
             this.orderType = orderType;
         }
 
+        public OrderGroup getOrderGroup() {
+            return orderGroup;
+        }
+
+        public void setOrderGroup(OrderGroup orderGroup) {
+            this.orderGroup = orderGroup;
+        }
+
         public String getPreviousOrderUuid() {
             return previousOrderUuid;
         }
@@ -717,6 +744,24 @@ public class EncounterTransaction {
         }
 
 
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class OrderSet {
+        private String uuid;
+
+        public OrderSet(){
+        }
+        public OrderSet(String uuid){
+            this.uuid = uuid;
+        }
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -828,6 +873,8 @@ public class EncounterTransaction {
         private Boolean voided;
         private String voidReason;
         private EncounterTransaction.Concept orderReasonConcept;
+
+        private Integer sortWeight;
 
         public Drug getDrug() {
             return drug;
@@ -946,6 +993,14 @@ public class EncounterTransaction {
 
         public String getVoidReason() {
             return voidReason;
+        }
+
+        public Integer getSortWeight() {
+            return sortWeight;
+        }
+
+        public void setSortWeight(Integer sortWeight) {
+            this.sortWeight = sortWeight;
         }
     }
 
