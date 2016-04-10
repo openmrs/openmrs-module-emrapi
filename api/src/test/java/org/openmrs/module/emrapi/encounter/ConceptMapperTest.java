@@ -55,7 +55,7 @@ public class ConceptMapperTest {
 
         EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(conceptBuilder.get());
 
-        Assert.assertEquals("[{source=PACS Procedure Code, name=null, code=122}]", encounterTransactionConcept.getMappings().toString());
+        Assert.assertEquals("[{code=122, name=null, source=PACS Procedure Code}]", encounterTransactionConcept.getMappings().toString());
     }
 
     @Test
