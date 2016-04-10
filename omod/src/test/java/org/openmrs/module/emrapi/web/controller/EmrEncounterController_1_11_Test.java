@@ -195,16 +195,16 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         Iterator<Obs> iterator = encounter.getObsAtTopLevel(false).iterator();
         
         Obs obs1 = iterator.next();
-        assertEquals("zf616900-5e7c-4667-9a7f-dcb260abf1de", obs1.getUuid());
-        assertEquals(new Double(100), obs1.getValueNumeric());
-        assertEquals("new c", obs1.getComment());
-        
-        Obs obs2 = iterator.next();
-        assertEquals("z9fb7f47-e80a-4056-9285-bd798be13c63", obs2.getUuid());
-        assertEquals(1, obs2.getGroupMembers().size());
-        Obs member = obs2.getGroupMembers().iterator().next();
+        assertEquals("z9fb7f47-e80a-4056-9285-bd798be13c63", obs1.getUuid());
+        assertEquals(1, obs1.getGroupMembers().size());
+        Obs member = obs1.getGroupMembers().iterator().next();
         assertEquals(new Double(20), member.getValueNumeric());
         assertEquals("new gc", member.getComment());
+        
+        Obs obs2 = iterator.next();
+        assertEquals("zf616900-5e7c-4667-9a7f-dcb260abf1de", obs2.getUuid());
+        assertEquals(new Double(100), obs2.getValueNumeric());
+        assertEquals("new c", obs2.getComment());
     }
 
     @Test

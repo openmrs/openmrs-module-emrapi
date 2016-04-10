@@ -66,14 +66,15 @@
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
-            <artifactId>webservices.rest-omod</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod-common</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>webservices.rest-omod-1.8</artifactId>
+            <version>2.14-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.test</groupId>
@@ -88,6 +89,12 @@
             <version>${openMRSVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
+            <exclusions>
+                  <exclusion>
+                      <groupId>javassist</groupId>
+                      <artifactId>javassist</artifactId>
+                  </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
 		    <groupId>org.apache.tomcat</groupId>
@@ -242,7 +249,7 @@
         <profile>
             <id>MRS1.9</id>
             <properties>
-                <openMRSVersion>1.9.8</openMRSVersion>
+                <openMRSVersion>1.9.9</openMRSVersion>
             </properties>
             <dependencies>
                 <dependency>
@@ -308,7 +315,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <openMRSVersion>1.11.0</openMRSVersion>
+                <openMRSVersion>1.11.5</openMRSVersion>
             </properties>
 
             <build>
