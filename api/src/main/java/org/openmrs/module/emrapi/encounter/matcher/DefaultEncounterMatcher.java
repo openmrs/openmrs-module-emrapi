@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.matcher;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Visit;
@@ -26,15 +27,16 @@ public class DefaultEncounterMatcher implements BaseEncounterMatcher {
     @Override
     public Encounter findEncounter(Visit visit, EncounterParameters encounterParameters) {
         EncounterType encounterType = encounterParameters.getEncounterType();
+        String encounterUuid = encounterParameters.getEncounterUuid();
 
-        if (encounterType == null){
-            throw new IllegalArgumentException("Encounter Type not found");
+        if (encounterType == null && StringUtils.isBlank(encounterUuid)){
+            throw new IllegalArgumentException("Encounter Type or Encounter Uuid must be specified");
         }
 
         if(visit.getEncounters()!=null){
             for (Encounter encounter : visit.getEncounters()) {
-                if (!encounter.isVoided() && (encounter.getUuid().equals(encounterParameters.getEncounterUuid())
-                        || encounterType.equals(encounter.getEncounterType()))) {
+                if (!encounter.isVoided() && (encounter.getUuid().equals(encounterUuid)
+                        || encounter.getEncounterType().equals(encounterType))) {
                     return encounter;
                 }
             }
