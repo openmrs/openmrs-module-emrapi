@@ -138,6 +138,7 @@ public class OrderMapper1_12 implements OrderMapper {
             EncounterTransaction.OrderSet orderSet = new EncounterTransaction.OrderSet(openMRSOrderGroup.getOrderSet().getUuid());
             orderGroup.setOrderSet(orderSet);
             drugOrder.setOrderGroup(orderGroup);
+            drugOrder.setSortWeight(openMRSDrugOrder.getSortWeight());
         }
         return drugOrder;
     }
