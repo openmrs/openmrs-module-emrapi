@@ -874,7 +874,7 @@ public class EncounterTransaction {
         private String voidReason;
         private EncounterTransaction.Concept orderReasonConcept;
 
-        private Integer sortWeight;
+        private Double sortWeight;
 
         public Drug getDrug() {
             return drug;
@@ -995,11 +995,11 @@ public class EncounterTransaction {
             return voidReason;
         }
 
-        public Integer getSortWeight() {
+        public Double getSortWeight() {
             return sortWeight;
         }
 
-        public void setSortWeight(Integer sortWeight) {
+        public void setSortWeight(Double sortWeight) {
             this.sortWeight = sortWeight;
         }
     }

@@ -69,6 +69,7 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setScheduledDate(drugOrder.getScheduledDate());
         openMRSDrugOrder.setUrgency(drugOrder.getScheduledDate() != null ? Order.Urgency.ON_SCHEDULED_DATE : DEFAULT_URGENCY);
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
+        openMRSDrugOrder.setSortWeight(drugOrder.getSortWeight());
         openMRSDrugOrder.setDurationUnits(orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits()));
         openMRSDrugOrder.setAutoExpireDate(drugOrder.getAutoExpireDate());
         if(drugOrder.getOrderReasonConcept() != null) {
