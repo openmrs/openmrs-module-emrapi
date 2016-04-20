@@ -233,7 +233,7 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
 
     @Override
     public void purge(PatientProfile delegate, RequestContext context) throws ResponseException {
-        throw new ResourceDoesNotSupportOperationException("purge of patient profile not supported");
+        throw new ResourceDoesNotSupportOperationException("delete forever of patient profile not supported");
     }
 
 }

@@ -17,7 +17,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
+import org.openmrs.Order;
+import org.openmrs.OrderGroup;
+import org.openmrs.OrderSet;
+import org.openmrs.Patient;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.OrderSetService;
 import org.openmrs.module.emrapi.encounter.builder.DrugOrderBuilder;
@@ -28,7 +34,9 @@ import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderGroupMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;

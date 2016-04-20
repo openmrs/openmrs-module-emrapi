@@ -43,11 +43,6 @@
         <distro.groupId>org.openmrs.distro</distro.groupId>
         <distro.artifactId>referenceapplication</distro.artifactId>
         <distro.version>2.4-SNAPSHOT</distro.version>
-        <reportingModuleVersion>0.9.6</reportingModuleVersion>
-        <providermanagementModuleVersion>2.3</providermanagementModuleVersion>
-        <metadatasharingVersion>1.1.9</metadatasharingVersion>
-        <eventVersion>2.2.1</eventVersion>
-        <webservicesRestModuleVersion>2.12</webservicesRestModuleVersion>
     </properties>
 
     <dependencyManagement>
@@ -67,6 +62,12 @@
        <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>reporting-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>reporting-api-1.9</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -119,6 +120,12 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency> 
+        
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>allergyapi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- End OpenMRS modules -->
 

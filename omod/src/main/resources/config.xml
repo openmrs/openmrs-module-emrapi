@@ -168,6 +168,14 @@
             UUID of the Discharge Form (not required)
         </description>
     </globalProperty>
+    
+    <globalProperty>
+        <property>emr.encounterMatcher</property>
+        <defaultValue></defaultValue>
+        <description>
+            Class name of a custom encounter matcher (e.g. org.openmrs.module.example.customEncounterMatcher)
+        </description>
+    </globalProperty>
 
     <globalProperty>
         <property>emrapi.suppressedDiagnosisConcepts</property>

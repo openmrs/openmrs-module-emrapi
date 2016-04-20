@@ -66,14 +66,14 @@
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
-            <artifactId>webservices.rest-omod</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod-common</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openmrs.module</groupId>
+            <artifactId>webservices.rest-omod-1.8</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openmrs.test</groupId>
@@ -88,6 +88,12 @@
             <version>${openMRSVersion}</version>
             <type>test-jar</type>
             <scope>test</scope>
+            <exclusions>
+                  <exclusion>
+                      <groupId>javassist</groupId>
+                      <artifactId>javassist</artifactId>
+                  </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
 		    <groupId>org.apache.tomcat</groupId>
@@ -242,7 +248,7 @@
         <profile>
             <id>MRS1.9</id>
             <properties>
-                <openMRSVersion>1.9.8</openMRSVersion>
+                <openMRSVersion>1.9.9</openMRSVersion>
             </properties>
             <dependencies>
                 <dependency>
@@ -265,6 +271,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
@@ -274,7 +281,7 @@
         <profile>
             <id>MRS1.10</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <openMRSVersion>1.10.0</openMRSVersion>
@@ -294,6 +301,7 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
@@ -306,7 +314,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <openMRSVersion>1.11.0</openMRSVersion>
+                <openMRSVersion>1.11.5</openMRSVersion>
             </properties>
 
             <build>
@@ -323,6 +331,37 @@
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
+                            </classpathDependencyExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>MRS1.12</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <openMRSVersion>1.12.0-SNAPSHOT</openMRSVersion>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.6</version>
+                        <configuration>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <includes>
+                                <include>**/*_1_12_Test.java</include>
+                            </includes>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
