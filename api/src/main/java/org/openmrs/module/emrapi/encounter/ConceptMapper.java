@@ -24,9 +24,11 @@ import org.openmrs.module.emrapi.utils.HibernateLazyLoader;
 import org.openmrs.util.LocaleUtility;
 import org.openmrs.util.OpenmrsConstants;
 
+import java.util.Locale;
+
 public class ConceptMapper {
     public EncounterTransaction.Concept map(Concept concept) {
-        if (concept == null){
+        if (concept == null) {
             return null;
         }
         concept = new HibernateLazyLoader().load(concept);
@@ -42,7 +44,8 @@ public class ConceptMapper {
                 conceptClassName,
                 getShortName(concept),
                 concept.getConceptMappings());
-        if(concept.isNumeric()) {
+
+        if (concept.isNumeric()) {
             encounterTransactionConcept.setUnits(((ConceptNumeric) concept).getUnits());
             encounterTransactionConcept.setHiNormal(((ConceptNumeric) concept).getHiNormal());
             encounterTransactionConcept.setLowNormal(((ConceptNumeric) concept).getLowNormal());
@@ -53,17 +56,43 @@ public class ConceptMapper {
     private String getShortName(Concept concept) {
         User authenticatedUser = Context.getAuthenticatedUser();
         String shortName = null;
-        if(authenticatedUser != null) {
-            String defaultLocale = authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE);
-            ConceptName shortNameInLocale = concept.getShortNameInLocale(LocaleUtility.fromSpecification(defaultLocale));
-            if(shortNameInLocale != null) {
-                shortName = shortNameInLocale.getName();
+        if (authenticatedUser != null) {
+            Locale userDefaultLocale = getUserDefaultLocale(authenticatedUser);
+            shortName = getAnAvailableName(concept, userDefaultLocale);
+            if (shortName == null) {
+                Locale systemDefaultLocale = getSystemDefaultLocale();
+                shortName = getAnAvailableName(concept, systemDefaultLocale);
             }
         }
-        if(shortName == null) {
-            shortName = concept.getShortNames() != null && concept.getShortNames().size() > 0 ? concept.getShortNames().iterator().next().getName() : null;
+        if (shortName == null) {
+            shortName = concept.getName().getName();
         }
-
         return shortName;
+    }
+
+    private String getAnAvailableName(Concept concept, Locale locale) {
+        ConceptName shortNameInLocale = concept.getShortNameInLocale(locale);
+        if (shortNameInLocale != null) {
+            return shortNameInLocale.getName();
+        } else {
+            ConceptName fullySpecifiedName = concept.getFullySpecifiedName(locale);
+            if (fullySpecifiedName != null) {
+                return fullySpecifiedName.getName();
+            }
+        }
+        return null;
+    }
+
+    private Locale getSystemDefaultLocale() {
+        String systemDefaultLocale = Context.getAdministrationService().getGlobalProperty(OpenmrsConstants.GLOBAL_PROPERTY_DEFAULT_LOCALE);
+        if (systemDefaultLocale != null) {
+            return LocaleUtility.fromSpecification(systemDefaultLocale);
+        }
+        return null;
+    }
+
+    private Locale getUserDefaultLocale(User authenticatedUser) {
+        String userDefaultLocale = authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE);
+        return LocaleUtility.fromSpecification(userDefaultLocale);
     }
 }
