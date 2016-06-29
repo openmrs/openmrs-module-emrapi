@@ -47,6 +47,12 @@ public class EncounterTransaction {
     private Set<Provider> providers = new HashSet<Provider>();
     private Map<String,Object> extensions = new HashMap<String,Object>();
     private Map<String, Object> context = new HashMap<String, Object>();
+    private String visitLocationUuid;
+
+
+    public String getVisitLocationUuid() { return visitLocationUuid; }
+
+    public void setVisitLocationUuid(String visitLocationUuid) { this.visitLocationUuid = visitLocationUuid; }
 
     public EncounterTransaction() {
     }

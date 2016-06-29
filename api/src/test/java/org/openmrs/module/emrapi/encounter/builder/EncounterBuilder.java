@@ -21,6 +21,9 @@ public class EncounterBuilder {
     public EncounterBuilder() {
         encounter = new Encounter();
         Visit visit = new Visit();
+        Location visitLocation = new Location();
+        visitLocation.setUuid(UUID.randomUUID().toString());
+        visit.setLocation(visitLocation);
         VisitType visitType = new VisitType();
         visitType.setUuid(UUID.randomUUID().toString());
         visit.setVisitType(visitType);

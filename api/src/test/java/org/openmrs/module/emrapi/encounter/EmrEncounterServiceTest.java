@@ -310,4 +310,38 @@ public class EmrEncounterServiceTest {
         emrEncounterService.onStartup();
         emrEncounterService.find(parameters);
     }
+
+    @Test
+    public void shouldStoreLocationInVisitIfTransationHasVisitLocationUuid(){
+
+        EncounterType encounterType = new EncounterType(1);
+        encounterType.setUuid("encType-invsgtn-uuid");
+
+        EncounterTransaction encounterTransaction = constructEncounterTransaction();
+        encounterTransaction.setVisitLocationUuid("visit-location-uuid");
+        encounterTransaction.setVisitUuid(null);
+        Encounter encounter = mock(Encounter.class);
+
+        Location location = new Location();
+        location.setName("hospital");
+        location.setUuid("visit-location-uuid");
+
+        encounterTransactionHandler = mock(EncounterTransactionHandler.class);
+        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+                Arrays.asList(encounterTransactionHandler));
+        when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
+        when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(location);
+
+        emrEncounterService.onStartup();
+        emrEncounterService.save(encounterTransaction);
+        verify(locationService).getLocationByUuid("visit-location-uuid");
+        verify(encounterTransactionHandler).forSave(any(Encounter.class), eq(encounterTransaction));
+
+        ArgumentCaptor<Visit> argumentCaptor = ArgumentCaptor.forClass(Visit.class);
+        verify(visitService).saveVisit(argumentCaptor.capture());
+
+        assertEquals(argumentCaptor.getValue().getLocation().getUuid(), "visit-location-uuid");
+    }
+
+
 }
