@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.postprocessor.EncounterTransactionHandler;
@@ -48,12 +49,14 @@ public class EncounterTransactionMapper {
     }
 
     public EncounterTransaction map(Encounter encounter, Boolean includeAll) {
-        EncounterTransaction encounterTransaction = new EncounterTransaction(encounter.getVisit().getUuid(), encounter.getUuid());
+        Visit visit = encounter.getVisit();
+        EncounterTransaction encounterTransaction = new EncounterTransaction(visit.getUuid(), encounter.getUuid());
         encounterTransaction.setPatientUuid(encounter.getPatient().getUuid());
         encounterTransaction.setEncounterTypeUuid(encounter.getEncounterType() != null ? encounter.getEncounterType().getUuid() : null);
         encounterTransaction.setLocationUuid(encounter.getLocation() != null ? encounter.getLocation().getUuid() : null);
         encounterTransaction.setLocationName(encounter.getLocation() != null ? encounter.getLocation().getName() : null);
-        encounterTransaction.setVisitTypeUuid(encounter.getVisit().getVisitType().getUuid());
+        encounterTransaction.setVisitTypeUuid(visit.getVisitType().getUuid());
+        encounterTransaction.setVisitLocationUuid(visit.getLocation() != null ? visit.getLocation().getUuid() : null);
         encounterTransaction.setEncounterDateTime(encounter.getEncounterDatetime());
 
         encounterProviderMapper.update(encounterTransaction, encounter.getEncounterProviders());

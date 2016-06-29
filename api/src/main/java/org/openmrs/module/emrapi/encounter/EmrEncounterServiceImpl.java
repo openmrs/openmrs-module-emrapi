@@ -275,6 +275,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private Visit findOrCreateVisit(EncounterTransaction encounterTransaction, Patient patient) {
 
         // return the visit that was explicitly asked for in the EncounterTransaction Object
+        Location location = locationService.getLocationByUuid(encounterTransaction.getVisitLocationUuid());
         if(encounterTransaction.getVisitUuid() != null && !encounterTransaction.getVisitUuid().isEmpty()){
             return visitService.getVisitByUuid(encounterTransaction.getVisitUuid());
         }
@@ -285,6 +286,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         }
 
         Visit visit = new Visit();
+        visit.setLocation(location);
         visit.setPatient(patient);
         visit.setVisitType(visitService.getVisitTypeByUuid(encounterTransaction.getVisitTypeUuid()));
         visit.setStartDatetime(getCurrentDateIfNull(encounterTransaction.getEncounterDateTime()));

@@ -71,6 +71,7 @@ public class EncounterTransactionMapperTest {
         Assert.assertEquals(encounter.getEncounterType().getUuid(), encounterTransaction.getEncounterTypeUuid());
         Assert.assertEquals(encounter.getLocation().getUuid(), encounterTransaction.getLocationUuid());
         Assert.assertEquals(encounter.getLocation().getName(), encounterTransaction.getLocationName());
+        Assert.assertEquals(encounter.getVisit().getLocation().getUuid(), encounterTransaction.getVisitLocationUuid());
         Assert.assertEquals(encounter.getVisit().getVisitType().getUuid(), encounterTransaction.getVisitTypeUuid());
     }
 
