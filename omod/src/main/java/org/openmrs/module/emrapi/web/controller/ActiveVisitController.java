@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * (Currently only supports "ensureActiveVisit")
  */
 @Controller
-@RequestMapping(value = "/rest/emrapi/visit")
-public class EmrVisitController extends BaseRestController {
+@RequestMapping(value = "/rest/emrapi/activevisit")
+public class ActiveVisitController extends BaseRestController {
 
     @Autowired
     private AdtService adtService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/ensureActiveVisit")
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
     @Transactional
     public SimpleObject ensureActiveVisit(@RequestParam("patient") Patient patient,
