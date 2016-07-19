@@ -19,7 +19,9 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
+import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openmrs.Encounter;
@@ -41,6 +43,8 @@ import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
+import org.openmrs.api.LocationService;
+import org.openmrs.Concept;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -50,6 +54,7 @@ import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
+import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.serialization.SerializationException;
@@ -76,6 +81,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyCollection;
@@ -102,6 +108,7 @@ public class AdtServiceTest {
     private AdtServiceImpl service;
 
     private VisitService mockVisitService;
+    private LocationService mockLocationService;
     private EncounterService mockEncounterService;
     private ProviderService mockProviderService;
     private PatientService mockPatientService;
@@ -146,6 +153,7 @@ public class AdtServiceTest {
 
         mockVisitService = mock(VisitService.class);
         mockEncounterService = mock(EncounterService.class);
+        mockLocationService = mock(LocationService.class);
         mockPatientService = mock(PatientService.class);
         mockDispositionService = mock(DispositionService.class);
         mockVisitQueryService = mock(VisitQueryService.class);
@@ -199,6 +207,7 @@ public class AdtServiceTest {
         AdtServiceImpl service = new AdtServiceImpl();
         service.setPatientService(mockPatientService);
         service.setVisitService(mockVisitService);
+        service.setLocationService(mockLocationService);
         service.setEncounterService(mockEncounterService);
         service.setProviderService(mockProviderService);
         service.setEmrApiProperties(emrApiProperties);
@@ -526,8 +535,9 @@ public class AdtServiceTest {
         encounter2.setEncounterDatetime(stopDatetime);
         visit.addEncounter(encounter2);
 
-        when(mockVisitService.getVisits(null, null, null, null, null, null, null, null, null, false, false))
-                .thenReturn(Collections.singletonList(visit));
+        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
+                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class)))
+                .thenReturn(Arrays.asList(visit));
 
         service.closeInactiveVisits();
 
@@ -570,12 +580,64 @@ public class AdtServiceTest {
         visit.addEncounter(encounter2);
         visit.addEncounter(encounter1);
 
-        when(mockVisitService.getVisits(null, null, null, null, null, null, null, null, null, false, false))
-                .thenReturn(Collections.singletonList(visit));
+        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
+                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class))).thenReturn(Arrays.asList(visit));
 
         service.closeInactiveVisits();
 
         assertThat(visit.getStopDatetime(), is(encounter2.getEncounterDatetime()));
+    }
+
+    @Test
+    public void shouldFetchCorrectSetOfLocationsToCloseVisit() {
+        List<Location> locations = getLocations();
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
+        visit.setLocation(locations.get (0));
+
+        when(mockLocationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS)).
+                thenReturn(locations.get(0).getTags().iterator().next());
+
+        when(mockLocationService.getLocationsByTag(locations.get(0).getTags().iterator().next())).
+                thenReturn(Arrays.asList(locations.get(0)));
+
+        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(),
+                Matchers.anyCollection(), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class),
+                Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class),
+                Matchers.any(Boolean.class))).thenReturn(Arrays.asList(visit));
+
+        service.closeInactiveVisits();
+
+        ArgumentCaptor<Collection<Location>> argumentCaptor = ArgumentCaptor.forClass((Class<Collection<Location>>)(Class)Collection.class);
+        verify(mockVisitService).getVisits(anyCollection(), anyCollection(), argumentCaptor.capture(), anyCollection(),
+                any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class), any(Boolean.class),
+                any(Boolean.class));
+        assertEquals(argumentCaptor.getValue().size(), 1);
+        assertEquals(((Location)argumentCaptor.getValue().toArray()[0]).getName(),"Hospital");
+    }
+
+
+    private List<Location> getLocations() {
+        LocationTag visitLocationTag = new LocationTag("Visit Location", "Visit Location tag");
+        LocationTag loginLocationTag = new LocationTag("Login Location", "Login Location tag");
+
+        Location rootLocation = new Location();
+        rootLocation.setName("Universe");
+
+        Location visitLocation = new Location();
+        visitLocation.setName("Hospital");
+        visitLocation.addTag(visitLocationTag);
+        visitLocation.setParentLocation(rootLocation);
+
+        Location loginLocation = new Location();
+        loginLocation.setName("Consultation Department");
+        loginLocation.addTag(loginLocationTag);
+        loginLocation.setParentLocation(visitLocation);
+
+        Location aRandomLocation = new Location();
+
+        return Arrays.asList(visitLocation, loginLocation, rootLocation, aRandomLocation);
     }
 
     @Test
@@ -584,8 +646,8 @@ public class AdtServiceTest {
         Date startDatetime = DateUtils.addHours(new Date(), -14);
         visit.setStartDatetime(startDatetime);
 
-        when(mockVisitService.getVisits(null, null, null, null, null, null, null, null, null, false, false))
-                .thenReturn(Collections.singletonList(visit));
+        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
+                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class))).thenReturn(Arrays.asList(visit));
 
         service.closeInactiveVisits();
 

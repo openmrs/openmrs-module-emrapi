@@ -28,6 +28,7 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.Visit;
+import org.openmrs.LocationTag;
 import org.openmrs.api.APIException;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
@@ -43,6 +44,7 @@ import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
+import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.openmrs.util.OpenmrsUtil;
@@ -60,6 +62,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 
 
 public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
@@ -121,16 +124,23 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     public void closeInactiveVisits() {
-        List<Visit> openVisits = visitService.getVisits(null, null, null, null, null, null, null, null, null, false, false);
-        for (Visit visit : openVisits) {
-            if (shouldBeClosed(visit)) {
-                try {
-                    closeAndSaveVisit(visit);
-                } catch (Exception ex) {
-                    log.warn("Failed to close inactive visit " + visit, ex);
+        Collection<Location> possibleLocations = getPossibleLocationsToCloseVisit();
+        List<Visit> openVisits = visitService.getVisits(null, null, possibleLocations, null, null, null, null, null, null, false, false);
+            for (Visit visit : openVisits) {
+                if (shouldBeClosed(visit)) {
+                    try {
+                        closeAndSaveVisit(visit);
+                    } catch (Exception ex) {
+                        log.warn("Failed to close inactive visit " + visit, ex);
+                    }
                 }
-            }
         }
+    }
+
+    private Collection<Location> getPossibleLocationsToCloseVisit() {
+        LocationTag visitLocationTag =  locationService.getLocationTagByName(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS);
+
+        return locationService.getLocationsByTag(visitLocationTag);
     }
 
     private boolean shouldBeClosed(Visit visit) {
@@ -298,7 +308,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         if (activeVisit == null) {
             activeVisit = ensureActiveVisit(patient, where);
         }
-        
+
         Encounter lastEncounter = getLastEncounter(patient);
 		if (lastEncounter != null && activeVisit.equals(lastEncounter.getVisit())
 		        && emrApiProperties.getCheckInEncounterType().equals(lastEncounter.getEncounterType())
