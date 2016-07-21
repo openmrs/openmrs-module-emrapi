@@ -29,11 +29,14 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -41,11 +44,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -120,12 +125,13 @@ public class EmrEncounterServiceTest {
         encTrans.setPatientUuid("patient-uuid");
         encTrans.setVisitUuid("visit-uuid");
         encTrans.setEncounterTypeUuid("encType-invsgtn-uuid");
+        encTrans.setVisitLocationUuid("login-location-uuid");
         encTrans.setObservations(observations);
         return  encTrans;
     }
 
     @Test
-    public void shouldSaveEncounter() throws Exception {
+    public void shouldSaveEncounterInTheSpecifiedVisitInEncounterTransaction() throws Exception {
         EncounterTransaction encounterTransaction = emrEncounterService.save(constructEncounterTransaction());
         assertNotNull(encounterTransaction);
         assertEquals("visit-uuid", encounterTransaction.getVisitUuid());
@@ -170,6 +176,9 @@ public class EmrEncounterServiceTest {
         visit.setUuid("visit-uuid");
         visit.addEncounter(voidedEncounter);
         when(visitService.getVisitByUuid("visit-uuid")).thenReturn(visit);
+        Location location = new Location();
+        location.setUuid("login-location-uuid");
+        when(locationService.getLocationByUuid("login-location-uuid")).thenReturn(location);
 
 
         EncounterTransaction encounterTransaction = emrEncounterService.save(constructEncounterTransaction());
@@ -312,7 +321,7 @@ public class EmrEncounterServiceTest {
     }
 
     @Test
-    public void shouldStoreLocationInVisitIfTransationHasVisitLocationUuid(){
+    public void shouldStoreLocationForVisit(){
 
         EncounterType encounterType = new EncounterType(1);
         encounterType.setUuid("encType-invsgtn-uuid");
@@ -343,5 +352,142 @@ public class EmrEncounterServiceTest {
         assertEquals(argumentCaptor.getValue().getLocation().getUuid(), "visit-location-uuid");
     }
 
+    @Test
+    public void shouldSaveEncounterInActiveVisitIfItIsThereInThatVisitLocation(){
 
+        EncounterType encounterType = new EncounterType(1);
+        encounterType.setUuid("encType-invsgtn-uuid");
+
+        EncounterTransaction encounterTransaction = constructEncounterTransaction();
+        encounterTransaction.setVisitLocationUuid("visit-location-uuid");
+        encounterTransaction.setVisitUuid(null);
+        Encounter encounter = new Encounter();
+        encounter.setUuid("encounterUuid");
+
+        Location location = new Location();
+        location.setName("hospital");
+        location.setUuid("visit-location-uuid");
+
+        Visit visit = new Visit();
+        visit.setUuid("visit-uuid");
+        visit.setLocation(location);
+        List visits = new ArrayList();
+        visits.add(visit);
+
+        encounterTransactionHandler = mock(EncounterTransactionHandler.class);
+        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+                Arrays.asList(encounterTransactionHandler));
+        when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
+        when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(location);
+        when(visitService.getVisitByUuid("visit-uuid")).thenReturn(visit);
+
+        when(visitService.getActiveVisitsByPatient(patient)).thenReturn(visits);
+
+        emrEncounterService.onStartup();
+        EncounterTransaction savedEncounterTransaction = emrEncounterService.save(encounterTransaction);
+        verify(encounterTransactionHandler).forSave(any(Encounter.class), eq(encounterTransaction));
+
+        assertEquals(savedEncounterTransaction.getVisitUuid(), "visit-uuid");
+    }
+
+    @Test
+    public void shouldCreateNewVisitAndSetVisitLocationWhenThereIsNoActiveVisitInThatLocation() {
+
+        EncounterType encounterType = new EncounterType(1);
+        encounterType.setUuid("encType-invsgtn-uuid");
+
+        EncounterTransaction encounterTransaction = constructEncounterTransaction();
+        encounterTransaction.setVisitLocationUuid("visit-location-uuid");
+        encounterTransaction.setVisitUuid(null);
+        Encounter encounter = mock(Encounter.class);
+
+        Location location = new Location();
+        location.setName("hospital");
+        location.setUuid("visit-location-uuid-two");
+
+        Location visitLocation = new Location();
+        visitLocation.setName("hospital");
+        visitLocation.setUuid("visit-location-uuid");
+
+        Visit visit = new Visit();
+        visit.setUuid("visit-uuid");
+        visit.setLocation(location);
+        List visits = new ArrayList();
+        visits.add(visit);
+
+        encounterTransactionHandler = mock(EncounterTransactionHandler.class);
+        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+                Arrays.asList(encounterTransactionHandler));
+        when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
+        when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(visitLocation);
+        when(visitService.getVisitByUuid("visit-uuid")).thenReturn(visit);
+        when(visitService.getActiveVisitsByPatient(patient)).thenReturn(visits);
+
+        emrEncounterService.onStartup();
+        EncounterTransaction savedEncounterTransaction = emrEncounterService.save(encounterTransaction);
+
+        ArgumentCaptor<Visit> argumentCaptor = ArgumentCaptor.forClass(Visit.class);
+        verify(visitService).saveVisit(argumentCaptor.capture());
+
+        assertEquals(argumentCaptor.getValue().getLocation().getUuid(), "visit-location-uuid");
+        assertNotEquals(savedEncounterTransaction.getVisitUuid(), "visit-uuid");
+    }
+
+    @Test
+    public void shouldUseActiveVisitWithoutLocationToSaveIfEncounterParametersIsNotPassedWithVisitLocation() throws ParseException {
+        String encounterTypeUuid = "encounterTypeUuid";
+        EncounterType encounterType = new EncounterType();
+        encounterType.setUuid(encounterTypeUuid);
+
+        EncounterTransaction encounterTransaction = new EncounterTransaction();
+        encounterTransaction.setEncounterTypeUuid(encounterTypeUuid);
+
+        String newPatientUuid = "newPatientUuid";
+        encounterTransaction.setPatientUuid(newPatientUuid);
+        Patient patient = new Patient();
+        patient.setUuid(newPatientUuid);
+
+        Visit visit = new Visit();
+        visit.setPatient(patient);
+        String visitUuid = "visitUuid";
+        visit.setUuid(visitUuid);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        Date date = simpleDateFormat.parse("21-10-2016");
+        visit.setStartDatetime(date);
+
+        when(patientService.getPatientByUuid(newPatientUuid)).thenReturn(patient);
+        when(visitService.getActiveVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
+        when(encounterService.getEncounterTypeByUuid(encounterTypeUuid)).thenReturn(encounterType);
+
+        EncounterTransaction savedEncounterTransaction = emrEncounterService.save(encounterTransaction);
+        assertEquals(visitUuid, savedEncounterTransaction.getVisitUuid());
+    }
+
+    @Test
+    public void shouldCreateANewVisitWithoutLocationIfVisitLocationUuidIsNotPassedInEncounterTransactionAndNoOtherActiveVisitPresent() {
+        String encounterTypeUuid = "encounterTypeUuid";
+        EncounterType encounterType = new EncounterType();
+        encounterType.setUuid(encounterTypeUuid);
+
+        EncounterTransaction encounterTransaction = new EncounterTransaction();
+        encounterTransaction.setEncounterTypeUuid(encounterTypeUuid);
+
+        String newPatientUuid = "newPatientUuid";
+        encounterTransaction.setPatientUuid(newPatientUuid);
+        Patient patient = new Patient();
+        patient.setUuid(newPatientUuid);
+
+        when(patientService.getPatientByUuid(newPatientUuid)).thenReturn(patient);
+        when(visitService.getActiveVisitsByPatient(patient)).thenReturn(null);
+        when(encounterService.getEncounterTypeByUuid(encounterTypeUuid)).thenReturn(encounterType);
+
+        emrEncounterService.save(encounterTransaction);
+
+        ArgumentCaptor<Visit> argumentCaptor = ArgumentCaptor.forClass(Visit.class);
+        verify(visitService).saveVisit(argumentCaptor.capture());
+        verify(locationService, times(2)).getLocationByUuid(null);
+
+        assertNull(argumentCaptor.getValue().getLocation());
+    }
 }

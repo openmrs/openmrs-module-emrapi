@@ -59,6 +59,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
                 "\"encounterDateTime\" : \"" + encounterDateTimeString + "\", " +
+                "\"visitLocationUuid\": \"f1771d8e-bf1f-4dc5-957f-0d40a5eebf08\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\" }";
 
         EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
@@ -80,7 +81,8 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
 
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
-                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\" }";
+                "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\"," +
+                "\"visitLocationUuid\": \"f1771d8e-bf1f-4dc5-957f-0d40a5eebf08\" }";
 
         EncounterTransaction response = deserialize(handle(newPostRequest("/rest/emrapi/encounter", json)), EncounterTransaction.class);
 
@@ -104,6 +106,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         String encounterDateTime = "2005-01-02T00:00:00.000+0000";
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                         "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                        "\"visitLocationUuid\": \"f1771d8e-bf1f-4dc5-957f-0d40a5eebf08\", " +
                         "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                         "\"encounterDateTime\" : \"" + encounterDateTime + "\", " +
                         "\"observations\":[" +
@@ -146,6 +149,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         String observationTime = "2005-01-02T12:00:00.000+0000";
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"visitLocationUuid\": \"f1771d8e-bf1f-4dc5-957f-0d40a5eebf08\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\", " +
                 "\"encounterDateTime\" : \"" + encounterDateTime + "\", " +
                 "\"observations\":[" +
@@ -178,6 +182,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
 
         String json = "{ \"patientUuid\" : \"a76e8d23-0c38-408c-b2a8-ea5540f01b51\", " +
                 "\"visitTypeUuid\" : \"b45ca846-c79a-11e2-b0c0-8e397087571c\", " +
+                "\"visitLocationUuid\": \"f1771d8e-bf1f-4dc5-957f-0d40a5eebf08\", " +
                 "\"encounterTypeUuid\": \"2b377dba-62c3-4e53-91ef-b51c68899890\"," +
                 "\"encounterDateTime\" : \"2013-01-01T00:00:00.000+0000\", " +
                 "\"observations\":[" +
@@ -195,16 +200,17 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         Iterator<Obs> iterator = encounter.getObsAtTopLevel(false).iterator();
         
         Obs obs1 = iterator.next();
-        assertEquals("zf616900-5e7c-4667-9a7f-dcb260abf1de", obs1.getUuid());
-        assertEquals(new Double(100), obs1.getValueNumeric());
-        assertEquals("new c", obs1.getComment());
-        
-        Obs obs2 = iterator.next();
-        assertEquals("z9fb7f47-e80a-4056-9285-bd798be13c63", obs2.getUuid());
-        assertEquals(1, obs2.getGroupMembers().size());
-        Obs member = obs2.getGroupMembers().iterator().next();
+        assertEquals("z9fb7f47-e80a-4056-9285-bd798be13c63", obs1.getUuid());
+        assertEquals(1, obs1.getGroupMembers().size());
+        Obs member = obs1.getGroupMembers().iterator().next();
         assertEquals(new Double(20), member.getValueNumeric());
         assertEquals("new gc", member.getComment());
+
+        Obs obs2 = iterator.next();
+        assertEquals("zf616900-5e7c-4667-9a7f-dcb260abf1de", obs2.getUuid());
+        assertEquals(new Double(100), obs2.getValueNumeric());
+        assertEquals("new c", obs2.getComment());
+        
     }
 
     @Test
@@ -259,7 +265,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         assertNotEquals(encounter1Response.getEncounterUuid(), encounter2Response.getEncounterUuid());
 
         List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter",
-                new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("encounterDate", "2005-01-01"), 
+                new Parameter[]{new Parameter("visitUuid", visitUuid), new Parameter("encounterDate", "2005-01-01"),
                 		new Parameter("patientUuid", "a76e8d23-0c38-408c-b2a8-ea5540f01b51"),
                 		new Parameter("visitTypeUuids", "b45ca846-c79a-11e2-b0c0-8e397087571c"),
                 		new Parameter("encounterTypeUuids", "2b377dba-62c3-4e53-91ef-b51c68899891"),
@@ -367,7 +373,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         String visitUuid = encounter1Response.getVisitUuid();
 
         List<EncounterTransaction> encounterTransactions = deserialize(handle(newGetRequest("/rest/emrapi/encounter",
-                new Parameter[]{new Parameter("visitUuid", visitUuid), 
+                new Parameter[]{new Parameter("visitUuid", visitUuid),
                 		new Parameter("patientUuid", "a76e8d23-0c38-408c-b2a8-ea5540f01b51"),
                 		new Parameter("includeAll", "true")})), new TypeReference<List<EncounterTransaction>>() {});
 
