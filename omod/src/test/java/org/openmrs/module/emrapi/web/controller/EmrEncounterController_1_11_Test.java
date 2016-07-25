@@ -17,6 +17,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.type.TypeReference;
 import org.junit.Test;
 import org.openmrs.*;
+import org.openmrs.api.ObsService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
@@ -33,6 +34,8 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
 
     @Autowired
     private VisitService visitService;
+    @Autowired
+    private ObsService obsService;
     private String dateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     @Test
@@ -196,21 +199,24 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         Visit visit = visitService.getVisitByUuid(response.getVisitUuid());
         Encounter encounter = (Encounter) visit.getEncounters().toArray()[0];
 
-        assertEquals(2, encounter.getObsAtTopLevel(false).size());
-        Iterator<Obs> iterator = encounter.getObsAtTopLevel(false).iterator();
-        
-        Obs obs1 = iterator.next();
-        assertEquals("z9fb7f47-e80a-4056-9285-bd798be13c63", obs1.getUuid());
+        Set<Obs> obsAtTopLevel = encounter.getObsAtTopLevel(false);
+        assertEquals(2, obsAtTopLevel.size());
+
+        List<String> allObsUuids = getAllObsUuids(obsAtTopLevel);
+        assertTrue(allObsUuids.contains("z9fb7f47-e80a-4056-9285-bd798be13c63"));
+        assertTrue(allObsUuids.contains("zf616900-5e7c-4667-9a7f-dcb260abf1de"));
+
+        Obs obs1 = obsService.getObsByUuid("z9fb7f47-e80a-4056-9285-bd798be13c63");
         assertEquals(1, obs1.getGroupMembers().size());
         Obs member = obs1.getGroupMembers().iterator().next();
         assertEquals(new Double(20), member.getValueNumeric());
         assertEquals("new gc", member.getComment());
 
-        Obs obs2 = iterator.next();
+        Obs obs2 = obsService.getObsByUuid("zf616900-5e7c-4667-9a7f-dcb260abf1de");
         assertEquals("zf616900-5e7c-4667-9a7f-dcb260abf1de", obs2.getUuid());
         assertEquals(new Double(100), obs2.getValueNumeric());
         assertEquals("new c", obs2.getComment());
-        
+
     }
 
     @Test
@@ -379,4 +385,13 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
 
         assertEquals(1, encounterTransactions.size());
     }
+
+    private List<String> getAllObsUuids(Set<Obs> obsAtTopLevel) {
+        ArrayList<String> obsUuids = new ArrayList<String>();
+        for (Obs observation : obsAtTopLevel) {
+            obsUuids.add(observation.getUuid());
+        }
+        return obsUuids;
+    }
+
 }
