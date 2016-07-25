@@ -147,7 +147,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         EncounterParameters encounterParameters = EncounterParameters.instance().
                             setPatient(patient).setEncounterType(encounterType).setProviders(providers).setLocation(location);
 
-        Visit visit = getActiveVisit(patient);
+        Visit visit = getActiveVisit(patient, null);
 
         if (visit == null) {
             return new EncounterTransaction();
@@ -212,9 +212,22 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         return encounters;
     }
 
-    private Visit getActiveVisit(Patient patient) {
-        List<Visit> activeVisitsByPatient = visitService.getActiveVisitsByPatient(patient);
-        return activeVisitsByPatient != null && !activeVisitsByPatient.isEmpty() ? activeVisitsByPatient.get(0) : null;
+    private Visit getVisitBasedOnLocation(String locationUuid, List<Visit> activeVisits) {
+        for (Visit visit : activeVisits) {
+            Location visitLocation = visit.getLocation();
+            if (visitLocation != null && (visitLocation.getUuid()).equals(locationUuid)){
+                return visit;
+            }
+        }
+        return null;
+    }
+
+    private Visit getActiveVisit(Patient patient, String visitLocationUuid) {
+        List<Visit> activeVisits = visitService.getActiveVisitsByPatient(patient);
+        if (visitLocationUuid != null) {
+            return getVisitBasedOnLocation(visitLocationUuid, activeVisits);
+        }
+        return activeVisits != null && !activeVisits.isEmpty() ? activeVisits.get(0) : null;
     }
 
     private Encounter findOrCreateEncounter(EncounterTransaction encounterTransaction, Patient patient, Visit visit) {
@@ -275,16 +288,18 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
     private Visit findOrCreateVisit(EncounterTransaction encounterTransaction, Patient patient) {
 
         // return the visit that was explicitly asked for in the EncounterTransaction Object
-        Location location = locationService.getLocationByUuid(encounterTransaction.getVisitLocationUuid());
         if(encounterTransaction.getVisitUuid() != null && !encounterTransaction.getVisitUuid().isEmpty()){
             return visitService.getVisitByUuid(encounterTransaction.getVisitUuid());
         }
 
-        Visit activeVisit = getActiveVisit(patient);
-        if (activeVisit != null){
+        String visitLocationUuid = encounterTransaction.getVisitLocationUuid();
+        Visit activeVisit = getActiveVisit(patient, visitLocationUuid);
+
+        if(activeVisit != null) {
             return activeVisit;
         }
 
+        Location location = locationService.getLocationByUuid(visitLocationUuid);
         Visit visit = new Visit();
         visit.setLocation(location);
         visit.setPatient(patient);
@@ -294,5 +309,4 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         visit.setUuid(UUID.randomUUID().toString());
         return visit;
     }
-
 }
