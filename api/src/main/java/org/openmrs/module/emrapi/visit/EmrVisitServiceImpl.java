@@ -36,4 +36,6 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
             throw new VisitNotFoundException("Visit by uuid "+ visitRequest.getVisitUuid() + " does not exist");
         return visitResponseMapper.map(visit);
     }
+
+
 }

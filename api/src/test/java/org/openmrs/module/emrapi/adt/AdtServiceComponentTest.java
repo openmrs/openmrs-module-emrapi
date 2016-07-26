@@ -43,6 +43,7 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
+import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,9 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     VisitService visitService;
+
+    @Autowired
+    EmrVisitService emrVisitService;
 
     @Autowired
     ConceptService conceptService;
@@ -170,7 +174,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertThat(admitEncounter.getLocation(), is(inpatientWard));
         assertThat(admitEncounter, hasProviders(providers));
         assertThat(admitEncounter.getAllObs().size(), is(0));
-        assertTrue(new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
+        assertTrue( new VisitDomainWrapper(admitEncounter.getVisit(), emrApiProperties).isAdmitted());
 
         // TODO transfer the patient within the hospital
 
@@ -402,12 +406,12 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         service.closeInactiveVisits();
 
-        // all these visits should now have stop datetime
+        // only visits that have a location that is tagged "Visit Location" will be closed
         assertThat(visitService.getVisit(1).getStopDatetime(), notNullValue());
-        assertThat(visitService.getVisit(2).getStopDatetime(), notNullValue());
-        assertThat(visitService.getVisit(3).getStopDatetime(), notNullValue());
-        assertThat(visitService.getVisit(4).getStopDatetime(), notNullValue());
-        assertThat(visitService.getVisit(5).getStopDatetime(), notNullValue());
+        assertThat(visitService.getVisit(2).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(3).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(4).getStopDatetime(), nullValue());
+        assertThat(visitService.getVisit(5).getStopDatetime(), nullValue());
 
         // should ignore voided visits
         assertThat(visitService.getVisit(6).getStopDatetime(), nullValue());
@@ -468,6 +472,13 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         assertNotNull(activeVisit);
     }
 
+    @Test
+    public void test_shouldNotCloseVisitOpenedInDifferentLocation() throws Exception {
+        executeDataSet("visitLocationDataSetUp.xml");
+        service.closeInactiveVisits();
+
+        assertNull(visitService.getVisit(1015).getStopDatetime());
+    }
 
     /**
      * I'm sure there's a standard matcher for this, but sometimes we run into bugs comparing a Date to a java.sql.Timestamp

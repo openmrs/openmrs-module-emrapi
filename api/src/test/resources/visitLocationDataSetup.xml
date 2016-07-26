@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<dataset>
+
+    <person person_id="109" gender="M" dead="false" creator="1" birthdate_estimated="0"
+            date_created="2008-08-15 15:57:09.0" voided="false" void_reason=""
+            uuid="86s04d42-3ca8-11e3-bf2b-0xjk09861s97"/>
+    <person_name person_name_id="109" person_id="109" preferred="true" prefix="" given_name="scott" middle_name=""
+                 family_name="clark" family_name_suffix="" creator="1" date_created="2005-09-22 00:00:00.0"
+                 voided="false" void_reason="" uuid="Xv9e3a7b-6482-487d-9jke-c07b123CxfP8"/>
+
+
+    <patient patient_id="109" creator="1" date_created="2015-01-01 00:00:00"  voided="false"/>
+
+    <location location_id="1901" name="Location tagged to visit" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="f1771d8e-bf1f-4dc5-957f-9d40a5eebf08"/>
+    <location location_id="1902" name="Location tagged to Login" creator="1" date_created="2005-01-01 00:00:00.0" parent_location= "1" retired="false" uuid="f1771doe-bf1f-4dc5-957f-9d40a5eebk08"/>
+    <location location_id="1903" name="Other Location" creator="1" date_created="2005-01-01 00:00:00.0"  retired="false" uuid="f17u1d8e-bf1f-4dc5-957f-9d40a5eebk08"/>
+    <location location_id="1904" name="root location" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="f1771doe-bf3f-4fc5-957f-9d40a5eebk08"/>
+
+    <location_tag location_tag_id="23" name="Visit Location"
+                  description="Visits are only allowed to happen at locations tagged with this location tag or at locations that descend from a location tagged with this tag."
+                  creator="1" date_created="2012-10-23 16:13:45 " retired="0"
+                  uuid="0967d73d-f3c9-492b-abed-35asd8610a94"/>
+    <location_tag location_tag_id="24" name="Login Location" description=""
+                  creator="1" date_created="2012-10-23 16:13:45 " retired="0"
+                  uuid="0967d73d-f3c9-492b-abed-356478610sad6"/>
+
+    <location_tag_map location_id="1901" location_tag_id="23"/>
+    <location_tag_map location_id="1902" location_tag_id="24"/>
+    <location_tag_map location_id="1904" location_tag_id="24"/>
+
+
+    <visit visit_id="1014" patient_id="109" visit_type_id="1" date_started="2013-04-04 00:00:00.0"  location_id="1901" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="1esd5218-6b78-11e0-93c3-18a905e044dc" />
+    <visit visit_id="1015" patient_id="109" visit_type_id="1" date_started="2013-04-01 00:00:00.0"  location_id="1903" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="4s663896-6b78-11e0-93c3-18a9s5e044dc" />
+    <visit visit_id="1016" patient_id="109" visit_type_id="1" date_started="2013-04-01 00:00:00.0"  location_id="1904" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="4f663896-6b78-11e0-93c3-18a9099e04dc" />
+
+</dataset>
