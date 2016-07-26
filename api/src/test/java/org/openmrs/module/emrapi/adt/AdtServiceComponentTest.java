@@ -474,7 +474,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void test_shouldNotCloseVisitOpenedInDifferentLocation() throws Exception {
-        executeDataSet("visitLocationDataSetUp.xml");
+        executeDataSet("visitLocationDataSetup.xml");
         service.closeInactiveVisits();
 
         assertNull(visitService.getVisit(1015).getStopDatetime());
