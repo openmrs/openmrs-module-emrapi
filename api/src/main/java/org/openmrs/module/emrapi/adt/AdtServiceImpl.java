@@ -20,6 +20,7 @@ import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Location;
+import org.openmrs.LocationTag;
 import org.openmrs.Obs;
 import org.openmrs.Order;
 import org.openmrs.Patient;
@@ -28,7 +29,6 @@ import org.openmrs.PersonAttributeType;
 import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.Visit;
-import org.openmrs.LocationTag;
 import org.openmrs.api.APIException;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
@@ -44,7 +44,6 @@ import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
-import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
 import org.openmrs.util.OpenmrsUtil;
@@ -62,7 +61,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 
 
 public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
@@ -143,7 +141,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         return locationService.getLocationsByTag(visitLocationTag);
     }
 
-    private boolean shouldBeClosed(Visit visit) {
+    @Override
+    public boolean shouldBeClosed(Visit visit) {
 
         if (visit.getStopDatetime() != null) {
             return false;  // already closed

@@ -62,6 +62,15 @@ public interface AdtService extends OpenmrsService {
      */
     VisitDomainWrapper getActiveVisit(Patient patient, Location department);
 
+
+    /**
+     * Returns true/false as to whether the specified visit should be closed based on the built-in EMR-API logic
+     *
+     * @param visit
+     * @return
+     */
+    boolean shouldBeClosed(Visit visit);
+
     /**
      * Close the patient's active visit at the given location
      *
