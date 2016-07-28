@@ -26,7 +26,7 @@
         "uuid": "12129630-b698-11e2-9e96-0800200c9a66",
         "name": "disposition.death",
         "type": "DISCHARGE",
-        "conceptCode": "org.openmrs.module.emrapi:Discharge",
+        "conceptCode": "org.openmrs.module.emrapi:Discharged",
         "actions": [
             "closeCurrentVisitAction"
         ],
