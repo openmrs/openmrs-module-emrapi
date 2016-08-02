@@ -29,7 +29,7 @@ import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
-import org.openmrs.module.emrapi.utils.ModuleProperties;
+import org.openmrs.module.metadatamapping.util.ModuleProperties;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -46,16 +46,23 @@ import java.util.List;
 @Component("emrApiProperties")
 public class EmrApiProperties extends ModuleProperties {
 
+	@Override
+	public String getMetadataSourceName() {
+		return EmrApiConstants.EMR_METADATA_SOURCE_NAME;
+	}
+
     public Location getUnknownLocation() {
-		return getLocationByGlobalProperty(EmrApiConstants.GP_UNKNOWN_LOCATION);
+		return getEmrApiMetadataByCode(Location.class, EmrApiConstants.GP_UNKNOWN_LOCATION);
 	}
 
 	public Provider getUnknownProvider() {
-		return getProviderByGlobalProperty(EmrApiConstants.GP_UNKNOWN_PROVIDER);
+		//have to use ProviderService because it returns objects of class org.openmrs.module.providermanagement.Provider
+		//casted to org.openmrs.Provider, which MetadataMappingService can't handle
+		return providerService.getProviderByUuid(getEmrApiMetadataUuidByCode(EmrApiConstants.GP_UNKNOWN_PROVIDER));
 	}
 
 	public EncounterRole getOrderingProviderEncounterRole() {
-		return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_ORDERING_PROVIDER_ENCOUNTER_ROLE);
+		return getEmrApiMetadataByCode(EncounterRole.class, EmrApiConstants.GP_ORDERING_PROVIDER_ENCOUNTER_ROLE);
 	}
 
 	public Role getFullPrivilegeLevel() {
@@ -63,16 +70,16 @@ public class EmrApiProperties extends ModuleProperties {
 	}
 
 	public EncounterType getCheckInEncounterType() {
-		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_CHECK_IN_ENCOUNTER_TYPE);
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_CHECK_IN_ENCOUNTER_TYPE);
 	}
 
 	public EncounterRole getCheckInClerkEncounterRole() {
-		return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CHECK_IN_CLERK_ENCOUNTER_ROLE);
+		return getEmrApiMetadataByCode(EncounterRole.class, EmrApiConstants.GP_CHECK_IN_CLERK_ENCOUNTER_ROLE);
 	}
 
     public EncounterType getVisitNoteEncounterType() {
         try {
-            return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_VISIT_NOTE_ENCOUNTER_TYPE);
+            return  getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_VISIT_NOTE_ENCOUNTER_TYPE);
         }
         // hack for implementations who are still using old global property "consultEncounterType"
         catch (IllegalStateException ex) {
@@ -82,35 +89,35 @@ public class EmrApiProperties extends ModuleProperties {
 
     @Deprecated // use visit note encounter type, as "Visit Note" is the proper naming convention
 	public EncounterType getConsultEncounterType() {
-		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_CONSULT_ENCOUNTER_TYPE);
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_CONSULT_ENCOUNTER_TYPE);
 	}
 
 	public EncounterRole getClinicianEncounterRole() {
-		return getEncounterRoleByGlobalProperty(EmrApiConstants.GP_CLINICIAN_ENCOUNTER_ROLE);
+		return getEmrApiMetadataByCode(EncounterRole.class, EmrApiConstants.GP_CLINICIAN_ENCOUNTER_ROLE);
 	}
 
 	public EncounterType getAdmissionEncounterType() {
-		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE, false);
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_ADMISSION_ENCOUNTER_TYPE, false);
 	}
 
 	public EncounterType getExitFromInpatientEncounterType() {
-		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE, false);
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_EXIT_FROM_INPATIENT_ENCOUNTER_TYPE, false);
 	}
 
 	public EncounterType getTransferWithinHospitalEncounterType() {
-		return getEncounterTypeByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE, false);
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE, false);
 	}
 
 	public Form getAdmissionForm() {
-		return getFormByGlobalProperty(EmrApiConstants.GP_ADMISSION_FORM);
+		return getEmrApiMetadataByCode(Form.class, EmrApiConstants.GP_ADMISSION_FORM, false);
 	}
 
 	public Form getDischargeForm() {
-		return getFormByGlobalProperty(EmrApiConstants.GP_EXIT_FROM_INPATIENT_FORM);
+		return getEmrApiMetadataByCode(Form.class, EmrApiConstants.GP_EXIT_FROM_INPATIENT_FORM, false);
 	}
 
 	public Form getTransferForm() {
-		return getFormByGlobalProperty(EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_FORM);
+		return getEmrApiMetadataByCode(Form.class, EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_FORM, false);
 	}
 
 	public int getVisitExpireHours() {
@@ -118,7 +125,7 @@ public class EmrApiProperties extends ModuleProperties {
 	}
 
 	public VisitType getAtFacilityVisitType() {
-		return getVisitTypeByGlobalProperty(EmrApiConstants.GP_AT_FACILITY_VISIT_TYPE);
+		return getEmrApiMetadataByCode(VisitType.class, EmrApiConstants.GP_AT_FACILITY_VISIT_TYPE);
 	}
 
 	public LocationTag getSupportsVisitsLocationTag() {
@@ -165,11 +172,11 @@ public class EmrApiProperties extends ModuleProperties {
 	}
 
 	public PatientIdentifierType getPrimaryIdentifierType() {
-		return getPatientIdentifierTypeByGlobalProperty(EmrApiConstants.PRIMARY_IDENTIFIER_TYPE, true);
+		return getEmrApiMetadataByCode(PatientIdentifierType.class, EmrApiConstants.PRIMARY_IDENTIFIER_TYPE, true);
 	}
 
 	public List<PatientIdentifierType> getExtraPatientIdentifierTypes() {
-		return getPatientIdentifierTypesByGlobalProperty(EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES, false);
+		return getPatientIdentifierTypesByCode(EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES);
 	}
 
 	public DiagnosisMetadata getDiagnosisMetadata() {
@@ -226,9 +233,9 @@ public class EmrApiProperties extends ModuleProperties {
 	 * @return
 	 */
 	public Collection<Concept> getDiagnosisSets() {
-		String gp = getGlobalProperty(EmrApiConstants.GP_DIAGNOSIS_SET_OF_SETS, false);
-		if (StringUtils.hasText(gp)) {
-			Concept setOfSets = conceptService.getConceptByUuid(gp);
+		String diagnosisSetsUuid = getGlobalProperty(EmrApiConstants.GP_DIAGNOSIS_SET_OF_SETS, true);
+		if (StringUtils.hasText(diagnosisSetsUuid)) {
+			Concept setOfSets = conceptService.getConceptByUuid(diagnosisSetsUuid);
 			if (setOfSets == null) {
 				throw new IllegalStateException("Configuration required: " + EmrApiConstants.GP_DIAGNOSIS_SET_OF_SETS);
 			}
@@ -280,7 +287,7 @@ public class EmrApiProperties extends ModuleProperties {
             File appDataDirectory = new File(OpenmrsUtil.getApplicationDataDirectory());
             personImagesDir =  appDataDirectory.getAbsolutePath() + "/person_images";
         }
-        
+
         return new File(personImagesDir);
     }
 }

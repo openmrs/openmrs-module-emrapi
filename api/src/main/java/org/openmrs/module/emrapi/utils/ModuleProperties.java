@@ -48,8 +48,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Helper class that lets modules centralize their configuration details. See EmrProperties for an example.
+ * Helper class that lets modules centralize their configuration details.
+ * Deprecated, replaced with {@link org.openmrs.module.metadatamapping.util.ModuleProperties which supports mappings}
  */
+@Deprecated
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public abstract class ModuleProperties {
 
@@ -300,32 +302,32 @@ public abstract class ModuleProperties {
         return globalProperty;
     }
 
-	protected Collection<Concept> getConceptsByGlobalProperty(String gpName) {
-		String gpValue = getGlobalProperty(gpName, false);
+    protected Collection<Concept> getConceptsByGlobalProperty(String gpName) {
+        String gpValue = getGlobalProperty(gpName, false);
 
-		if (!org.springframework.util.StringUtils.hasText(gpValue)) {
-			return Collections.emptyList();
-		}
+        if (!org.springframework.util.StringUtils.hasText(gpValue)) {
+            return Collections.emptyList();
+        }
 
-		List<Concept> result = new ArrayList<Concept>();
+        List<Concept> result = new ArrayList<Concept>();
 
-		String[] concepts = gpValue.split("\\,");
-		for (String concept : concepts) {
-			Concept foundConcept = conceptService.getConceptByUuid(concept);
-			if (foundConcept == null) {
-				String[] mapping = concept.split("\\:");
-				if (mapping.length == 2) {
-					foundConcept = conceptService.getConceptByMapping(mapping[0], mapping[1]);
-				}
-			}
+        String[] concepts = gpValue.split("\\,");
+        for (String concept : concepts) {
+            Concept foundConcept = conceptService.getConceptByUuid(concept);
+            if (foundConcept == null) {
+                String[] mapping = concept.split("\\:");
+                if (mapping.length == 2) {
+                    foundConcept = conceptService.getConceptByMapping(mapping[0], mapping[1]);
+                }
+            }
 
-			if (foundConcept != null) {
-				result.add(foundConcept);
-			} else {
-				throw new IllegalStateException("Invalid configuration: concept '" + concept + "' defined in " + gpName + " does not exist");
-			}
-		}
+            if (foundConcept != null) {
+                result.add(foundConcept);
+            } else {
+                throw new IllegalStateException("Invalid configuration: concept '" + concept + "' defined in " + gpName + " does not exist");
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 }
