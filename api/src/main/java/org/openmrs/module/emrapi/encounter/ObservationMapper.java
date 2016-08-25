@@ -16,13 +16,17 @@ package org.openmrs.module.emrapi.encounter;
 import org.openmrs.Concept;
 import org.openmrs.Drug;
 import org.openmrs.Obs;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 
+@Component("observationMapper")
+@OpenmrsProfile(openmrsVersion = "[1.9.* - 1.11.*]")
 public class ObservationMapper {
     private ConceptMapper conceptMapper;
     private DrugMapper drugMapper;
