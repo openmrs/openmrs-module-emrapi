@@ -295,12 +295,6 @@
 
     <bean id="conceptMapper" class="org.openmrs.module.emrapi.encounter.ConceptMapper"/>
 
-    <bean id="observationMapper" class="org.openmrs.module.emrapi.encounter.ObservationMapper">
-        <constructor-arg name="conceptMapper" ref="conceptMapper"/>
-        <constructor-arg name="drugMapper" ref="drugMapper"/>
-        <constructor-arg name="userMapper" ref="userMapper"/>
-    </bean>
-
     <bean id="diagnosisMapper" class="org.openmrs.module.emrapi.encounter.DiagnosisMapper">
     </bean>
 
