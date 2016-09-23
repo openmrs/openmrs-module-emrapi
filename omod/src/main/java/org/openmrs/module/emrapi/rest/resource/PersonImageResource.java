@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/personimage", supportedClass = PersonImage.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*"})
+@Resource(name = RestConstants.VERSION_1 + "/personimage", supportedClass = PersonImage.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*"})
 public class PersonImageResource extends DelegatingCrudResource<PersonImage> {
 
     @Override
