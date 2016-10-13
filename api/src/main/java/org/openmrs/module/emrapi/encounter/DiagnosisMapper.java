@@ -53,11 +53,15 @@ public class DiagnosisMapper {
             encounterDiagnosis.setCodedAnswer(conceptMapper.map(codedOrFreeTextAnswer.getCodedAnswer()));
         }
         encounterDiagnosis.setOrder(String.valueOf(diagnosis.getOrder()));
-        encounterDiagnosis.setDiagnosisDateTime(diagnosis.getExistingObs().getObsDatetime());
-        encounterDiagnosis.setExistingObs(diagnosis.getExistingObs() != null ? diagnosis.getExistingObs().getUuid() : null);
+        Obs existingObs = diagnosis.getExistingObs();
+        if(existingObs != null) {
+            encounterDiagnosis.setDiagnosisDateTime(existingObs.getObsDatetime());
+            encounterDiagnosis.setExistingObs(existingObs.getUuid());
 
-        Set<EncounterProvider> encounterProviders = diagnosis.getExistingObs().getEncounter().getEncounterProviders();
-        encounterDiagnosis.setProviders(diagnosis.getExistingObs() != null ? encounterProviderMapper.convert(encounterProviders) : null);
+            Set<EncounterProvider> encounterProviders = existingObs.getEncounter().getEncounterProviders();
+            encounterDiagnosis.setProviders(encounterProviderMapper.convert(encounterProviders));
+            encounterDiagnosis.setComments(existingObs.getComment());
+        }
 
         return encounterDiagnosis;
     }

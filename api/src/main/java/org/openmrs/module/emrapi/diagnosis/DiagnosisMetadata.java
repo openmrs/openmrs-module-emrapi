@@ -100,11 +100,12 @@ public class DiagnosisMetadata extends ConceptSetDescriptor {
         Concept orderAnswer = findAnswer(diagnosisOrderConcept, diagnosis.getOrder().getCodeInEmrConceptSource());
         Concept certaintyAnswer = findAnswer(diagnosisCertaintyConcept, diagnosis.getCertainty().getCodeInEmrConceptSource());
 
-        if (diagnosis.getExistingObs() != null) {
-            setCodedMember(diagnosis.getExistingObs(), diagnosisOrderConcept, orderAnswer, null);
-            setCodedMember(diagnosis.getExistingObs(), diagnosisCertaintyConcept, certaintyAnswer, null);
-            setCodedOrFreeTextMember(diagnosis.getExistingObs(), diagnosis.getDiagnosis(), codedDiagnosisConcept, nonCodedDiagnosisConcept);
-            return diagnosis.getExistingObs();
+        Obs existingObs = diagnosis.getExistingObs();
+        if (existingObs != null) {
+            setCodedMember(existingObs, diagnosisOrderConcept, orderAnswer, null);
+            setCodedMember(existingObs, diagnosisCertaintyConcept, certaintyAnswer, null);
+            setCodedOrFreeTextMember(existingObs, diagnosis.getDiagnosis(), codedDiagnosisConcept, nonCodedDiagnosisConcept);
+            return existingObs;
         }
         else {
             Obs order = buildObsFor(diagnosisOrderConcept, orderAnswer, null);

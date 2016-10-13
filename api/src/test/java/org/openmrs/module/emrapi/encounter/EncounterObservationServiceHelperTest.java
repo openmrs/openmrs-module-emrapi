@@ -248,7 +248,9 @@ public class EncounterObservationServiceHelperTest {
     public void shouldSaveDiagnosisAsAnObservationWhenPassedTheUuidOfDiagnosisConcept() {
         String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
         List<EncounterTransaction.Diagnosis> diagnosises = asList(
-                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY").setCodedAnswer(new EncounterTransaction.Concept(diagnosisConceptUuid, "conceptName"))
+                new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY")
+                        .setComments("comments")
+                        .setCodedAnswer(new EncounterTransaction.Concept(diagnosisConceptUuid, "conceptName"))
         );
 
         Encounter encounter = new Encounter();
@@ -269,6 +271,7 @@ public class EncounterObservationServiceHelperTest {
         assertEquals(1, parentObservations.size());
         Obs parent = parentObservations.iterator().next();
         assertTrue(parent.isObsGrouping());
+        assertEquals("comments", parent.getComment());
         int children = parent.getGroupMembers().size();
         assertEquals(3, children);
         ArgumentCaptor<org.openmrs.module.emrapi.diagnosis.Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(org.openmrs.module.emrapi.diagnosis.Diagnosis.class);

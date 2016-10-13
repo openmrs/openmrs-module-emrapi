@@ -780,6 +780,7 @@ public class EncounterTransaction {
         private Date diagnosisDateTime;
         private boolean voided;
         private String voidReason;
+        private String comments;
         private Set<Provider> providers = new HashSet<Provider>();
 
         public String getOrder() {
@@ -859,6 +860,15 @@ public class EncounterTransaction {
 
         public Set<Provider> getProviders() {
             return providers;
+        }
+
+        public String getComments() {
+            return comments;
+        }
+
+        public Diagnosis setComments(String comments) {
+            this.comments = comments;
+            return this;
         }
     }
 
