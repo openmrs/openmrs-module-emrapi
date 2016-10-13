@@ -70,6 +70,7 @@ public class EncounterObservationServiceHelper {
             Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
             Date diagnosisDateTime = getCurrentDateIfNull(diagnosisRequest.getDiagnosisDateTime());
             obs.setObsDatetime(diagnosisDateTime);
+            obs.setComment(diagnosisRequest.getComments());
             if (diagnosisRequest.isVoided()) {
                 voidDiagnosisObservation(diagnosisRequest, obs);
             }
