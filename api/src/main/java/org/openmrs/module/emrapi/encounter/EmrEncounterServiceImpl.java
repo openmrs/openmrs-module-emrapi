@@ -14,6 +14,7 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.FlushMode;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -30,6 +31,7 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.db.DbSessionUtil;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.EncounterMatcherNotFoundException;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
@@ -106,6 +108,22 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
     @Override
     public EncounterTransaction save(EncounterTransaction encounterTransaction) {
+
+        EncounterTransaction updatedEncounterTransaction = null;
+
+        FlushMode flushMode = DbSessionUtil.getCurrentFlushMode();
+        DbSessionUtil.setManualFlushMode();
+
+        try {
+            updatedEncounterTransaction = saveInternal(encounterTransaction);
+        } finally {
+            DbSessionUtil.setFlushMode(flushMode);
+        }
+
+        return updatedEncounterTransaction;
+    }
+
+        private EncounterTransaction saveInternal(EncounterTransaction encounterTransaction) {
         Patient patient = patientService.getPatientByUuid(encounterTransaction.getPatientUuid());
         Visit visit = findOrCreateVisit(encounterTransaction, patient);
         Encounter encounter = findOrCreateEncounter(encounterTransaction, patient, visit);
