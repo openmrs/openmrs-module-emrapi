@@ -369,4 +369,11 @@
         </property>
     </bean>
 
+    <bean id="dbSessionDAO" class="org.openmrs.module.emrapi.db.DbSessionDAOImpl">
+        <property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
+    </bean>
+    <bean id="dbSessionUtil" class="org.openmrs.module.emrapi.db.DbSessionUtil">
+        <property name="dbSessionDAO"><ref bean="dbSessionDAO"/></property>
+    </bean>
+
 </beans>

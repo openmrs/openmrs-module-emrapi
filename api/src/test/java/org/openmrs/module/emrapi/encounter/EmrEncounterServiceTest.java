@@ -21,6 +21,8 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.emrapi.db.DbSessionDAO;
+import org.openmrs.module.emrapi.db.DbSessionUtil;
 import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
@@ -81,6 +83,9 @@ public class EmrEncounterServiceTest {
     private EncounterProviderServiceHelper encounterProviderServiceHelper;
 
     @Mock
+    private DbSessionDAO dbSessionDAO;
+
+    @Mock
     private EmrOrderService orderService;
 
     private EmrEncounterServiceImpl emrEncounterService;
@@ -107,7 +112,7 @@ public class EmrEncounterServiceTest {
         EncounterType encounterType = new EncounterType(1);
         encounterType.setUuid("encType-invsgtn-uuid");
         when(encounterService.getEncounterTypeByUuid("encType-invsgtn-uuid")).thenReturn(encounterType);
-
+        DbSessionUtil.setDAO(dbSessionDAO);
         PowerMockito.mockStatic(Context.class);
     }
 
