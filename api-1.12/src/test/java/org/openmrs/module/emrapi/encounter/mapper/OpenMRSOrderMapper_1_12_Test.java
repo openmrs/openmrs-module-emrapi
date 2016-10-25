@@ -24,6 +24,7 @@ import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.Provider;
 import org.openmrs.Order;
+import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.encounter.builder.OrderBuilder;
@@ -69,6 +70,7 @@ public class OpenMRSOrderMapper_1_12_Test {
 
         EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
         etOrder.setConcept(blood);
+        etOrder.setUrgency("STAT");
         etOrder.setDateCreated(currentDate);
 
         OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService,conceptService);
@@ -76,8 +78,23 @@ public class OpenMRSOrderMapper_1_12_Test {
         Order order = orderMapper.map(etOrder, encounter);
 
         Assert.assertEquals(encounter, order.getEncounter());
+        Assert.assertEquals(Order.Urgency.STAT, order.getUrgency());
         Assert.assertEquals(mrsBloodConcept, order.getConcept());
         Assert.assertEquals(provider, order.getOrderer());
+    }
+
+    @Test(expected = APIException.class)
+    public void shouldThrowExceptionForInvalidUrgencyType() throws Exception {
+        Provider provider = mock(Provider.class);
+        handleEncounterProvider(provider);
+
+        EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
+        etOrder.setUrgency("STT");
+
+        OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService,conceptService);
+
+        orderMapper.map(etOrder, encounter);
+
     }
 
     @Test

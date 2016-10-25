@@ -620,6 +620,15 @@ public class EncounterTransaction {
         private String action;
         private String commentToFulfiller;
         private Date autoExpireDate;
+        private String urgency;
+
+        public void setUrgency(String urgency) {
+            this.urgency = urgency;
+        }
+
+        public String getUrgency() {
+            return urgency;
+        }
 
         public Date getAutoExpireDate() {
             return autoExpireDate;

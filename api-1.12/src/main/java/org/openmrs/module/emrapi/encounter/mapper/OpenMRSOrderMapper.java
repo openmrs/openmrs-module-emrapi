@@ -43,8 +43,8 @@ public class OpenMRSOrderMapper {
     public Order map(EncounterTransaction.Order order, Encounter encounter) {
 
         Order openMRSOrder = createOrder(order);
+        openMRSOrder.setUrgency(getOrderUrgency(order));
         openMRSOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
-
         openMRSOrder.setEncounter(encounter);
         openMRSOrder.setAutoExpireDate(order.getAutoExpireDate());
         openMRSOrder.setCommentToFulfiller(order.getCommentToFulfiller());
@@ -52,6 +52,17 @@ public class OpenMRSOrderMapper {
         openMRSOrder.setOrderer(getProviderForOrders(encounter));
 
         return openMRSOrder;
+    }
+
+    private Order.Urgency getOrderUrgency(EncounterTransaction.Order order) {
+        try {
+            if (order.getUrgency() != null) {
+                return Order.Urgency.valueOf(order.getUrgency());
+            }
+        } catch (Exception e) {
+            throw new APIException("Invalid urgency type " + order.getUrgency());
+        }
+        return Order.Urgency.ROUTINE;
     }
 
     private Order createOrder(EncounterTransaction.Order order) {
