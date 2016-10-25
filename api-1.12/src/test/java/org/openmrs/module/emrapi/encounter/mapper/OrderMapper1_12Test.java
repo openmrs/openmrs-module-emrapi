@@ -86,7 +86,7 @@ public class OrderMapper1_12Test {
     @Test
     public void shouldMapNewOrder() throws ParseException, NoSuchFieldException, IllegalAccessException {
 
-        Order openMrsOrder = order("boil in water", "comments", "ORD-99", "ORD-100", ORDER_TYPE);
+        Order openMrsOrder = order("boil in water", "comments", "ORD-99", "ORD-100", ORDER_TYPE,"STAT");
         openMrsOrder.setUuid(ORDER_UUID);
         EncounterTransaction.Order order = orderMapper1_12.mapOrder(openMrsOrder);
 
@@ -95,6 +95,7 @@ public class OrderMapper1_12Test {
         assertThat(order.getOrderType(), is(equalTo(ORDER_TYPE)));
         assertThat(order.getInstructions(), is(equalTo("boil in water")));
         assertThat(order.getCommentToFulfiller(), is(equalTo("comments")));
+        assertThat(order.getUrgency(),is(equalTo("STAT")));
         assertThat(order.getOrderNumber(), is(equalTo("ORD-100")));
         assertThat(order.getDateCreated(), is(equalTo(new LocalDate().toDate())));
         assertThat(order.getDateChanged(), is(equalTo(new LocalDate().toDate())));
@@ -103,7 +104,7 @@ public class OrderMapper1_12Test {
 
     @Test
     public void shouldSetPreviousOrder() throws NoSuchFieldException, IllegalAccessException {
-        Order openMrsOrder = order("boil in water", "comments", "Previous Order Uuid", "ORD-100", ORDER_TYPE);
+        Order openMrsOrder = order("boil in water", "comments", "Previous Order Uuid", "ORD-100", ORDER_TYPE,"ROUTINE");
         EncounterTransaction.Order order = orderMapper1_12.mapOrder(openMrsOrder);
 
         assertThat(order.getPreviousOrderUuid(), is(equalTo("Previous Order Uuid")));
@@ -111,9 +112,9 @@ public class OrderMapper1_12Test {
 
     @Test
     public void shouldMapMultipleOrders() throws NoSuchFieldException, IllegalAccessException {
-        Order order100 = order("before meals", "boil in water", null, "ORD-100", ORDER_TYPE);
-        Order order201 = order("before meals", "boil in water", null, "ORD-201", ORDER_TYPE);
-        Order order350 = order("before meals", "boil in water", null, "ORD-350", ORDER_TYPE);
+        Order order100 = order("before meals", "boil in water", null, "ORD-100", ORDER_TYPE, "ROUTINE");
+        Order order201 = order("before meals", "boil in water", null, "ORD-201", ORDER_TYPE, "ROUTINE");
+        Order order350 = order("before meals", "boil in water", null, "ORD-350", ORDER_TYPE, "ROUTINE");
 
         Encounter encounter = new Encounter();
         encounter.setOrders(new HashSet<Order>(Arrays.asList(order350, order100, order201)));
@@ -198,7 +199,7 @@ public class OrderMapper1_12Test {
         assertEquals("ORD-350", sortedDrugOrders.get(2).getOrderNumber());
     }
 
-    private Order order(String instructions, String commentToFulfiller, String previousOrderUuid, String orderNumber, String orderType) throws NoSuchFieldException, IllegalAccessException {
+    private Order order(String instructions, String commentToFulfiller, String previousOrderUuid, String orderNumber, String orderType,String urgency) throws NoSuchFieldException, IllegalAccessException {
         Order order = new Order();
         order.setPatient(new Patient());
         order.setAction(Order.Action.NEW);
@@ -221,6 +222,8 @@ public class OrderMapper1_12Test {
 
         order.setInstructions(instructions);
         order.setCommentToFulfiller(commentToFulfiller);
+
+        order.setUrgency(Order.Urgency.valueOf(urgency));
 
         Field field = Order.class.getDeclaredField("orderNumber");
         field.setAccessible(true);
