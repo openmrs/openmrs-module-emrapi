@@ -333,7 +333,7 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
-                <openMRSVersion>1.12.0-SNAPSHOT</openMRSVersion>
+                <openMRSVersion>1.12.0</openMRSVersion>
             </properties>
 
             <build>
@@ -346,6 +346,39 @@
                             <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
                             <includes>
                                 <include>**/*_1_12_Test.java</include>
+                            </includes>
+                            <classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
+                            </classpathDependencyExcludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>MRS2.0</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <openMRSVersion>2.0.1-SNAPSHOT</openMRSVersion>
+                <jacksonVersion>1.9.13</jacksonVersion>
+                <reportingApiConditionalArtifactId>reporting-api-2.0</reportingApiConditionalArtifactId>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.6</version>
+                        <configuration>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <includes>
+                                <include>**/*_2_0_Test.java</include>
+                                <include>**/*_2_0_IT.java</include>
                             </includes>
                             <classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>

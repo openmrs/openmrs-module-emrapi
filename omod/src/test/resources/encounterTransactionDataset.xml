@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <person person_id="1000" gender="M" dead="false" creator="1" birthdate_estimated="0"
+            date_created="2008-08-15 15:57:09.0" voided="true" void_reason="For test purposes"
+            uuid="86526ed6-3c11-11de-a0ba-001e378eb68f"/>
+    <patient patient_id="1000" creator="1" date_created="2006-01-18 00:00:00.0" changed_by="1"
+             date_changed="2008-08-18 12:24:34.0" voided="true" void_reason="For test purposes"/>
+    <visit visit_id="7" patient_id="1000" visit_type_id="1" date_started="2016-08-01 00:00:00.0" creator="1"
+           location_id="1" date_created="2005-01-01 00:00:00.0" voided="0"
+           uuid="e1428fea-6b78-11e0-93c3-1811105e044dc"/>
+    <encounter encounter_id="7" encounter_type="1" patient_id="1000" visit_id="7" location_id="1" form_id="1"
+               encounter_datetime="2016-08-19 00:00:00.0" creator="1" date_created="2016-08-19 12:34:40.0"
+               voided="false" uuid="e403fafb-e5e4-42d0-9d11-4f52e89d1477"/>
+
+</dataset>
