@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <obs obs_id="116" person_id="1000" concept_id="1116" encounter_id="7" obs_datetime="2016-08-20 00:00:00.0"
+         location_id="1" comments="" creator="1" date_created="2016-08-20 00:00:00.0"
+         voided="false" uuid="2ed1e57d-9f18-41d3-b067-2ffaf4b30fb0"/>
+    <obs obs_id="117" person_id="1000" concept_id="1117" encounter_id="7" obs_datetime="2016-08-20 00:00:00.0"
+         location_id="1" obs_group_id="116" value_coded="1118" comments="" creator="1" date_created="2016-08-20 00:00:00.0"
+         voided="false" uuid="2ed1e57d-9f18-41d3-b067-2eeaf4b30fb1"/>
+    <obs obs_id="118" person_id="1000" concept_id="1119" encounter_id="7" obs_datetime="2016-08-20 00:00:00.0"
+         location_id="1" obs_group_id="116" value_text="immediately admit him" comments="" creator="1"
+         date_created="2016-08-20 00:00:00.0" voided="false" uuid="2ed1e57d-9f18-41d3-b067-2eeaf4b30fb2"/>
+
+</dataset>

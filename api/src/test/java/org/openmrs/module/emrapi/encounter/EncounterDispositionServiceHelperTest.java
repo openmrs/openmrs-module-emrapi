@@ -56,7 +56,9 @@ public class EncounterDispositionServiceHelperTest {
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
-        disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
+        EncounterTransaction.Observation additionalObs = new EncounterTransaction.Observation()
+                .setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue);
+        disposition.setCode(code).setAdditionalObs(Arrays.asList(additionalObs));
 
         encounterDispositionServiceHelper.update(encounter, disposition);
 

@@ -49,6 +49,8 @@
         <allergyapiVersion>1.4</allergyapiVersion>
         <webservices.restVersion>2.16</webservices.restVersion>
         <openMRSVersion>1.11.6</openMRSVersion>
+        <jacksonVersion>1.5.0</jacksonVersion>
+        <reportingApiConditionalArtifactId>reporting-api-1.9</reportingApiConditionalArtifactId>
     </properties>
 
     <dependencyManagement>
@@ -61,7 +63,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.openmrs.module</groupId>
-				<artifactId>reporting-api-1.9</artifactId>
+				<artifactId>${reportingApiConditionalArtifactId}</artifactId>
 				<version>${reportingVersion}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -125,12 +127,6 @@
 				<version>${eventVersion}</version>
 				<scope>provided</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.openmrs.module</groupId>
-				<artifactId>allergyapi-api</artifactId>
-				<version>${allergyapiVersion}</version>
-				<scope>provided</scope>
-			</dependency>
         </dependencies>
     </dependencyManagement> 
 
@@ -144,7 +140,7 @@
 
         <dependency>
             <groupId>org.openmrs.module</groupId>
-            <artifactId>reporting-api-1.9</artifactId>
+            <artifactId>${reportingApiConditionalArtifactId}</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -215,12 +211,6 @@
             <type>jar</type>
             <scope>provided</scope>
         </dependency> 
-        
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>allergyapi-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
         <!-- End OpenMRS modules -->
 
@@ -260,13 +250,13 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>1.5.0</version>
+            <version>${jacksonVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.5.0</version>
+            <version>${jacksonVersion}</version>
             <scope>provided</scope>
         </dependency>
 

@@ -3,12 +3,12 @@
  * Version 1.0 (the "License"); you may not use this file except in
  * compliance with the License. You may obtain a copy of the License at
  * http://license.openmrs.org
- *
+ * <p>
  * Software distributed under the License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
  * License for the specific language governing rights and limitations
  * under the License.
- *
+ * <p>
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 package org.openmrs.module.emrapi.encounter;
@@ -46,93 +46,92 @@ public class EncounterDispositionServiceHelper {
 
     public void update(Encounter encounter, EncounterTransaction.Disposition disposition) {
         try {
-            if(isValid(disposition)){
+            if (isValid(disposition)) {
                 dispositionGroupConcept = getDispositionGroupConcept();
                 dispositionConcept = getDispositionConcept();
-
-                if(!hasDisposition(encounter)){
-                    Obs obs = createObsGroupForDisposition(disposition,encounter);
-                    encounter.addObs(obs);
-                    return;
+                Obs dispositionObsGroup = getExistingDisposition(encounter);
+                if (dispositionObsGroup == null) {
+                    dispositionObsGroup = createObsGroupForDisposition(disposition);
+                } else if (disposition.isVoided()) {
+                    dispositionObsGroup = voidDisposition(dispositionObsGroup, disposition);
+                } else {
+                    dispositionObsGroup = editExistingDisposition(dispositionObsGroup, disposition);
                 }
-
-                editExistingObservations(disposition,encounter);
+                encounter.addObs(dispositionObsGroup);
             }
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private Obs createObsGroupForDisposition(EncounterTransaction.Disposition disposition,Encounter encounter) throws ParseException {
-        Date dispositionDateTime = getCurrentDateIfNull(disposition.getDispositionDateTime());
-        Obs obs = new Obs();
-        obs.setConcept(dispositionGroupConcept);
-        Obs dispositionAsObservation = constructDispositionObs(encounter, new Obs(), disposition.getCode(), dispositionDateTime);
-        obs.addGroupMember(dispositionAsObservation);
-        obs.setObsDatetime(dispositionDateTime);
-
-        if(disposition.getAdditionalObs() != null){
-            for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
-                if(observation.getValue() != null && !((String) observation.getValue()).isEmpty() ){
-                    obs.addGroupMember(createObsFromObservation(observation, encounter, dispositionDateTime));
-                }
-            }
-        }
-        return obs;
-    }
-
-    private void editExistingObservations(EncounterTransaction.Disposition disposition, Encounter encounter) throws ParseException {
-        Set<Obs> allEncounterObs = encounter.getAllObs();
-        Obs existingDispositionGroup = getMatchingObservation(allEncounterObs, dispositionGroupConcept.getUuid());
-        Date dispositionDateTime = getCurrentDateIfNull(disposition.getDispositionDateTime());
-        Obs existingDisposition = getMatchingObservation(existingDispositionGroup.getGroupMembers(), dispositionConcept.getUuid());
-        existingDispositionGroup.setObsDatetime(dispositionDateTime);
-        existingDispositionGroup.setVoided(disposition.isVoided());
-        existingDispositionGroup.setVoidReason(disposition.getVoidReason());
-
-        constructDispositionObs(encounter, existingDisposition, disposition.getCode(), dispositionDateTime);
-        if(disposition.getAdditionalObs() != null){
-            for (EncounterTransaction.Observation observation : disposition.getAdditionalObs()) {
-                Obs matchingObservation = getMatchingObservation(existingDispositionGroup.getGroupMembers(), observation.getConceptUuid());
-                if(matchingObservation == null){
-                    existingDispositionGroup.addGroupMember(createObsFromObservation(observation, encounter, dispositionDateTime));
-                    return;
-                }
-                updateObsFromObservation(observation, matchingObservation, dispositionDateTime);
-            }
-        }
-        for (Obs groupMemberObs : existingDispositionGroup.getGroupMembers()) {
-            groupMemberObs.setObsDatetime(dispositionDateTime);
+    private Obs voidDisposition(Obs existingDispositionObsGroup, EncounterTransaction.Disposition disposition) {
+        existingDispositionObsGroup.setVoided(disposition.isVoided());
+        existingDispositionObsGroup.setVoidReason(disposition.getVoidReason());
+        for (Obs groupMemberObs : existingDispositionObsGroup.getGroupMembers()) {
             groupMemberObs.setVoided(disposition.isVoided());
             groupMemberObs.setVoidReason(disposition.getVoidReason());
         }
+        return existingDispositionObsGroup;
     }
 
+    private Obs createObsGroupForDisposition(EncounterTransaction.Disposition disposition) throws ParseException {
+        Date dispositionDateTime = getCurrentDateIfNull(disposition.getDispositionDateTime());
+        Obs obs = new Obs();
+        obs.setConcept(dispositionGroupConcept);
+        Obs dispositionAsObservation = mapDispositionProperties(new Obs(), disposition.getCode());
+        obs.addGroupMember(dispositionAsObservation);
+        obs.setObsDatetime(dispositionDateTime);
 
-    private boolean hasDisposition(Encounter encounter) {
-        Set<Obs> obsAtTopLevel = encounter.getObsAtTopLevel(false);
-        for (Obs obs : obsAtTopLevel) {
-            if(obs.getConcept().getUuid().equals(dispositionGroupConcept.getUuid())){
-                return true;
+        if (disposition.getAdditionalObs() != null) {
+            for (EncounterTransaction.Observation etObservation : disposition.getAdditionalObs()) {
+                if (etObservation.getValue() != null && !((String) etObservation.getValue()).isEmpty()) {
+                    obs.addGroupMember(createObsFromETObservation(etObservation));
+                }
             }
         }
-        return false;
-    }
-
-    private Obs createObsFromObservation(EncounterTransaction.Observation observation,Encounter encounter,Date observationDateTime) throws ParseException {
-        Obs obs = new Obs();
-        updateObsFromObservation(observation,obs,observationDateTime);
-        obs.setPerson(encounter.getPatient());
-        obs.setEncounter(encounter);
         return obs;
     }
 
-    private Obs updateObsFromObservation(EncounterTransaction.Observation observation, Obs obs,Date observationDateTime) throws ParseException {
-        if(observation != null && obs != null) {
+    private Obs editExistingDisposition(Obs existingDispositionObsGroup, EncounterTransaction.Disposition disposition) throws ParseException {
+        Obs existingDisposition = getMatchingObservation(existingDispositionObsGroup.getGroupMembers(),
+                dispositionConcept.getUuid());
+        mapDispositionProperties(existingDisposition, disposition.getCode());
+        if (disposition.getAdditionalObs() != null) {
+            for (EncounterTransaction.Observation additionalObs : disposition.getAdditionalObs()) {
+                Obs matchingObs = getMatchingObservation(existingDispositionObsGroup.getGroupMembers(),
+                        additionalObs.getConceptUuid());
+                if (matchingObs == null) {
+                    existingDispositionObsGroup.addGroupMember(createObsFromETObservation(additionalObs));
+                } else {
+                    updateObsFromObservation(additionalObs, matchingObs);
+                }
+            }
+        }
+        return existingDispositionObsGroup;
+    }
+
+
+    private Obs getExistingDisposition(Encounter encounter) {
+        Set<Obs> obsAtTopLevel = encounter.getObsAtTopLevel(false);
+        for (Obs obs : obsAtTopLevel) {
+            if (obs.getConcept().getUuid().equals(dispositionGroupConcept.getUuid())) {
+                return obs;
+            }
+        }
+        return null;
+    }
+
+    private Obs createObsFromETObservation(EncounterTransaction.Observation observation) throws ParseException {
+        Obs obs = new Obs();
+        updateObsFromObservation(observation, obs);
+        return obs;
+    }
+
+    private Obs updateObsFromObservation(EncounterTransaction.Observation observation, Obs obs) throws ParseException {
+        if (observation != null && obs != null) {
             obs.setConcept(getConceptByUuid(observation.getConceptUuid()));
             obs.setComment(observation.getComment());
-            obs.setObsDatetime(observationDateTime);
-            if(observation.getVoided()){
+            if (observation.getVoided()) {
                 obs.setVoided(observation.getVoided());
                 obs.setVoidReason(observation.getVoidReason());
                 return obs;
@@ -143,13 +142,10 @@ public class EncounterDispositionServiceHelper {
     }
 
 
-    private Obs constructDispositionObs(Encounter encounter,Obs dispositionObs, String dispositionCode, Date observationDateTime) {
-        if(dispositionObs != null){
+    private Obs mapDispositionProperties(Obs dispositionObs, String dispositionCode) {
+        if (dispositionObs != null) {
             dispositionObs.setConcept(dispositionConcept);
             dispositionObs.setValueCoded(getMatchingAnswer(dispositionConcept.getAnswers(), dispositionCode));
-            dispositionObs.setObsDatetime(observationDateTime);
-            dispositionObs.setPerson(encounter.getPatient());
-            dispositionObs.setEncounter(encounter);
         }
         return dispositionObs;
     }
@@ -189,15 +185,15 @@ public class EncounterDispositionServiceHelper {
     private Concept getMatchingAnswer(Collection<ConceptAnswer> answers, String dispositionCode) {
         Concept answerConcept = conceptService.getConceptByMapping(dispositionCode, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
         for (ConceptAnswer answer : answers) {
-            if(answerConcept.getUuid().equals(answer.getAnswerConcept().getUuid())){
+            if (answerConcept.getUuid().equals(answer.getAnswerConcept().getUuid())) {
                 return answerConcept;
             }
         }
-        throw  new IllegalArgumentException("Concept with code "+dispositionCode+" does not belong to this observation group");
+        throw new IllegalArgumentException("Concept with code " + dispositionCode + " does not belong to this observation group");
     }
 
-    private boolean isValid(EncounterTransaction.Disposition disposition){
-        if(disposition == null || StringUtils.isEmpty(disposition.getCode()) ) {
+    private boolean isValid(EncounterTransaction.Disposition disposition) {
+        if (disposition == null || StringUtils.isEmpty(disposition.getCode())) {
             return false;
         }
         return true;
