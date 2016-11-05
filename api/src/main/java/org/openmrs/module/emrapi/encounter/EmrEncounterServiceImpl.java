@@ -113,7 +113,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         FlushMode flushMode = DbSessionUtil.getCurrentFlushMode();
         DbSessionUtil.setManualFlushMode();
-
+        Context.flushSession();
+        
         try {
             updatedEncounterTransaction = saveInternal(encounterTransaction);
         } finally {
