@@ -359,9 +359,6 @@
         </profile>
         <profile>
             <id>MRS2.0</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <openMRSVersion>2.0.1-SNAPSHOT</openMRSVersion>
                 <jacksonVersion>1.9.13</jacksonVersion>
