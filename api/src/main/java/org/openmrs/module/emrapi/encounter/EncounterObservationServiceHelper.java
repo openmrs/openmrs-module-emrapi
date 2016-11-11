@@ -31,8 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
-
 /**
  * Add/update/delete a {@link org.openmrs.Obs} on an {@link org.openmrs.Encounter}.
  */
@@ -68,8 +66,12 @@ public class EncounterObservationServiceHelper {
         for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
             org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
             Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
-            Date diagnosisDateTime = getCurrentDateIfNull(diagnosisRequest.getDiagnosisDateTime());
-            obs.setObsDatetime(diagnosisDateTime);
+            if (diagnosisRequest.getDiagnosisDateTime() != null) {
+                obs.setObsDatetime(diagnosisRequest.getDiagnosisDateTime());
+            }
+            if (obs.getObsDatetime() == null) {
+                obs.setObsDatetime(new Date());
+            }
             obs.setComment(diagnosisRequest.getComments());
             if (diagnosisRequest.isVoided()) {
                 voidDiagnosisObservation(diagnosisRequest, obs);
