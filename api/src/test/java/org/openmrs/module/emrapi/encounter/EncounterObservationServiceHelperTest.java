@@ -36,12 +36,15 @@ import org.openmrs.module.emrapi.test.builder.ConceptDataTypeBuilder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -246,6 +249,7 @@ public class EncounterObservationServiceHelperTest {
 
     @Test
     public void shouldSaveDiagnosisAsAnObservationWhenPassedTheUuidOfDiagnosisConcept() {
+        Date encounterDatetime = new Date(1000);
         String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
         List<EncounterTransaction.Diagnosis> diagnosises = asList(
                 new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY")
@@ -255,7 +259,7 @@ public class EncounterObservationServiceHelperTest {
 
         Encounter encounter = new Encounter();
         encounter.setUuid("e-uuid");
-        encounter.setEncounterDatetime(new Date());
+        encounter.setEncounterDatetime(encounterDatetime);
         Obs savedObservations = new Obs();
         savedObservations.addGroupMember(new Obs());
         savedObservations.addGroupMember(new Obs());
@@ -271,6 +275,8 @@ public class EncounterObservationServiceHelperTest {
         assertEquals(1, parentObservations.size());
         Obs parent = parentObservations.iterator().next();
         assertTrue(parent.isObsGrouping());
+        assertNotNull(parent.getObsDatetime());
+        assertNotEquals(encounterDatetime, parent.getObsDatetime());
         assertEquals("comments", parent.getComment());
         int children = parent.getGroupMembers().size();
         assertEquals(3, children);
@@ -280,6 +286,47 @@ public class EncounterObservationServiceHelperTest {
         assertEquals(conceptForDiagnosis, diagnosis.getDiagnosis().getCodedAnswer());
         assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty.CONFIRMED, diagnosis.getCertainty());
         assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Order.PRIMARY, diagnosis.getOrder());
+        verify(conceptService).getConceptByUuid(diagnosisConceptUuid);
+        verify(conceptService, never()).getConcept(anyInt());
+    }
+
+    @Test
+    public void shouldSetObsdatetimeWithDiagnosisDateTimeIfProvided() {
+        String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
+        Date diagnosisDateTime = new Date();
+        EncounterTransaction.Diagnosis diagnosis = new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED").setOrder("PRIMARY")
+                .setComments("comments")
+                .setCodedAnswer(new EncounterTransaction.Concept(diagnosisConceptUuid, "conceptName"));
+        diagnosis.setDiagnosisDateTime(diagnosisDateTime);
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        encounter.setEncounterDatetime(new Date());
+        Obs savedObservations = new Obs();
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        savedObservations.addGroupMember(new Obs());
+        Concept conceptForDiagnosis = new Concept();
+
+        when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class)))
+                .thenReturn(savedObservations);
+        when(conceptService.getConceptByUuid(diagnosisConceptUuid)).thenReturn(conceptForDiagnosis);
+
+        encounterObservationServiceHelper.updateDiagnoses(encounter, Arrays.asList(diagnosis));
+
+        Set<Obs> parentObservations = encounter.getObsAtTopLevel(false);
+        assertEquals(1, parentObservations.size());
+        Obs parent = parentObservations.iterator().next();
+        assertEquals(diagnosisDateTime, parent.getObsDatetime());
+        assertTrue(parent.isObsGrouping());
+        assertEquals("comments", parent.getComment());
+        int children = parent.getGroupMembers().size();
+        assertEquals(3, children);
+        ArgumentCaptor<org.openmrs.module.emrapi.diagnosis.Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(org.openmrs.module.emrapi.diagnosis.Diagnosis.class);
+        verify(diagnosisMetadata, times(1)).buildDiagnosisObsGroup(diagnosisCaptor.capture());
+        org.openmrs.module.emrapi.diagnosis.Diagnosis actualDiagnosis = diagnosisCaptor.getValue();
+        assertEquals(conceptForDiagnosis, actualDiagnosis.getDiagnosis().getCodedAnswer());
+        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty.CONFIRMED, actualDiagnosis.getCertainty());
+        assertEquals(org.openmrs.module.emrapi.diagnosis.Diagnosis.Order.PRIMARY, actualDiagnosis.getOrder());
         verify(conceptService).getConceptByUuid(diagnosisConceptUuid);
         verify(conceptService, never()).getConcept(anyInt());
     }
