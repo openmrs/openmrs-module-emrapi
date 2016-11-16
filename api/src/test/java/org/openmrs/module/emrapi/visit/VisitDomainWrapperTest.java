@@ -653,17 +653,17 @@ public class VisitDomainWrapperTest {
 		// Only factor diagnosis into uniqueness
 		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis1), Diagnosis.Order.PRIMARY, Diagnosis.Certainty.CONFIRMED);
 		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis1), Diagnosis.Order.SECONDARY, Diagnosis.Certainty.PRESUMED);
-		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, false).size(), is(1));
-		assertThat(visitDomainWrapper.getUniqueDiagnoses(true, false).size(), is(1));
+		assertThat(visitDomainWrapper.getUniqueDiagnosesLegacy(false, false).size(), is(1));
+		assertThat(visitDomainWrapper.getUniqueDiagnosesLegacy(true, false).size(), is(1));
 		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis2), Diagnosis.Order.PRIMARY, Diagnosis.Certainty.CONFIRMED);
-		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, false).size(), is(2));
+		assertThat(visitDomainWrapper.getUniqueDiagnosesLegacy(false, false).size(), is(2));
 
 		// Only return secondary or presumed if asked
 		addDiagnosis(encounter, new CodedOrFreeTextAnswer(diagnosis3), Diagnosis.Order.SECONDARY, Diagnosis.Certainty.PRESUMED);
-		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, false).size(), is(3));
-		assertThat(visitDomainWrapper.getUniqueDiagnoses(true, false).size(), is(2));
-		assertThat(visitDomainWrapper.getUniqueDiagnoses(false, true).size(), is(2));
-		assertThat(visitDomainWrapper.getUniqueDiagnoses(true, true).size(), is(2));
+		assertThat(visitDomainWrapper.getUniqueDiagnosesLegacy(false, false).size(), is(3));
+		assertThat(visitDomainWrapper.getUniqueDiagnosesLegacy(true, false).size(), is(2));
+		assertThat(visitDomainWrapper.getUniqueDiagnosesLegacy(false, true).size(), is(2));
+		assertThat(visitDomainWrapper.getUniqueDiagnosesLegacy(true, true).size(), is(2));
 	}
 
     @Test

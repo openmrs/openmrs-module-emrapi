@@ -13,9 +13,14 @@
  */
 package org.openmrs.module.emrapi.visit;
 
+import java.util.List;
+
+import org.openmrs.Obs;
 import org.openmrs.Visit;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.db.EmrVisitDAO;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.encounter.exception.VisitNotFoundException;
 import org.openmrs.module.emrapi.visit.contract.VisitRequest;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
@@ -23,6 +28,16 @@ import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitService {
     private VisitService visitService;
     private VisitResponseMapper visitResponseMapper;
+    
+    protected EmrVisitDAO dao;
+    
+    public EmrVisitDAO getDao() {
+      return dao;
+    }
+    
+    public void setDao(EmrVisitDAO dao) {
+       this.dao = dao;
+    }
 
     public EmrVisitServiceImpl(VisitService visitService, VisitResponseMapper visitResponseMapper) {
         this.visitService = visitService;
@@ -37,5 +52,23 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
         return visitResponseMapper.map(visit);
     }
 
-
+   @Override
+   public List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
+      if (primaryOnly == true) {
+         if (confirmedOnly == false) {
+            return dao.getPrimaryDiagnoses(visit, diagnosisMetadata);
+         }
+         else {
+            return dao.getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
+         }
+      }
+      else {
+         if (confirmedOnly == false) {
+            return dao.getDiagnoses(visit, diagnosisMetadata);
+         }
+         else {
+            return dao.getConfirmedDiagnoses(visit, diagnosisMetadata);
+         }
+      }
+   }
 }

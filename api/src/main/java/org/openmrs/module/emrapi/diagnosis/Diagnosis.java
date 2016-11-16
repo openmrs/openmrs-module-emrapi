@@ -44,9 +44,14 @@ public class Diagnosis {
     }
 
     public Diagnosis(CodedOrFreeTextAnswer diagnosis, Order order) {
-        this.diagnosis = diagnosis;
+        this(diagnosis);
         this.order = order;
     }
+    
+    public Diagnosis(CodedOrFreeTextAnswer diagnosis, Order order, Certainty certainty) {
+       this(diagnosis, order);
+       this.certainty = certainty;
+   }
 
     public CodedOrFreeTextAnswer getDiagnosis() {
         return diagnosis;
