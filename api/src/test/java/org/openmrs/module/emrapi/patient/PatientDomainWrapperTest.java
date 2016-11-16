@@ -1,5 +1,26 @@
 package org.openmrs.module.emrapi.patient;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Location;
@@ -16,27 +37,8 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class PatientDomainWrapperTest {
 
@@ -44,14 +46,16 @@ public class PatientDomainWrapperTest {
     private EmrApiProperties emrApiProperties;
     private Patient patient;
     private VisitService visitService;
+    private DomainWrapperFactory domainWrapperFactory;
 
     @Before
     public void setUp() throws Exception {
         patient = new Patient();
         emrApiProperties = mock(EmrApiProperties.class);
         visitService = mock(VisitService.class);
+        domainWrapperFactory = mock(DomainWrapperFactory.class);
         patientDomainWrapper = new PatientDomainWrapper(patient, emrApiProperties, mock(AdtService.class),
-                visitService, mock(EncounterService.class), mock(DiagnosisService.class));
+                visitService, mock(EncounterService.class), mock(DiagnosisService.class), domainWrapperFactory);
     }
 
     @Test
@@ -112,6 +116,7 @@ public class PatientDomainWrapperTest {
     @Test
     public void shouldCreateAListOfVisitDomainWrappersBasedOnVisitListFromVisitService() {
         when(visitService.getVisitsByPatient(patient, true, false)).thenReturn(asList(new Visit(), new Visit(), new Visit()));
+        when(domainWrapperFactory.newVisitDomainWrapper(any(Visit.class))).thenReturn(new VisitDomainWrapper());
 
         List<VisitDomainWrapper> visitDomainWrappers = patientDomainWrapper.getAllVisitsUsingWrappers();
 
@@ -123,7 +128,7 @@ public class PatientDomainWrapperTest {
         patient = mock(Patient.class);
 
         patientDomainWrapper = new PatientDomainWrapper(patient, emrApiProperties, mock(AdtService.class),
-                visitService, mock(EncounterService.class), mock(DiagnosisService.class));
+                visitService, mock(EncounterService.class), mock(DiagnosisService.class), mock(DomainWrapperFactory.class));
 
         Set<PersonName> personNames = new HashSet<PersonName>();
 
@@ -143,7 +148,7 @@ public class PatientDomainWrapperTest {
         patient = mock(Patient.class);
 
         patientDomainWrapper = new PatientDomainWrapper(patient, emrApiProperties, mock(AdtService.class),
-                visitService, mock(EncounterService.class), mock(DiagnosisService.class));
+                visitService, mock(EncounterService.class), mock(DiagnosisService.class), mock(DomainWrapperFactory.class));
 
         Set<PersonName> personNames = new HashSet<PersonName>();
 
@@ -165,7 +170,7 @@ public class PatientDomainWrapperTest {
         patient = mock(Patient.class);
 
         patientDomainWrapper = new PatientDomainWrapper(patient, emrApiProperties, mock(AdtService.class),
-                visitService, mock(EncounterService.class), mock(DiagnosisService.class));
+                visitService, mock(EncounterService.class), mock(DiagnosisService.class), mock(DomainWrapperFactory.class));
 
         Set<PersonName> personNames = new HashSet<PersonName>();
 

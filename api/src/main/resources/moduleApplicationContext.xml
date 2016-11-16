@@ -260,15 +260,26 @@
         <constructor-arg ref="encounterService"/>
     </bean>
 
+    <bean id="emrVisitDAOImpl" class="${project.parent.groupId}.${project.parent.artifactId}.db.EmrVisitDAOImpl">
+        <property name="sessionFactory">
+            <ref bean="dbSessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="emrVisitServiceImpl" class="${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitServiceImpl">
+        <constructor-arg ref="visitService"/>
+        <constructor-arg ref="visitResponseMapper"/>
+        <property name="dao">
+            <ref local="emrVisitDAOImpl"/>
+        </property>
+    </bean>
+
     <bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="org.openmrs.module.emrapi.visit.EmrVisitServiceImpl">
-                <constructor-arg  ref="visitService"/>
-                <constructor-arg  ref="visitResponseMapper"/>
-            </bean>
+            <ref local="emrVisitServiceImpl"/>
         </property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors"/>
@@ -365,6 +376,15 @@
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.disposition.DispositionService</value>
                 <ref local="dispositionService"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitService</value>
+                <ref local="emrVisitService"/>
             </list>
         </property>
     </bean>
