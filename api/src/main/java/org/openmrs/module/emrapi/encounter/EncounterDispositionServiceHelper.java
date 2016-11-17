@@ -75,12 +75,14 @@ public class EncounterDispositionServiceHelper {
     }
 
     private Obs createObsGroupForDisposition(EncounterTransaction.Disposition disposition) throws ParseException {
-        Date dispositionDateTime = getCurrentDateIfNull(disposition.getDispositionDateTime());
+        Date dispositionDateTime = new Date();
         Obs obs = new Obs();
         obs.setConcept(dispositionGroupConcept);
-        Obs dispositionAsObservation = mapDispositionProperties(new Obs(), disposition.getCode());
-        obs.addGroupMember(dispositionAsObservation);
         obs.setObsDatetime(dispositionDateTime);
+
+        Obs dispositionAsObservation = mapDispositionProperties(new Obs(), disposition.getCode());
+        dispositionAsObservation.setObsDatetime(dispositionDateTime);
+        obs.addGroupMember(dispositionAsObservation);
 
         if (disposition.getAdditionalObs() != null) {
             for (EncounterTransaction.Observation etObservation : disposition.getAdditionalObs()) {
@@ -124,6 +126,7 @@ public class EncounterDispositionServiceHelper {
     private Obs createObsFromETObservation(EncounterTransaction.Observation observation) throws ParseException {
         Obs obs = new Obs();
         updateObsFromObservation(observation, obs);
+        obs.setObsDatetime(new Date());
         return obs;
     }
 
