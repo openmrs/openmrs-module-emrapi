@@ -15,9 +15,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -53,8 +56,7 @@ public class EncounterDispositionServiceHelperTest {
         String dispositionNoteValue = "disposition note text";
         String code = "ADMIT";
         newConcept(ConceptDatatype.TEXT, noteConceptUuid);
-        Encounter encounter = new Encounter();
-        encounter.setUuid("e-uuid");
+        Encounter encounter = createEncounter("e-uuid");
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
         EncounterTransaction.Observation additionalObs = new EncounterTransaction.Observation()
                 .setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue);
@@ -63,36 +65,6 @@ public class EncounterDispositionServiceHelperTest {
         encounterDispositionServiceHelper.update(encounter, disposition);
 
         assertDispositionValues(noteConceptUuid, dispositionNoteValue, code, encounter);
-    }
-
-    private EncounterTransaction.Concept getConcept(String conceptUuid) {
-        return new EncounterTransaction.Concept(conceptUuid, "concept_name");
-    }
-
-    private void assertDispositionValues(String noteConceptUuid, String dispositionNoteValue, String code, Encounter encounter) {
-        Set<Obs> obsAtTopLevel = encounter.getObsAtTopLevel(false);
-        assertEquals(1, obsAtTopLevel.size());
-        Obs obs = obsAtTopLevel.iterator().next();
-        assertTrue(obs.isObsGrouping());
-        Set<Obs> obsGroupMembers = obs.getGroupMembers();
-        assertEquals(2, obsGroupMembers.size());
-
-        boolean dispositionConceptExists = false;
-        boolean noteConceptExists = false;
-
-        for (Obs obsGroupMember : obsGroupMembers) {
-            if(obsGroupMember.getConcept().getUuid().equals(EmrApiConstants.CONCEPT_CODE_DISPOSITION+UUID_SUFFIX)){
-                dispositionConceptExists =true;
-                assertEquals("Disposition answer not being added correctly",code+UUID_SUFFIX,obsGroupMember.getValueCoded().getUuid());
-            }
-            else if(obsGroupMember.getConcept().getUuid().equals(noteConceptUuid)){
-                noteConceptExists =true;
-                assertEquals("Error in disposition note value",dispositionNoteValue,obsGroupMember.getValueText());
-            }
-
-        }
-        assertTrue("disposition not being added correctly",dispositionConceptExists);
-        assertTrue("Disposition note is not being added correctly",noteConceptExists);
     }
 
     @Test
@@ -118,21 +90,13 @@ public class EncounterDispositionServiceHelperTest {
         }
     }
 
-    private Obs buildDispositionGroupObservation() {
-        Obs dispositionGroupObservation = new ObsBuilder().setConcept(dispositionGroupConcept).setUuid(UUID.randomUUID().toString()).get();
-        Obs dispositionObservation = new ObsBuilder().setConcept(dispositionConcept).setUuid(UUID.randomUUID().toString()).get();
-        dispositionGroupObservation.addGroupMember(dispositionObservation);
-        return dispositionGroupObservation;
-    }
-
     @Test
     public void shouldUpdateDispositionAsObsGroup() {
         String noteConceptUuid = "disposition-note"+UUID_SUFFIX;
         String dispositionNoteValue = "disposition note text";
         String code = "ADMIT";
         newConcept(ConceptDatatype.TEXT, noteConceptUuid);
-        Encounter encounter = new Encounter();
-        encounter.setUuid("e-uuid");
+        Encounter encounter = createEncounter("e-uuid");
 
         EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
         disposition.setCode(code).setAdditionalObs(Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid)).setValue(dispositionNoteValue)));
@@ -150,6 +114,13 @@ public class EncounterDispositionServiceHelperTest {
         assertDispositionValues(noteConceptUuid, dispositionNoteValue, code, encounter);
     }
 
+    private Encounter createEncounter(String uuid) {
+        Encounter encounter = new Encounter();
+        encounter.setUuid(uuid);
+        Date encounterDateTime = new Date(1000);
+        encounter.setEncounterDatetime(encounterDateTime);
+        return encounter;
+    }
 
 
 //    @Test
@@ -204,6 +175,47 @@ public class EncounterDispositionServiceHelperTest {
 //    }
 
 
+    private EncounterTransaction.Concept getConcept(String conceptUuid) {
+        return new EncounterTransaction.Concept(conceptUuid, "concept_name");
+    }
+
+    private void assertDispositionValues(String noteConceptUuid, String dispositionNoteValue, String code, Encounter encounter) {
+        Set<Obs> obsAtTopLevel = encounter.getObsAtTopLevel(false);
+        assertEquals(1, obsAtTopLevel.size());
+        Obs obs = obsAtTopLevel.iterator().next();
+        assertTrue(obs.isObsGrouping());
+        assertNotNull(obs.getObsDatetime());
+        assertNotEquals(encounter.getEncounterDatetime(), obs.getObsDatetime());
+        Set<Obs> obsGroupMembers = obs.getGroupMembers();
+        assertEquals(2, obsGroupMembers.size());
+
+        boolean dispositionConceptExists = false;
+        boolean noteConceptExists = false;
+
+        for (Obs obsGroupMember : obsGroupMembers) {
+            if(obsGroupMember.getConcept().getUuid().equals(EmrApiConstants.CONCEPT_CODE_DISPOSITION+UUID_SUFFIX)){
+                dispositionConceptExists =true;
+                assertEquals("Disposition answer not being added correctly",code+UUID_SUFFIX,obsGroupMember.getValueCoded().getUuid());
+            }
+            else if(obsGroupMember.getConcept().getUuid().equals(noteConceptUuid)){
+                noteConceptExists =true;
+                assertEquals("Error in disposition note value",dispositionNoteValue,obsGroupMember.getValueText());
+            }
+            assertNotNull(obs.getObsDatetime());
+            assertNotEquals(encounter.getEncounterDatetime(), obsGroupMember.getObsDatetime());
+            assertEquals(encounter.getPatient(), obs.getPerson());
+            assertEquals(encounter.getLocation(), obs.getLocation());
+        }
+        assertTrue("disposition not being added correctly",dispositionConceptExists);
+        assertTrue("Disposition note is not being added correctly",noteConceptExists);
+    }
+
+    private Obs buildDispositionGroupObservation() {
+        Obs dispositionGroupObservation = new ObsBuilder().setConcept(dispositionGroupConcept).setUuid(UUID.randomUUID().toString()).get();
+        Obs dispositionObservation = new ObsBuilder().setConcept(dispositionConcept).setUuid(UUID.randomUUID().toString()).get();
+        dispositionGroupObservation.addGroupMember(dispositionObservation);
+        return dispositionGroupObservation;
+    }
 
     private Obs getObsByUuid(String uuid,Set<Obs> obsSet){
         for (Obs obs: obsSet){

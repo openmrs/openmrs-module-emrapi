@@ -302,7 +302,6 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         //Assert Disposition data
         EncounterTransaction.Disposition fetchedDisposition = fetchedEncounterTransaction.getDisposition();
         assertEquals("ADMIT", fetchedDisposition.getCode());
-        assertEquals(DateUtils.parseDate(dispositionDateTime, dateTimeFormat), fetchedDisposition.getDispositionDateTime());
         assertNotNull(fetchedDisposition.getExistingObs());
         assertEquals(1, fetchedDisposition.getAdditionalObs().size());
         assertEquals("Admit him to ICU.", fetchedDisposition.getAdditionalObs().get(0).getValue());
