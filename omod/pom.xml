@@ -312,4 +312,5 @@
             </build>
         </profile>
     </profiles>
+    <version>1.12.1-SNAPSHOT</version>
 </project>
