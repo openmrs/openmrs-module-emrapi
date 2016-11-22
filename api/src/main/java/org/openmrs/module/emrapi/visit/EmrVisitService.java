@@ -13,7 +13,12 @@
  */
 package org.openmrs.module.emrapi.visit;
 
+import java.util.List;
+
+import org.openmrs.Obs;
+import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.visit.contract.VisitRequest;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 
@@ -24,4 +29,6 @@ import org.openmrs.module.emrapi.visit.contract.VisitResponse;
  */
 public interface EmrVisitService extends OpenmrsService {
     VisitResponse find(VisitRequest visitRequest);
+    
+    List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly);
 }

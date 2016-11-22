@@ -495,7 +495,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private boolean itBelongsToARealPatient(Visit candidate) {
         Patient patient = candidate.getPatient();
-        PatientDomainWrapper domainWrapper = new PatientDomainWrapper(patient, emrApiProperties, null, null, null, null);
+        PatientDomainWrapper domainWrapper = new PatientDomainWrapper(patient, emrApiProperties, null, null, null, null, null);
         return !domainWrapper.isTestPatient();
     }
 
