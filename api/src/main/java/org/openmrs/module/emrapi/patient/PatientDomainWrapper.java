@@ -14,6 +14,13 @@
 
 package org.openmrs.module.emrapi.patient;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Months;
@@ -31,25 +38,14 @@ import org.openmrs.api.EncounterService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
-import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
+import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
-import org.openmrs.module.reporting.query.visit.VisitIdSet;
-import org.openmrs.module.reporting.query.visit.VisitQueryResult;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A rich-domain-model class that wraps a Patient, and lets you perform common queries.
@@ -78,21 +74,26 @@ public class PatientDomainWrapper implements DomainWrapper {
 	@Autowired
 	protected DiagnosisService diagnosisService;
 
-    @Autowired
-    protected VisitQueryService visitQueryService;
+   @Autowired
+   protected VisitQueryService visitQueryService;
+    
+   @Qualifier("domainWrapperFactory")
+   @Autowired
+   protected DomainWrapperFactory domainWrapperFactory;
 
 	public PatientDomainWrapper() {
 	}
 
     @Deprecated  // use the PatientDomainWrapperFactory component to instantiate a new PDW
 	public PatientDomainWrapper(Patient patient, EmrApiProperties emrApiProperties, AdtService adtService,
-								VisitService visitService, EncounterService encounterService, DiagnosisService diagnosisService) {
+								VisitService visitService, EncounterService encounterService, DiagnosisService diagnosisService, DomainWrapperFactory domainWrapperFactory) {
 		this.patient = patient;
 		this.emrApiProperties = emrApiProperties;
 		this.adtService = adtService;
 		this.visitService = visitService;
 		this.encounterService = encounterService;
 		this.diagnosisService = diagnosisService;
+		this.domainWrapperFactory = domainWrapperFactory; 
 	}
 
 	public void setPatient(Patient patient) {
@@ -318,7 +319,7 @@ public class PatientDomainWrapper implements DomainWrapper {
 		List<VisitDomainWrapper> visitDomainWrappers = new ArrayList<VisitDomainWrapper>();
 
 		for (Visit visit : getAllVisits()) {
-			VisitDomainWrapper visitWrapper = new VisitDomainWrapper(visit);
+			VisitDomainWrapper visitWrapper = domainWrapperFactory.newVisitDomainWrapper(visit);
 			visitWrapper.setEmrApiProperties(emrApiProperties);
 			visitDomainWrappers.add(visitWrapper);
 		}

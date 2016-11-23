@@ -14,6 +14,21 @@
 package org.openmrs.module.emrapi.visit;
 
 
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.reverseOrder;
+import static java.util.Collections.sort;
+import static org.apache.commons.collections.CollectionUtils.find;
+import static org.apache.commons.collections.CollectionUtils.select;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,21 +61,6 @@ import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Collections.EMPTY_LIST;
-import static java.util.Collections.reverseOrder;
-import static java.util.Collections.sort;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.collections.CollectionUtils.select;
-
 
 /**
  * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
@@ -83,6 +83,10 @@ public class VisitDomainWrapper implements DomainWrapper {
 
     @Autowired
     protected VisitQueryService visitQueryService;
+    
+    @Qualifier("emrVisitService")
+    @Autowired
+    protected EmrVisitService emrVisitService; 
 
     private Visit visit;
 
@@ -330,6 +334,46 @@ public class VisitDomainWrapper implements DomainWrapper {
         }
         return diagnoses;
     }
+    
+    /**
+     * @return the unique list of diagnoses recorded in this visit, where uniqueness is based only on
+     * whether the CodedOrNonCoded diagnosis is the same, not on whether the order or certainty are the same
+     * if the primaryOnly flag is true, return only primary diagnoses
+     * if the confirmedOnly flag is true, return only confirmed diagnoses
+      * will return null if diagnosis support not currently configured
+     */
+    public List<Diagnosis> getUniqueDiagnoses(Boolean primaryOnly, Boolean confirmedOnly) {
+       
+       if (primaryOnly == true && confirmedOnly == true) // TODO: Re-implement that specific case with HQL
+          return getUniqueDiagnosesLegacy(primaryOnly, confirmedOnly);
+    
+       DiagnosisMetadata diagnosisMetadata;
+       try {
+           diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+       }
+       catch (MissingConceptException ex) {
+           // this isn't a hard error, because some implementations will not be using diagnoses functionality
+           log.warn("Diagnosis metadata not configured", ex);
+           return Collections.emptyList();
+       }
+       
+       List<Obs> obsList = emrVisitService.getDiagnoses(getVisit(), diagnosisMetadata, primaryOnly, confirmedOnly);
+       
+       Map<CodedOrFreeTextAnswer, Diagnosis> diagnoses = new LinkedHashMap<CodedOrFreeTextAnswer, Diagnosis>();
+       for (Obs obs : obsList) {
+          if (diagnosisMetadata.isDiagnosis(obs)) {
+              try {
+                  Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
+                  if (!diagnoses.containsKey(diagnosis.getDiagnosis())) {  // Checking uniqueness here
+                     diagnoses.put(diagnosis.getDiagnosis(), diagnosis);
+                  }
+              } catch (Exception ex) {
+                  log.warn("malformed diagnosis obs group with obsId " + obs.getObsId(), ex);
+              }
+          }
+       }
+       return new ArrayList<Diagnosis>(diagnoses.values());
+    }
 
 	/**
 	 * @return the unique list of diagnoses recorded in this visit, where uniqueness is based only on
@@ -338,14 +382,18 @@ public class VisitDomainWrapper implements DomainWrapper {
 	 * if the confirmedOnly flag is true, return only confirmed diagnoses
      * will return null if diagnosis support not currently configured
 	 */
-	public List<Diagnosis> getUniqueDiagnoses(Boolean primaryOnly, Boolean confirmedOnly) {
+    /**
+     * @deprecated  As of release 1.19, replaced by {@link #getUniqueDiagnoses(Boolean, Boolean)}
+     */
+    @Deprecated
+    public List<Diagnosis> getUniqueDiagnosesLegacy(Boolean primaryOnly, Boolean confirmedOnly) {
 		Map<CodedOrFreeTextAnswer, Diagnosis> diagnoses = new LinkedHashMap<CodedOrFreeTextAnswer, Diagnosis>();
 		for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
 
-            List<Diagnosis> diagnosesFromEncounter = getDiagnosesFromEncounter(encounter);
-            if (diagnosesFromEncounter == null) {
-                return null;
-            }
+         List<Diagnosis> diagnosesFromEncounter = getDiagnosesFromEncounter(encounter);
+         if (diagnosesFromEncounter == null) {
+             return null;
+         }
 
 			for (Diagnosis d : diagnosesFromEncounter) {
 				if (!primaryOnly || d.getOrder() == Diagnosis.Order.PRIMARY) {
@@ -364,7 +412,7 @@ public class VisitDomainWrapper implements DomainWrapper {
     private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter) {
         return getDiagnosesFromEncounter(encounter, null);
     }
-
+    
     private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter, List<Diagnosis.Order> diagnosisOrders) {
 
         DiagnosisMetadata diagnosisMetadata;
