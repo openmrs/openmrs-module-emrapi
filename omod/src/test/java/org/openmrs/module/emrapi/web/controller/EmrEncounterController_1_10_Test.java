@@ -30,6 +30,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
     @Autowired
     private EncounterService encounterService;
 
+    
     @Test
     public void shouldAddDrugOrder() throws Exception {
         executeDataSet("shouldAddNewDrugOrder.xml");
@@ -74,6 +75,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
         assertEquals(1, savedDrugOrders.size());
     }
 
+    
     @Test
     public void shouldRespectDrugUuidIfProvidedWhileAddingDrugs() throws Exception {
         executeDataSet("shouldAddNewDrugOrder.xml");
@@ -118,6 +120,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
         assertEquals(1, savedDrugOrders.size());
     }
 
+    
     @Test
     public void shouldReviseDrugOrder() throws Exception{
 
@@ -159,6 +162,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
         assertEquals(2, savedDrugOrders.size());
     }
 
+    
     @Test
     public void shouldDiscontinueDrugOrder() throws Exception{
 
@@ -208,6 +212,7 @@ public class EmrEncounterController_1_10_Test extends BaseEmrControllerTest {
         assertTrue(actions.contains("DISCONTINUE"));
     }
 
+    
     @Test
     public void shouldGetEncounterTransactionForEncounterUuid() throws Exception {
         executeDataSet("baseMetaData.xml");
