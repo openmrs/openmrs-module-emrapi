@@ -15,8 +15,6 @@ import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
-import org.openmrs.module.metadatamapping.MetadataSource;
-import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 
 /**
  *
@@ -26,7 +24,7 @@ public class ContextSensitiveMetadataTestUtils {
     /**
      * Sets up DispositionDescriptor in a context-sensitive test
      * @param conceptService
-     * @param dispositionService
+     * @param emrApiProperties
      * @return
      */
     public static DispositionDescriptor setupDispositionDescriptor(ConceptService conceptService, DispositionService dispositionService) {

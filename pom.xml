@@ -44,7 +44,6 @@
         <serialization.xstreamVersion>0.2.12</serialization.xstreamVersion>
         <calculationVersion>1.1</calculationVersion>
         <providermanagementVersion>2.5.0</providermanagementVersion>
-        <metadatamappingVersion>1.2.1</metadatamappingVersion>
         <metadatasharingVersion>1.2.2</metadatasharingVersion>
         <eventVersion>2.5</eventVersion>
         <allergyapiVersion>1.4</allergyapiVersion>
@@ -128,12 +127,6 @@
 				<version>${eventVersion}</version>
 				<scope>provided</scope>
 			</dependency>
-            <dependency>
-                <groupId>org.openmrs.module</groupId>
-                <artifactId>metadatamapping-api</artifactId>
-                <version>${metadatamappingVersion}</version>
-                <scope>provided</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement> 
 
@@ -174,18 +167,10 @@
             <artifactId>serialization.xstream-api-2.0</artifactId>
             <scope>provided</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>calculation-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>1.7.6</version>
-            <type>jar</type>
             <scope>provided</scope>
         </dependency>
 
@@ -198,12 +183,6 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>metadatasharing-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>metadatamapping-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -231,7 +210,7 @@
             <version>1.1.1</version>
             <type>jar</type>
             <scope>provided</scope>
-        </dependency>
+        </dependency> 
 
         <!-- End OpenMRS modules -->
 

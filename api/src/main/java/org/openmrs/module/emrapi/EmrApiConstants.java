@@ -14,12 +14,6 @@
 
 package org.openmrs.module.emrapi;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  *
  */
@@ -107,10 +101,6 @@ public class EmrApiConstants {
 
     public static final String EMR_CONCEPT_SOURCE_DESCRIPTION = "Source used to tag concepts used in the EMR API module";
 
-    public static final String EMR_METADATA_SOURCE_NAME = "org.openmrs.module.emrapi";
-
-    public static final String EMR_METADATA_SOURCE_DESCRIPTION = "Source used to tag metadata used in the EMR API module";
-
     public static final String EMR_CONCEPT_SOURCE_UUID = "edd52713-8887-47b7-ba9e-6e1148824ca4";
 
     public static final String GP_DIAGNOSIS_SET_OF_SETS = "emr.concept.diagnosisSetOfSets";
@@ -183,8 +173,5 @@ public class EmrApiConstants {
 */
 
     public static final String CONCEPT_CODE_DISPOSITION_CONCEPT = "Disposition";
-
     public static final String LOCATION_TAG_SUPPORTS_DISPENSING = "Dispensing Location";
-
-    public static final String EXTRA_PATIENT_IDENTIFIER_TYPES_DESCR = "Extra Patient Identifier Types that should be displayed";
 }
