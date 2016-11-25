@@ -22,6 +22,7 @@
         <require_module version="${reportingModuleVersion}">org.openmrs.module.reporting</require_module>
         <require_module version="${providermanagementModuleVersion}">org.openmrs.module.providermanagement</require_module>
         <require_module version="${metadatasharingVersion}">org.openmrs.module.metadatasharing</require_module>
+        <require_module version="${metadatamappingVersion}">org.openmrs.module.metadatamapping</require_module>
         <require_module version="${eventVersion}">org.openmrs.event</require_module>
         <require_module version="${webservicesRestModuleVersion}">org.openmrs.module.webservices.rest</require_module>
     </require_modules>
@@ -73,101 +74,6 @@
         <file>messages_de.properties</file>
     </messages>
     <!-- /Internationalization -->
-
-    <globalProperty>
-        <property>emr.unknownLocation</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the Location that represents an Unknown Location
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.unknownProvider</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the Provider that represents an Unknown Provider
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.admissionEncounterType</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the encounter type for admitting a patient
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.exitFromInpatientEncounterType</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the encounter type for exiting a patient from inpatient care
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.transferWithinHospitalEncounterType</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the encounter type for transferring a patient within the hospital
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.visitNoteEncounterType</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the encounter type for a visit note
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.primaryIdentifierType</property>
-        <defaultValue></defaultValue>
-        <description>
-            Primary identifier type for looking up patients, generating barcodes, etc
-        </description>
-    </globalProperty>
-    
-    <globalProperty>
-        <property>emr.extraPatientIdentifierTypes</property>
-        <defaultValue></defaultValue>
-        <description>
-            A list of UUIDs indicating extra Patient Identifier Types that should be displayed
-        </description>
-    </globalProperty>
-    <globalProperty>
-        <property>emr.atFacilityVisitType</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the VisitType that we use for newly-created visits
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.admissionForm</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the Admission Form (not required)
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.transferWithinHospitalForm</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the Transfer Form (not required)
-        </description>
-    </globalProperty>
-
-    <globalProperty>
-        <property>emr.exitFromInpatientForm</property>
-        <defaultValue></defaultValue>
-        <description>
-            UUID of the Discharge Form (not required)
-        </description>
-    </globalProperty>
     
     <globalProperty>
         <property>emr.encounterMatcher</property>
@@ -215,17 +121,6 @@
         <defaultValue></defaultValue>
         <description>
             UUID of non coded concept
-        </description>
-    </globalProperty>
-
-
-    <!-- this core global property will eventually replace emr.unknownProvider -->
-    <!-- currently, at module startup, the activator should make sure both properties are set to the same value -->
-    <globalProperty>
-        <property>provider.unknownProviderUuid</property>
-        <defaultValue></defaultValue>
-        <description>
-            Specifies the uuid of the Unknown Provider account
         </description>
     </globalProperty>
 

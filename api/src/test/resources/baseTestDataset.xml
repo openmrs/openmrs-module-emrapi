@@ -1,60 +1,109 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <dataset>
-    <global_property property="emr.atFacilityVisitType" property_value="f01c54cb-2225-471a-9cd5-d348552c337c"
-                     uuid="a0ee79e5-1d6c-46bf-903f-55437441329f"/>
+
+    <metadatamapping_metadata_source
+            metadata_source_id = "2134"
+            creator = "1"
+            date_created="2008-08-18 12:38:58.0"
+            uuid="cf25712e-f193-48d5-a85a-5fd8d0242223"
+            name="org.openmrs.module.emrapi"
+            retired = "false"
+    />
+
+    <metadatamapping_metadata_source
+            metadata_source_id = "2137"
+            creator = "1"
+            date_created="2008-08-18 12:38:58.0"
+            uuid="cf25712e-f193-48d5-a85a-5fd8d0242228"
+            name="emr.extraPatientIdentifierTypes"
+            retired = "false"
+    />
+
+
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3245" metadata_source_id = "2134"
+            creator = "1" date_created="2008-08-18 12:38:58.0" uuid="cf25712e-f193-48d5-a85a-5fd8d0244c71"
+            retired = "false" code = "emr.unknownProvider" name = "Unknown Provider"
+    />
+
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "32245" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="cf25712e-f193-48d5-aaaa-5fd8d0244c71"
+                                           retired = "false" code = "emr.admissionForm" name = "Admission Form"
+    />
+
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "32451" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="a0ee79e5-1d6c-46bf-903f-55437441329f"
+                                           retired = "false" code = "emr.atFacilityVisitType" name = "emr.atFacilityVisitType"
+                                           metadata_uuid = "f01c54cb-2225-471a-9cd5-d348552c337c" metadata_class = "org.openmrs.VisitType"
+    />
     <visit_type visit_type_id="1" name="Clinic or Hospital Visit" creator="1" date_created="2012-10-23 18:04:14"
                 changed_by="1" date_changed="2012-10-23 18:04:14"
                 retired="0" uuid="f01c54cb-2225-471a-9cd5-d348552c337c"/>
 
-    <global_property property="emr.checkInEncounterType" property_value="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"
-                     uuid="6686a8c0-fcc5-4fc5-b997-906e7ee23bd1"/>
+
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "32245" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="6686a8c0-fcc5-4fc5-b997-906e7ee23bd1"
+                                           retired = "false" code = "emr.checkInEncounterType" name = "emr.checkInEncounterType"
+                                           metadata_uuid = "55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b" metadata_class = "org.openmrs.EncounterType"
+    />
     <encounter_type encounter_type_id="1000" name="Check-in" description="Check in for a clinic visit" creator="1"
                     date_created="2012-10-23 18:04:14" retired="0" uuid="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"/>
 
-    <global_property property="emr.checkInClerkEncounterRole" property_value="cbfe0b9d-9923-404c-941b-f048adc8cdc0"
-                     uuid="de7a1223-990a-4714-84a3-a05f7ad89896"/>
+
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "35" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="de7a1223-990a-4714-84a3-a05f7ad89896"
+                                           retired = "false" code = "emr.checkInClerkEncounterRole" name = "emr.checkInClerkEncounterRole"
+                                           metadata_uuid = "cbfe0b9d-9923-404c-941b-f048adc8cdc0" metadata_class = "org.openmrs.EncounterRole"
+    />
     <encounter_role encounter_role_id="6" name="Administrative Clerk" creator="1" date_created="2012-10-23 18:04:14"
                     changed_by="1" date_changed="2012-10-23 18:04:14"
                     retired="0" uuid="cbfe0b9d-9923-404c-941b-f048adc8cdc0"/>
 
-    <global_property property="emr.admissionEncounterType" property_value="2c8c3ff2-b8eb-11e2-9426-3edb8e345d35"
-                     uuid="35c57674-b8eb-11e2-9426-3edb8e345d35"/>
-    <encounter_type encounter_type_id="1001" name="Admission" description="Admit to Inpatient (prevents autoclosing visits)" creator="1"
-                    date_created="2012-10-23 18:04:14" retired="0" uuid="2c8c3ff2-b8eb-11e2-9426-3edb8e345d35"/>
 
-    <global_property property="emr.exitFromInpatientEncounterType" property_value="3bbdc54a-b8eb-11e2-9426-3edb8e345d35"
-                     uuid="453e855a-b8eb-11e2-9426-3edb8e345d35"/>
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "39" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="453e855a-b8eb-11e2-9426-3edb8e345d35"
+                                           retired = "false" code = "emr.exitFromInpatientEncounterType" name = "emr.exitFromInpatientEncounterType"
+                                           metadata_uuid = "3bbdc54a-b8eb-11e2-9426-3edb8e345d35" metadata_class = "org.openmrs.EncounterType"
+    />
     <encounter_type encounter_type_id="1002" name="Discharge" description="Discharge from Inpatient (allows autoclosing visits)" creator="1"
                     date_created="2012-10-23 18:04:14" retired="0" uuid="3bbdc54a-b8eb-11e2-9426-3edb8e345d35"/>
 
-    <global_property property="emr.visitNoteEncounterType" property_value="06087e80-d565-11e3-9c1a-0800200c9a66"
-                     uuid="111bbad0-d565-11e3-9c1a-0800200c9a665"/>
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3945" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="111bbad0-d565-11e3-9c1a-0800200c9a665"
+                                           retired = "false" code = "emr.visitNoteEncounterType" name = "emr.visitNoteEncounterType"
+                                           metadata_uuid = "06087e80-d565-11e3-9c1a-0800200c9a66" metadata_class = "org.openmrs.EncounterType"
+    />
     <encounter_type encounter_type_id="1003" name="Visit Note" description="Consult With Physican" creator="1"
                     date_created="2012-10-23 18:04:14" retired="0" uuid="06087e80-d565-11e3-9c1a-0800200c9a66"/>
 
-    <global_property property="emr.admissionEncounterType" property_value="06087111-222-11e3-9c1a-0800200c9a66"
-                     uuid="111b2340-d565-11e3-9c1a-0800200c9a665"/>
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3288" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="111b2340-d565-11e3-9c1a-0800200c9a665"
+                                           retired = "false" code = "emr.admissionEncounterType" name = "emr.admissionEncounterType"
+                                           metadata_uuid = "06087111-222-11e3-9c1a-0800200c9a66" metadata_class = "org.openmrs.EncounterType"
+    />
     <encounter_type encounter_type_id="1004" name="Admission" description="Admit to Inpatient" creator="1"
                     date_created="2012-10-23 18:04:14" retired="0" uuid="06087111-222-11e3-9c1a-0800200c9a66"/>
-
-    <global_property property="visits.assignmentHandler"
-                     property_value="org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler"
-                     uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>
-
-    <!-- this sets the identifier type with id=1 in the standard test dataset to the "primary identifier type" -->
-    <global_property property="emr.primaryIdentifierType" property_value="1a339fe9-38bc-4ab3-b180-320988c0b968"
-                     uuid="776cb3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
-
-    <person_attribute_type person_attribute_type_id="10" name="Unknown patient" description="Unknown patient"
-                           format="java.lang.String" searchable="false" creator="1" date_created="2008-08-15 15:53:36.0"
-                           retired="false" uuid="a0f5521c-dbbd-4c10-81b2-1b7ab18330dz" sort_weight="2"/>
 
     <global_property property="provider.unknownProviderUuid" property_value=""
                      uuid="984628b0-e914-11e4-b571-0800200c9a66"/>
 
     <global_property property="emr.unknownProvider" property_value=""
                      uuid="a0351a90-e914-11e4-b571-0800200c9a66"/>
+
+    <global_property property="visits.assignmentHandler"
+                     property_value="org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler"
+                     uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>
+
+    <!-- this sets the identifier type with id=1 in the standard test dataset to the "primary identifier type" -->
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3288676" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="776cb3c3-9e66-42c6-8f03-2a0c1e9ca2a8"
+                                           retired = "false" code = "emr.primaryIdentifierType" name = "emr.primaryIdentifierType"
+                                           metadata_uuid = "1a339fe9-38bc-4ab3-b180-320988c0b968" metadata_class = "org.openmrs.PatientIdentifierType"
+    />
+
+    <person_attribute_type person_attribute_type_id="10" name="Unknown patient" description="Unknown patient"
+                           format="java.lang.String" searchable="false" creator="1" date_created="2008-08-15 15:53:36.0"
+                           retired="false" uuid="a0f5521c-dbbd-4c10-81b2-1b7ab18330dz" sort_weight="2"/>
 
     <concept_reference_source concept_source_id="1001" name="org.openmrs.module.emrapi" description="EMR API Concept Source" creator="1" date_created="2009-06-03 13:41:25.0" retired="false" uuid="edd52713-8887-47b7-ba9e-6e1148824ca4"/>
 
