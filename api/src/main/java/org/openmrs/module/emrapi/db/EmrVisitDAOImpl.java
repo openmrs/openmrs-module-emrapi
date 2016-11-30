@@ -94,6 +94,10 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
       }
       Query query = sessionFactory.getCurrentSession().createQuery(queryString);
       query.setInteger("visitId", visit.getId());
+      query.setInteger("diagnosisOrderConceptId", diagnosisMetadata.getDiagnosisOrderConcept().getId());
+      query.setInteger("primaryOrderConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Order.PRIMARY).getId());
+      query.setInteger("diagnosisCertaintyConceptId", diagnosisMetadata.getDiagnosisCertaintyConcept().getId());
+      query.setInteger("confirmedCertaintyConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Certainty.CONFIRMED).getId());
       return (List<Obs>) query.list();
    }
 }

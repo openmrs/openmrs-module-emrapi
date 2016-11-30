@@ -344,9 +344,6 @@ public class VisitDomainWrapper implements DomainWrapper {
      */
     public List<Diagnosis> getUniqueDiagnoses(Boolean primaryOnly, Boolean confirmedOnly) {
        
-       if (primaryOnly == true && confirmedOnly == true) // TODO: Re-implement that specific case with HQL
-          return getUniqueDiagnosesLegacy(primaryOnly, confirmedOnly);
-    
        DiagnosisMetadata diagnosisMetadata;
        try {
            diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
