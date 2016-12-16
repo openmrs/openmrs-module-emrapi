@@ -555,6 +555,13 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new IllegalArgumentException("Cannot merge a permanent record into an unknown one");
         }
 
+        // do any "before-merge actions" that have been registered
+        if (patientMergeActions != null) {
+            for (PatientMergeAction patientMergeAction : patientMergeActions) {
+                patientMergeAction.beforeMergingPatients(preferred, notPreferred);
+            }
+        }
+
         List<Visit> preferredVisits = visitService.getVisitsByPatient(preferred, true, false);
         List<Visit> notPreferredVisits = visitService.getVisitsByPatient(notPreferred, true, false);
 
@@ -589,12 +596,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
         }
 
-        if (patientMergeActions != null) {
-            for (PatientMergeAction patientMergeAction : patientMergeActions) {
-                patientMergeAction.beforeMergingPatients(preferred, notPreferred);
-            }
-        }
-
         try {
             patientService.mergePatients(preferred, notPreferred);
             // if we merged an unknown record into a permanent one, remove the unknown flag; if we merged two unknown records, keep it
@@ -605,6 +606,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             throw new APIException("Unable to merge patients due to serialization error", e);
         }
 
+        // do any "after-merge actions" that have been registered
         if (patientMergeActions != null) {
             for (PatientMergeAction patientMergeAction : patientMergeActions) {
                 patientMergeAction.afterMergingPatients(preferred, notPreferred);
