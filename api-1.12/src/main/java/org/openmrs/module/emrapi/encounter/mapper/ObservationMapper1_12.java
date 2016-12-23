@@ -35,6 +35,7 @@ public class ObservationMapper1_12 extends ObservationMapper {
     public EncounterTransaction.Observation map(Obs obs) {
         EncounterTransaction.Observation observation = super.map(obs);
         observation.setFormNamespace(obs.getFormFieldNamespace());
+        observation.setFormFieldPath(obs.getFormFieldPath());
         return observation;
     }
 }

@@ -62,10 +62,11 @@ public class ObservationMapper1_12Test {
     @Test
     public void shouldMapObservationWithNumericValue(){
         when(conceptDatatype.isNumeric()).thenReturn(true);
-        Obs obs = obsBuilder.setFormField("form uuid", "").get();
+        Obs obs = obsBuilder.setFormField("form uuid", "formFieldPath").get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
         assertEquals(observation.getFormNamespace(), "form uuid");
+        assertEquals(observation.getFormFieldPath(), "formFieldPath");
     }
     private ConceptClass getConceptClass(String conceptClassName) {
         ConceptClass conceptClass = new ConceptClass();
