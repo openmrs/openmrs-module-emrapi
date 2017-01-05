@@ -14,13 +14,23 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
+import org.openmrs.VisitType;
+import org.openmrs.api.APIException;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.handler.BaseEncounterVisitHandler;
 import org.openmrs.api.handler.EncounterVisitHandler;
+import org.openmrs.api.handler.ExistingOrNewVisitAssignmentHandler;
+import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.util.OpenmrsUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.Date;
@@ -30,13 +40,18 @@ import java.util.Locale;
 /**
  * Ensures that encounters are assigned to visits based on the EMR module's business logic.
  * <p/>
- * For now, we require that a compatible visit exist before you're allowed to create an encounter.
+ * For now, we require that a compatible visit exist before you're allowed to create an encounter. However if the EmrApiConstants#GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP
+ * property that provides a mapping between encounter types and visit types is set then a new visit is created using the visit type from the saved mapping
  */
 public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler implements EncounterVisitHandler {
 
     private VisitService visitService;
 
     private AdtService adtService;
+    
+    private AdministrationService administrationService;
+    
+    private EncounterTypetoVisitTypeMapper encounterTypetoVisitTypeMapper;
 
     /**
      * Since the OpenMRS core doesn't load this bean via Spring, do some hacky setup here.
@@ -48,6 +63,8 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
             // in production, set the fields this way
             visitService = Context.getVisitService();
             adtService = Context.getService(AdtService.class);
+            administrationService = Context.getAdministrationService();
+            encounterTypetoVisitTypeMapper = Context.getRegisteredComponents(EncounterTypetoVisitTypeMapper.class).get(0);
         } catch (Exception ex) {
             // unit tests will set the fields manually
         }
@@ -91,6 +108,23 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
                 }
             }
         }
+        // there is no suitable visit so create one if there is a mapping encounter type to the visit type via the Global property
+        if (StringUtils.isNotBlank(administrationService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))) {
+            VisitType visitType = getEncounterTypetoVisitTypeMapper().getVisitTypeForEncounter(encounter);
+            // only process a visit if there is a matching visitType
+            if (visitType != null) {
+                Visit visit = new Visit();
+                visit.setStartDatetime(encounter.getEncounterDatetime());
+                visit.setLocation(encounter.getLocation());
+                visit.setPatient(encounter.getPatient());
+                visit.setVisitType(visitType);
+                //set stop date time to last millisecond of the encounter day for a past visit
+                if (!encounter.getEncounterDatetime().equals(new Date())) {
+                    visit.setStopDatetime(OpenmrsUtil.getLastMomentOfDay(encounter.getEncounterDatetime()));
+                }
+                visit.addEncounter(encounter);
+            }
+        }
 
         // TEMP HACK: allow visit-free encounters while we continue to discuss this
         // throw new IllegalStateException("Cannot create an encounter outside of a visit");
@@ -102,5 +136,16 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
 
     public void setAdtService(AdtService adtService) {
         this.adtService = adtService;
+    }
+    
+    public void setAdministrationService(AdministrationService administrationService) {this.administrationService = administrationService; }
+    
+    public EncounterTypetoVisitTypeMapper getEncounterTypetoVisitTypeMapper() {
+        return encounterTypetoVisitTypeMapper;
+    }
+    
+    public void setEncounterTypetoVisitTypeMapper(
+            EncounterTypetoVisitTypeMapper encounterTypetoVisitTypeMapper) {
+        this.encounterTypetoVisitTypeMapper = encounterTypetoVisitTypeMapper;
     }
 }
