@@ -14,6 +14,7 @@ import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
+import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;

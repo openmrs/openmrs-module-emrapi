@@ -15,6 +15,7 @@ package org.openmrs.module.emrapi.web.controller;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.type.TypeReference;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.*;
 import org.openmrs.api.ObsService;
@@ -38,6 +39,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
     private ObsService obsService;
     private String dateTimeFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
+    
     @Test
     public void shouldCreateVisitWhenNoVisitsAreActive() throws Exception {
         executeDataSet("shouldCreateVisitWhenNoVisitsAreActive.xml");
@@ -52,6 +54,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         assertEquals("b45ca846-c79a-11e2-b0c0-8e397087571c", visit.getVisitType().getUuid());
     }
 
+    
     @Test
     public void shouldCreateNewEncounter() throws Exception {
         executeDataSet("shouldCreateMatchingEncounter.xml");
@@ -78,6 +81,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         assertEquals(encounterDateTime, encounter.getEncounterDatetime());
     }
 
+    
     @Test
     public void shouldUpdateMatchingEncounterWhenCustomMatchingStrategyIsProvided() throws Exception {
         executeDataSet("shouldUpdateMatchingEncounterWhenCustomMatchingStrategyIsProvided.xml");
@@ -92,6 +96,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         assertEquals("f13d6fae-baa9-4553-955d-920098bec08g", response.getEncounterUuid());
     }
 
+    
     @Test(expected = EncounterMatcherNotFoundException.class)
     public void shouldReturnErrorWhenInvalidMatchingStrategyIsProvided() throws Exception {
         executeDataSet("shouldReturnErrorWhenInvalidMatchingStrategyIsProvided.xml");
@@ -103,6 +108,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         handle(newPostRequest("/rest/emrapi/encounter", json));
     }
 
+    
     @Test
     public void shouldAddNewObservation() throws Exception {
         executeDataSet("shouldAddNewObservation.xml");
@@ -145,6 +151,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         assertEquals(new Double(20.0), map.get(ConceptDatatype.NUMERIC).getValueNumeric());
     }
 
+    
     @Test
     public void shouldAddNewObservationGroup() throws Exception {
         executeDataSet("shouldAddNewObservation.xml");
@@ -179,6 +186,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         assertEquals(new SimpleDateFormat(dateTimeFormat).parse(observationTime), member.getObsDatetime());
     }
 
+    
     @Test
     public void shouldUpdateObservations() throws Exception {
         executeDataSet("shouldUpdateObservations.xml");
@@ -219,6 +227,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
 
     }
 
+    
     @Test
     public void shouldGetEncounterTransactionByDate() throws Exception {
         executeDataSet("baseMetaData.xml");
@@ -316,6 +325,7 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         return null;
     }
 
+    
     @Test
     public void shouldAddDiagnosesAdObservation() throws Exception {
         executeDataSet("baseMetaData.xml");
@@ -360,7 +370,8 @@ public class EmrEncounterController_1_11_Test extends BaseEmrControllerTest {
         }
         return valueCodedNames;
     }
-
+    
+    
     @Test
     public void shouldGetAllEncounterTransactionsWhenDateNotProvided() throws Exception {
         executeDataSet("baseMetaData.xml");

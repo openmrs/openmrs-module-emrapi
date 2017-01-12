@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<dataset>
+
+    <metadatamapping_metadata_source
+            metadata_source_id = "2134"
+            creator = "1"
+            date_created="2008-08-18 12:38:58.0"
+            uuid="cf25712e-f193-48d5-a85a-5fd8d0242223"
+            name="org.openmrs.module.emrapi"
+            retired = "false"
+    />
+
+    <visit_type visit_type_id="1" name="Clinic or Hospital Visit" creator="1" date_created="2012-10-23 18:04:14"
+                changed_by="1" date_changed="2012-10-23 18:04:14"
+                retired="0" uuid="f01c54cb-2225-471a-9cd5-d348552c337c"/>
+
+    <global_property property="emr.checkInEncounterType" property_value="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"
+                     uuid="6686a8c0-fcc5-4fc5-b997-906e7ee23bd1"/>
+    <encounter_type encounter_type_id="1000" name="Check-in" description="Check in for a clinic visit" creator="1"
+                    date_created="2012-10-23 18:04:14" retired="0" uuid="55a0d3ea-a4d7-4e88-8f01-5aceb2d3c61b"/>
+
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "39" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="453e855a-b8eb-11e2-9426-3edb8e345d35"
+                                           retired = "false" code = "emr.exitFromInpatientEncounterType" name = "emr.exitFromInpatientEncounterType"
+    />
+
+    <global_property property="emr.exitFromInpatientEncounterType" property_value="3bbdc54a-b8eb-11e2-9426-3edb8e345d35"
+                     uuid="453e855a-b8eb-11e2-9426-3edb8e345d35"/>
+    <encounter_type encounter_type_id="1002" name="Discharge" description="Discharge from Inpatient (allows autoclosing visits)" creator="1"
+                    date_created="2012-10-23 18:04:14" retired="0" uuid="3bbdc54a-b8eb-11e2-9426-3edb8e345d35"/>
+
+    <global_property property="provider.unknownProviderUuid" property_value=""
+                     uuid="984628b0-e914-11e4-b571-0800200c9a66"/>
+
+    <global_property property="emr.unknownProvider" property_value=""
+                     uuid="a0351a90-e914-11e4-b571-0800200c9a66"/>
+
+    <global_property property="visits.assignmentHandler"
+                     property_value="org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler"
+                     uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>
+
+    <!-- this sets the identifier type with id=1 in the standard test dataset to the "primary identifier type" -->
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3288676" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="776cb3c3-9e66-42c6-8f03-2a0c1e9ca2a8"
+                                           retired = "false" code = "emr.primaryIdentifierType" name = "emr.primaryIdentifierType"
+                                           metadata_uuid = "1a339fe9-38bc-4ab3-b180-320988c0b968" metadata_class = "org.openmrs.PatientIdentifierType"
+    />
+
+    <!--set of extra patient identifier types saved as global property-->
+    <global_property property="emr.extraPatientIdentifierTypes"
+                     property_value="87c67899-ae36-4535-a69f-b30ac1110c65, a81886c6-aeae-461b-beb6-aa903a146784,b7d17960-976b-4303-a62a-31fb1c5d47d9"
+                     uuid="a0351a90-e914-11e4-b571-0800202c9a66"/>
+    <patient_identifier_type patient_identifier_type_id="1" uuid="87c67899-ae36-4535-a69f-b30ac1110c65" creator="1"
+                             date_created="2012-10-23 18:04:14" retired="0" required="false" check_digit="true"
+                             name="IDENT" description="TEST DESCRIPTION"
+    />
+    <patient_identifier_type patient_identifier_type_id="3" uuid="a81886c6-aeae-461b-beb6-aa903a146784" creator="1"
+                             date_created="2012-10-23 18:04:14" retired="0" required="false" check_digit="true"
+                             name="IDENT" description="TEST DESCRIPTION"
+    />
+    <patient_identifier_type patient_identifier_type_id="2" uuid="b7d17960-976b-4303-a62a-31fb1c5d47d9" creator="1"
+                             date_created="2012-10-23 18:04:14" retired="0" required="false" check_digit="true"
+                             name="IDENT" description="TEST DESCRIPTION"
+    />
+
+</dataset>
