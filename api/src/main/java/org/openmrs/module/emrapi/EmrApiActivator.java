@@ -22,7 +22,6 @@ import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
-import org.openmrs.OpenmrsMetadata;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
@@ -54,8 +53,6 @@ import org.openmrs.module.metadatamapping.util.GlobalPropertyToMappingConverter;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.io.File;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,7 +143,7 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
      */
     private void createMissingMetadataMappings() {
         //create main metadata source
-        MetadataSource emrapiMetadataSource = saveMetadataSourceIfMissing(EmrApiConstants.EMR_METADATA_SOURCE_NAME, EmrApiConstants.EMR_METADATA_SOURCE_DESCRIPTION);
+        MetadataSource emrapiMetadataSource = saveMetadataSourceIfMissing(EmrApiConstants.EMR_METADATA_SOURCE_NAME, EmrApiConstants.EMR_METADATA_SOURCE_DESCRIPTION, EmrApiConstants.EMR_METADATA_SOURCE_UUID);
 
         createExtraPatientIdTypesSetIfMissing(emrapiMetadataSource);
 
@@ -225,12 +222,14 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         }
     }
     
-    private MetadataSource saveMetadataSourceIfMissing(String name, String description){
+    private MetadataSource saveMetadataSourceIfMissing(String name, String description, String uuid){
+        // we fetch by name because the definition of a uuid constant was added in afterwards, so it's *possible* that implementations running a bleeding-edge snapshot of emr-api may have a source with a different uuid
         MetadataSource source = metadataMappingService.getMetadataSourceByName(name);
         if(source == null){
             source = new MetadataSource();
             source.setName(name);
             source.setDescription(description);
+            source.setUuid(uuid);
             metadataMappingService.saveMetadataSource(source);
         }
         return source;
