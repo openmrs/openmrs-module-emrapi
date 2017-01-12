@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <global_property property="emr.someConceptSource" property_value="00001827-639f-4cb4-961f-1e025bf80000" uuid="696cb3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
+    <global_property property="emr.unknownLocation" property_value="8d6c993e-c2cc-11de-8d13-0010c6dffd0f" uuid="6977b3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
+    <global_property property="emr.unknownProvider" property_value="c2299800-cca9-11e0-9572-0800200c9a66" uuid="6988b3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
+    <global_property property="emr.unknownForm" property_value="d9218f76-6c39-45f4-8efa-4c5c6c199f50" uuid="6728b3c3-9e66-42c6-8f03-2a0c1e9ca2a8"/>
+</dataset>
