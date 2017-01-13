@@ -14,6 +14,12 @@
 
 package org.openmrs.module.emrapi;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  *
  */
@@ -104,8 +110,6 @@ public class EmrApiConstants {
     public static final String EMR_METADATA_SOURCE_NAME = "org.openmrs.module.emrapi";
 
     public static final String EMR_METADATA_SOURCE_DESCRIPTION = "Source used to tag metadata used in the EMR API module";
-
-    public static final String EMR_METADATA_SOURCE_UUID = "146c836c-818d-4a80-bd8c-072caabe05d7";
 
     public static final String EMR_CONCEPT_SOURCE_UUID = "edd52713-8887-47b7-ba9e-6e1148824ca4";
 
