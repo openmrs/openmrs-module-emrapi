@@ -179,7 +179,12 @@ public class CodedOrFreeTextAnswer {
         } else if (codedAnswer == null) {
             return "?";
         } else {
-            return codedAnswer.getName(locale).getName();
+        	ConceptName conceptName = codedAnswer.getName(locale);
+        	if (conceptName == null) {
+        		//just get name in any locale
+        		conceptName = codedAnswer.getName();
+        	}
+            return conceptName.getName();
         }
     }
 
