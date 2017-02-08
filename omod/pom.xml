@@ -56,12 +56,14 @@
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod</artifactId>
             <scope>provided</scope>
+            <version>${webservicesRestVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod-common</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
+            <version>${webservicesRestVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openmrs.test</groupId>
