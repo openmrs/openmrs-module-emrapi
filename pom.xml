@@ -139,7 +139,7 @@
 
     <dependencies>
         <!-- Begin OpenMRS modules -->
-       <dependency>
+        <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>reporting-api</artifactId>
             <scope>provided</scope>
@@ -237,7 +237,7 @@
 
         <!-- Begin OpenMRS contrib -->
 
-       <dependency>
+        <dependency>
             <groupId>org.openmrs.contrib</groupId>
             <artifactId>testutils</artifactId>
             <version>${openmrsTestutilsVersion}</version>
