@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Patient;
@@ -115,11 +116,11 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
             if (visitType != null) {
                 Visit visit = new Visit();
                 visit.setStartDatetime(encounter.getEncounterDatetime());
-                visit.setLocation(encounter.getLocation());
+                visit.setLocation(adtService.getLocationThatSupportsVisits(encounter.getLocation()));
                 visit.setPatient(encounter.getPatient());
                 visit.setVisitType(visitType);
                 //set stop date time to last millisecond of the encounter day for a past visit
-                if (!encounter.getEncounterDatetime().equals(new Date())) {
+                if (!DateUtils.isSameDay(encounter.getEncounterDatetime(), new Date())) {
                     visit.setStopDatetime(OpenmrsUtil.getLastMomentOfDay(encounter.getEncounterDatetime()));
                 }
                 visit.addEncounter(encounter);

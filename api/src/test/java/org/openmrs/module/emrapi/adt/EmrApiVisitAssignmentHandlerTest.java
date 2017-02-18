@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
+import org.openmrs.LocationTag;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
@@ -64,6 +65,7 @@ public class EmrApiVisitAssignmentHandlerTest {
         visitService = mock(VisitService.class);
         adminService = mock(AdministrationService.class);
         adtService = new AdtServiceImpl();
+        
         handler.setVisitService(visitService);
         handler.setAdtService(adtService);
         handler.setAdministrationService(adminService);
@@ -141,6 +143,7 @@ public class EmrApiVisitAssignmentHandlerTest {
         Encounter encounter = new Encounter();
         encounter.setPatient(patient);
         encounter.setLocation(location);
+        location.addTag(new LocationTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS, "Tag that supports visits"));
         encounter.setEncounterDatetime(new Date());
         encounter.setEncounterType(encounterType);
     
@@ -168,6 +171,7 @@ public class EmrApiVisitAssignmentHandlerTest {
         cal.set(2017, 1, 5); // January 5, 2017 a date in the past
         Patient patient = new Patient();
         Location location = new Location();
+        location.addTag(new LocationTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS, "Tag that supports visits"));
         Encounter encounter = new Encounter();
         encounter.setPatient(patient);
         encounter.setLocation(location);
