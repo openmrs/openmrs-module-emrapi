@@ -395,5 +395,14 @@
     <bean id="dbSessionUtil" class="org.openmrs.module.emrapi.db.DbSessionUtil">
         <property name="dbSessionDAO"><ref bean="dbSessionDAO"/></property>
     </bean>
+    
+    <bean id="encounterTypetoVisitTypeMapper" class="org.openmrs.module.emrapi.adt.EncounterTypetoVisitTypeMapper">
+        <property name="adminService">
+            <ref bean="adminService"/>
+        </property>
+        <property name="visitService">
+            <ref bean="visitService"/>
+        </property>
+    </bean>
 
 </beans>

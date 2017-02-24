@@ -187,4 +187,6 @@ public class EmrApiConstants {
     public static final String LOCATION_TAG_SUPPORTS_DISPENSING = "Dispensing Location";
 
     public static final String EXTRA_PATIENT_IDENTIFIER_TYPES_DESCR = "Extra Patient Identifier Types that should be displayed";
+    
+    public static final String GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP = "emrapi.EmrApiVisitAssignmentHandler.encounterTypeToNewVisitTypeMap";
 }
