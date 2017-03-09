@@ -27,7 +27,6 @@
         <property name="additionalDetail" type="java.lang.String" column="additional_detail" length="1024"/>
         <property name="endDate" type="java.util.Date" column="end_date"/>
         <property name="dateCreated" type="java.util.Date" column="date_created" not-null="true"/>
-        <property name="dateChanged" type="java.util.Date" column="date_changed"/>
         <property name="voided" type="java.lang.Boolean" column="voided"/>
         <property name="dateVoided" type="java.util.Date" column="date_voided"/>
         <property name="voidReason" type="java.lang.String" column="void_reason" length="255"/>
@@ -38,7 +37,6 @@
         <many-to-one name="concept" column="concept_id" class="org.openmrs.Concept" not-null="true"/>
         <many-to-one name="endReason" column="end_reason" class="org.openmrs.Concept"/>
         <many-to-one name="creator" class="org.openmrs.User" not-null="true"/>
-        <many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
         <many-to-one name="voidedBy" class="org.openmrs.User" column="voided_by"/>
     </class>
 </hibernate-mapping>

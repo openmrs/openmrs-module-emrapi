@@ -22,6 +22,12 @@
             <artifactId>openmrs-api</artifactId>
             <version>${openMRSVersion}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -30,6 +36,12 @@
             <type>test-jar</type>
             <version>${openMRSVersion}</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -37,13 +49,6 @@
             <artifactId>openmrs-test</artifactId>
             <version>${openMRSVersion}</version>
             <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
             <scope>test</scope>
         </dependency>
 

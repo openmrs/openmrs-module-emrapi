@@ -1,42 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-
-		 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-
-
-    <bean id="conditionDAO" class="org.openmrs.api.db.hibernate.HibernateConditionDAO">
-        <property name="sessionFactory">
-            <ref bean="dbSessionFactory"/>
-        </property>
-    </bean>
-
-    <bean id="conditionServiceTarget" class="org.openmrs.api.impl.ConditionServiceImpl">
-        <constructor-arg index="0" ref="conditionDAO"/>
-        <constructor-arg index="1" ref="conceptService"/>
-        <constructor-arg index="2" ref="adminService"/>
-    </bean>
-
-    <bean id="conditionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref local="conditionServiceTarget"/>
-        </property>
-        <property name="preInterceptors">
-            <ref bean="serviceInterceptors"/>
-        </property>
-        <property name="transactionAttributeSource">
-            <ref bean="transactionAttributeSource"/>
-        </property>
-    </bean>
-
-    <bean id="conditionValidator" class="org.openmrs.api.validator.ConditionValidator">
-        <constructor-arg name="conditionService" ref="conditionService"/>
-        <constructor-arg name="administrationService" ref="adminService"/>
-    </bean>
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	
+	
+	<bean id="conditionDAO" class="org.openmrs.module.emrapi.conditionslist.db.hibernate.HibernateConditionDAO">
+		<property name="sessionFactory">
+			<ref bean="dbSessionFactory" />
+		</property>
+	</bean>
+	
+	<bean id="conditionServiceTarget" class="org.openmrs.module.emrapi.conditionslist.impl.ConditionServiceImpl">
+		<constructor-arg index="0" ref="conditionDAO" />
+		<constructor-arg index="1" ref="conceptService" />
+		<constructor-arg index="2" ref="adminService" />
+	</bean>
+	
+	<bean id="conditionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="target">
+			<ref local="conditionServiceTarget" />
+		</property>
+		<property name="preInterceptors">
+			<ref bean="serviceInterceptors" />
+		</property>
+		<property name="transactionAttributeSource">
+			<ref bean="transactionAttributeSource" />
+		</property>
+	</bean>
+	
+	<bean id="conditionValidator" class="org.openmrs.module.emrapi.conditionslist.ConditionValidator">
+		<constructor-arg name="conditionService" ref="conditionService" />
+		<constructor-arg name="administrationService" ref="adminService" />
+	</bean>
+	
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.emrapi.conditionslist.ConditionService</value>
+				<ref bean="conditionService" />
+			</list>
+		</property>
+	</bean>
 </beans>

@@ -11,16 +11,15 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.api.db;
+package org.openmrs.module.emrapi.conditionslist;
 
-import org.openmrs.Condition;
-import org.openmrs.Patient;
+import org.openmrs.annotation.AddOnStartup;
 
-import java.util.List;
-
-public interface ConditionDAO {
-    Condition saveOrUpdate(Condition condition);
-    Condition getConditionByUuid(String uuid);
-    List<Condition> getConditionHistory(Patient patient);
-    List<Condition> getActiveConditions(Patient patient);
+public class PrivilegeConstants {
+	
+	@AddOnStartup(description = "Able to edit conditions")
+	public static final String EDIT_CONDITIONS = "Edit conditions";
+	
+	@AddOnStartup(description = "Able to get conditions")
+	public static final String GET_CONDITIONS = "Get conditions";
 }

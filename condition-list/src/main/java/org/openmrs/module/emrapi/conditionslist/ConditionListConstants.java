@@ -11,8 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.api.util;
-
+package org.openmrs.module.emrapi.conditionslist;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,11 +23,12 @@ import org.apache.commons.logging.LogFactory;
  * methods will be written to the database at startup if they don't exist yet.
  */
 
-
 public final class ConditionListConstants {
-
-    private static Log log = LogFactory.getLog(ConditionListConstants.class);
-    public static final String GP_END_REASON_CONCEPT_SET_UUID = "conditionList.endReasonConceptSetUuid" ;
-    public static final String GLOBAL_PROPERTY_NON_CODED_UUID = "conditionList.nonCodedUuid";
-
+	
+	private static Log log = LogFactory.getLog(ConditionListConstants.class);
+	
+	public static final String GP_END_REASON_CONCEPT_SET_UUID = "conditionList.endReasonConceptSetUuid";
+	
+	public static final String GLOBAL_PROPERTY_NON_CODED_UUID = "conditionList.nonCodedUuid";
+	
 }
