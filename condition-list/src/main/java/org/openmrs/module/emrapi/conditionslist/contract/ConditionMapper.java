@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.conditionslist.contract;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import org.openmrs.ConceptName;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
@@ -9,8 +10,7 @@ import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
 public class ConditionMapper {
 	
 	public Condition map(org.openmrs.Condition openmrsCondition) {
-		Concept concept = new Concept(openmrsCondition.getConcept().getUuid(),
-				openmrsCondition.getConcept().getDisplayString());
+		Concept concept = mapConcept(openmrsCondition.getConcept());
 		Condition condition = new Condition();
 		condition.setUuid(openmrsCondition.getUuid());
 		condition.setAdditionalDetail(openmrsCondition.getAdditionalDetail());
@@ -28,9 +28,7 @@ public class ConditionMapper {
 			condition.setPreviousConditionUuid(openmrsCondition.getPreviousCondition().getUuid());
 		}
 		if (openmrsCondition.getEndReason() != null) {
-			Concept endReason = new Concept(openmrsCondition.getEndReason().getUuid(), openmrsCondition.getEndReason()
-					.getDisplayString());
-			condition.setEndReason(endReason);
+			condition.setEndReason(mapConcept(openmrsCondition.getEndReason()));
 		}
 		return condition;
 	}
@@ -65,5 +63,16 @@ public class ConditionMapper {
 		openmrsCondition.setVoidReason(condition.getVoidReason());
 		
 		return openmrsCondition;
+	}
+	
+	private Concept mapConcept(org.openmrs.Concept openmrsConcept) {
+		Concept concept = new Concept(openmrsConcept.getUuid(),
+				openmrsConcept.getFullySpecifiedName(Context.getLocale()).getName());
+		ConceptName shortName = openmrsConcept.getShortNameInLocale(Context.getLocale());
+		
+		if (shortName != null) {
+			concept.setShortName(shortName.getName());
+		}
+		return concept;
 	}
 }
