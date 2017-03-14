@@ -7,22 +7,35 @@ public class Concept {
 	
 	private String uuid;
 	
-	private String displayString;
+	private String name;
+	
+	private String shortName;
 	
 	public Concept() {
 	}
 	
-	public Concept(String uuid, String displayString) {
-		
+	public Concept(String uuid, String name) {
 		this.uuid = uuid;
-		this.displayString = displayString;
+		this.name = name;
 	}
 	
 	public String getUuid() {
 		return uuid;
 	}
 	
-	public String getDisplayString() {
-		return displayString;
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public String getShortName() {
+		return shortName;
+	}
+	
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
 	}
 }

@@ -6,12 +6,14 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static org.openmrs.Condition.Status.INACTIVE;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.openmrs.Concept;
+import org.openmrs.ConceptName;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
@@ -45,6 +47,7 @@ public class ConditionMapperTest {
 		when(Context.getConceptService()).thenReturn(conceptService);
 		when(Context.getPatientService()).thenReturn(patientService);
 		when(Context.getAdministrationService()).thenReturn(administrationService);
+		when(Context.getLocale()).thenReturn(Locale.ENGLISH);
 		
 		String nonCodedUuid = "nonCodedUuid";
 		Concept nonCodedConcept = new Concept();
@@ -73,7 +76,9 @@ public class ConditionMapperTest {
 		openmrsCondition.setUuid(uuid);
 		
 		Concept concept = new Concept();
+		concept.setFullySpecifiedName(new ConceptName("dog bite", Locale.ENGLISH));
 		Concept endReason = new Concept();
+		endReason.setFullySpecifiedName(new ConceptName("end", Locale.ENGLISH));
 		endReason.setUuid(endReasonUuid);
 		openmrsCondition.setEndReason(endReason);
 		
