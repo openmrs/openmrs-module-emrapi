@@ -68,10 +68,10 @@ public class ConditionServiceImpl extends BaseOpenmrsService implements Conditio
 			conditionDAO.saveOrUpdate(existingCondition);
 			return conditionDAO.saveOrUpdate(condition);
 		}
-		existingCondition.setEndDate(endDate);
+		Date onSetDate = condition.getOnsetDate() != null ? condition.getOnsetDate() : new Date();
+		existingCondition.setEndDate(onSetDate);
 		conditionDAO.saveOrUpdate(existingCondition);
-		condition.setOnsetDate(endDate);
-		condition.setEndDate(null);
+		condition.setOnsetDate(onSetDate);
 		return conditionDAO.saveOrUpdate(condition);
 	}
 	

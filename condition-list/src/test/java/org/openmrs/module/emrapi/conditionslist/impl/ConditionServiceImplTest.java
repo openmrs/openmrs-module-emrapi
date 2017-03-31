@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openmrs.Condition.Status.ACTIVE;
 import static org.openmrs.Condition.Status.INACTIVE;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -145,15 +146,15 @@ public class ConditionServiceImplTest extends BaseModuleContextSensitiveTest {
 	}
 	
 	@Test
-	public void shouldSetEndDateIfStatusHasChanged() {
-		Date today = new Date();
+	public void shouldSetOnsetDateOfNewConditionAsEndDateForExistingIfStatusHasChanged() throws Exception {
+		Date newOnSetDate = new SimpleDateFormat("yyyy-MM-dd").parse("2017-01-01");
 		Condition existingCondition = conditionService.getConditionByUuid("c84i8o0e-2n46-11e4-58f4-a6i5e4d22fb7");
 		
 		assertEquals(existingCondition.getStatus(), ACTIVE);
 		
 		Condition condition = Condition.newInstance(existingCondition);
 		condition.setUuid(existingCondition.getUuid());
-		condition.setEndDate(today);
+		condition.setOnsetDate(newOnSetDate);
 		condition.setStatus(INACTIVE);
 		
 		Condition newCondition = conditionService.save(condition);
@@ -162,8 +163,8 @@ public class ConditionServiceImplTest extends BaseModuleContextSensitiveTest {
 		assertNotSame(existingCondition.getUuid(), newCondition.getUuid());
 		assertEquals(ACTIVE, existingCondition.getStatus());
 		assertEquals(INACTIVE, newCondition.getStatus());
-		assertTrue(isEquals(today, existingCondition.getEndDate()));
-		assertTrue(isEquals(today, newCondition.getOnsetDate()));
+		assertTrue(isEquals(newOnSetDate, existingCondition.getEndDate()));
+		assertTrue(isEquals(newOnSetDate, newCondition.getOnsetDate()));
 		assertNull(newCondition.getEndDate());
 	}
 	
