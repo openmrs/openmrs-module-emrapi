@@ -21,12 +21,13 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
+import org.openmrs.util.LocaleUtility;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
+@PrepareForTest(value = {Context.class, LocaleUtility.class})
 public class ConditionMapperTest {
 	
 	@Mock
@@ -44,6 +45,7 @@ public class ConditionMapperTest {
 	public void before() {
 		initMocks(this);
 		PowerMockito.mockStatic(Context.class);
+		PowerMockito.mockStatic(LocaleUtility.class);
 		when(Context.getConceptService()).thenReturn(conceptService);
 		when(Context.getPatientService()).thenReturn(patientService);
 		when(Context.getAdministrationService()).thenReturn(administrationService);
@@ -155,5 +157,32 @@ public class ConditionMapperTest {
 		assertEquals(INACTIVE, openmrsCondition.getStatus());
 		
 	}
-	
+
+	@Test
+	public void shouldUseDefaultLocaleWhenConceptNameNotInUseLocale() throws Exception{
+		String patientUuid = "13a1234-asdf23-ad2354-sas23";
+		Concept concept = new Concept();
+		String conceptUuid = "conceptUuid";
+		ConceptName conceptNameInUK = new ConceptName("Name in Uk", Locale.UK);
+		concept.setUuid(conceptUuid);
+		concept.setFullySpecifiedName(conceptNameInUK);
+
+		org.openmrs.Condition openmrsCondition = new org.openmrs.Condition();
+		openmrsCondition.setConcept(concept);
+		
+		Patient patient = new Patient();
+		patient.setUuid(patientUuid);
+		openmrsCondition.setPatient(patient);
+		
+		User creator = new User();
+		creator.setUsername("CREATOR");
+		openmrsCondition.setCreator(creator);
+		
+		when(Context.getLocale()).thenReturn(Locale.FRANCE);
+		when(LocaleUtility.getDefaultLocale()).thenReturn(Locale.UK);
+		
+		Condition condition = conditionMapper.map(openmrsCondition);
+		
+		assertEquals(condition.getConcept().getName(),"Name in Uk");
+	}
 }

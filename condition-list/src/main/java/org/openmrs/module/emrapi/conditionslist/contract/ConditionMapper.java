@@ -1,6 +1,7 @@
 package org.openmrs.module.emrapi.conditionslist.contract;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.openmrs.util.LocaleUtility.getDefaultLocale;
 
 import org.openmrs.ConceptName;
 import org.openmrs.Patient;
@@ -66,8 +67,11 @@ public class ConditionMapper {
 	}
 	
 	private Concept mapConcept(org.openmrs.Concept openmrsConcept) {
-		Concept concept = new Concept(openmrsConcept.getUuid(),
-				openmrsConcept.getFullySpecifiedName(Context.getLocale()).getName());
+		ConceptName fullySpecifiedName = openmrsConcept.getFullySpecifiedName(Context.getLocale());
+		if(fullySpecifiedName == null){
+			fullySpecifiedName = openmrsConcept.getFullySpecifiedName(getDefaultLocale());
+		}
+		Concept concept = new Concept(openmrsConcept.getUuid(), fullySpecifiedName.getName());
 		ConceptName shortName = openmrsConcept.getShortNameInLocale(Context.getLocale());
 		
 		if (shortName != null) {
