@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+
+    <concept concept_id="10001" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="1002c80f-1yz9-4da3-bb88-8122ce8868df"/>
+    <concept_name concept_id="10001" concept_name_id="10001" name="Angina" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="d102c80f-wety-4da3-99tt-8122ce8868df"/>
+
+    <concept concept_id="10003" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="1002c80f-1yz9-4da3-9999-8122ce8868df"/>
+    <concept_name concept_id="10003" concept_name_id="10003" name="Malaria" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="d1010003-wety-4da3-99tt-8122ce8868df"/>
+    <concept_name concept_id="10003" concept_name_id="10004" name="fever" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="SHORT" locale_preferred="0"
+                  voided="false" uuid="d1010003-wety-4da3-99tt-8122ce886834"/>
+
+
+    <concept concept_id="10004" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="1002c80f-1yz9-4da3-2222-8122ce8868df"/>
+    <concept_name concept_id="10004" concept_name_id="10005" name="Tuberculosis English" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="d1010003-wety-4da3-full-8122ce8868df"/>
+    <concept_name concept_id="10004" concept_name_id="10006" name="Tuberculosis Short" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="SHORT" locale_preferred="0"
+                  voided="false" uuid="d1010003-wety-4da3-shrt-8122ce886834"/>
+    <concept_name concept_id="10004" concept_name_id="10007" name="Tuberculosis French" locale="fr" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="SHORT" locale_preferred="1"
+                  voided="false" uuid="d1010003-wety-4da3-fren-8122ce886834"/>
+
+
+
+    <concept concept_id="10005" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="1005c80f-1yz9-4da3-2222-8122ce8868df"/>
+    <concept_name concept_id="10005" concept_name_id="10055" name="Malaria English" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="d1010005-wety-4da3-full-8122ce8868df"/>
+    <concept_name concept_id="10005" concept_name_id="10056" name="Malaria French Full" locale="fr" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="d1010005-wety-4da3-shrt-8122ce886834"/>
+    <concept_name concept_id="10005" concept_name_id="10057" name="Malaria English" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="SHORT" locale_preferred="0"
+                  voided="false" uuid="d1010005-wety-4da3-fren-8122ce886834"/>
+
+    <concept concept_id="10006" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="1006c80f-1yz9-4da3-2222-8122ce8868df"/>
+    <concept_name concept_id="10006" concept_name_id="10061" name="Makaria English" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="d1010006-wety-4da3-full-8122ce8868df"/>
+    <concept_name concept_id="10006" concept_name_id="10062" name="Makaria French Full" locale="fr" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
+                  voided="false" uuid="d1010006-wety-4da3-shrt-8122ce886834"/>
+    <concept_name concept_id="10006" concept_name_id="10063" name="Mamaria Fr Short" locale="fr" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="SHORT" locale_preferred="0"
+                  voided="false" uuid="d1010006-wety-4da3-fren-8122ce886834"/>
+
+
+    <concept concept_id="10007" retired="false" datatype_id="2" class_id="11" is_set="false" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="1007c80f-1yz9-4da3-2222-8122ce8868df"/>
+    <concept_name concept_id="10007" concept_name_id="10071" name="Cold English" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="d1010007-wety-4da3-full-8122ce8868df"/>
+    <concept_name concept_id="10007" concept_name_id="10072" name="Bookar Hindhi Full" locale="fr" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="1"
+                  voided="false" uuid="d1010007-wety-4da3-shrt-8122ce886834"/>
+    <concept_name concept_id="10007" concept_name_id="10073" name="Sardhi Hi Synonim" locale="fr" creator="1"
+                  date_created="2004-08-12 00:00:00" locale_preferred="0"
+                  voided="false" uuid="d1010007-wety-4da3-fren-8122ce886834" />
+
+
+
+    <concept concept_id="10002" retired="false" datatype_id="2" class_id="11" is_set="true" creator="501"
+             date_created="2004-08-12 00:00:00" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0"
+             uuid="reason4f-1yz9-4da3-bb88-8122ce810002"/>
+    <concept_name concept_id="10002" concept_name_id="1414" name="diagnosis set of sets" locale="en" creator="1"
+                  date_created="2004-08-12 00:00:00" concept_name_type="FULLY_SPECIFIED" locale_preferred="0"
+                  voided="false" uuid="reason4f-1yz9-4da3-bb88-00012ce810002"/>
+
+
+    <concept_set concept_set_id="10001" concept_id="10001" concept_set="10002" creator="1"
+                 date_created="2004-08-12 00:00:00.0"
+                 sort_weight="1"/>
+    <concept_set concept_set_id="10002" concept_id="10003" concept_set="10002" creator="1"
+                 date_created="2004-08-12 00:00:00.0"
+                 sort_weight="2"/>
+
+    <global_property property="emr.concept.diagnosisSetOfSets" property_value="reason4f-1yz9-4da3-bb88-8122ce810002"
+                     uuid="35584f40-d9c5-ssss-9c1a-0800200c9a66"/>
+    <global_property property="defaultLocale" property_value="en"
+                     uuid="35584f40-d9c5-ssss-9c1a-0800200c9a55"/>
+
+</dataset>

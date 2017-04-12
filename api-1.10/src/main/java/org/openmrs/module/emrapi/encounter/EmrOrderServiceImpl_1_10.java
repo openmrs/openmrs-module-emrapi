@@ -57,5 +57,4 @@ public class EmrOrderServiceImpl_1_10 implements EmrOrderService {
         }
         encounterService.saveEncounter(encounter);
     }
-
 }
