@@ -32,8 +32,11 @@ import org.openmrs.module.metadatasharing.wrapper.PackageImporter;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -85,13 +88,38 @@ public class MetadataUtil {
     }
 
     private synchronized static boolean loadPackages(MetadataPackagesConfig config, ClassLoader loader) throws IOException {
-        boolean anyChanges = false;
 
+        List<PackageImporter> packageImporters = new ArrayList<PackageImporter>();
+
+        // first, instantiate and load a package importer for each package
         for (MetadataPackageConfig pkg : config.getPackages()) {
-            anyChanges |= installMetadataPackageIfNecessary(pkg, loader);
+            PackageImporter packageImporter = loadPackageImporterIfNecessary(pkg, loader);
+            if (packageImporter != null) {
+                packageImporters.add(packageImporter);
+            }
         }
 
-        return anyChanges;
+        // do the actual imports
+        if (packageImporters.size() > 0) {
+
+            // sort in order of date created, with most recently created coming last: this is so in the case of inconsistent metadata between packages, the most recent one wins
+            Collections.sort(packageImporters, new Comparator<PackageImporter>() {
+                @Override
+                public int compare(PackageImporter i1, PackageImporter i2) {
+                    return i1.getImportedPackage().getDateCreated().compareTo(i2.getImportedPackage().getDateCreated());
+                }
+            });
+
+            for (PackageImporter packageImporter : packageImporters) {
+                long timer = System.currentTimeMillis();
+                log.info("Importing package: " + packageImporter.getImportedPackage().getName());
+                packageImporter .importPackage();
+                log.info("Imported " + packageImporter.getImportedPackage().getName() + " in " + (System.currentTimeMillis() - timer) + "ms");
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public static MetadataPackagesConfig getMetadataPackagesForModule(ClassLoader loader) {
@@ -110,54 +138,49 @@ public class MetadataUtil {
 			throw new RuntimeException("Cannot find " + packageFilePath + ", or error deserializing it", ex);
 		}
 	}
-	
-	/**
-	 * Checks whether the given version of the MDS package has been installed yet, and if not,
-	 * install it
-	 * 
-	 * @param config the metadata package configuration object
-	 * @param loader the class loader to use for loading the packages
-	 * @return whether any changes were made to the db
-	 * @throws IOException
-	 */
-	private static boolean installMetadataPackageIfNecessary(MetadataPackageConfig config, ClassLoader loader)
-	    throws IOException {
+
+    /**
+     * Checks whether the given version of the MDS package has been installed yet, and if not,
+     * install it
+     *
+     * @param config the metadata package configuration object
+     * @param loader the class loader to use for loading the packages
+     * @return whether any changes were made to the db
+     * @throws IOException
+     */
+    private static PackageImporter loadPackageImporterIfNecessary(MetadataPackageConfig config, ClassLoader loader)
+            throws IOException {
         String filename = config.getFilenameBase() + "-" + config.getVersion().toString() + ".zip";
         try {
 
-			Matcher matcher = Pattern.compile("(?:.+/)?\\w+-(\\d+).zip").matcher(filename);
-			if (!matcher.matches())
-				throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
-			Integer version = Integer.valueOf(matcher.group(1));
-			
-			ImportedPackage installed = Context.getService(MetadataSharingService.class).getImportedPackageByGroup(
-			    config.getGroupUuid());
-			if (installed != null && installed.getVersion() >= version) {
-				log.info("Metadata package " + config.getFilenameBase() + " is already installed with version "
-				        + installed.getVersion());
-				return false;
-			}
-			
-			if (loader.getResource(filename) == null) {
-				throw new RuntimeException("Cannot find " + filename + " for group " + config.getGroupUuid());
-			}
+            Matcher matcher = Pattern.compile("(?:.+/)?\\w+-(\\d+).zip").matcher(filename);
+            if (!matcher.matches())
+                throw new RuntimeException("Filename must match PackageNameWithNoSpaces-X.zip");
+            Integer version = Integer.valueOf(matcher.group(1));
 
-            log.info("About to import MDS package: " + filename);
-            long timer = System.currentTimeMillis();
-			PackageImporter metadataImporter = MetadataSharing.getInstance().newPackageImporter();
-			metadataImporter.setImportConfig(ImportConfig.valueOf(config.getImportMode()));
+            ImportedPackage installed = Context.getService(MetadataSharingService.class).getImportedPackageByGroup(
+                    config.getGroupUuid());
+            if (installed != null && installed.getVersion() >= version) {
+                log.info("Metadata package " + config.getFilenameBase() + " is already installed with version "
+                        + installed.getVersion());
+                return null;
+            }
+
+            if (loader.getResource(filename) == null) {
+                throw new RuntimeException("Cannot find " + filename + " for group " + config.getGroupUuid());
+            }
+
+            PackageImporter metadataImporter = MetadataSharing.getInstance().newPackageImporter();
+            metadataImporter.setImportConfig(ImportConfig.valueOf(config.getImportMode()));
             log.info("...loading package: " + filename);
             metadataImporter.loadSerializedPackageStream(loader.getResourceAsStream(filename));
-            log.info("...importing package: " + filename);
-            metadataImporter.importPackage();
-            log.info("Imported " + filename + " in " + (System.currentTimeMillis() - timer) + "ms");
-			return true;
-		}
-		catch (Exception ex) {
-			log.error("Failed to install metadata package " + filename, ex);
-			return false;
-		}
-	}
+            return metadataImporter;
+        }
+        catch (Exception ex) {
+            log.error("Failed to install metadata package " + filename, ex);
+            return null;
+        }
+    }
 
     /**
      * If multiple MDS packages contain different versions of the same item, then loading them is order-dependent, which
