@@ -381,6 +381,9 @@ public class EncounterTransaction {
         private String formNamespace;
         private String formFieldPath;
 
+        private String interpretation;
+        private String status;
+
         public String getFormNamespace() {
             return formNamespace;
         }
@@ -495,6 +498,24 @@ public class EncounterTransaction {
         @JsonSerialize(using = CustomJsonDateSerializer.class)
         public Date getObservationDateTime() {
             return observationDateTime;
+        }
+
+        public String getInterpretation() {
+            return interpretation;
+        }
+
+        public Observation setInterpretation(String interpretation) {
+            this.interpretation = interpretation;
+            return this;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public Observation setStatus(String status) {
+            this.status = status;
+            return this;
         }
     }
 
