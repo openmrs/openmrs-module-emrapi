@@ -87,7 +87,7 @@ public class ObsMapper {
         return observationData.getVoided();
     }
 
-    private void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) {
+    protected void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) {
         if(setVoidedObs(observationData, observation))
             return;
         observation.setComment(observationData.getComment());
