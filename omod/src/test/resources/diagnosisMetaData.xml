@@ -1,6 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
 
+    <concept_reference_source concept_source_id="2" name="ICD-10-WHO" creator="1" date_created="2004-08-12 00:00:00.0" uuid="b5e44116-778f-11e2-ad73-903c7bb84694"/>
+
+
     <concept concept_id="401" retired="false" datatype_id="1" class_id="11" is_set="false" creator="501" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="baef67ac-b24e-4b04-ac83-c3b994132b85"/>
     <concept_name concept_id="401" concept_name_id="1401" name="My Diagnosis Concept Set" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="baef67ac-b24e-4b04-ac83-c3b994132b85"/>
     <concept_reference_term concept_reference_term_id="1" concept_source_id="1" code="Diagnosis Concept Set" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
@@ -48,6 +51,21 @@
     <concept_reference_map concept_map_id="7" concept_id="407" concept_reference_term_id="7" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
     <concept_answer concept_answer_id="407" concept_id="404" answer_concept="407" creator="1" date_created="2004-08-12 00:00:00.0" uuid="766c8d85-abc9-4991-b1be-d2b0da8282dd"/>
     <concept_numeric concept_id="407" precise="0"></concept_numeric>
+
+    <concept concept_id="408" retired="false" datatype_id="1" class_id="11" is_set="false" creator="501" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="d102c80f-1yz9-4da3-bb88-8122ce8897de"/>
+    <concept_name concept_id="408" concept_name_id="1408" name="Diabetes" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="d102c80f-1yz9-4da3-bb88-8122ce7768de"/>
+    <concept_reference_term concept_reference_term_id="8" concept_source_id="2" code="ABC123" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
+    <concept_reference_map concept_map_id="8" concept_id="408" concept_reference_term_id="8" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
+    <concept_set concept_set_id="6" concept_id="408" concept_set="402" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+
+    <concept concept_id="409" retired="false" datatype_id="1" class_id="11" is_set="false" creator="501" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="d102c80f-1fg9-4da3-bb88-8122ce8897de"/>
+    <concept_name concept_id="409" concept_name_id="1409" name="Diabetes Mellitus" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="d102c80f-1fg9-4da3-bb88-8122ce7768de"/>
+    <concept_reference_term concept_reference_term_id="9" concept_source_id="2" code="ABC124" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
+    <concept_reference_map concept_map_id="9" concept_id="409" concept_reference_term_id="9" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
+    <concept_set concept_set_id="7" concept_id="409" concept_set="402" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+
+    <global_property property="emr.concept.diagnosisSetOfSets" property_value="baef67ac-b24e-4b04-ac83-c3b994132b85" uuid="4f55827e-26fe-102b-hacb-0017a47871b3"/>
+
 
 </dataset>
 
