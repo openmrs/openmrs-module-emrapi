@@ -15,8 +15,10 @@
 package org.openmrs.module.emrapi.web.controller;
 
 import org.openmrs.Concept;
-import org.openmrs.ConceptName;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
+import org.openmrs.ConceptSource;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -45,26 +47,43 @@ public class EmrConceptSearchController {
     public Object search(@RequestParam("term") String query, @RequestParam Integer limit) throws Exception {
 
         Collection<Concept> diagnosisSets = emrApiProperties.getDiagnosisSets();
+        List<ConceptSource> conceptSources = emrApiProperties.getConceptSourcesForDiagnosisSearch();
         Locale locale = Locale.ENGLISH;
-        List<ConceptSearchResult> conceptSearchResults = emrService.conceptSearch(query, locale, null, diagnosisSets, null, limit);
-        List<ConceptName> matchingConceptNames = new ArrayList<ConceptName>();
-        for (ConceptSearchResult searchResult : conceptSearchResults) {
-            matchingConceptNames.add(searchResult.getConceptName());
-        }
-        return createListResponse(matchingConceptNames);
+        List<ConceptSearchResult> conceptSearchResults = emrService.conceptSearch(query, locale, null, diagnosisSets, conceptSources, limit);
+
+        return createListResponse(conceptSearchResults, conceptSources.get(0));
     }
 
-    private List<SimpleObject> createListResponse(List<ConceptName> resultList) {
+    private List<SimpleObject> createListResponse(List<ConceptSearchResult> resultList, ConceptSource conceptSource) {
         List<SimpleObject> allDiagnoses = new ArrayList<SimpleObject>();
 
-        for (ConceptName diagnosis : resultList) {
+        for (ConceptSearchResult diagnosis : resultList) {
             SimpleObject diagnosisObject = new SimpleObject();
+
             diagnosisObject.add("conceptName", diagnosis.getConcept().getName().getName());
             diagnosisObject.add("conceptUuid", diagnosis.getConcept().getUuid());
-            diagnosisObject.add("matchedName", diagnosis.getName());
+            diagnosisObject.add("matchedName", diagnosis.getConceptName()!=null ? diagnosis.getConceptName().getName() : null);
+            Concept concept = diagnosis.getConcept();
+            ConceptReferenceTerm term = getConceptReferenceTermByConceptSource(concept, conceptSource);
+            if(term != null)
+                diagnosisObject.add("code", term.getCode());
             allDiagnoses.add(diagnosisObject);
         }
         return allDiagnoses;
+    }
+
+    private ConceptReferenceTerm getConceptReferenceTermByConceptSource(Concept concept, ConceptSource conceptSource) {
+        Collection<ConceptMap> conceptMappings = concept.getConceptMappings();
+
+        if(conceptMappings != null) {
+            for (ConceptMap cm : conceptMappings) {
+                ConceptReferenceTerm term = cm.getConceptReferenceTerm();
+                if (term.getConceptSource().equals(conceptSource))
+                    return term;
+            }
+        }
+
+        return null;
     }
 }
 
