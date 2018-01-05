@@ -13,13 +13,11 @@
  */
 package org.openmrs.module.emrapi.conditionslist;
 
-import org.openmrs.annotation.AddOnStartup;
-
 public class PrivilegeConstants {
-	
-	@AddOnStartup(description = "Able to edit conditions")
+
+	// these are added in the EMR API config.xml
+
 	public static final String EDIT_CONDITIONS = "Edit conditions";
-	
-	@AddOnStartup(description = "Able to get conditions")
+
 	public static final String GET_CONDITIONS = "Get conditions";
 }
