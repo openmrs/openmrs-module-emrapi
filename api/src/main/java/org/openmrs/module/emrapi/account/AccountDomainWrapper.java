@@ -337,7 +337,7 @@ public class AccountDomainWrapper implements DomainWrapper {
         }
         user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
         user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS);
-        userService.saveUser(user, null);
+        userService.createUser(user, null);
     }
 
     public void save() {
@@ -348,7 +348,7 @@ public class AccountDomainWrapper implements DomainWrapper {
 
         if (user != null) {
             boolean existingUser = (user.getUserId() != null);
-            userService.saveUser(user, password);
+            userService.createUser(user, password);
 
             // the saveUser(user, password) method will *only* set a password for a new user, it won't change an existing one
             if (existingUser && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(confirmPassword)) {

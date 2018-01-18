@@ -411,7 +411,7 @@ public class AccountDomainWrapperTest {
         assertThat(account.getUser().getUserProperty(USER_PROPERTY_LOCKOUT_TIMESTAMP), is(""));
         assertThat(account.getUser().getUserProperty(USER_PROPERTY_LOGIN_ATTEMPTS), is(""));
 
-        verify(userService).saveUser(account.getUser(), null);
+        verify(userService).createUser(account.getUser(), null);
     }
 
 
@@ -425,7 +425,7 @@ public class AccountDomainWrapperTest {
 
         verify(personService).savePerson(person);
 
-        verify(userService, never()).saveUser(any(User.class), anyString());
+        verify(userService, never()).createUser(any(User.class), anyString());
     }
 
     @Test
@@ -440,7 +440,7 @@ public class AccountDomainWrapperTest {
         account.save();
 
         verify(personService).savePerson(person);
-        verify(userService).saveUser(account.getUser(), "abc");
+        verify(userService).createUser(account.getUser(), "abc");
 
         verify(userService, never()).changePassword(account.getUser(), "abc");
     }
@@ -460,7 +460,7 @@ public class AccountDomainWrapperTest {
 
         verify(personService).savePerson(person);
         verify(providerService).saveProvider(argThat(new IsExpectedProvider(expectedProvider)));
-        verify(userService, never()).saveUser(any(User.class), anyString());
+        verify(userService, never()).createUser(any(User.class), anyString());
     }
 
     @Test
@@ -475,7 +475,7 @@ public class AccountDomainWrapperTest {
         account.getUser().setUserId(1);    // mimic making this user persistent
         account.save();
 
-        verify(userService).saveUser(account.getUser(), "abc");
+        verify(userService).createUser(account.getUser(), "abc");
         verify(userService).changePassword(account.getUser(), "abc");
     }
 
@@ -597,7 +597,7 @@ public class AccountDomainWrapperTest {
         account.save();
 
         verify(personService).savePerson(person);
-        verify(userService).saveUser(account.getUser(), "abc");
+        verify(userService).createUser(account.getUser(), "abc");
         verify(userService, never()).changePassword(account.getUser(), "abc");
     }
 
