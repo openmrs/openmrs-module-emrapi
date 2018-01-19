@@ -359,8 +359,9 @@ public class AccountDomainWrapper implements DomainWrapper {
                 // hack to work-around change to service methods for saving users in Core 2.x
                 try {
                     Method saveUser = UserService.class.getDeclaredMethod("saveUser", User.class);
+                    saveUser.invoke(userService, user);
                 }
-                catch (NoSuchMethodException e) {
+                catch (Exception e) {
                     userService.createUser(user, password);
                 }
             }
