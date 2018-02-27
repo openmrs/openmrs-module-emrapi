@@ -168,7 +168,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         if (visit.getEncounters() != null) {
             for (Encounter candidate : visit.getEncounters()) {
-                if (OpenmrsUtil.compare(candidate.getEncounterDatetime(), mustHaveSomethingAfter) >= 0) {
+                if (!candidate.isVoided() && OpenmrsUtil.compare(candidate.getEncounterDatetime(), mustHaveSomethingAfter) >= 0) {
                     return false;
                 }
             }
