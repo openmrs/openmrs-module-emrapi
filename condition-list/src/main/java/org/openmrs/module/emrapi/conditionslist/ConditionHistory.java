@@ -11,11 +11,12 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs;
+package org.openmrs.module.emrapi.conditionslist;
 
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.openmrs.Concept;
 
 public class ConditionHistory {
 	

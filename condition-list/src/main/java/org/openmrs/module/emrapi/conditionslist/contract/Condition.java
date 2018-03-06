@@ -15,7 +15,7 @@ public class Condition {
 	
 	private String conditionNonCoded;
 	
-	private org.openmrs.Condition.Status status;
+	private org.openmrs.module.emrapi.conditionslist.Condition.Status status;
 	
 	private Date onSetDate;
 	
@@ -123,11 +123,11 @@ public class Condition {
 		this.voidReason = voidReason;
 	}
 	
-	public org.openmrs.Condition.Status getStatus() {
+	public org.openmrs.module.emrapi.conditionslist.Condition.Status getStatus() {
 		return status;
 	}
 	
-	public void setStatus(org.openmrs.Condition.Status status) {
+	public void setStatus(org.openmrs.module.emrapi.conditionslist.Condition.Status status) {
 		this.status = status;
 	}
 	

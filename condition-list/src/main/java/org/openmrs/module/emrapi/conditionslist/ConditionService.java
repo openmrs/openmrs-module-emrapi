@@ -16,8 +16,6 @@ package org.openmrs.module.emrapi.conditionslist;
 import java.util.List;
 
 import org.openmrs.Concept;
-import org.openmrs.Condition;
-import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;

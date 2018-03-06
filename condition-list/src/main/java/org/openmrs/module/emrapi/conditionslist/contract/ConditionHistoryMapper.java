@@ -11,12 +11,12 @@ public class ConditionHistoryMapper {
 		this.conditionMapper = conditionMapper;
 	}
 	
-	public ConditionHistory map(org.openmrs.ConditionHistory conditionHistory) {
+	public ConditionHistory map(org.openmrs.module.emrapi.conditionslist.ConditionHistory conditionHistory) {
 		ConditionHistory conditionHistoryContract = new ConditionHistory();
 		conditionHistoryContract.setConceptUuid(conditionHistory.getCondition().getUuid());
 		
 		ArrayList<Condition> conditions = new ArrayList<Condition>();
-		for (org.openmrs.Condition condition : conditionHistory.getConditions()) {
+		for (org.openmrs.module.emrapi.conditionslist.Condition condition : conditionHistory.getConditions()) {
 			conditions.add(conditionMapper.map(condition));
 		}
 		conditionHistoryContract.setConditions(conditions);
@@ -24,9 +24,9 @@ public class ConditionHistoryMapper {
 		return conditionHistoryContract;
 	}
 	
-	public List<ConditionHistory> map(List<org.openmrs.ConditionHistory> conditionHistories100) {
+	public List<ConditionHistory> map(List<org.openmrs.module.emrapi.conditionslist.ConditionHistory> conditionHistories100) {
 		List<ConditionHistory> conditionHistories101 = new ArrayList<ConditionHistory>();
-		for (org.openmrs.ConditionHistory conditionHistory : conditionHistories100) {
+		for (org.openmrs.module.emrapi.conditionslist.ConditionHistory conditionHistory : conditionHistories100) {
 			conditionHistories101.add(map(conditionHistory));
 		}
 		return conditionHistories101;

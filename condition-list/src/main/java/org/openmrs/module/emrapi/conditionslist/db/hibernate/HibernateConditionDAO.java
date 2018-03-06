@@ -18,9 +18,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
-import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
+import org.openmrs.module.emrapi.conditionslist.Condition;
 import org.openmrs.module.emrapi.conditionslist.db.ConditionDAO;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -19,7 +19,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
-import org.openmrs.Condition;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.AdministrationService;
 import org.springframework.validation.Errors;
@@ -27,7 +26,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 @Handler(supports = { Condition.class })
-public class ConditionValidator implements Validator {
+public class EmrConditionValidator implements Validator {
 	
 	/**
 	 * Log for this class and subclasses
@@ -38,7 +37,7 @@ public class ConditionValidator implements Validator {
 	
 	private ConditionService conditionService;
 	
-	public ConditionValidator(ConditionService conditionService, AdministrationService administrationService) {
+	public EmrConditionValidator(ConditionService conditionService, AdministrationService administrationService) {
 		this.conditionService = conditionService;
 		this.administrationService = administrationService;
 	}

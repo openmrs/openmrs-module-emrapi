@@ -15,8 +15,8 @@ package org.openmrs.module.emrapi.conditionslist.db;
 
 import java.util.List;
 
-import org.openmrs.Condition;
 import org.openmrs.Patient;
+import org.openmrs.module.emrapi.conditionslist.Condition;
 
 public interface ConditionDAO {
 	

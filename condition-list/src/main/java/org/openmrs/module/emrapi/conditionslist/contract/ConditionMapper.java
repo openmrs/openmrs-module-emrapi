@@ -10,7 +10,7 @@ import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
 
 public class ConditionMapper {
 	
-	public Condition map(org.openmrs.Condition openmrsCondition) {
+	public Condition map(org.openmrs.module.emrapi.conditionslist.Condition openmrsCondition) {
 		Concept concept = mapConcept(openmrsCondition.getConcept());
 		Condition condition = new Condition();
 		condition.setUuid(openmrsCondition.getUuid());
@@ -34,13 +34,13 @@ public class ConditionMapper {
 		return condition;
 	}
 	
-	public org.openmrs.Condition map(Condition condition) {
+	public org.openmrs.module.emrapi.conditionslist.Condition map(Condition condition) {
 		org.openmrs.Concept concept = Context.getConceptService().getConceptByUuid(condition.getConcept().getUuid());
 		Patient patient = Context.getPatientService().getPatientByUuid(condition.getPatientUuid());
 		String nonCodedConditionConcept = Context.getAdministrationService().getGlobalProperty(
 				ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID);
 		
-		org.openmrs.Condition openmrsCondition = new org.openmrs.Condition();
+		org.openmrs.module.emrapi.conditionslist.Condition openmrsCondition = new org.openmrs.module.emrapi.conditionslist.Condition();
 		
 		if (!isEmpty(condition.getConditionNonCoded())) {
 			concept = Context.getConceptService().getConceptByUuid(nonCodedConditionConcept);

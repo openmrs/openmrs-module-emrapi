@@ -20,14 +20,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Concept;
-import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
+import org.openmrs.module.emrapi.conditionslist.Condition;
 import org.openmrs.module.emrapi.conditionslist.ConditionService;
-import org.openmrs.module.emrapi.conditionslist.ConditionValidator;
+import org.openmrs.module.emrapi.conditionslist.EmrConditionValidator;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
@@ -49,7 +49,7 @@ public class ConditionValidatorTest extends BaseModuleContextSensitiveTest {
 	PatientService patientService;
 
 	@Autowired
-	ConditionValidator conditionValidator;
+	EmrConditionValidator conditionValidator;
 
 	@Before
 	public void setUp() throws Exception {

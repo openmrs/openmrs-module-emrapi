@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.openmrs.Concept;
-import org.openmrs.Condition;
-import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.conditionslist.Condition;
+import org.openmrs.module.emrapi.conditionslist.ConditionHistory;
 import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
 import org.openmrs.module.emrapi.conditionslist.ConditionService;
 import org.openmrs.module.emrapi.conditionslist.db.ConditionDAO;

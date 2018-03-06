@@ -5,24 +5,22 @@
 		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 	
 	
-	<bean id="conditionDAO" class="org.openmrs.module.emrapi.conditionslist.db.hibernate.HibernateConditionDAO">
+	<bean id="emrConditionDAO" class="org.openmrs.module.emrapi.conditionslist.db.hibernate.HibernateConditionDAO">
 		<property name="sessionFactory">
 			<ref bean="dbSessionFactory" />
 		</property>
 	</bean>
 	
-	<bean id="conditionServiceTarget" class="org.openmrs.module.emrapi.conditionslist.impl.ConditionServiceImpl">
-		<constructor-arg index="0" ref="conditionDAO" />
-		<constructor-arg index="1" ref="conceptService" />
-		<constructor-arg index="2" ref="adminService" />
-	</bean>
-	
-	<bean id="conditionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+	<bean id="emrConditionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager">
 			<ref bean="transactionManager" />
 		</property>
 		<property name="target">
-			<ref local="conditionServiceTarget" />
+			<bean id="emrConditionServiceTarget" class="org.openmrs.module.emrapi.conditionslist.impl.ConditionServiceImpl">
+				<constructor-arg index="0" ref="emrConditionDAO" />
+				<constructor-arg index="1" ref="conceptService" />
+				<constructor-arg index="2" ref="adminService" />
+			</bean>
 		</property>
 		<property name="preInterceptors">
 			<ref bean="serviceInterceptors" />
@@ -32,8 +30,8 @@
 		</property>
 	</bean>
 	
-	<bean id="conditionValidator" class="org.openmrs.module.emrapi.conditionslist.ConditionValidator">
-		<constructor-arg name="conditionService" ref="conditionService" />
+	<bean id="emrConditionValidator" class="org.openmrs.module.emrapi.conditionslist.EmrConditionValidator">
+		<constructor-arg name="conditionService" ref="emrConditionService" />
 		<constructor-arg name="administrationService" ref="adminService" />
 	</bean>
 	
@@ -41,7 +39,7 @@
 		<property name="moduleService">
 			<list>
 				<value>org.openmrs.module.emrapi.conditionslist.ConditionService</value>
-				<ref bean="conditionService" />
+				<ref bean="emrConditionService" />
 			</list>
 		</property>
 	</bean>

@@ -20,8 +20,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.openmrs.Condition.Status.ACTIVE;
-import static org.openmrs.Condition.Status.INACTIVE;
+import static org.openmrs.module.emrapi.conditionslist.Condition.Status.ACTIVE;
+import static org.openmrs.module.emrapi.conditionslist.Condition.Status.INACTIVE;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -34,14 +34,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.openmrs.Concept;
-import org.openmrs.Condition;
-import org.openmrs.ConditionHistory;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
+import org.openmrs.module.emrapi.conditionslist.Condition;
+import org.openmrs.module.emrapi.conditionslist.ConditionHistory;
 import org.openmrs.module.emrapi.conditionslist.ConditionService;
-import org.openmrs.module.emrapi.conditionslist.ConditionValidator;
+import org.openmrs.module.emrapi.conditionslist.EmrConditionValidator;
 import org.openmrs.module.emrapi.conditionslist.db.ConditionDAO;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class ConditionServiceImplTest extends BaseModuleContextSensitiveTest {
 	UserService userService;
 	
 	@Autowired
-	ConditionValidator conditionValidator;
+	EmrConditionValidator conditionValidator;
 	
 	@Autowired
 	ConditionDAO conditionDAO;

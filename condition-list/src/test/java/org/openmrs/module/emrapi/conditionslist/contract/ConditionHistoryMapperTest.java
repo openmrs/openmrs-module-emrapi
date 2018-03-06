@@ -32,12 +32,12 @@ public class ConditionHistoryMapperTest {
 		
 		conditionHistoryMapper = new ConditionHistoryMapper(conditionMapper);
 		
-		when(conditionMapper.map(any(org.openmrs.Condition.class))).then(new Answer<Condition>() {
+		when(conditionMapper.map(any(org.openmrs.module.emrapi.conditionslist.Condition.class))).then(new Answer<Condition>() {
 			
 			@Override
 			public Condition answer(final InvocationOnMock invocationOnMock) throws Throwable {
 				return new Condition() {{
-					setUuid(((org.openmrs.Condition) invocationOnMock.getArguments()[0]).getUuid());
+					setUuid(((org.openmrs.module.emrapi.conditionslist.Condition) invocationOnMock.getArguments()[0]).getUuid());
 				}};
 			}
 		});
@@ -45,10 +45,10 @@ public class ConditionHistoryMapperTest {
 	
 	@Test
 	public void shouldMapConditionHistoryModalToContract() throws Exception {
-		org.openmrs.ConditionHistory conditionHistory = new org.openmrs.ConditionHistory();
-		org.openmrs.Condition condition1 = getCondition("uuid_one");
-		org.openmrs.Condition condition2 = getCondition("uuid_two");
-		org.openmrs.Condition condition3 = getCondition("uuid_three");
+		org.openmrs.module.emrapi.conditionslist.ConditionHistory conditionHistory = new org.openmrs.module.emrapi.conditionslist.ConditionHistory();
+		org.openmrs.module.emrapi.conditionslist.Condition condition1 = getCondition("uuid_one");
+		org.openmrs.module.emrapi.conditionslist.Condition condition2 = getCondition("uuid_two");
+		org.openmrs.module.emrapi.conditionslist.Condition condition3 = getCondition("uuid_three");
 		conditionHistory.setConditions(Arrays.asList(condition1, condition2, condition3));
 		conditionHistory.setCondition(new Concept());
 		
@@ -61,17 +61,17 @@ public class ConditionHistoryMapperTest {
 	
 	@Test
 	public void shouldMapConditionHistoryModalsToListOfContracts() throws Exception {
-		org.openmrs.ConditionHistory conditionHistory1 = new org.openmrs.ConditionHistory();
-		org.openmrs.Condition condition1 = getCondition("uuid_one");
-		org.openmrs.Condition condition2 = getCondition("uuid_two");
-		org.openmrs.Condition condition3 = getCondition("uuid_three");
+		org.openmrs.module.emrapi.conditionslist.ConditionHistory conditionHistory1 = new org.openmrs.module.emrapi.conditionslist.ConditionHistory();
+		org.openmrs.module.emrapi.conditionslist.Condition condition1 = getCondition("uuid_one");
+		org.openmrs.module.emrapi.conditionslist.Condition condition2 = getCondition("uuid_two");
+		org.openmrs.module.emrapi.conditionslist.Condition condition3 = getCondition("uuid_three");
 		conditionHistory1.setConditions(Arrays.asList(condition1, condition2, condition3));
 		conditionHistory1.setCondition(new Concept());
 		
-		org.openmrs.ConditionHistory conditionHistory2 = new org.openmrs.ConditionHistory();
-		org.openmrs.Condition condition4 = getCondition("uuid_four");
-		org.openmrs.Condition condition5 = getCondition("uuid_five");
-		org.openmrs.Condition condition6 = getCondition("uuid_six");
+		org.openmrs.module.emrapi.conditionslist.ConditionHistory conditionHistory2 = new org.openmrs.module.emrapi.conditionslist.ConditionHistory();
+		org.openmrs.module.emrapi.conditionslist.Condition condition4 = getCondition("uuid_four");
+		org.openmrs.module.emrapi.conditionslist.Condition condition5 = getCondition("uuid_five");
+		org.openmrs.module.emrapi.conditionslist.Condition condition6 = getCondition("uuid_six");
 		conditionHistory2.setConditions(Arrays.asList(condition4, condition5, condition6));
 		conditionHistory2.setCondition(new Concept());
 		
@@ -89,8 +89,8 @@ public class ConditionHistoryMapperTest {
 		assertEquals("uuid_six", conditions2.get(2).getUuid());
 	}
 	
-	private org.openmrs.Condition getCondition(String uuid) {
-		org.openmrs.Condition condition = new org.openmrs.Condition();
+	private org.openmrs.module.emrapi.conditionslist.Condition getCondition(String uuid) {
+		org.openmrs.module.emrapi.conditionslist.Condition condition = new org.openmrs.module.emrapi.conditionslist.Condition();
 		condition.setPatient(new Patient());
 		condition.setConcept(new Concept());
 		condition.setUuid(uuid);

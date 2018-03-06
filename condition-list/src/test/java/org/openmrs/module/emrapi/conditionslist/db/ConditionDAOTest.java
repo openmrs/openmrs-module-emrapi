@@ -22,9 +22,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.openmrs.Condition;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
+import org.openmrs.module.emrapi.conditionslist.Condition;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 

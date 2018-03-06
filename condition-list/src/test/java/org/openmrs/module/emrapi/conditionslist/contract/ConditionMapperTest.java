@@ -3,7 +3,7 @@ package org.openmrs.module.emrapi.conditionslist.contract;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.openmrs.Condition.Status.INACTIVE;
+import static org.openmrs.module.emrapi.conditionslist.Condition.Status.INACTIVE;
 
 import java.util.Date;
 import java.util.Locale;
@@ -70,8 +70,8 @@ public class ConditionMapperTest {
 		String additionalDetail = "some notes";
 		String endReasonUuid = "end-reason-uuid-288a-asdf";
 		
-		org.openmrs.Condition prevOpenmrsCondition = new org.openmrs.Condition();
-		org.openmrs.Condition openmrsCondition = new org.openmrs.Condition();
+		org.openmrs.module.emrapi.conditionslist.Condition prevOpenmrsCondition = new org.openmrs.module.emrapi.conditionslist.Condition();
+		org.openmrs.module.emrapi.conditionslist.Condition openmrsCondition = new org.openmrs.module.emrapi.conditionslist.Condition();
 		openmrsCondition.setDateCreated(new Date());
 		openmrsCondition.setPreviousCondition(prevOpenmrsCondition);
 		openmrsCondition.setOnsetDate(today);
@@ -144,7 +144,7 @@ public class ConditionMapperTest {
 		when(conceptService.getConceptByUuid(conceptUuid)).thenReturn(concept);
 		when(conceptService.getConceptByUuid(endReasonUuid)).thenReturn(endReason);
 		
-		org.openmrs.Condition openmrsCondition = conditionMapper.map(condition);
+		org.openmrs.module.emrapi.conditionslist.Condition openmrsCondition = conditionMapper.map(condition);
 		
 		assertEquals(uuid, openmrsCondition.getUuid());
 		assertEquals(conceptUuid, openmrsCondition.getConcept().getUuid());
@@ -167,7 +167,7 @@ public class ConditionMapperTest {
 		concept.setUuid(conceptUuid);
 		concept.setFullySpecifiedName(conceptNameInUK);
 
-		org.openmrs.Condition openmrsCondition = new org.openmrs.Condition();
+		org.openmrs.module.emrapi.conditionslist.Condition openmrsCondition = new org.openmrs.module.emrapi.conditionslist.Condition();
 		openmrsCondition.setConcept(concept);
 		
 		Patient patient = new Patient();
