@@ -339,8 +339,14 @@ public class AccountDomainWrapper implements DomainWrapper {
         user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
         user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS);
 
-        // TODO: figure out proper way to make this work in Core 2.x
-        userService.createUser(user, null);
+        // hack to work-around change to service methods for saving users in Core 2.x
+        try {
+            Method saveUser = UserService.class.getDeclaredMethod("saveUser", User.class);
+            saveUser.invoke(userService, user);
+        }
+        catch (Exception e) {
+            userService.createUser(user, password);
+        };
     }
 
     public void save() {
