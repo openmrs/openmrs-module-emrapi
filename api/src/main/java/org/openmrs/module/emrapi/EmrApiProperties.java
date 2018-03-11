@@ -69,6 +69,10 @@ public class EmrApiProperties extends ModuleProperties {
 		return userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);
 	}
 
+    public Role getHighPrivilegeLevel(){
+        return userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_HIGH_ROLE);
+    }
+
 	public EncounterType getCheckInEncounterType() {
 		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_CHECK_IN_ENCOUNTER_TYPE);
 	}
