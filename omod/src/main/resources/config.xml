@@ -46,7 +46,10 @@
             <path>/lib/emrapi-api-1.9-${project.parent.version}.jar</path>
             <openmrsVersion>1.9.*</openmrsVersion>
         </conditionalResource>
-
+        <conditionalResource>
+            <path>/lib/emrapi-api-2.2-${project.parent.version}.jar</path>
+            <openmrsVersion>2.2.*</openmrsVersion>
+        </conditionalResource>
     </conditionalResources>
     <!-- / Conditional Resources -->
 
@@ -74,7 +77,7 @@
         <file>messages_de.properties</file>
     </messages>
     <!-- /Internationalization -->
-    
+
     <globalProperty>
         <property>emr.encounterMatcher</property>
         <defaultValue></defaultValue>
