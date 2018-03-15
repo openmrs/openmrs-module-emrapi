@@ -3,7 +3,7 @@
         "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<hibernate-mapping>
+<hibernate-mapping auto-import="false">
     <!-- Plural table name ("conditions") because "condition" is a MySQL reserved word -->
     <class name="org.openmrs.module.emrapi.conditionslist.Condition" table="conditions">
         <id name="conditionId" type="int" column="condition_id" unsaved-value="0">

@@ -53,7 +53,7 @@ public class HibernateConditionDAO implements ConditionDAO {
 	@Override
 	@Transactional(readOnly = true)
 	public Condition getConditionByUuid(String uuid) {
-		return (Condition) sessionFactory.getCurrentSession().createQuery("from Condition c where c.uuid = :uuid")
+		return (Condition) sessionFactory.getCurrentSession().createQuery("from org.openmrs.module.emrapi.conditionslist.Condition c where c.uuid = :uuid")
 				.setString("uuid", uuid).uniqueResult();
 	}
 	
@@ -61,7 +61,7 @@ public class HibernateConditionDAO implements ConditionDAO {
 	@Transactional(readOnly = true)
 	public List<Condition> getConditionHistory(Patient patient) {
 		Query query = sessionFactory.getCurrentSession().createQuery(
-				"select con from Condition as con where con.patient.patientId = :patientId and con.voided = false " +
+				"select con from org.openmrs.module.emrapi.conditionslist.Condition as con where con.patient.patientId = :patientId and con.voided = false " +
 						"order by con.dateCreated desc");
 		query.setInteger("patientId", patient.getId());
 		return query.list();
@@ -71,7 +71,7 @@ public class HibernateConditionDAO implements ConditionDAO {
 	@Transactional(readOnly = true)
 	public List<Condition> getActiveConditions(Patient patient) {
 		Query query = sessionFactory.getCurrentSession().createQuery(
-				"from Condition c where c.patient.patientId = :patientId and c.voided = false and c.endDate is null order "
+				"from org.openmrs.module.emrapi.conditionslist.Condition c where c.patient.patientId = :patientId and c.voided = false and c.endDate is null order "
 						+ "by c.dateCreated desc");
 		query.setInteger("patientId", patient.getId());
 		return query.list();
