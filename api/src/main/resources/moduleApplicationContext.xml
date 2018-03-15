@@ -35,7 +35,7 @@
         </property>
     </bean>
 
-    <bean id="diagnosisService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+    <bean id="emrDiagnosisService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
@@ -58,7 +58,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisService</value>
-                <ref local="diagnosisService"/>
+                <ref local="emrDiagnosisService"/>
             </list>
         </property>
     </bean>

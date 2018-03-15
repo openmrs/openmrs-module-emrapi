@@ -70,7 +70,7 @@ public class PatientDomainWrapper implements DomainWrapper {
 	@Autowired
 	protected EncounterService encounterService;
 
-	@Qualifier("diagnosisService")
+	@Qualifier("emrDiagnosisService")
 	@Autowired
 	protected DiagnosisService diagnosisService;
 
