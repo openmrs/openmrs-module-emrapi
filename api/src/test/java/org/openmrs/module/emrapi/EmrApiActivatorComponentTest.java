@@ -72,6 +72,11 @@ public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest
         Role fullPrivsRole = userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);
         assertThat(fullPrivsRole, is(notNullValue()));
         assertThat(fullPrivsRole.getUuid(), is(EmrApiConstants.PRIVILEGE_LEVEL_FULL_UUID));
+
+        // ensure Privilege Level: High role
+        Role highPrivsRole = userService.getRole(EmrApiConstants.PRIVILEGE_LEVEL_HIGH_ROLE);
+        assertThat(highPrivsRole, is(notNullValue()));
+        assertThat(highPrivsRole.getUuid(), is(EmrApiConstants.PRIVILEGE_LEVEL_HIGH_UUID));
     }
 
     @Test
