@@ -199,6 +199,10 @@ public class EmrApiConstants {
 
     public static final ArrayList<String> UNSAFE_PRIVILEGES = new ArrayList<String>(Arrays.asList(
             "Share Metadata",
-            "Edit Reports"
+            "Edit Reports",
+            "Add Reports",
+            "Add Report Objects",
+            "Edit Report Objects",
+            "Manage Privileges"
     ));
 }
