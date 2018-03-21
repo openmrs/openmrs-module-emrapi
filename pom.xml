@@ -33,6 +33,7 @@
         <module>api-1.10</module>
         <module>api-1.11</module>
         <module>api-1.12</module>
+        <module>api-2.2</module>
         <module>condition-list</module>
         <module>omod</module>
     </modules>
