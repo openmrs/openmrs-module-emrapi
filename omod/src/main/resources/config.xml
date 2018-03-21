@@ -50,6 +50,10 @@
             <path>/lib/emrapi-api-2.2-${project.parent.version}.jar</path>
             <openmrsVersion>2.2.*</openmrsVersion>
         </conditionalResource>
+        <conditionalResource>
+            <path>/lib/emrapi-web-2.2-${project.parent.version}.jar</path>
+            <openmrsVersion>2.2.*</openmrsVersion>
+        </conditionalResource>
     </conditionalResources>
     <!-- / Conditional Resources -->
 

@@ -34,6 +34,7 @@
         <module>api-1.11</module>
         <module>api-1.12</module>
         <module>api-2.2</module>
+        <module>web-2.2</module>
         <module>condition-list</module>
         <module>omod</module>
     </modules>
@@ -136,7 +137,7 @@
                 <scope>provided</scope>
             </dependency>
         </dependencies>
-    </dependencyManagement> 
+    </dependencyManagement>
 
     <dependencies>
         <!-- Begin OpenMRS modules -->
@@ -157,7 +158,7 @@
             <artifactId>serialization.xstream-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>serialization.xstream-api-1.9</artifactId>
@@ -169,7 +170,7 @@
             <artifactId>serialization.xstream-api-1.10</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>serialization.xstream-api-2.0</artifactId>
@@ -213,13 +214,13 @@
             <artifactId>event-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.openmrs</groupId>
             <artifactId>event-api-1.x</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>org.openmrs</groupId>
             <artifactId>event-api-2.x</artifactId>
@@ -243,19 +244,19 @@
             <artifactId>testutils</artifactId>
             <version>${openmrsTestutilsVersion}</version>
             <scope>test</scope>
-        </dependency> 
+        </dependency>
 
         <!-- End OpenMRS contrib -->
 
         <!-- Begin other dependencies -->
 
         <!-- Needed because the UI Framework module uses HttpSession in its api project -->
-        <dependency> 
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
             <scope>provided</scope>
-        </dependency> 
+        </dependency>
 
         <dependency>
             <groupId>joda-time</groupId>
