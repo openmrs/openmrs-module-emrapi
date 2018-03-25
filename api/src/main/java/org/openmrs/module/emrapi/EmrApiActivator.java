@@ -57,6 +57,7 @@ import java.io.File;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -100,6 +101,8 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         EmrApiProperties emrProperties = Context.getRegisteredComponents(EmrApiProperties.class).iterator().next();
 
         Role fullPrivilegeLevel = emrProperties.getFullPrivilegeLevel();
+        Role highPrivilegeLevel = emrProperties.getHighPrivilegeLevel();
+
         if (fullPrivilegeLevel == null) {
             fullPrivilegeLevel = new Role();
             fullPrivilegeLevel.setRole(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);
@@ -108,12 +111,27 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
             userService.saveRole(fullPrivilegeLevel);
         }
 
+        if (highPrivilegeLevel == null) {
+            highPrivilegeLevel = new Role();
+            highPrivilegeLevel.setRole(EmrApiConstants.PRIVILEGE_LEVEL_HIGH_ROLE);
+            highPrivilegeLevel.setDescription(EmrApiConstants.PRIVILEGE_LEVEL_HIGH_DESCRIPTION);
+            highPrivilegeLevel.setUuid(EmrApiConstants.PRIVILEGE_LEVEL_HIGH_UUID);
+            userService.saveRole(highPrivilegeLevel);
+        }
+
         for (Privilege candidate : accountService.getApiPrivileges()) {
+
             if (!fullPrivilegeLevel.hasPrivilege(candidate.getName())) {
                 fullPrivilegeLevel.addPrivilege(candidate);
             }
+
+            if (!highPrivilegeLevel.hasPrivilege(candidate.getName()) && !EmrApiConstants.UNSAFE_PRIVILEGES.contains(candidate.getName())) {
+                highPrivilegeLevel.addPrivilege(candidate);
+            }
         }
+
         userService.saveRole(fullPrivilegeLevel);
+        userService.saveRole(highPrivilegeLevel);
     }
 
     @Override
