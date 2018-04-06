@@ -3,14 +3,14 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-	
-	
+
+
 	<bean id="emrConditionDAO" class="org.openmrs.module.emrapi.conditionslist.db.hibernate.HibernateConditionDAO">
 		<property name="sessionFactory">
 			<ref bean="dbSessionFactory" />
 		</property>
 	</bean>
-	
+
 	<bean id="emrConditionService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager">
 			<ref bean="transactionManager" />
@@ -29,12 +29,12 @@
 			<ref bean="transactionAttributeSource" />
 		</property>
 	</bean>
-	
+
 	<bean id="emrConditionValidator" class="org.openmrs.module.emrapi.conditionslist.EmrConditionValidator">
 		<constructor-arg name="conditionService" ref="emrConditionService" />
 		<constructor-arg name="administrationService" ref="adminService" />
 	</bean>
-	
+
 	<bean parent="serviceContext">
 		<property name="moduleService">
 			<list>
