@@ -33,6 +33,10 @@ import org.openmrs.module.emrapi.conditionslist.db.ConditionDAO;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+/**
+ * @deprecated as of 1.25.0, replaced by {@link ConditionServiceImpl} in the openmrs core platform 2.2.0
+ */
+@Deprecated
 public class ConditionServiceImpl extends BaseOpenmrsService implements ConditionService {
 	
 	private ConditionDAO conditionDAO;
