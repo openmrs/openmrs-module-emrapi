@@ -94,6 +94,14 @@ public class CodedOrFreeTextAnswer {
         this.nonCodedAnswer = nonCodedAnswer;
     }
 
+    /**
+     * @since 1.25.0
+     */
+    public  CodedOrFreeTextAnswer(Concept codedAnswer, ConceptName specificCodedAnswer, String nonCodedAnswer){
+        this.nonCodedAnswer = nonCodedAnswer;
+        this.codedAnswer = codedAnswer;
+    }
+
     public String toClientString() {
         if (specificCodedAnswer != null) {
             return CONCEPT_NAME_PREFIX + specificCodedAnswer.getId();
