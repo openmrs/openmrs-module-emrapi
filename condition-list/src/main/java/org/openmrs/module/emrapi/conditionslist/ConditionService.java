@@ -20,6 +20,10 @@ import org.openmrs.Patient;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
 
+/**
+ * @deprecated as of 1.25.0, replaced by {@link ConditionService} in the openmrs core platform 2.2.0
+ */
+@Deprecated
 public interface ConditionService extends OpenmrsService {
 	
 	@Authorized({ PrivilegeConstants.EDIT_CONDITIONS })
