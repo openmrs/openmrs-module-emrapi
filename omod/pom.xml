@@ -49,6 +49,12 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>${project.parent.artifactId}-api-pre2.2</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>compile</scope>
+		</dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>${project.parent.artifactId}-web-2.2</artifactId>
