@@ -48,6 +48,8 @@ public class CodedOrFreeTextAnswer {
     public CodedOrFreeTextAnswer() {
     }
 
+
+
     public CodedOrFreeTextAnswer(String spec, ConceptService conceptService) {
         if (spec.startsWith(CONCEPT_NAME_PREFIX)) {
             String conceptNameId = spec.substring(CONCEPT_NAME_PREFIX.length());

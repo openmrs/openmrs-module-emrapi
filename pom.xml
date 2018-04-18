@@ -37,6 +37,7 @@
         <module>web-2.2</module>
         <module>condition-list</module>
         <module>omod</module>
+	    <module>api-pre2.2</module>
     </modules>
 
     <properties>
