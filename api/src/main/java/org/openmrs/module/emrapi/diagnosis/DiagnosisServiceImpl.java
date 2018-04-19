@@ -21,6 +21,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @deprecated as of 1.25.0, replaced by {@link DiagnosisServiceImpl} in the openmrs core platform 2.2.0
+ */
+@Deprecated
 public class DiagnosisServiceImpl extends BaseOpenmrsService implements DiagnosisService {
 
     private static final Log log = LogFactory.getLog(DiagnosisService.class);
