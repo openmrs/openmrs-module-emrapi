@@ -14,6 +14,10 @@ import java.util.List;
  * API methods for managing diagnoses
  * </pre>
  */
+/**
+ * @deprecated as of 1.25.0, replaced by {@link DiagnosisService} in the openmrs core platform 2.2.0
+ */
+@Deprecated
 public interface DiagnosisService extends OpenmrsService {
 
     /**
