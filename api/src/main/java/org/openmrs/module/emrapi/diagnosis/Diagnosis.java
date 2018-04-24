@@ -36,6 +36,11 @@ public class Diagnosis {
 
     Obs existingObs;
 
+    /**
+     * @since 1.25.0
+     */
+    Integer existingDiagnosis;
+
     public Diagnosis() {
     }
 
@@ -83,6 +88,20 @@ public class Diagnosis {
 
     public void setExistingObs(Obs existingObs) {
         this.existingObs = existingObs;
+    }
+
+    /**
+     * @since 1.25.0
+     */
+    public void setExistingDiagnosis(Integer existingDiagnosis) {
+        this.existingDiagnosis = existingDiagnosis;
+    }
+
+    /**
+     * @since 1.25.0
+     */
+    public Integer getExistingDiagnosis() {
+        return existingDiagnosis;
     }
 
     @Override
