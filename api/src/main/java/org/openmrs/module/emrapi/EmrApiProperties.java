@@ -38,6 +38,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -192,7 +193,7 @@ public class EmrApiProperties extends ModuleProperties {
 		if (icd10 != null) {
 			return Arrays.asList(icd10);
 		} else {
-			return null;
+			return Collections.emptyList();
 		}
 	}
 
