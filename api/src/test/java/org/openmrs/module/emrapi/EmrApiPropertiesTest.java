@@ -1,9 +1,12 @@
 package org.openmrs.module.emrapi;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.openmrs.ConceptSource;
 import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -13,12 +16,15 @@ public class EmrApiPropertiesTest {
     @Mock
     private AdministrationService administrationService;
     private EmrApiProperties emrApiProperties;
-
+    @Mock
+    private ConceptService conceptService;
+    
     @Before
     public void setUp() {
         initMocks(this);
         emrApiProperties = new EmrApiProperties();
         emrApiProperties.setAdministrationService(administrationService);
+        emrApiProperties.setConceptService(conceptService);
     }
 
     @Test
@@ -40,5 +46,18 @@ public class EmrApiPropertiesTest {
         when(administrationService.getGlobalProperty(EmrApiConstants.GP_VISIT_EXPIRE_HOURS)).thenReturn("foo");
 
         assertEquals(EmrApiConstants.DEFAULT_VISIT_EXPIRE_HOURS, emrApiProperties.getVisitExpireHours());
+    }
+    
+    @Test
+    public void getConceptSourcesForDiagnosisSearch_shouldNotReturnNull(){
+        when(conceptService.getConceptSourceByName("ICD-10-WHO")).thenReturn(null);
+        Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+        Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().size() == 0);
+        
+        when(conceptService.getConceptSourceByName("ICD-10-WHO")).thenReturn(new ConceptSource());
+        Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+        Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().size() > 0);
+        
+        
     }
 }

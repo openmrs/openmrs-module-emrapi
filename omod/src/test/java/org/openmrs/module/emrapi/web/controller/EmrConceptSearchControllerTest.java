@@ -1,6 +1,7 @@
 package org.openmrs.module.emrapi.web.controller;
 
 import org.codehaus.jackson.type.TypeReference;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -51,4 +52,16 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 		assertEquals(0, response.size());
 	}
 
+
+    /**
+     * This test case depends on the content of diagnosisMetadata.xml file. Remove and add the concept_reference_source tag
+     * to simulate an empty/non-empty list of ConceptSource..
+     * @throws Exception
+     */
+    @Test
+    public void shouldHandleEmptyListOfConceptSource() throws Exception {
+        @SuppressWarnings("unchecked")
+        List<SimpleObject> response1 = deserialize(handle(newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")})), new TypeReference<List>() {});
+        Assert.assertEquals(2, response1.size());
+    }
 }
