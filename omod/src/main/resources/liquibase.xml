@@ -6,8 +6,14 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet author="Shruthi, Sravanthi" id="20150109-0505">
-        <createTable tableName="conditions">
+    <changeSet author="Kelechi+iheanyi" id="20180507-0002">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="emrapi_conditions"/></not>
+        </preConditions>
+        <comment>
+            Create emrapi_conditions table
+        </comment>
+        <createTable tableName="emrapi_conditions">
             <column name="condition_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -42,43 +48,38 @@
                 <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
-
-    </changeSet>
-    <changeSet author="Shruthi, Sravanthi" id="20150109-0627">
-        <addForeignKeyConstraint constraintName="conditions_previous_condition_id_fk" baseTableName="conditions"
-                                 baseColumnNames="previous_condition_id" referencedTableName="conditions"
+        <addForeignKeyConstraint constraintName="conditions_previous_condition_id_fk" baseTableName="emrapi_conditions"
+                                 baseColumnNames="previous_condition_id" referencedTableName="emrapi_conditions"
                                  referencedColumnNames="condition_id"/>
-        <addForeignKeyConstraint baseColumnNames="patient_id" baseTableName="conditions"
+        <addForeignKeyConstraint baseColumnNames="patient_id" baseTableName="emrapi_conditions"
                                  constraintName="conditions_patient_fk" deferrable="false" initiallyDeferred="false"
                                  onUpdate="CASCADE" referencedColumnNames="patient_id" referencedTableName="patient"/>
-        <addForeignKeyConstraint baseColumnNames="concept_id" baseTableName="conditions"
+        <addForeignKeyConstraint baseColumnNames="concept_id" baseTableName="emrapi_conditions"
                                  constraintName="conditions_concept_fk"
                                  deferrable="false" initiallyDeferred="false" referencedColumnNames="concept_id"
                                  referencedTableName="concept"/>
-        <addForeignKeyConstraint baseColumnNames="end_reason" baseTableName="conditions"
+        <addForeignKeyConstraint baseColumnNames="end_reason" baseTableName="emrapi_conditions"
                                  constraintName="conditions_end_reason_fk"
                                  deferrable="false" initiallyDeferred="false" referencedColumnNames="concept_id"
                                  referencedTableName="concept"/>
-        <addForeignKeyConstraint baseColumnNames="creator" baseTableName="conditions"
+        <addForeignKeyConstraint baseColumnNames="creator" baseTableName="emrapi_conditions"
                                  constraintName="conditions_created_by_fk"
                                  deferrable="false" initiallyDeferred="false" referencedColumnNames="user_id"
                                  referencedTableName="users"/>
-        <addForeignKeyConstraint baseColumnNames="voided_by" baseTableName="conditions"
+        <addForeignKeyConstraint baseColumnNames="voided_by" baseTableName="emrapi_conditions"
                                  constraintName="conditions_voided_by_fk"
                                  deferrable="false" initiallyDeferred="false" referencedColumnNames="user_id"
                                  referencedTableName="users"/>
     </changeSet>
-
-    <changeSet author="Shruthi, Sravanthi" id="20150109-0521">
+    <changeSet author="Kelechi+iheanyi" id="20180507-0003">
         <preConditions onFail="MARK_RAN">
             <not>
                 <indexExists indexName="condition_uuid_index"/>
             </not>
         </preConditions>
         <comment>Creating unique index on condition.uuid column</comment>
-        <createIndex tableName="conditions" unique="true" indexName="condition_uuid_index">
+        <createIndex tableName="emrapi_conditions" unique="true" indexName="condition_uuid_index">
             <column name="uuid"/>
         </createIndex>
     </changeSet>
-    
 </databaseChangeLog>
