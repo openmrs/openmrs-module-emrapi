@@ -126,7 +126,7 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
         }
 
         // find matches based on mapping
-        if (CollectionUtils.isEmpty(sources)) {
+        if (!CollectionUtils.isEmpty(sources)) {
             Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ConceptMap.class);
             criteria.setMaxResults(limit);
 
