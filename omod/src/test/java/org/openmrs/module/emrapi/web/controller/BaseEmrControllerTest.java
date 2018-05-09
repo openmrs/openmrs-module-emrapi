@@ -13,10 +13,13 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -26,11 +29,7 @@ import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
 import org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-
-@Ignore
-public class BaseEmrControllerTest extends BaseModuleWebContextSensitiveTest {
+public abstract class BaseEmrControllerTest extends BaseModuleWebContextSensitiveTest {
 
     @Autowired
     private AnnotationMethodHandlerAdapter handlerAdapter;
