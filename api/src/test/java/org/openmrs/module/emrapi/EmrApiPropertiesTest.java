@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
