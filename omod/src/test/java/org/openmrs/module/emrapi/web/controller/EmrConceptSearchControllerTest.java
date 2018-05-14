@@ -11,6 +11,7 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -76,14 +77,15 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
         source.setName("foobar"); // so that "ICD-10-WHO" can't be found by name - produces empty list of ConceptSources
         cs.saveConceptSource(source);
 
+		MockHttpServletRequest getRequest = newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")});
         @SuppressWarnings("unchecked")
-        List<SimpleObject> response1 = deserialize(handle(newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")})), new TypeReference<List>() {});
+        List<SimpleObject> response1 = deserialize(handle(getRequest), new TypeReference<List>() {});
         Assert.assertEquals(2, response1.size());
 
         source.setName("ICD-10-WHO"); // so that "ICD-10-WHO" conceptSource is not null - produces non-empty list of ConceptSources
         cs.saveConceptSource(source);
 
-        response1 = deserialize(handle(newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")})), new TypeReference<List>() {});
+        response1 = deserialize(handle(getRequest), new TypeReference<List>() {});
         Assert.assertEquals(2, response1.size());
 
     }

@@ -77,7 +77,7 @@ public class EmrConceptSearchController {
         if(conceptMappings != null && conceptSource != null) {
             for (ConceptMap cm : conceptMappings) {
                 ConceptReferenceTerm term = cm.getConceptReferenceTerm();
-                if (term.getConceptSource() != null && term.getConceptSource().equals(conceptSource)) {
+                if (conceptSource.equals(term.getConceptSource())) {
                     return term;
                 }
             }
