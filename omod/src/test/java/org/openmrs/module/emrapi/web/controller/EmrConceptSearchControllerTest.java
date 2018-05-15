@@ -61,33 +61,37 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 		assertEquals(0, response.size());
 	}
 
-
-    /**
-     * Tests how EmrConceptSearchController handle empty and non-empty lists of ConceptSource.
-     * This test method basically gets and manipulates the specific 'ICD-10-WHO' ConceptSource since it will be fetched by
-     * {@link org.openmrs.module.emrapi.EmrApiProperties#getConceptSourcesForDiagnosisSearch()} method
-     * which is invoked on the {@link EmrConceptSearchController#emrApiProperties} instance injected
-     * into {@link EmrConceptSearchController} class
-     * @throws Exception
-     */
     @Test
-    public void shouldHandleEmptyListOfConceptSource() throws Exception {
+    public void shouldHandleEmptyListOfDiagnosesConceptSource() throws Exception {
 
         ConceptSource source = cs.getConceptSourceByName("ICD-10-WHO");
+
         source.setName("foobar"); // so that "ICD-10-WHO" can't be found by name - produces empty list of ConceptSources
         cs.saveConceptSource(source);
+
+		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+        Assert.assertEquals(0, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
 
 		MockHttpServletRequest getRequest = newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")});
         @SuppressWarnings("unchecked")
         List<SimpleObject> response1 = deserialize(handle(getRequest), new TypeReference<List>() {});
         Assert.assertEquals(2, response1.size());
+		for(Map simpleObject : response1)
+			Assert.assertNull(simpleObject.get("code"));
+
+
 
         source.setName("ICD-10-WHO"); // so that "ICD-10-WHO" conceptSource is not null - produces non-empty list of ConceptSources
         cs.saveConceptSource(source);
 
-        response1 = deserialize(handle(getRequest), new TypeReference<List>() {});
-        Assert.assertEquals(2, response1.size());
+		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+		Assert.assertEquals(1, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
 
-    }
+		response1 = deserialize(handle(getRequest), new TypeReference<List>() {});
+        Assert.assertEquals(2, response1.size());
+		for(Map simpleObject : response1)
+			Assert.assertNotNull(simpleObject.get("code"));
+
+	}
 
 }
