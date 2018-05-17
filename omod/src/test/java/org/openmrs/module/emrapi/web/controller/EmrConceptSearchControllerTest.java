@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +27,8 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 	EmrApiProperties emrApiProperties;
 
 	@Autowired
-    @Qualifier("conceptService")
-    private ConceptService cs;
+	@Qualifier("conceptService")
+	private ConceptService cs;
 
 	@Before
 	public void setUp() throws Exception {
@@ -61,10 +62,9 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 		assertEquals(0, response.size());
 	}
 
-    @Test
-    public void shouldHandleEmptyListOfDiagnosesConceptSource() throws Exception {
-
-        ConceptSource source = cs.getConceptSourceByName("ICD-10-WHO");
+	@Test
+	public void shouldHandleEmptyListOfDiagnosesConceptSource() throws Exception {    			
+		ConceptSource source = cs.getConceptSourceByName("ICD-10-WHO");
 
         source.setName("foobar"); // so that "ICD-10-WHO" can't be found by name - produces empty list of ConceptSources
         cs.saveConceptSource(source);
@@ -74,11 +74,14 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 
 		MockHttpServletRequest getRequest = newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")});
         @SuppressWarnings("unchecked")
-        List<SimpleObject> response1 = deserialize(handle(getRequest), new TypeReference<List>() {});
-        Assert.assertEquals(2, response1.size());
-		for(Map simpleObject : response1)
-			Assert.assertNull(simpleObject.get("code"));
+        List<SimpleObject> response = deserialize(handle(getRequest), new TypeReference<List>() {});
+        Assert.assertEquals(2, response.size());
 
+        List<String> uuidList_WithoutCodeField = new ArrayList<String>();
+        for(Map simpleObject : response){
+			Assert.assertNull(simpleObject.get("code"));
+            uuidList_WithoutCodeField.add((String) simpleObject.get("conceptUuid"));
+        }
 
 
         source.setName("ICD-10-WHO"); // so that "ICD-10-WHO" conceptSource is not null - produces non-empty list of ConceptSources
@@ -87,11 +90,17 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
 		Assert.assertEquals(1, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
 
-		response1 = deserialize(handle(getRequest), new TypeReference<List>() {});
-        Assert.assertEquals(2, response1.size());
-		for(Map simpleObject : response1)
-			Assert.assertNotNull(simpleObject.get("code"));
+		response = deserialize(handle(getRequest), new TypeReference<List>() {});
+        Assert.assertEquals(2, response.size());
 
+        List<String> uuidList_WithCodeField = new ArrayList<String>();
+        for(Map simpleObject : response){
+			Assert.assertNotNull(simpleObject.get("code"));
+            uuidList_WithCodeField.add((String) simpleObject.get("conceptUuid"));
+        }
+
+        //both lists shall have the same concepts identified by the unique UUID.
+        Assert.assertArrayEquals(uuidList_WithoutCodeField.toArray(), uuidList_WithCodeField.toArray());
 	}
 
 }
