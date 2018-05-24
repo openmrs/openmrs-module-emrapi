@@ -5,7 +5,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="false">
     <!-- Plural table name ("conditions") because "condition" is a MySQL reserved word -->
-    <class name="org.openmrs.module.emrapi.conditionslist.Condition" table="conditions">
+    <class name="org.openmrs.module.emrapi.conditionslist.Condition" table="emrapi_conditions">
         <id name="conditionId" type="int" column="condition_id" unsaved-value="0">
             <generator class="native">
                 <param name="sequence">conditions_condition_id_seq</param>
