@@ -386,6 +386,7 @@
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
+								<classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-web-2.2</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
