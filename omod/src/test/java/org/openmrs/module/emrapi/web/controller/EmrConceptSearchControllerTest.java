@@ -77,10 +77,10 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
         List<SimpleObject> response = deserialize(handle(getRequest), new TypeReference<List>() {});
         Assert.assertEquals(2, response.size());
 
-        List<String> uuidList_WithoutCodeField = new ArrayList<String>();
+        List<String> actualUuids = new ArrayList<String>();
         for(Map simpleObject : response){
 			Assert.assertNull(simpleObject.get("code"));
-            uuidList_WithoutCodeField.add((String) simpleObject.get("conceptUuid"));
+			actualUuids.add((String) simpleObject.get("conceptUuid"));
         }
 
 
@@ -93,14 +93,14 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 		response = deserialize(handle(getRequest), new TypeReference<List>() {});
         Assert.assertEquals(2, response.size());
 
-        List<String> uuidList_WithCodeField = new ArrayList<String>();
+        List<String> expectedUuids = new ArrayList<String>();
         for(Map simpleObject : response){
 			Assert.assertNotNull(simpleObject.get("code"));
-            uuidList_WithCodeField.add((String) simpleObject.get("conceptUuid"));
+			expectedUuids.add((String) simpleObject.get("conceptUuid"));
         }
 
         //both lists shall have the same concepts identified by the unique UUID.
-        Assert.assertArrayEquals(uuidList_WithoutCodeField.toArray(), uuidList_WithCodeField.toArray());
+        Assert.assertArrayEquals(expectedUuids.toArray(), actualUuids.toArray());
 	}
 
 }
