@@ -49,7 +49,8 @@ public class EmrConceptSearchController {
         List<ConceptSource> conceptSources = emrApiProperties.getConceptSourcesForDiagnosisSearch();
         Locale locale = Locale.ENGLISH;
         List<ConceptSearchResult> conceptSearchResults = emrService.conceptSearch(query, locale, null, diagnosisSets, conceptSources, limit);
-        return createListResponse(conceptSearchResults, conceptSources.get(0));
+        ConceptSource conceptSource = conceptSources.isEmpty() ? null: conceptSources.get(0);
+        return createListResponse(conceptSearchResults, conceptSource);
     }
 
     private List<SimpleObject> createListResponse(List<ConceptSearchResult> resultList, ConceptSource conceptSource) {
@@ -73,10 +74,10 @@ public class EmrConceptSearchController {
 
     private ConceptReferenceTerm getConceptReferenceTermByConceptSource(Concept concept, ConceptSource conceptSource) {
         Collection<ConceptMap> conceptMappings = concept.getConceptMappings();
-        if(conceptMappings != null) {
+        if(conceptMappings != null && conceptSource != null) {
             for (ConceptMap cm : conceptMappings) {
                 ConceptReferenceTerm term = cm.getConceptReferenceTerm();
-                if (term.getConceptSource().equals(conceptSource)) {
+                if (conceptSource.equals(term.getConceptSource())) {
                     return term;
                 }
             }
