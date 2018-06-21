@@ -14,6 +14,10 @@
 
 package org.openmrs.module.emrapi.web.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptReferenceTerm;
@@ -22,17 +26,13 @@ import org.openmrs.ConceptSource;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.webservices.rest.SimpleObject;
+import org.openmrs.util.LocaleUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
 
 @Controller
 @RequestMapping(method = RequestMethod.GET, value = "/rest/emrapi/concept")
@@ -47,9 +47,10 @@ public class EmrConceptSearchController {
     public Object search(@RequestParam("term") String query, @RequestParam Integer limit) throws Exception {
         Collection<Concept> diagnosisSets = emrApiProperties.getDiagnosisSets();
         List<ConceptSource> conceptSources = emrApiProperties.getConceptSourcesForDiagnosisSearch();
-        Locale locale = Locale.ENGLISH;
-        List<ConceptSearchResult> conceptSearchResults = emrService.conceptSearch(query, locale, null, diagnosisSets, conceptSources, limit);
-        return createListResponse(conceptSearchResults, conceptSources.get(0));
+        List<ConceptSearchResult> conceptSearchResults =
+                emrService.conceptSearch(query, LocaleUtility.getDefaultLocale(), null, diagnosisSets, conceptSources, limit);
+        ConceptSource conceptSource = conceptSources.isEmpty() ? null: conceptSources.get(0);
+        return createListResponse(conceptSearchResults, conceptSource);
     }
 
     private List<SimpleObject> createListResponse(List<ConceptSearchResult> resultList, ConceptSource conceptSource) {
