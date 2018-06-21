@@ -141,6 +141,13 @@
             Specifies the mapping of encounter types to new visit types for more see https://wiki.openmrs.org/x/vgF4Aw
         </description>
     </globalProperty>
+    <globalProperty>
+        <property>emrapi.conceptSourcesForDiagnosisSearch</property>
+        <defaultValue>ICD-10-WHO</defaultValue>
+        <description>
+            Specifies comma separated list of reference term source names to be used for diagnosis and condition search
+        </description>
+    </globalProperty>
 
     <!-- privileges for conditions, see  org.openmrs.module.emrapi.conditionslist.PrivilegeConstants -->
     <privilege>

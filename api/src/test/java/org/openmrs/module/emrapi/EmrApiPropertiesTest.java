@@ -7,7 +7,9 @@ import org.mockito.Mock;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
+
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -49,14 +51,18 @@ public class EmrApiPropertiesTest {
     
     @Test
     public void getConceptSourcesForDiagnosisSearch_shouldNotReturnNull(){
-        when(conceptService.getConceptSourceByName("ICD-10-WHO")).thenReturn(null);
+        when(administrationService.getGlobalProperty(EmrApiConstants.EMR_CONCEPT_SOURCES_FOR_DIAGNOSIS_SEARCH)).thenReturn("ICD-10-WHO");
+        when(conceptService.getConceptSourceByName(anyString())).thenReturn(null);
         Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
         Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().size() == 0);
-        
-        when(conceptService.getConceptSourceByName("ICD-10-WHO")).thenReturn(new ConceptSource());
+
+        ConceptSource icd10Source = new ConceptSource();
+        icd10Source.setName("ICD-10-WHO");
+        when(conceptService.getConceptSourceByName(anyString())).thenReturn(icd10Source);
         Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
         Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().size() > 0);
         
         
     }
+
 }
