@@ -22,6 +22,7 @@ import org.openmrs.ConceptSource;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.webservices.rest.SimpleObject;
+import org.openmrs.util.LocaleUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,8 +48,8 @@ public class EmrConceptSearchController {
     public Object search(@RequestParam("term") String query, @RequestParam Integer limit) throws Exception {
         Collection<Concept> diagnosisSets = emrApiProperties.getDiagnosisSets();
         List<ConceptSource> conceptSources = emrApiProperties.getConceptSourcesForDiagnosisSearch();
-        Locale locale = Locale.ENGLISH;
-        List<ConceptSearchResult> conceptSearchResults = emrService.conceptSearch(query, locale, null, diagnosisSets, conceptSources, limit);
+        List<ConceptSearchResult> conceptSearchResults =
+                emrService.conceptSearch(query, LocaleUtility.getDefaultLocale(), null, diagnosisSets, conceptSources, limit);
         ConceptSource conceptSource = conceptSources.isEmpty() ? null: conceptSources.get(0);
         return createListResponse(conceptSearchResults, conceptSource);
     }

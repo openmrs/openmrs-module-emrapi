@@ -197,6 +197,8 @@ public class EmrApiConstants {
     
     public static final String GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP = "emrapi.EmrApiVisitAssignmentHandler.encounterTypeToNewVisitTypeMap";
 
+    public static final String EMR_CONCEPT_SOURCES_FOR_DIAGNOSIS_SEARCH =  "emrapi.conceptSourcesForDiagnosisSearch";
+
     public static final ArrayList<String> UNSAFE_PRIVILEGES = new ArrayList<String>(Arrays.asList(
             "Share Metadata",
             "Edit Reports",

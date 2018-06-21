@@ -36,9 +36,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -188,13 +186,23 @@ public class EmrApiProperties extends ModuleProperties {
 		return new DiagnosisMetadata(conceptService, getEmrApiConceptSource());
 	}
 
+
 	public List<ConceptSource> getConceptSourcesForDiagnosisSearch() {
-		ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10-WHO");
-		if (icd10 != null) {
-			return Arrays.asList(icd10);
-		} else {
-			return Collections.emptyList();
+		//The results can very well be cached to reduce calls to database.
+		//however the compatibility requirement to core 1.9.9 do not allow this currently
+		String conceptSourcesForDiagnosisSearch =
+				administrationService.getGlobalProperty(EmrApiConstants.EMR_CONCEPT_SOURCES_FOR_DIAGNOSIS_SEARCH);
+		List<ConceptSource> conceptSourceList = new ArrayList<ConceptSource>();
+		if (StringUtils.hasText(conceptSourcesForDiagnosisSearch)) {
+			String[] specifiedSourceNames = conceptSourcesForDiagnosisSearch.split(",");
+			for (String specifiedSourceName : specifiedSourceNames) {
+				ConceptSource aSource = conceptService.getConceptSourceByName(specifiedSourceName);
+				if (aSource != null) {
+					conceptSourceList.add(aSource);
+				}
+			}
 		}
+		return conceptSourceList;
 	}
 
 	public ConceptSource getEmrApiConceptSource() {
