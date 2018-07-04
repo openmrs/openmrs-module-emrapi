@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.test.builder;
 
 import org.openmrs.Concept;
 import org.openmrs.Drug;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Person;
 import org.openmrs.User;
@@ -121,6 +122,11 @@ public class ObsBuilder {
 
     public ObsBuilder setCreator(User creator){
         obs.setCreator(creator);
+        return this;
+    }
+
+    public ObsBuilder setEncounter(Encounter encounter) {
+        obs.setEncounter(encounter);
         return this;
     }
 }
