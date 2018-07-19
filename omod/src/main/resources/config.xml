@@ -67,6 +67,12 @@
 
     <!-- Module Activator -->
     <activator>${project.parent.groupId}.${project.parent.artifactId}.EmrApiActivator</activator>
+     
+     <!-- Extensions -->
+	<extension>
+		<point>org.openmrs.admin.list</point>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.extension.html.AdminList</class>
+	</extension>
 
 
     <!-- Maps hibernate files, if present -->

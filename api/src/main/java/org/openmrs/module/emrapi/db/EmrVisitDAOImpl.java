@@ -1,6 +1,7 @@
 package org.openmrs.module.emrapi.db;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
+import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
@@ -24,8 +26,10 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
    protected static String PRIMARY_DIAGNOSES_HQL            = "hql/visit_primary_diagnoses.hql";
    protected static String CONFIRMED_DIAGNOSES_HQL          = "hql/visit_confirmed_diagnoses.hql";
    protected static String CONFIRMED_PRIMARY_DIAGNOSES_HQL  = "hql/visit_confirmed_primary_diagnoses.hql";
+   protected static String PATIENTS_DIAGNOSES_HQL           = "hql/patients_diagnoses.hql";
 
    private DbSessionFactory sessionFactory;
+   private Concept concept;
 
    public void setSessionFactory(DbSessionFactory sessionFactory) {
       this.sessionFactory = sessionFactory;
@@ -100,4 +104,25 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
       query.setInteger("confirmedCertaintyConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Certainty.CONFIRMED).getId());
       return (List<Obs>) query.list();
    }
+
+   @Override
+     public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
+   
+        List<Integer> allPatients = new ArrayList<Integer>();
+   
+       String queryString = "";
+         try {
+            queryString = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(PATIENTS_DIAGNOSES_HQL));
+        } catch (IOException e) {
+            log.error(RESOURCE_NOT_FOUND, e);
+            return Collections.emptyList();
+         }
+         concept = new Concept();
+         
+         Query query = sessionFactory.getCurrentSession().createQuery(queryString);
+         query.setInteger("diagnosisSetConceptId", diagnosisMetadata.getDiagnosisSetConcept().getConceptId());
+         allPatients.addAll(query.list());
+   
+        return allPatients;
+     }
 }
