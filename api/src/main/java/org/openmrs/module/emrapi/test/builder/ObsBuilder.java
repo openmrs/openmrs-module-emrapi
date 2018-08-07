@@ -14,14 +14,15 @@
 
 package org.openmrs.module.emrapi.test.builder;
 
+import java.util.Date;
+
 import org.openmrs.Concept;
 import org.openmrs.Drug;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Person;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
-
-import java.util.Date;
 
 /**
  * Helper for building Obs in unit tests
@@ -123,4 +124,8 @@ public class ObsBuilder {
         obs.setCreator(creator);
         return this;
     }
+    public ObsBuilder setEncounter(Encounter encounter) {
+    	        obs.setEncounter(encounter);
+    	       return this;
+    	    }
 }

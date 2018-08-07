@@ -70,5 +70,12 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
             return dao.getConfirmedDiagnoses(visit, diagnosisMetadata);
          }
       }
+          
    }
+   
+   @Override
+   public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
+       return dao.getAllPatientsWithDiagnosis(diagnosisMetadata);
+   }
+   
 }

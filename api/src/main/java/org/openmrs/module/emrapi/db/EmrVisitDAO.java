@@ -16,4 +16,5 @@ public interface EmrVisitDAO {
    
    List<Obs> getConfirmedPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata);
    
+   List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata);
 }
