@@ -28,13 +28,13 @@ import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitService {
     private VisitService visitService;
     private VisitResponseMapper visitResponseMapper;
-    
+
     protected EmrVisitDAO dao;
-    
+
     public EmrVisitDAO getDao() {
       return dao;
     }
-    
+
     public void setDao(EmrVisitDAO dao) {
        this.dao = dao;
     }
@@ -71,4 +71,9 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
          }
       }
    }
+
+    @Override
+    public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
+        return dao.getAllPatientsWithDiagnosis(diagnosisMetadata);
+    }
 }

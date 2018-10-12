@@ -31,4 +31,6 @@ public interface EmrVisitService extends OpenmrsService {
     VisitResponse find(VisitRequest visitRequest);
     
     List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly);
+
+    List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata);
 }

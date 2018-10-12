@@ -90,6 +90,12 @@
     </messages>
     <!-- /Internationalization -->
 
+	<!-- Extensions -->
+	<extension>
+		<point>org.openmrs.admin.list</point>
+		<class>${project.parent.groupId}.${project.parent.artifactId}.extension.html.AdminList</class>
+	</extension>
+	
     <globalProperty>
         <property>emr.encounterMatcher</property>
         <defaultValue></defaultValue>
