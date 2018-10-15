@@ -1,6 +1,7 @@
 package org.openmrs.module.emrapi.db;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
    protected static String PRIMARY_DIAGNOSES_HQL            = "hql/visit_primary_diagnoses.hql";
    protected static String CONFIRMED_DIAGNOSES_HQL          = "hql/visit_confirmed_diagnoses.hql";
    protected static String CONFIRMED_PRIMARY_DIAGNOSES_HQL  = "hql/visit_confirmed_primary_diagnoses.hql";
+   protected static String PATIENTS_DIAGNOSES_HQL           = "hql/patients_diagnoses.hql";
 
    private DbSessionFactory sessionFactory;
 
@@ -99,5 +101,19 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
       query.setInteger("diagnosisCertaintyConceptId", diagnosisMetadata.getDiagnosisCertaintyConcept().getId());
       query.setInteger("confirmedCertaintyConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Certainty.CONFIRMED).getId());
       return (List<Obs>) query.list();
+   }
+
+   @Override
+   public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
+      String queryString = "";
+      try {
+    	  queryString = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(PATIENTS_DIAGNOSES_HQL));
+      } catch (IOException e) {
+         log.error(RESOURCE_NOT_FOUND, e);
+         return Collections.emptyList();
+      }
+      Query query = sessionFactory.getCurrentSession().createQuery(queryString);
+      query.setInteger("diagnosisSetConceptId", diagnosisMetadata.getDiagnosisSetConcept().getConceptId());
+      return query.list();
    }
 }
