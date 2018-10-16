@@ -38,10 +38,7 @@ public class MigrateDiagnosis {
 		Boolean migratedAtleastOneEncounterDiagosis = false;
 		
 		EmrVisitService emrVisitService = Context.getService(EmrVisitService.class);
-		DiagnosisService oldDiagnosisService = new DiagnosisServiceImpl();
-		((DiagnosisServiceImpl)oldDiagnosisService).setEncounterService(Context.getEncounterService());
-		((DiagnosisServiceImpl)oldDiagnosisService).setObsService(Context.getObsService());
-		((DiagnosisServiceImpl)oldDiagnosisService).setEmrApiProperties(Context.getRegisteredComponent("emrApiProperties", EmrApiProperties.class));
+		DiagnosisService oldDiagnosisService = getDeprecatedDiagnosisService();
 		
 		org.openmrs.api.DiagnosisService newDiagnosisService = Context.getService(org.openmrs.api.DiagnosisService.class);
 		List<Integer> patientsIds = emrVisitService.getAllPatientsWithDiagnosis(diagnosisMetadata);
@@ -100,4 +97,17 @@ public class MigrateDiagnosis {
 		return coreDiagnoses;
 	}
 
+	/**
+	 * Gets the old deprecated diagnosis service found in the emrapi module. 
+	 * The one which was used before platform 2.2
+	 * 
+	 * @return the deprecated diagnosis service
+	 */
+	public static DiagnosisService getDeprecatedDiagnosisService() {
+		DiagnosisService oldDiagnosisService = new DiagnosisServiceImpl();
+		((DiagnosisServiceImpl)oldDiagnosisService).setEncounterService(Context.getEncounterService());
+		((DiagnosisServiceImpl)oldDiagnosisService).setObsService(Context.getObsService());
+		((DiagnosisServiceImpl)oldDiagnosisService).setEmrApiProperties(Context.getRegisteredComponent("emrApiProperties", EmrApiProperties.class));
+		return oldDiagnosisService;
+	}
 }

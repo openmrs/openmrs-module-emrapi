@@ -43,9 +43,6 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 	EmrVisitService emrVisitService;
 
 	@Autowired
-	DiagnosisService emrapiDiagnosisService;
-
-	@Autowired
 	org.openmrs.api.DiagnosisService diagnosisService;
 
 	@Autowired
@@ -77,7 +74,7 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 		Obs obs = oldDiagnosisBuilder.buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).save().get();
 		oldDiagnosisBuilder.buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded disease", encounterService.getEncounter(1)).save();
 		assertFalse(obs.getVoided());
-		List<Diagnosis> emrapiDiagnoses = emrapiDiagnosisService.getDiagnoses(patient, null);
+		List<Diagnosis> emrapiDiagnoses = MigrateDiagnosis.getDeprecatedDiagnosisService().getDiagnoses(patient, null);
 		assertEquals(2, emrapiDiagnoses.size());
 		// before migration
 		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
