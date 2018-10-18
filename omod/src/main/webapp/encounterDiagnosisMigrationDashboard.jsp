@@ -18,7 +18,7 @@
 	<br><br>
 	<table>
 		<tr>
-			<td><input type="button" value="Continue" onclick="document.location.href='migrateEncounterDiagnosis.form.form';"></td>
+			<td><input type="button" value="Continue" onclick="document.location.href='migrateEncounterDiagnosis.form';"></td>
 			<td><input type="button" value="Cancel" onclick="document.location.href='${pageContext.request.contextPath}/admin';"></td>
 		</tr>
 	</table>
