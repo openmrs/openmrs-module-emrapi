@@ -22,6 +22,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
@@ -280,6 +281,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
+    @Ignore("Unignore after fixing EA-141")
     public void test_getVisitsAndHasVisitDuring() throws Exception {
 
         ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
