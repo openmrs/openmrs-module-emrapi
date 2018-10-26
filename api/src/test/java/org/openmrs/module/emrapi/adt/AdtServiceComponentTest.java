@@ -281,7 +281,6 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    @Ignore("Unignore after fixing EA-141")
     public void test_getVisitsAndHasVisitDuring() throws Exception {
 
         ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
