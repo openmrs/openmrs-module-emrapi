@@ -286,7 +286,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                    <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
@@ -318,7 +318,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>2.6</version>
                         <configuration>
-                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                             <includes>
                                 <include>**/*Test.java</include>
                             </includes>
@@ -348,7 +348,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>2.6</version>
                         <configuration>
-                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                             <includes>
                                 <include>**/*_1_10_Test.java</include>
                             </includes>
@@ -378,7 +378,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>2.6</version>
                         <configuration>
-                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                             <includes>
                                 <include>**/*_1_11_Test.java</include>
                             </includes>
@@ -409,7 +409,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>2.6</version>
                         <configuration>
-                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                             <includes>
                                 <include>**/*_1_12_Test.java</include>
                             </includes>
@@ -438,7 +438,7 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>2.6</version>
                         <configuration>
-                            <argLine>-Xmx512m -XX:MaxPermSize=512m</argLine>
+                            <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                             <includes>
                                 <include>**/*_2_0_Test.java</include>
                                 <include>**/*_2_0_IT.java</include>
