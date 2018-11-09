@@ -5,11 +5,9 @@ import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
-import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.EmrApiConstants;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +15,13 @@ import java.util.List;
 /**
  * class implementing the DiagnosisService while delegating calls to the core module
  * */
-public class DiagnosisServiceImpl2_2 extends BaseOpenmrsService implements DiagnosisService {
+public class DiagnosisServiceImpl2_2 extends DiagnosisServiceImpl implements DiagnosisService {
+
+	private AdministrationService adminService;
+
+	public void setAdminService(AdministrationService adminService) {
+		this.adminService = adminService;
+	}
 
 	/**
 	 * Method to convert the core diagnosis object into a list of diagnoses compatible with the diagnosis object in the emrapi module
@@ -37,25 +41,51 @@ public class DiagnosisServiceImpl2_2 extends BaseOpenmrsService implements Diagn
 	}
 
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
-		 return convert(Context.getDiagnosisService().getDiagnoses(patient, fromDate));
+		if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE,"false").equalsIgnoreCase("true")) {
+			return super.getDiagnoses(patient,fromDate);
+		}
+		 else {
+			return convert(Context.getDiagnosisService().getDiagnoses(patient, fromDate));
+		}
 	}
 
 
 	public 	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate){
-		return convert(Context.getDiagnosisService().getUniqueDiagnoses(patient, fromDate));
+		if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true")) {
+			return super.getUniqueDiagnoses(patient, fromDate);
+		}
+		else {
+			return convert(Context.getDiagnosisService().getUniqueDiagnoses(patient, fromDate));
+		}
 
 	}
 
 	public List<Diagnosis> getPrimaryDiagnoses(Encounter encounter){
-		return convert(Context.getDiagnosisService().getPrimaryDiagnoses(encounter));
+		if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true")) {
+			return super.getPrimaryDiagnoses(encounter);
+		}
+		else {
+			return convert(Context.getDiagnosisService().getPrimaryDiagnoses(encounter));
+		}
 	}
 
 	public boolean hasDiagnosis(Encounter encounter, Diagnosis diagnosis){
-		return true;
+		if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true")) {
+			return super.hasDiagnosis(encounter, diagnosis);
+		}
+		else {
+			return true;
+		}
 	}
 
 	public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses){
-		return null;
+		if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true")) {
+			return super.codeNonCodedDiagnosis(nonCodedObs, diagnoses);
+
+		}
+		else {
+			return null;
+		}
 	}
 
 }

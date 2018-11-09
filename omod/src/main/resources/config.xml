@@ -159,6 +159,14 @@
         </description>
     </globalProperty>
 
+    <globalProperty>
+        <property>emrapi.useLegacyDiagnosisService</property>
+        <defaultValue>false</defaultValue>
+        <description>
+            When running Core 2.2+, use the legacy diagnosis service instead of the new one provided to work with the new diagnosis model
+        </description>
+    </globalProperty>
+
     <!-- privileges for conditions, see  org.openmrs.module.emrapi.conditionslist.PrivilegeConstants -->
     <privilege>
         <name>Edit conditions</name>

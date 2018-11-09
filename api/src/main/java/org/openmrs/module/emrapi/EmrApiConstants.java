@@ -14,12 +14,8 @@
 
 package org.openmrs.module.emrapi;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -207,4 +203,6 @@ public class EmrApiConstants {
             "Edit Report Objects",
             "Manage Privileges"
     ));
+
+    public static final String GP_USE_LEGACY_DIAGNOSIS_SERVICE = "emrapi.useLegacyDiagnosisService";
 }

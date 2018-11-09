@@ -10,6 +10,10 @@
 		</property>
 		<property name="target">
 			<bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisServiceImpl2_2">
+				<property name="emrApiProperties" ref="emrApiProperties"/>
+				<property name="obsService" ref="obsService"/>
+				<property name="encounterService" ref="encounterService"/>
+				<property name="adminService" ref="adminService"/>
 			</bean>
 		</property>
 		<property name="preInterceptors">
