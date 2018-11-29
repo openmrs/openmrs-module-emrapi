@@ -426,7 +426,7 @@
         <profile>
             <id>MRS2.0</id>
             <properties>
-                <openMRSVersion>2.0.1-SNAPSHOT</openMRSVersion>
+                <openMRSVersion>2.2.0-alpha</openMRSVersion>
                 <jacksonVersion>1.9.13</jacksonVersion>
                 <reportingApiConditionalArtifactId>reporting-api-2.0</reportingApiConditionalArtifactId>
             </properties>
