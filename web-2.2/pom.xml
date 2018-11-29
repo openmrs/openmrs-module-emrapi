@@ -13,7 +13,7 @@
     <description>WEB 2.2 project for EMRAPI</description>
 
     <properties>
-        <openMRSVersion>2.2.0-SNAPSHOT</openMRSVersion>
+        <openMRSVersion>2.2.0-alpha</openMRSVersion>
     </properties>
 
     <dependencies>
