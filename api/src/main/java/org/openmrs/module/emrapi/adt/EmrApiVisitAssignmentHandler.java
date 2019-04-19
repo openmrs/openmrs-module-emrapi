@@ -16,22 +16,19 @@ package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTime;
 import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
-import org.openmrs.api.APIException;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.handler.BaseEncounterVisitHandler;
 import org.openmrs.api.handler.EncounterVisitHandler;
-import org.openmrs.api.handler.ExistingOrNewVisitAssignmentHandler;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.util.OpenmrsConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.util.OpenmrsUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.Date;
@@ -51,7 +48,9 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
     private AdtService adtService;
     
     private AdministrationService administrationService;
-    
+
+    private EmrApiProperties emrApiProperties;
+
     private EncounterTypetoVisitTypeMapper encounterTypetoVisitTypeMapper;
 
     /**
@@ -65,6 +64,7 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
             visitService = Context.getVisitService();
             adtService = Context.getService(AdtService.class);
             administrationService = Context.getAdministrationService();
+            emrApiProperties = Context.getRegisteredComponents(EmrApiProperties.class).get(0);
             encounterTypetoVisitTypeMapper = Context.getRegisteredComponents(EncounterTypetoVisitTypeMapper.class).get(0);
         } catch (Exception ex) {
             // unit tests will set the fields manually
@@ -78,34 +78,53 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
 
     @Override
     public void beforeCreateEncounter(Encounter encounter) {
-        //Do nothing if the encounter already belongs to a visit.
-        if (encounter.getVisit() != null)
-            return;
 
-        // location-less encounters shouldn't belong to a visit
-        if (encounter.getLocation() == null) {
+        //Do nothing if the encounter already belongs to a visit.
+        if (encounter.getVisit() != null) {
             return;
         }
 
         // Eventually we should explicitly allow some encounters to be visit-free, probably via a GP defining a list of EncounterTypes.
         // If we do that, we'd return early from here, and re-enable the IllegalStateException below.
 
+
         Date when = encounter.getEncounterDatetime();
         if (when == null) {
             when = new Date();
         }
 
+        // location-less encounters shouldn't belong to a visit
+        if (encounter.getLocation() == null) {
+            return;
+        }
+
         List<Patient> patient = Collections.singletonList(encounter.getPatient());
 
-        // visits that have not ended by the encounter date.
+        // visits that have started by end of day on the encounter date
         List<Visit> candidates = visitService.getVisits(null, patient, null, null, null,
-                when, null, null, null, true, false);
+                new DateTime(when).withTime(23, 59, 59, 999).toDate(), null, null, null, true, false);
 
         if (candidates != null) {
             for (Visit candidate : candidates) {
-                if (adtService.isSuitableVisit(candidate, encounter.getLocation(), when)) {
-                    candidate.addEncounter(encounter);
-                    return;
+
+                if (emrApiProperties.getVisitAssignmentHandlerAdjustEncounterTimeOfDayIfNecessary()) {
+                    if (adtService.isSuitableVisitIgnoringTime(candidate, encounter.getLocation(), when)) {
+                        if (when.before(candidate.getStartDatetime())) {
+                            encounter.setEncounterDatetime(candidate.getStartDatetime());
+                        }
+                        else if (candidate.getStopDatetime() != null && when.after(candidate.getStopDatetime())) {
+                            encounter.setEncounterDatetime(candidate.getStopDatetime());
+                        }
+
+                        candidate.addEncounter(encounter);
+                        return;
+                    }
+                }
+                else {
+                    if (adtService.isSuitableVisit(candidate, encounter.getLocation(), when)) {
+                        candidate.addEncounter(encounter);
+                        return;
+                    }
                 }
             }
         }
@@ -140,7 +159,11 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
     }
     
     public void setAdministrationService(AdministrationService administrationService) {this.administrationService = administrationService; }
-    
+
+    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
+        this.emrApiProperties = emrApiProperties;
+    }
+
     public EncounterTypetoVisitTypeMapper getEncounterTypetoVisitTypeMapper() {
         return encounterTypetoVisitTypeMapper;
     }

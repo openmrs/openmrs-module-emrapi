@@ -152,6 +152,13 @@
         </description>
     </globalProperty>
     <globalProperty>
+        <property>emrapi.EmrApiVisitAssignmentHandler.adjustEncounterTimeOfDayIfNecessary</property>
+        <defaultValue>false</defaultValue>
+        <description>
+            If true, and a visit is found on the same day but the encounter is not within that timeframe will adjust the encounter time as needed
+        </description>
+    </globalProperty>
+    <globalProperty>
         <property>emrapi.conceptSourcesForDiagnosisSearch</property>
         <defaultValue>ICD-10-WHO</defaultValue>
         <description>

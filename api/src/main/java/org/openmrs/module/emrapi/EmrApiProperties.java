@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.openmrs.module.emrapi.EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ADJUST_ENCOUNTER_TIME_OF_DAY_IF_NECESSARY;
+
 /**
  * Properties (some constant, some configured via GPs) for this module.
  */
@@ -303,4 +305,9 @@ public class EmrApiProperties extends ModuleProperties {
 
         return new File(personImagesDir);
     }
+
+	public Boolean getVisitAssignmentHandlerAdjustEncounterTimeOfDayIfNecessary() {
+		return "TRUE".equalsIgnoreCase(getGlobalProperty(GP_VISIT_ASSIGNMENT_HANDLER_ADJUST_ENCOUNTER_TIME_OF_DAY_IF_NECESSARY, false));
+	}
+
 }

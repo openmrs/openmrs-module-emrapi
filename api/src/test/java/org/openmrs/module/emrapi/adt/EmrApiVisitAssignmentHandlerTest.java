@@ -14,22 +14,8 @@
 
 package org.openmrs.module.emrapi.adt;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Map;
-
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -44,6 +30,22 @@ import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class EmrApiVisitAssignmentHandlerTest {
 
@@ -54,6 +56,8 @@ public class EmrApiVisitAssignmentHandlerTest {
     AdtService adtService;
     
     AdministrationService adminService;
+
+    EmrApiProperties emrApiProperties;
     
     EncounterTypetoVisitTypeMapper encounterTypetoVisitTypeMapper;
     
@@ -64,17 +68,21 @@ public class EmrApiVisitAssignmentHandlerTest {
         handler = new EmrApiVisitAssignmentHandler();
         visitService = mock(VisitService.class);
         adminService = mock(AdministrationService.class);
+        emrApiProperties = mock(EmrApiProperties.class);
         adtService = new AdtServiceImpl();
         
         handler.setVisitService(visitService);
         handler.setAdtService(adtService);
         handler.setAdministrationService(adminService);
+        handler.setEmrApiProperties(emrApiProperties);
         
         encounterTypetoVisitTypeMapper = new EncounterTypetoVisitTypeMapper();
         encounterTypetoVisitTypeMapper.setVisitService(visitService);
         encounterTypetoVisitTypeMapper.setAdminService(adminService);
     
         handler.setEncounterTypetoVisitTypeMapper(encounterTypetoVisitTypeMapper);
+
+        when(emrApiProperties.getVisitAssignmentHandlerAdjustEncounterTimeOfDayIfNecessary()).thenReturn(true);
     
         encounterType = new EncounterType();
         encounterType.setId(1);
@@ -126,14 +134,18 @@ public class EmrApiVisitAssignmentHandlerTest {
                         any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
                         anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(notSuitable, suitable));
 
+        Date encounterDatetime = new Date();
         Encounter encounter = new Encounter();
         encounter.setPatient(patient);
         encounter.setLocation(location);
+        encounter.setEncounterDatetime(encounterDatetime);
 
         handler.beforeCreateEncounter(encounter);
+        encounter.setEncounterDatetime(encounterDatetime);
 
         Assert.assertThat(encounter.getVisit(), is(suitable));
         Assert.assertThat(suitable.getEncounters(), contains(encounter));
+        Assert.assertThat(encounter.getEncounterDatetime(), is(encounterDatetime));
     }
     
     @Test
@@ -222,4 +234,67 @@ public class EmrApiVisitAssignmentHandlerTest {
         // there is a visit on the encounter
         Assert.assertNull(encounter.getVisit());
     }
+
+    @Test
+    public void testAdjustingEncounterTimeToStartOfVisitWhenAssignedToVisit() throws Exception {
+
+        Patient patient = new Patient();
+        Location location = new Location();
+
+        Visit suitable = new Visit();
+        suitable.setPatient(patient);
+        suitable.setStartDatetime(new DateTime().withTimeAtStartOfDay().minusDays(1).plusHours(12).toDate());  // start time = 12:00 yesterday
+        suitable.setStopDatetime(new DateTime().withTimeAtStartOfDay().minusDays(1).plusHours(16).toDate());  // stop time = 16:00 yesterday
+        suitable.setLocation(location);
+
+        // TODO this doesn't test that the query works correctly!
+        when(
+                visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
+                        any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
+                        anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(suitable));
+
+        Encounter encounter = new Encounter();
+        encounter.setPatient(patient);
+        encounter.setLocation(location);
+        encounter.setEncounterDatetime(new DateTime().withTimeAtStartOfDay().minusDays(1).plusHours(10).toDate()); // 10:00 yesterday
+
+
+        handler.beforeCreateEncounter(encounter);
+
+        Assert.assertThat(encounter.getVisit(), is(suitable));
+        Assert.assertThat(suitable.getEncounters(), contains(encounter));
+        Assert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStartDatetime()));
+    }
+
+    @Test
+    public void testAdjustingEncounterTimeToEndOfVisitWhenAssignedToVisit() throws Exception {
+
+        Patient patient = new Patient();
+        Location location = new Location();
+
+        Visit suitable = new Visit();
+        suitable.setPatient(patient);
+        suitable.setStartDatetime(new DateTime().withTimeAtStartOfDay().minusDays(1).plusHours(12).toDate());  // start time = 12:00 yesterday
+        suitable.setStopDatetime(new DateTime().withTimeAtStartOfDay().minusDays(1).plusHours(16).toDate());  // stop time = 16:00 yesterday
+        suitable.setLocation(location);
+
+        // TODO this doesn't test that the query works correctly!
+        when(
+                visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
+                        any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
+                        anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(suitable));
+
+        Encounter encounter = new Encounter();
+        encounter.setPatient(patient);
+        encounter.setLocation(location);
+        encounter.setEncounterDatetime(new DateTime().withTimeAtStartOfDay().minusDays(1).plusHours(20).toDate()); // 20:00 yesterday
+
+
+        handler.beforeCreateEncounter(encounter);
+
+        Assert.assertThat(encounter.getVisit(), is(suitable));
+        Assert.assertThat(suitable.getEncounters(), contains(encounter));
+        Assert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStopDatetime()));
+    }
+
 }

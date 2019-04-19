@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -428,6 +429,24 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
         return isSameOrAncestor(visit.getLocation(), location);
     }
+
+    /**
+     * @param visit
+     * @param location
+     * @param when
+     * @return true if when falls in the visits timespan (ignoring time component) AND location is within visit.location
+     */
+    @Override
+    public boolean isSuitableVisitIgnoringTime(Visit visit, Location location, Date when) {
+        if (OpenmrsUtil.compare(when, new DateTime(visit.getStartDatetime()).withTimeAtStartOfDay().toDate()) < 0) {
+            return false;
+        }
+        if (visit.getStopDatetime() != null && OpenmrsUtil.compareWithNullAsLatest(when, new DateTime(visit.getStopDatetime()).withTime(23, 59, 59, 999).toDate()) > 0) {
+            return false;
+        }
+        return isSameOrAncestor(visit.getLocation(), location);
+    }
+
 
     /**
      * @param a

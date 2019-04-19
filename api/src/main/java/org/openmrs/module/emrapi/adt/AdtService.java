@@ -141,6 +141,14 @@ public interface AdtService extends OpenmrsService {
     boolean isSuitableVisit(Visit visit, Location location, Date when);
 
     /**
+     * @param visit
+     * @param location
+     * @param when
+     * @return whether the given visit is suitable to store a patient interaction at the given location and date; returns true if this visit occurred on the the same day as the encounter, ignoring time
+     */
+    boolean isSuitableVisitIgnoringTime(Visit visit, Location location, Date when);
+
+    /**
      * Gets all currently-active visits at the given location or any of its children
      *
      *
