@@ -5,9 +5,11 @@ import org.junit.Test;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
+import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
+import org.openmrs.api.PatientService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,6 +25,9 @@ public class EmrEncounterDAOComponentTest extends BaseModuleContextSensitiveTest
 
     @Autowired
     private ConceptService conceptService;
+
+    @Autowired
+    private PatientService patientService;
 
     @Autowired
     private ObsService obsService;
@@ -92,4 +97,20 @@ public class EmrEncounterDAOComponentTest extends BaseModuleContextSensitiveTest
         assertThat(encounters.get(0).getId(),is(1000));
     }
 
+    @Test
+    public void getEncountersByObsValueText_shouldCorrectlyIncludePatient() {
+        Concept concept = conceptService.getConcept(19);
+        Patient patient = patientService.getPatient(7);
+        List<Encounter> encounters = emrEncounterDAO.getEncountersByObsValueText(patient, concept, "some test value", null, false);
+        assertThat(encounters.size(), is(1));
+        assertThat(encounters.get(0).getId(),is(1000));
+    }
+
+    @Test
+    public void getEncountersByObsValueText_shouldCorrectlyExcludePatient() {
+        Concept concept = conceptService.getConcept(19);
+        Patient patient = patientService.getPatient(6);
+        List<Encounter> encounters = emrEncounterDAO.getEncountersByObsValueText(patient, concept, "some test value", null, false);
+        assertThat(encounters.size(), is(0));
+    }
 }

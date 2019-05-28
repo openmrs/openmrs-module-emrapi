@@ -1,7 +1,8 @@
 package org.openmrs.module.emrapi.db;
 
 import org.hibernate.Criteria;
-import org.openmrs.api.db.hibernate.DbSessionFactory;  
+import org.openmrs.Patient;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Concept;
@@ -21,7 +22,7 @@ public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
     }
 
     @Override
-    public List<Encounter> getEncountersByObsValueText(Concept obsConcept, String valueText, EncounterType encounterType, boolean includeVoided) {
+    public List<Encounter> getEncountersByObsValueText(Patient patient, Concept obsConcept, String valueText, EncounterType encounterType, boolean includeVoided) {
 
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 
@@ -44,7 +45,16 @@ public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
             criteria.add(Restrictions.eq("encounter.encounterType", encounterType));
         }
 
+        if (patient != null) {
+            criteria.add(Restrictions.eq("person", patient));
+        }
+
         return criteria.list();
+    }
+
+    @Override
+    public List<Encounter> getEncountersByObsValueText(Concept obsConcept, String valueText, EncounterType encounterType, boolean includeVoided) {
+        return getEncountersByObsValueText(null, obsConcept, valueText, encounterType, includeVoided);
     }
 
 }
