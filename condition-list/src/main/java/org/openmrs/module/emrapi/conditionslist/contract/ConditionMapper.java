@@ -7,6 +7,7 @@ import org.openmrs.ConceptName;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
+import java.util.Locale;
 
 public class ConditionMapper {
 	
@@ -70,6 +71,9 @@ public class ConditionMapper {
 		ConceptName fullySpecifiedName = openmrsConcept.getFullySpecifiedName(Context.getLocale());
 		if(fullySpecifiedName == null){
 			fullySpecifiedName = openmrsConcept.getFullySpecifiedName(getDefaultLocale());
+		}
+		if(fullySpecifiedName == null){
+			fullySpecifiedName = openmrsConcept.getFullySpecifiedName(new Locale("en"));
 		}
 		Concept concept = new Concept(openmrsConcept.getUuid(), fullySpecifiedName.getName());
 		ConceptName shortName = openmrsConcept.getShortNameInLocale(Context.getLocale());
