@@ -149,11 +149,36 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
         assertThat(firstResult.getConcept(), is(concepts.get("diabetes")));
     }
 
+    @Test
+    public void testConceptSearchByNameFromSpecificSources() throws Exception {
+        Map<String, Concept> concepts = setupConcepts();
+        ConceptClass diagnosis = conceptService.getConceptClassByName("Diagnosis");
+        ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10");
+
+        List<ConceptSearchResult> searchResults = emrConceptService.conceptSearch("ia", Locale.ENGLISH, Collections.singleton(diagnosis), null, Collections.singleton(icd10), null);
+
+        assertThat(searchResults.size(), is(3));
+
+        ConceptSearchResult firstResult = searchResults.get(0);
+        ConceptSearchResult secondResult = searchResults.get(1);
+        ConceptSearchResult thirdResult = searchResults.get(2);
+
+        assertThat(firstResult.getConcept(), is(concepts.get("malaria")));
+        assertThat(firstResult.getConceptName().getName(), is("Malaria"));
+
+        assertThat(secondResult.getConcept(), is(concepts.get("cerebral malaria")));
+        assertThat(secondResult.getConceptName().getName(), is("Cerebral Malaria"));
+
+        assertThat(thirdResult.getConcept(), is(concepts.get("diabetes")));
+        assertThat(thirdResult.getConceptName().getName(), is("Diabetes Mellitus, Type II"));
+    }
+
     private Map<String, Concept> setupConcepts() {
         Map<String, Concept> concepts = new HashMap<String, Concept>();
 
         ConceptMapType sameAs = conceptService.getConceptMapTypeByName("same-as");
         ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10");
+        ConceptSource snomed = conceptService.getConceptSourceByName("SNOMED CT");
 
         ConceptDatatype na = conceptService.getConceptDatatypeByName("N/A");
         ConceptClass diagnosis = conceptService.getConceptClassByName("Diagnosis");
@@ -174,6 +199,10 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
                 .add(new ConceptName("Diabetes Mellitus, Type II", Locale.ENGLISH))
                 .addVoidedName(new ConceptName("Malaria", Locale.ENGLISH))
                 .addMapping(sameAs, icd10, "E11.9").get()));
+
+        concepts.put("preeclampsia", conceptService.saveConcept(new ConceptBuilder(conceptService, na, diagnosis)
+                .add(new ConceptName("Severe Preeclampsia", Locale.ENGLISH))
+                .addMapping(sameAs, snomed, "46764007").get()));
 
         concepts.put("allowedDiagnoses", conceptService.saveConcept(new ConceptBuilder(conceptService, na, convSet)
                 .add(new ConceptName("Allowed Diagnoses", Locale.ENGLISH))
