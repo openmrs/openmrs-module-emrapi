@@ -15,7 +15,6 @@
 package org.openmrs.module.emrapi.concept;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,7 +28,6 @@ import java.util.Vector;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
@@ -44,9 +42,8 @@ import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSet;
 import org.openmrs.ConceptSource;
-import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ModuleUtil;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,7 +89,7 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
             }
             criteria.setMaxResults(limit);
 
-            Criteria conceptCriteria = criteria.createCriteria("concept");
+            Criteria conceptCriteria = criteria.createCriteria("concept", "cpt");
             conceptCriteria.add(Restrictions.eq("retired", false));
             if (classes != null) {
                 conceptCriteria.add(Restrictions.in("conceptClass", classes));
@@ -110,13 +107,12 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 
             if (!CollectionUtils.isEmpty(sources)) {
                 DetachedCriteria mappingCriteria = DetachedCriteria.forClass(ConceptMap.class);
-                
-                DetachedCriteria referenceTermCriteria = mappingCriteria.createCriteria("conceptReferenceTerm");
-                referenceTermCriteria.add(Restrictions.eq("retired", false));
-                referenceTermCriteria.add(Restrictions.in("conceptSource", sources));
-
+                mappingCriteria.createAlias("conceptReferenceTerm", "refTerm");
+                mappingCriteria.add(Restrictions.in("refTerm.conceptSource", sources));
+                mappingCriteria.add(Restrictions.eqProperty("concept", "cpt.conceptId"));
                 mappingCriteria.setProjection(Projections.property("concept"));
-                criteria.add(Subqueries.propertyIn("concept", mappingCriteria));
+                
+                criteria.add(Subqueries.exists(mappingCriteria));
             }
 
             Set<Concept> conceptsMatchedByPreferredName = new HashSet<Concept>();
