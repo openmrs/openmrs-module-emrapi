@@ -106,13 +106,10 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
             }
 
             if (!CollectionUtils.isEmpty(sources)) {
-                DetachedCriteria mappingCriteria = DetachedCriteria.forClass(ConceptMap.class);
+            	Criteria mappingCriteria = conceptCriteria.createCriteria("conceptMappings");
                 mappingCriteria.createAlias("conceptReferenceTerm", "refTerm");
                 mappingCriteria.add(Restrictions.in("refTerm.conceptSource", sources));
                 mappingCriteria.add(Restrictions.eqProperty("concept", "cpt.conceptId"));
-                mappingCriteria.setProjection(Projections.property("concept"));
-                
-                criteria.add(Subqueries.exists(mappingCriteria));
             }
 
             Set<Concept> conceptsMatchedByPreferredName = new HashSet<Concept>();
