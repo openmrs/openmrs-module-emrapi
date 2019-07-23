@@ -34,8 +34,8 @@ public interface EmrConceptDAO {
 
     /**
      * Searches for concepts based on either inSets or classes, sources or combination of classes and sources 
-     * in the specified locale. inSets overrides sources and classes if provided.
-     * Can search concepts based on code for the query restricted by the sources provided.
+     * in the specified locale. If inSets is specified, it overrides sources and classes.
+     * Can search concepts based on code as the query restricted by the specified sources.
      *
      * @param query name or term of concept to search for
      * @param locale locale to search in
