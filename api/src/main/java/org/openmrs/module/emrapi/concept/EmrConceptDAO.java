@@ -32,6 +32,18 @@ public interface EmrConceptDAO {
 
     List<Concept> getConceptsMappedTo(Collection<ConceptMapType> mapTypes, ConceptReferenceTerm term);
 
+    /**
+     * Searches for concepts based on either inSets or classes, sources or combination of classes and sources 
+     * in the specified locale. inSets overrides sources and classes if provided.
+     * Can search concepts based on code for the query restricted by the sources provided.
+     *
+     * @param query name or term of concept to search for
+     * @param locale locale to search in
+     * @param classes concept classes to search against
+     * @param inSets concept sets to search in
+     * @param sources concept source to searcch against
+     * @param limit the maximum results to fetch
+     */
     List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit);
 
 }

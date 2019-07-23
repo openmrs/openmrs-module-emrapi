@@ -67,6 +67,9 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
         return crit.list();
     }
 
+    /**
+     * @see org.openmrs.module.emrapi.concept.EmrConceptDAO#conceptSearch(String,Locale,Collection<org.openmrs.ConceptClass>,Collection<org.openmrs.Concept>,Collection<org.openmrs.ConceptSource>,Integer)
+     */
     @Override
     @Transactional(readOnly=true)
     public List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit) {
