@@ -32,6 +32,20 @@ public interface EmrConceptDAO {
 
     List<Concept> getConceptsMappedTo(Collection<ConceptMapType> mapTypes, ConceptReferenceTerm term);
 
+    /**
+     * Searches for concepts by name either 1) within the specified concept sources and/or concept classes, or 2) within the specified concept sets.
+	 * The name search within classes and/or sources is bypassed when sets are provided for the search. In that case the name search only operates within those sets, 
+	 * and the classes and/or sources are just ignored.
+	 * Also searches for concepts by mapping code if the concept sources are specified (regardless whether classes and/or sets are specified.)
+     *
+     * @param query name or term of concept to search for
+     * @param locale locale to search in
+     * @param classes concept classes to search against
+     * @param inSets concept sets to search in
+     * @param sources concept source to search against
+     * @param limit the maximum results to fetch
+     * @return concept search results
+     */
     List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit);
 
 }

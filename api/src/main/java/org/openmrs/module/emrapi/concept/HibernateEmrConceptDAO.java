@@ -67,6 +67,9 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
         return crit.list();
     }
 
+    /**
+     * @see org.openmrs.module.emrapi.concept.EmrConceptDAO#conceptSearch(String,Locale,Collection<org.openmrs.ConceptClass>,Collection<org.openmrs.Concept>,Collection<org.openmrs.ConceptSource>,Integer)
+     */
     @Override
     @Transactional(readOnly=true)
     public List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit) {
@@ -91,9 +94,7 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 
             Criteria conceptCriteria = criteria.createCriteria("concept", "cpt");
             conceptCriteria.add(Restrictions.eq("retired", false));
-            if (classes != null) {
-                conceptCriteria.add(Restrictions.in("conceptClass", classes));
-            }
+
             if (inSets != null) {
                 DetachedCriteria allowedSetMembers = DetachedCriteria.forClass(ConceptSet.class);
                 allowedSetMembers.add(Restrictions.in("conceptSet", inSets));
@@ -101,15 +102,19 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
                 criteria.add(Subqueries.propertyIn("concept", allowedSetMembers));
             }
 
-            for (String word : uniqueWords) {
-                criteria.add(Restrictions.ilike("name", word, MatchMode.ANYWHERE));
+            if (!CollectionUtils.isEmpty(classes) && CollectionUtils.isEmpty(inSets)) {
+                conceptCriteria.add(Restrictions.in("conceptClass", classes));
             }
 
-            if (!CollectionUtils.isEmpty(sources)) {
-            	Criteria mappingCriteria = conceptCriteria.createCriteria("conceptMappings");
+            if (!CollectionUtils.isEmpty(sources) && CollectionUtils.isEmpty(inSets)) {
+                Criteria mappingCriteria = conceptCriteria.createCriteria("conceptMappings");
                 mappingCriteria.createAlias("conceptReferenceTerm", "refTerm");
                 mappingCriteria.add(Restrictions.in("refTerm.conceptSource", sources));
                 mappingCriteria.add(Restrictions.eqProperty("concept", "cpt.conceptId"));
+            }            
+
+            for (String word : uniqueWords) {
+                criteria.add(Restrictions.ilike("name", word, MatchMode.ANYWHERE));
             }
 
             Set<Concept> conceptsMatchedByPreferredName = new HashSet<Concept>();
