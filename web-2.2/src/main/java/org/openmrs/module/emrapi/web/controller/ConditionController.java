@@ -375,6 +375,17 @@ public class ConditionController extends BaseRestController {
 		return conditionHistoryMapper.map(convertHistory(activeConditions));
 	}
 
+    @RequestMapping(method = RequestMethod.GET, value = "/condition")
+	@ResponseBody
+	public List<org.openmrs.module.emrapi.conditionslist.contract.Condition> getCondition(@RequestParam("conditionUuid") String conditionUuid) {
+		org.openmrs.Condition condition = conditionService.getConditionByUuid(conditionUuid);
+        List<org.openmrs.Condition> conditionList =new ArrayList<org.openmrs.Condition>();
+		conditionList.add(condition);
+		List<org.openmrs.module.emrapi.conditionslist.contract.Condition> result = new ArrayList<org.openmrs.module.emrapi.conditionslist.contract.Condition>();
+		result.add(conditionMapper.map(convertCoreConditionsToEmrapiConditions(conditionList).get(0)));
+		return result;
+	}
+
 	/**
 	 * Saves a condition.
 	 *
