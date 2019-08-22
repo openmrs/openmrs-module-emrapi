@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 import org.openmrs.CodedOrFreeText;
 import org.openmrs.Concept;
@@ -140,6 +141,9 @@ public class ConditionController extends BaseRestController {
 		ConceptName fullySpecifiedName = coreConcept.getFullySpecifiedName(Context.getLocale());
 		if (fullySpecifiedName == null) {
 			fullySpecifiedName = coreConcept.getFullySpecifiedName(getDefaultLocale());
+		}
+		if (fullySpecifiedName == null) {
+			fullySpecifiedName = coreConcept.getFullySpecifiedName(new Locale("en"));
 		}
 		org.openmrs.module.emrapi.conditionslist.contract.Concept concept =
 				new org.openmrs.module.emrapi.conditionslist.contract.Concept(coreConcept.getUuid(),
