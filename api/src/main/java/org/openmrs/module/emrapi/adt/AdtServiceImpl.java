@@ -118,6 +118,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     // for testing
     public List<PatientMergeAction> getPatientMergeActions() {
+    	if (patientMergeActions == null) {
+    		patientMergeActions = Context.getRegisteredComponents(PatientMergeAction.class);
+    	}
         return patientMergeActions;
     }
 
