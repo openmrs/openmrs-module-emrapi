@@ -48,7 +48,7 @@
         </conditionalResource>
         <conditionalResource>
             <path>/lib/emrapi-api-2.2-${project.parent.version}.jar</path>
-            <openmrsVersion>2.2.* - 2.3.*</openmrsVersion>
+            <openmrsVersion>2.2.* - 2.4.*</openmrsVersion>
         </conditionalResource>
         <conditionalResource>
             <path>/lib/emrapi-api-pre2.2-${project.parent.version}.jar</path>
@@ -60,7 +60,7 @@
         </conditionalResource>
         <conditionalResource>
             <path>/lib/emrapi-web-2.2-${project.parent.version}.jar</path>
-            <openmrsVersion>2.2.* - 2.3.*</openmrsVersion>
+            <openmrsVersion>2.2.* - 2.4.*</openmrsVersion>
         </conditionalResource>
     </conditionalResources>
     <!-- / Conditional Resources -->
