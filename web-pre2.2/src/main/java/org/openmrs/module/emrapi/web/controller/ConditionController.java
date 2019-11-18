@@ -50,6 +50,15 @@ public class ConditionController extends BaseRestController {
 		return conditionHistoryMapper.map(conditionHistory);
 	}
 	
+	@RequestMapping(method = RequestMethod.GET, value = "/condition")
+	@ResponseBody
+	public List<Condition> getCondition(@RequestParam("conditionUuid") String conditionUuid) {
+		List <Condition> conditions =new ArrayList<Condition>();
+		org.openmrs.module.emrapi.conditionslist.Condition condition = conditionService.getConditionByUuid(conditionUuid);
+		conditions.add(conditionMapper.map(condition));
+		return conditions;
+	}
+	
 	@RequestMapping(method = RequestMethod.POST, value = "/condition")
 	@ResponseBody
 	public List<Condition> save(@RequestBody Condition[] conditions) {

@@ -15,7 +15,6 @@
 package org.openmrs.module.emrapi.concept;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,7 +28,6 @@ import java.util.Vector;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.openmrs.api.db.hibernate.DbSessionFactory;  
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
@@ -44,9 +42,8 @@ import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSet;
 import org.openmrs.ConceptSource;
-import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.ModuleUtil;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,6 +67,9 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
         return crit.list();
     }
 
+    /**
+     * @see org.openmrs.module.emrapi.concept.EmrConceptDAO#conceptSearch(String,Locale,Collection<org.openmrs.ConceptClass>,Collection<org.openmrs.Concept>,Collection<org.openmrs.ConceptSource>,Integer)
+     */
     @Override
     @Transactional(readOnly=true)
     public List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit) {
@@ -92,17 +92,26 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
             }
             criteria.setMaxResults(limit);
 
-            Criteria conceptCriteria = criteria.createCriteria("concept");
+            Criteria conceptCriteria = criteria.createCriteria("concept", "cpt");
             conceptCriteria.add(Restrictions.eq("retired", false));
-            if (classes != null) {
-                conceptCriteria.add(Restrictions.in("conceptClass", classes));
-            }
+
             if (inSets != null) {
                 DetachedCriteria allowedSetMembers = DetachedCriteria.forClass(ConceptSet.class);
                 allowedSetMembers.add(Restrictions.in("conceptSet", inSets));
                 allowedSetMembers.setProjection(Projections.property("concept"));
                 criteria.add(Subqueries.propertyIn("concept", allowedSetMembers));
             }
+
+            if (!CollectionUtils.isEmpty(classes) && CollectionUtils.isEmpty(inSets)) {
+                conceptCriteria.add(Restrictions.in("conceptClass", classes));
+            }
+
+            if (!CollectionUtils.isEmpty(sources) && CollectionUtils.isEmpty(inSets)) {
+                Criteria mappingCriteria = conceptCriteria.createCriteria("conceptMappings");
+                mappingCriteria.createAlias("conceptReferenceTerm", "refTerm");
+                mappingCriteria.add(Restrictions.in("refTerm.conceptSource", sources));
+                mappingCriteria.add(Restrictions.eqProperty("concept", "cpt.conceptId"));
+            }            
 
             for (String word : uniqueWords) {
                 criteria.add(Restrictions.ilike("name", word, MatchMode.ANYWHERE));

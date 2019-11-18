@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 import org.openmrs.CodedOrFreeText;
 import org.openmrs.Concept;
@@ -140,6 +141,9 @@ public class ConditionController extends BaseRestController {
 		ConceptName fullySpecifiedName = coreConcept.getFullySpecifiedName(Context.getLocale());
 		if (fullySpecifiedName == null) {
 			fullySpecifiedName = coreConcept.getFullySpecifiedName(getDefaultLocale());
+		}
+		if (fullySpecifiedName == null) {
+			fullySpecifiedName = coreConcept.getFullySpecifiedName(new Locale("en"));
 		}
 		org.openmrs.module.emrapi.conditionslist.contract.Concept concept =
 				new org.openmrs.module.emrapi.conditionslist.contract.Concept(coreConcept.getUuid(),
@@ -373,6 +377,17 @@ public class ConditionController extends BaseRestController {
 		List<org.openmrs.Condition> activeConditions = conditionService.getActiveConditions(patientService.getPatientByUuid(patientUuid));
 
 		return conditionHistoryMapper.map(convertHistory(activeConditions));
+	}
+
+    @RequestMapping(method = RequestMethod.GET, value = "/condition")
+	@ResponseBody
+	public List<org.openmrs.module.emrapi.conditionslist.contract.Condition> getCondition(@RequestParam("conditionUuid") String conditionUuid) {
+		org.openmrs.Condition condition = conditionService.getConditionByUuid(conditionUuid);
+        List<org.openmrs.Condition> conditionList =new ArrayList<org.openmrs.Condition>();
+		conditionList.add(condition);
+		List<org.openmrs.module.emrapi.conditionslist.contract.Condition> result = new ArrayList<org.openmrs.module.emrapi.conditionslist.contract.Condition>();
+		result.add(conditionMapper.map(convertCoreConditionsToEmrapiConditions(conditionList).get(0)));
+		return result;
 	}
 
 	/**
