@@ -374,9 +374,9 @@ public class ConditionController extends BaseRestController {
 	@RequestMapping(method = RequestMethod.GET, value = "/conditionhistory")
 	@ResponseBody
 	public List<org.openmrs.module.emrapi.conditionslist.contract.ConditionHistory> getConditionHistory(@RequestParam("patientUuid") String patientUuid) {
-		List<org.openmrs.Condition> activeConditions = conditionService.getActiveConditions(patientService.getPatientByUuid(patientUuid));
+		List<org.openmrs.Condition> conditions = conditionService.getAllConditions(patientService.getPatientByUuid(patientUuid));
 
-		return conditionHistoryMapper.map(convertHistory(activeConditions));
+		return conditionHistoryMapper.map(convertHistory(conditions));
 	}
 
     @RequestMapping(method = RequestMethod.GET, value = "/condition")
