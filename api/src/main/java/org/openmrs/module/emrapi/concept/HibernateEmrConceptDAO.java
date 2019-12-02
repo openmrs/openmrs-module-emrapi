@@ -74,7 +74,7 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
     @Transactional(readOnly=true)
     public List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit) {
         List<String> uniqueWords = getUniqueWords(query, locale);
-        if (uniqueWords.size() == 0) {
+        if (uniqueWords.isEmpty()) {
             return Collections.emptyList();
         }
 

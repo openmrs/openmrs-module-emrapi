@@ -188,7 +188,7 @@ public class PatientDomainWrapper implements DomainWrapper {
 
 	public PatientIdentifier getPrimaryIdentifier() {
 		List<PatientIdentifier> primaryIdentifiers = getPrimaryIdentifiers();
-		if (primaryIdentifiers.size() == 0) {
+		if (primaryIdentifiers.isEmpty()) {
 			return null;
 		} else {
 			return primaryIdentifiers.get(0);

@@ -54,7 +54,7 @@ public class EmrApiPropertiesTest {
         when(administrationService.getGlobalProperty(EmrApiConstants.EMR_CONCEPT_SOURCES_FOR_DIAGNOSIS_SEARCH)).thenReturn("ICD-10-WHO");
         when(conceptService.getConceptSourceByName(anyString())).thenReturn(null);
         Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
-        Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().size() == 0);
+        Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().isEmpty());
 
         ConceptSource icd10Source = new ConceptSource();
         icd10Source.setName("ICD-10-WHO");
