@@ -826,7 +826,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional(readOnly = true)
     public boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
         List<VisitDomainWrapper> visits = getVisits(patient, location, startDatetime, stopDatetime);
-        return visits != null && !visits.isEmpty();
+        return visits == null || visits.isEmpty() ? false : true;
     }
 
     @Override
