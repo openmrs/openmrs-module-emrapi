@@ -269,7 +269,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     private Date guessVisitStopDatetime(Visit visit) {
-        if (visit.getEncounters() == null || visit.getEncounters().size() == 0) {
+        if (visit.getEncounters() == null || visit.getEncounters().isEmpty()) {
             return visit.getStartDatetime();
         }
 
@@ -349,7 +349,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private Provider getProvider(User accountBelongingToUser) {
         Collection<Provider> candidates = providerService.getProvidersByPerson(accountBelongingToUser.getPerson(), false);
-        if (candidates.size() == 0) {
+        if (candidates.isEmpty()) {
             throw new IllegalStateException("User " + accountBelongingToUser.getUsername() + " does not have a Provider account");
         } else if (candidates.size() > 1) {
             throw new IllegalStateException("User " + accountBelongingToUser.getUsername() + " has more than one Provider account");
@@ -522,7 +522,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     public Encounter getLastEncounter(Patient patient) {
         // speed this up by implementing it directly in a DAO
         List<Encounter> byPatient = encounterService.getEncountersByPatient(patient);
-        if (byPatient.size() == 0) {
+        if (byPatient.isEmpty()) {
             return null;
         } else {
             return byPatient.get(byPatient.size() - 1);
@@ -826,7 +826,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional(readOnly = true)
     public boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
         List<VisitDomainWrapper> visits = getVisits(patient, location, startDatetime, stopDatetime);
-        return visits == null || visits.size() == 0 ? false : true;
+        return visits == null || visits.isEmpty() ? false : true;
     }
 
     @Override

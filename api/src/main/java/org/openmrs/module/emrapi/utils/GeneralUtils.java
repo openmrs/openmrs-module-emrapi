@@ -197,7 +197,7 @@ public class GeneralUtils {
 
         List<PatientIdentifier> patientIdentifiers = patient.getPatientIdentifiers(patientIdentifierType);
 
-        if (patientIdentifiers == null || patientIdentifiers.size() == 0) {
+        if (patientIdentifiers == null || patientIdentifiers.isEmpty()) {
             return null;
         }
 

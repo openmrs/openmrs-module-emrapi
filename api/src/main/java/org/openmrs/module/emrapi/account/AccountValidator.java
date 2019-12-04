@@ -185,7 +185,7 @@ public class AccountValidator implements Validator {
     }
 
     private void checkIfNoCapabilities(Errors errors, AccountDomainWrapper account) {
-        if (account.getCapabilities() == null || account.getCapabilities().size() == 0) {
+        if (account.getCapabilities() == null || account.getCapabilities().isEmpty()) {
             errors.rejectValue("capabilities", "emr.user.Capabilities.required",
                     new Object[]{messageSourceService.getMessage("emr.user.Capabilities.required")}, null);
         }

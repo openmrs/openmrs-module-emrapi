@@ -53,7 +53,7 @@ public class ConceptBuilder {
     }
 
     public ConceptBuilder add(ConceptName conceptName) {
-        if (concept.getNames().size() == 0) {
+        if (concept.getNames().isEmpty()) {
             conceptName.setLocalePreferred(true);
             conceptName.setConceptNameType(ConceptNameType.FULLY_SPECIFIED);
         }

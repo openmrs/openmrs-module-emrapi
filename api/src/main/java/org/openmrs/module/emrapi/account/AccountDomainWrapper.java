@@ -420,7 +420,7 @@ public class AccountDomainWrapper implements DomainWrapper {
             }
         }
         //return a retired account if they have none
-        if (users.size() == 0)
+        if (users.isEmpty())
             users = userService.getUsersByPerson(person, true);
 
         if (users.size() == 1)

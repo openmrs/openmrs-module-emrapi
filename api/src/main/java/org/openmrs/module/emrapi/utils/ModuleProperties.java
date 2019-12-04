@@ -161,7 +161,7 @@ public abstract class ModuleProperties {
 
     protected Concept getSingleConceptByMapping(ConceptSource conceptSource, String code) {
         List<Concept> candidates = conceptService.getConceptsByMapping(code, conceptSource.getName(), false);
-        if (candidates.size() == 0) {
+        if (candidates.isEmpty()) {
             throw new IllegalStateException("Configuration required: can't find a concept by mapping " + conceptSource.getName() + ":" + code);
         } else if (candidates.size() == 1) {
             return candidates.get(0);
