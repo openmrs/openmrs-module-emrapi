@@ -118,9 +118,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     // for testing
     public List<PatientMergeAction> getPatientMergeActions() {
-    	if (patientMergeActions == null) {
-    		patientMergeActions = Context.getRegisteredComponents(PatientMergeAction.class);
-    	}
         return patientMergeActions;
     }
 
@@ -290,7 +287,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     /**
      * This method is synchronized to prevent multiple check-ins in a row at the same location and during the same visit.
      * See #579.
-     * 
+     *
      * @see org.openmrs.module.emrapi.adt.AdtService#checkInPatient(org.openmrs.Patient, org.openmrs.Location, org.openmrs.Provider, java.util.List, java.util.List, boolean)
      */
     @Override
