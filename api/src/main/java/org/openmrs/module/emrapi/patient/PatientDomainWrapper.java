@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collections;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -34,6 +35,7 @@ import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.Visit;
+import org.openmrs.VisitType;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -285,6 +287,16 @@ public class PatientDomainWrapper implements DomainWrapper {
 		return encounterService.getEncountersByPatient(patient);
 	}
 
+	public List<Visit> getAllVisits(Integer visitTypeId) {
+   		List<VisitType> visitTypes = null;
+   		if (visitTypeId != null) {
+			VisitType visitType = visitService.getVisitType(visitTypeId);
+			if (visitType != null) {
+				visitTypes = Collections.singletonList(visitType);
+			}
+		}
+		return visitService.getVisits(visitTypes, Collections.singletonList(patient), null, null, null, null, null, null, null, true, false);
+	}
 	public List<Visit> getAllVisits() {
 		return visitService.getVisitsByPatient(patient, true, false);
 	}
@@ -315,16 +327,20 @@ public class PatientDomainWrapper implements DomainWrapper {
 		return unknownPatient;
 	}
 
-	public List<VisitDomainWrapper> getAllVisitsUsingWrappers() {
+	public List<VisitDomainWrapper> getAllVisitsUsingWrappers(Integer visitTypeId) {
 		List<VisitDomainWrapper> visitDomainWrappers = new ArrayList<VisitDomainWrapper>();
 
-		for (Visit visit : getAllVisits()) {
+		for (Visit visit : (visitTypeId != null ) ? getAllVisits(visitTypeId) : getAllVisits()) {
 			VisitDomainWrapper visitWrapper = domainWrapperFactory.newVisitDomainWrapper(visit);
 			visitWrapper.setEmrApiProperties(emrApiProperties);
 			visitDomainWrappers.add(visitWrapper);
 		}
 
 		return visitDomainWrappers;
+	}
+
+	public List<VisitDomainWrapper> getAllVisitsUsingWrappers() {
+		return getAllVisitsUsingWrappers(null);
 	}
 
 	public String getFormattedName() {
