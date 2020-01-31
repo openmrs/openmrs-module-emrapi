@@ -287,10 +287,9 @@ public class PatientDomainWrapper implements DomainWrapper {
 		return encounterService.getEncountersByPatient(patient);
 	}
 
-	public List<Visit> getAllVisits(Integer visitTypeId) {
+	public List<Visit> getVisitsByType(VisitType visitType) {
    		List<VisitType> visitTypes = null;
-   		if (visitTypeId != null) {
-			VisitType visitType = visitService.getVisitType(visitTypeId);
+   		if (visitType != null) {
 			if (visitType != null) {
 				visitTypes = Collections.singletonList(visitType);
 			}
@@ -327,10 +326,10 @@ public class PatientDomainWrapper implements DomainWrapper {
 		return unknownPatient;
 	}
 
-	public List<VisitDomainWrapper> getAllVisitsUsingWrappers(Integer visitTypeId) {
+	public List<VisitDomainWrapper> getVisitsByTypeUsingWrappers(VisitType visitType) {
 		List<VisitDomainWrapper> visitDomainWrappers = new ArrayList<VisitDomainWrapper>();
 
-		for (Visit visit : (visitTypeId != null ) ? getAllVisits(visitTypeId) : getAllVisits()) {
+		for (Visit visit : (visitType != null ) ? getVisitsByType(visitType) : getAllVisits()) {
 			VisitDomainWrapper visitWrapper = domainWrapperFactory.newVisitDomainWrapper(visit);
 			visitWrapper.setEmrApiProperties(emrApiProperties);
 			visitDomainWrappers.add(visitWrapper);
@@ -340,7 +339,7 @@ public class PatientDomainWrapper implements DomainWrapper {
 	}
 
 	public List<VisitDomainWrapper> getAllVisitsUsingWrappers() {
-		return getAllVisitsUsingWrappers(null);
+		return getVisitsByTypeUsingWrappers(null);
 	}
 
 	public String getFormattedName() {
