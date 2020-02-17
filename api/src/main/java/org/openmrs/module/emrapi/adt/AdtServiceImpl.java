@@ -784,16 +784,16 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional
     public VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
         throws ExistingVisitDuringTimePeriodException {
-
+        
         if (startDatetime.after(new Date())) {
             throw new IllegalArgumentException("emrapi.retrospectiveVisit.startDateCannotBeInFuture");
         }
 
-        if (stopDatetime.after(new Date())) {
+        if (stopDatetime != null && stopDatetime.after(new Date())) {
             throw new IllegalArgumentException("emrapi.retrospectiveVisit.stopDateCannotBeInFuture");
         }
 
-        if (startDatetime.after(stopDatetime)) {
+        if (stopDatetime != null && startDatetime.after(stopDatetime)) {
             throw new IllegalArgumentException("emrapi.retrospectiveVisit.endDateBeforeStartDateMessage");
         }
 
