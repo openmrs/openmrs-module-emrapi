@@ -297,4 +297,37 @@ public class EmrApiVisitAssignmentHandlerTest {
         Assert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStopDatetime()));
     }
 
+    @Test
+    public void testIgnoreTheAssociatedVisitIfItIsNotYetSaved() {
+        Patient patient = new Patient();
+        Location location = new Location();
+
+        Visit suitable = new Visit();
+        suitable.setPatient(patient);
+        suitable.setStartDatetime(DateUtils.addDays(new Date(), -1));
+        suitable.setLocation(location);
+
+        when(
+                visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
+                        any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
+                        anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(suitable));
+
+        Date encounterDatetime = new Date();
+        Encounter encounter = new Encounter();
+        encounter.setPatient(patient);
+        encounter.setLocation(location);
+        encounter.setEncounterDatetime(encounterDatetime);
+
+        Visit associatedVisit = new Visit();
+        associatedVisit.setStartDatetime(DateUtils.addDays(new Date(), -1));
+        associatedVisit.setLocation(location);
+        encounter.setVisit(associatedVisit);
+
+        handler.beforeCreateEncounter(encounter);
+        encounter.setEncounterDatetime(encounterDatetime);
+
+        Assert.assertThat(encounter.getVisit(), is(suitable));
+        Assert.assertThat(suitable.getEncounters(), contains(encounter));
+        Assert.assertThat(encounter.getEncounterDatetime(), is(encounterDatetime));
+    }
 }

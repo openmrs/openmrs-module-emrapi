@@ -80,7 +80,7 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
     public void beforeCreateEncounter(Encounter encounter) {
 
         //Do nothing if the encounter already belongs to a visit.
-        if (encounter.getVisit() != null) {
+        if (encounter.getVisit() != null && encounter.getVisit().getVisitId() != null) {
             return;
         }
 
