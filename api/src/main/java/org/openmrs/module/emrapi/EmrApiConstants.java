@@ -101,6 +101,8 @@ public class EmrApiConstants {
     public static final String PRIMARY_IDENTIFIER_TYPE = "emr.primaryIdentifierType";
 
     public static final String GP_EXTRA_PATIENT_IDENTIFIER_TYPES = "emr.extraPatientIdentifierTypes";
+    
+    public static final String MM_EXTRA_PIT_SET_UUID = "e4aab2eb-5d19-496f-858b-c1269d92c549";
 
     public static final String SAME_AS_CONCEPT_MAP_TYPE_UUID = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
 
