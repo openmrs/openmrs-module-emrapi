@@ -13,6 +13,10 @@
  */
 package org.openmrs.module.emrapi;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,7 +26,6 @@ import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Location;
-import org.openmrs.OpenmrsMetadata;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
@@ -52,13 +55,6 @@ import org.openmrs.module.metadatamapping.MetadataTermMapping;
 import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 import org.openmrs.module.metadatamapping.util.GlobalPropertyToMappingConverter;
 import org.openmrs.util.OpenmrsConstants;
-
-import java.io.File;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * This class contains the logic that is run every time this module is either started or stopped.
@@ -229,8 +225,8 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         MetadataTermMapping extraPatientIdTypesMapping = metadataMappingService.getMetadataTermMapping(emrapiMetadataSource, EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES);
 
         if(extraPatientIdTypesMapping == null){
-            MetadataSet extraPatientIdTypesSet = new MetadataSet();
-            extraPatientIdTypesSet.setUuid("e4aab2eb-5d19-496f-858b-c1269d92c549");
+        	MetadataSet extraPatientIdTypesSet = new MetadataSet();
+        	extraPatientIdTypesSet.setUuid(EmrApiConstants.MM_EXTRA_PIT_SET_UUID);
             extraPatientIdTypesSet = metadataMappingService.saveMetadataSet(extraPatientIdTypesSet);
 
             List<PatientIdentifierType> types = getPatientIdentifierTypesFromGlobalProperty(administrationService, EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES);
