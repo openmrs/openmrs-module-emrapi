@@ -39,7 +39,8 @@
         <module>omod</module>
 	    <module>api-pre2.2</module>
 		<module>web-pre2.2</module>
-	</modules>
+        <module>fhir-conditions</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+    This Source Code Form is subject to the terms of the Mozilla Public License,
+    v. 2.0. If a copy of the MPL was not distributed with this file, You can
+    obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+    the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+
+    Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+    graphic logo is a trademark of OpenMRS Inc.
+-->
+<dataset>
+	<conditions condition_id="1" patient_id="2" status="ACTIVE" concept_id="5497" creator="1" onset_date="2020-03-12 00:00:00"
+				date_created="2020-01-02 00:00:00" voided="false" uuid="2ss6880e-2c46-11e4-9038-a6c5e4d22fb7"/>
+
+	<conditions condition_id="2" patient_id="2" status="INACTIVE" concept_id="5089" creator="1" onset_date="2020-03-12 00:00:00"
+				date_created="2020-01-03 00:00:00" uuid="2ss6880e-2c46-11e4-5844-a6c5e4d22fb7" voided="false" condition_non_coded="NON-CODED-CONDITION"/>
+</dataset>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<module configVersion="1.2">
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN"
+        "https://resources.openmrs.org/doctype/config-1.6.dtd">
+<module configVersion="1.6">
 
     <!-- Module Properties -->
     <id>${project.parent.artifactId}</id>
@@ -28,6 +29,10 @@
     </require_modules>
     <!-- / Required Modules -->
 
+    <aware_of_modules>
+        <aware_of_module>org.openmrs.module.fhir2</aware_of_module>
+    </aware_of_modules>
+
     <!-- Conditional Resources -->
     <conditionalResources>
     	<conditionalResource>
@@ -49,6 +54,16 @@
         <conditionalResource>
             <path>/lib/emrapi-api-2.2-${project.parent.version}.jar</path>
             <openmrsVersion>2.2.* - 2.4.*</openmrsVersion>
+        </conditionalResource>
+        <conditionalResource>
+            <path>/lib/fhir-api-${project.parent.version}.jar</path>
+            <loadIfModulesPresent>
+                <openmrsModule>
+                    <moduleId>org.openmrs.module.fhir2</moduleId>
+                    <version>1.*</version>
+                </openmrsModule>
+            </loadIfModulesPresent>
+            <openmrsVersion>2.0.5 - 2.1.*</openmrsVersion>
         </conditionalResource>
         <conditionalResource>
             <path>/lib/emrapi-api-pre2.2-${project.parent.version}.jar</path>
