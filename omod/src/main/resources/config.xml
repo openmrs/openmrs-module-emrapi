@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<module configVersion="1.2">
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN"
+        "https://resources.openmrs.org/doctype/config-1.6.dtd">
+<module configVersion="1.6">
 
     <!-- Module Properties -->
     <id>${project.parent.artifactId}</id>
