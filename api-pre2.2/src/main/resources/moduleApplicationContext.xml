@@ -27,7 +27,7 @@
 		<property name="moduleService">
 			<list merge="true">
 				<value>${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisService</value>
-				<ref local="emrDiagnosisService"/>
+				<ref bean="emrDiagnosisService"/>
 			</list>
 		</property>
 	</bean>

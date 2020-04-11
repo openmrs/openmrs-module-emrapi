@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@OpenmrsProfile(openmrsVersion = "1.9.*")
+@OpenmrsProfile(openmrsPlatformVersion = "1.9.*")
 public class DefaultOrderMapper implements OrderMapper{
     @Override
     public List<EncounterTransaction.DrugOrder> mapDrugOrders(Encounter encounter) {

@@ -32,7 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component(value = "orderMapper")
-@OpenmrsProfile(openmrsVersion = "1.11.*")
+@OpenmrsProfile(openmrsPlatformVersion = "1.11.*")
 public class OrderMapper1_11 implements OrderMapper {
 
     private final ConceptMapper conceptMapper = new ConceptMapper();

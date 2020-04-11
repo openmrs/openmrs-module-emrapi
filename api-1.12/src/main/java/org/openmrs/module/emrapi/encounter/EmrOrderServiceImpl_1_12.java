@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 @Service(value = "emrOrderService")
-@OpenmrsProfile(openmrsVersion = "1.12.0 - 2.*")
+@OpenmrsProfile(openmrsPlatformVersion = "1.12.0 - 2.*")
 public class EmrOrderServiceImpl_1_12 implements EmrOrderService {
 
     private final EncounterService encounterService;

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 
 @Component("observationMapper")
-@OpenmrsProfile(openmrsVersion = "[1.9.* - 1.11.*]")
+@OpenmrsProfile(openmrsPlatformVersion = "[1.9.* - 1.11.*]")
 public class ObservationMapper {
     private ConceptMapper conceptMapper;
     private DrugMapper drugMapper;

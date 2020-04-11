@@ -30,7 +30,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.account.AccountService</value>
-                <ref local="accountService"/>
+                <ref bean="accountService"/>
             </list>
         </property>
     </bean>
@@ -64,7 +64,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.adt.AdtService</value>
-                <ref local="adtService"/>
+                <ref bean="adtService"/>
             </list>
         </property>
     </bean>
@@ -243,7 +243,7 @@
         <constructor-arg ref="visitService"/>
         <constructor-arg ref="visitResponseMapper"/>
         <property name="dao">
-            <ref local="emrVisitDAOImpl"/>
+            <ref bean="emrVisitDAOImpl"/>
         </property>
     </bean>
 
@@ -252,7 +252,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref local="emrVisitServiceImpl"/>
+            <ref bean="emrVisitServiceImpl"/>
         </property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors"/>
@@ -296,7 +296,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.encounter.EmrEncounterService</value>
-                <ref local="emrEncounterService"/>
+                <ref bean="emrEncounterService"/>
             </list>
         </property>
     </bean>
@@ -305,7 +305,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.concept.EmrConceptService</value>
-                <ref local="emrConceptService"/>
+                <ref bean="emrConceptService"/>
             </list>
         </property>
     </bean>
@@ -314,7 +314,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.patient.EmrPatientService</value>
-                <ref local="emrPatientService"/>
+                <ref bean="emrPatientService"/>
             </list>
         </property>
     </bean>
@@ -323,7 +323,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.event.ApplicationEventService</value>
-                <ref local="applicationEventService"/>
+                <ref bean="applicationEventService"/>
             </list>
         </property>
     </bean>
@@ -333,7 +333,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.person.image.EmrPersonImageService</value>
-                <ref local="emrPersonImageService"/>
+                <ref bean="emrPersonImageService"/>
             </list>
         </property>
     </bean>
@@ -342,7 +342,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.disposition.DispositionService</value>
-                <ref local="dispositionService"/>
+                <ref bean="dispositionService"/>
             </list>
         </property>
     </bean>
@@ -351,7 +351,7 @@
         <property name="moduleService">
             <list merge="true">
                 <value>${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitService</value>
-                <ref local="emrVisitService"/>
+                <ref bean="emrVisitService"/>
             </list>
         </property>
     </bean>
