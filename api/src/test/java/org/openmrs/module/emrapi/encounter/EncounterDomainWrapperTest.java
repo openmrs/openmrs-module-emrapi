@@ -252,6 +252,25 @@ public class EncounterDomainWrapperTest {
     }
 
     @Test
+    public void test_attachToVisit_shouldSetStartDateToCurrentDatetimeForOpenVisitWithNoEncounterDatetime() throws Exception {
+        DateTime currentDate = new DateTime().withTime(0, 0, 0, 0);
+
+        Encounter encounter = new Encounter();
+        EncounterDomainWrapper encounterWrapper = new EncounterDomainWrapper(encounter);
+
+        Visit visit = new Visit();
+        visit.setStartDatetime(currentDate.withTimeAtStartOfDay().toDate());
+
+        Date shouldBeLessThenEncounterDatetime = new Date();
+        encounterWrapper.attachToVisit(visit);
+        Date shouldBeGreaterThanEncounterDatetime = new Date();
+
+        assertThat(encounter.getEncounterDatetime(), greaterThanOrEqualTo(shouldBeLessThenEncounterDatetime));
+        assertThat(encounter.getEncounterDatetime(), lessThanOrEqualTo(shouldBeGreaterThanEncounterDatetime));
+        assertThat(encounter.getVisit(), is(visit));
+    }
+
+    @Test
     public void test_attachToVisit_shouldPropagateEncounterDatetimeChangeToObs()
             throws Exception {
 
