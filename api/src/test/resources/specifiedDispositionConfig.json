@@ -45,6 +45,16 @@
         "careSettingTypes": ["OUTPATIENT"],
         "actions": [],
         "additionalObs": []
+    },
+    {
+        "uuid": "38c15c7f-0718-4fd9-8dc5-2027e267faac",
+        "name": "disposition.fled",
+        "conceptCode": "789",
+        "type": "TRANSFER",
+        "careSettingTypes": ["OUTPATIENT"],
+        "encounterTypes": ["COVID-19"],
+        "actions": [],
+        "additionalObs": []
     }
 
 

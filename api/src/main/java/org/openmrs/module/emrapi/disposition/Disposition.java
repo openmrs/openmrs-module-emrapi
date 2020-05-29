@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.disposition;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.openmrs.EncounterType;
 import org.openmrs.module.emrapi.CareSettingType;
 
 import java.util.List;
@@ -31,6 +32,9 @@ public class Disposition {
 
     @JsonProperty
     private List<CareSettingType> careSettingTypes;
+
+    @JsonProperty
+    private List<String> encounterTypes;
 
     @JsonProperty
     private Boolean keepsVisitOpen;   // if this is the most recent disposition in a visit, visit will not be automatically closed (see closeInactiveVisits and shouldBeClosed methods in AdtService)
@@ -119,6 +123,14 @@ public class Disposition {
 
     public void setCareSettingTypes(List<CareSettingType> careSettingTypes) {
         this.careSettingTypes = careSettingTypes;
+    }
+
+    public List<String> getEncounterTypes() {
+        return encounterTypes;
+    }
+
+    public void setEncounterTypes(List<String> encounterTypes) {
+        this.encounterTypes = encounterTypes;
     }
 
     public Boolean getKeepsVisitOpen() {
