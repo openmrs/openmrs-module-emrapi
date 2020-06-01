@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component(value = "emrOrderService")
-@OpenmrsProfile(openmrsVersion = "1.9.*")
+@OpenmrsProfile(openmrsPlatformVersion = "1.9.*")
 public class DefaultOrderServiceImpl implements EmrOrderService{
 
     @Override

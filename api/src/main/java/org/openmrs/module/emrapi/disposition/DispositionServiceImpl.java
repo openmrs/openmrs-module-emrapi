@@ -2,12 +2,15 @@ package org.openmrs.module.emrapi.disposition;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.descriptor.MissingConceptException;
+import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class DispositionServiceImpl extends BaseOpenmrsService implements DispositionService  {
@@ -86,9 +90,8 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     @Override
     public List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper) {
-
         // just return all dispositions if the visit isn't active
-        if (!visitDomainWrapper.isActive()) {
+        if (visitDomainWrapper == null || !visitDomainWrapper.isActive()) {
             return getDispositions();
         }
         else {
@@ -109,7 +112,36 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
         }
     }
 
+    @Override
+    public List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper,
+            EncounterDomainWrapper encounterDomainWrapper) {
 
+        List<Disposition> dispositions = getValidDispositions(visitDomainWrapper);
+
+        if (visitDomainWrapper != null && visitDomainWrapper.isActive() && encounterDomainWrapper != null) {
+            Encounter encounter = encounterDomainWrapper.getEncounter();
+            EncounterType encounterType = encounter == null ? null : encounter.getEncounterType();
+
+            if (encounterType != null) {
+	            String encounterTypeId = encounterType.getEncounterTypeId() == null ? null : encounterType.getEncounterTypeId().toString();
+	            String encounterTypeUuid = encounterType.getUuid();
+	            String encounterTypeName = encounterType.getName();
+
+                for (Iterator<Disposition> it = dispositions.iterator(); it.hasNext(); ) {
+                    Disposition candidate = it.next();
+
+                    List<String> encounterTypes = candidate.getEncounterTypes();
+                    if (encounterTypes != null && !((encounterTypeId != null && encounterTypes.contains(encounterTypeId)) ||
+		                    (encounterTypeUuid != null && encounterTypes.contains(encounterTypeUuid)) ||
+		                    (encounterTypeName != null && encounterTypes.contains(encounterTypeName)))) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+
+        return dispositions;
+    }
 
     @Override
     @Transactional(readOnly = true)

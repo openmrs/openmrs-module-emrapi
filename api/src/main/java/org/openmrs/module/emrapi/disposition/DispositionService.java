@@ -1,6 +1,7 @@
 package org.openmrs.module.emrapi.disposition;
 
 import org.openmrs.Obs;
+import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.io.IOException;
@@ -48,6 +49,14 @@ public interface DispositionService {
      * 3) if visit.isAdmitted() = false, then return only those whore careSettingTypes contains OUTPATIENT (or any where careSettingType = null)
      */
     List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper);
+
+    /**
+     * Gets only dispositions that are valid in the specified visit and encounter context
+     *
+     * Currently, this follows the logic of {@link #getValidDispositions(VisitDomainWrapper)}, but also filters dispositions
+     * which define an encounterType to only those encounterTypes.
+     */
+    List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper, EncounterDomainWrapper encounterDomainWrapper);
 
     /**
      * Fetches a disposition referenced by it's unique id
