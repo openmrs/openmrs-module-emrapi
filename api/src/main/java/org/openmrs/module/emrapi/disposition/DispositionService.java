@@ -1,7 +1,7 @@
 package org.openmrs.module.emrapi.disposition;
 
+import org.openmrs.EncounterType;
 import org.openmrs.Obs;
-import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.io.IOException;
@@ -56,7 +56,7 @@ public interface DispositionService {
      * Currently, this follows the logic of {@link #getValidDispositions(VisitDomainWrapper)}, but also filters dispositions
      * which define an encounterType to only those encounterTypes.
      */
-    List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper, EncounterDomainWrapper encounterDomainWrapper);
+    List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper, EncounterType encounterType);
 
     /**
      * Fetches a disposition referenced by it's unique id

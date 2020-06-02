@@ -4,14 +4,12 @@ package org.openmrs.module.emrapi.disposition;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Concept;
-import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
-import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
@@ -29,7 +27,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -214,14 +211,10 @@ public class DispositionServiceTest {
         when(visitDomainWrapper.isActive()).thenReturn(true);
         when(visitDomainWrapper.isAdmitted()).thenReturn(false);
 
-        EncounterDomainWrapper encounterDomainWrapper = mock(EncounterDomainWrapper.class);
-        Encounter encounter = mock(Encounter.class);
         EncounterType encounterType = mock(EncounterType.class);
-        when(encounter.getEncounterType()).thenReturn(encounterType);
-        when(encounterDomainWrapper.getEncounter()).thenReturn(encounter);
         when(encounterType.getName()).thenReturn("INVALID");
 
-        List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper, encounterDomainWrapper);
+        List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper, encounterType);
 
         assertThat(dispositions.size(), is(3));
         assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));

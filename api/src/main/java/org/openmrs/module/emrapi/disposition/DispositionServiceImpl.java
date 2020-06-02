@@ -2,7 +2,6 @@ package org.openmrs.module.emrapi.disposition;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
@@ -10,7 +9,6 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.descriptor.MissingConceptException;
-import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.core.io.Resource;
@@ -115,13 +113,11 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     @Override
     public List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper,
-            EncounterDomainWrapper encounterDomainWrapper) {
+            EncounterType encounterType) {
 
         List<Disposition> dispositions = getValidDispositions(visitDomainWrapper);
 
-        if (visitDomainWrapper != null && visitDomainWrapper.isActive() && encounterDomainWrapper != null) {
-            Encounter encounter = encounterDomainWrapper.getEncounter();
-            EncounterType encounterType = encounter == null ? null : encounter.getEncounterType();
+        if (visitDomainWrapper != null && visitDomainWrapper.isActive() && encounterType != null) {
 
             if (encounterType != null) {
 	            String encounterTypeId = encounterType.getEncounterTypeId() == null ? null : encounterType.getEncounterTypeId().toString();
