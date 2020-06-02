@@ -181,7 +181,7 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
                 path  = "classpath*:/" + configFile;
             }
             else {
-                path = "file:" + OpenmrsUtil.getApplicationDataDirectory() + configFile.replace("file:","");
+                path = "file:" + OpenmrsUtil.getApplicationDataDirectory() + "/" + configFile.replace("file:","");
             }
 
             Resource[] dispositionDefinitions = resourceResolver.getResources(path);
