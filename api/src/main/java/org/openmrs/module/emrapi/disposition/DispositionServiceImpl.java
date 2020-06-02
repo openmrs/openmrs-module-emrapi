@@ -12,6 +12,7 @@ import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.util.OpenmrsUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,7 +174,17 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
     private List<Disposition> getDispositionsFrom(String configFile)  {
 
         try {
-            Resource[] dispositionDefinitions = resourceResolver.getResources("classpath*:/" + configFile);
+
+            String path;
+
+            if (configFile.indexOf("file:") == -1) {
+                path  = "classpath*:/" + configFile;
+            }
+            else {
+                path = "file:" + OpenmrsUtil.getApplicationDataDirectory() + configFile.replace("file:","");
+            }
+
+            Resource[] dispositionDefinitions = resourceResolver.getResources(path);
             for (Resource dispositionDefinition : dispositionDefinitions) {
                 return objectMapper.readValue(dispositionDefinition.getInputStream(), new TypeReference<List<Disposition>>() {});
             }
