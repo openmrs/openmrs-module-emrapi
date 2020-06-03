@@ -117,22 +117,25 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
         List<Disposition> dispositions = getValidDispositions(visitDomainWrapper);
 
-        if (visitDomainWrapper != null && visitDomainWrapper.isActive() && encounterType != null) {
+        if (encounterType != null) {
+            String encounterTypeId = encounterType.getEncounterTypeId() == null ? null : encounterType.getEncounterTypeId().toString();
+            String encounterTypeUuid = encounterType.getUuid();
+            String encounterTypeName = encounterType.getName();
 
-            if (encounterType != null) {
-	            String encounterTypeId = encounterType.getEncounterTypeId() == null ? null : encounterType.getEncounterTypeId().toString();
-	            String encounterTypeUuid = encounterType.getUuid();
-	            String encounterTypeName = encounterType.getName();
+            for (Iterator<Disposition> it = dispositions.iterator(); it.hasNext(); ) {
+                Disposition candidate = it.next();
 
-                for (Iterator<Disposition> it = dispositions.iterator(); it.hasNext(); ) {
-                    Disposition candidate = it.next();
-
-                    List<String> encounterTypes = candidate.getEncounterTypes();
-                    if (encounterTypes != null && !((encounterTypeId != null && encounterTypes.contains(encounterTypeId)) ||
-		                    (encounterTypeUuid != null && encounterTypes.contains(encounterTypeUuid)) ||
-		                    (encounterTypeName != null && encounterTypes.contains(encounterTypeName)))) {
-                        it.remove();
-                    }
+                List<String> encounterTypes = candidate.getEncounterTypes();
+                List<String> excludedEncounterTypes = candidate.getExcludedEncounterTypes();
+                if (encounterTypes != null && !((encounterTypeId != null && encounterTypes.contains(encounterTypeId)) ||
+                        (encounterTypeUuid != null && encounterTypes.contains(encounterTypeUuid)) ||
+                        (encounterTypeName != null && encounterTypes.contains(encounterTypeName)))) {
+                    it.remove();
+                }
+                else if (excludedEncounterTypes != null && ((encounterTypeId != null && excludedEncounterTypes.contains(encounterTypeId)) ||
+                        (encounterTypeUuid != null && excludedEncounterTypes.contains(encounterTypeUuid)) ||
+                        (encounterTypeName != null && excludedEncounterTypes.contains(encounterTypeName)))) {
+                    it.remove();
                 }
             }
         }

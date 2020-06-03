@@ -78,7 +78,7 @@ public class DispositionServiceTest {
         dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
         List<Disposition> dispositions = dispositionService.getDispositions();
 
-        assertEquals(6, dispositions.size());
+        assertEquals(7, dispositions.size());
 
         Map<String,Disposition> dispositionMap = new HashMap<String, Disposition>();
         for (Disposition disposition : dispositions) {
@@ -128,6 +128,14 @@ public class DispositionServiceTest {
         assertThat(encounterType.getConceptCode(), is("789"));
         assertThat(encounterType.getEncounterTypes(), hasSize(1));
         assertThat(encounterType.getEncounterTypes(), contains("COVID-19"));
+
+        encounterType = dispositionMap.get("9e5558bb-9960-4585-af66-225350b1e7cf");
+        assertThat(encounterType, notNullValue());
+        assertThat(encounterType.getName(), is("disposition.angry"));
+        assertThat(encounterType.getConceptCode(), is("321"));
+        assertThat(encounterType.getEncounterTypes(), nullValue());
+        assertThat(encounterType.getExcludedEncounterTypes(), hasSize(1));
+        assertThat(encounterType.getExcludedEncounterTypes(), contains("COVID-19"));
     }
 
     @Test
@@ -136,10 +144,11 @@ public class DispositionServiceTest {
         dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
 
         List<Disposition> dispositions = dispositionService.getDispositionsByType(DispositionType.TRANSFER);
-        assertThat(dispositions.size(), is(3));
+        assertThat(dispositions.size(), is(4));
         assertThat(dispositions.get(0).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(1).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(2).getUuid(), is("38c15c7f-0718-4fd9-8dc5-2027e267faac"));
+        assertThat(dispositions.get(3).getUuid(), is("9e5558bb-9960-4585-af66-225350b1e7cf"));
 
         dispositions = dispositionService.getDispositionsByType(DispositionType.DISCHARGE);
         assertThat(dispositions.size(), is(1));
@@ -174,11 +183,12 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper);
 
-        assertThat(dispositions.size(), is(4));
+        assertThat(dispositions.size(), is(5));
         assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(1).getUuid(), is("844436e0-e02d-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(2).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(3).getUuid(), is("38c15c7f-0718-4fd9-8dc5-2027e267faac"));
+        assertThat(dispositions.get(4).getUuid(), is("9e5558bb-9960-4585-af66-225350b1e7cf"));
 
     }
 
@@ -193,13 +203,14 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper);
 
-        assertThat(dispositions.size(), is(6));
+        assertThat(dispositions.size(), is(7));
         assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(1).getUuid(), is("66de7f60-b73a-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(2).getUuid(), is("799820d0-e02d-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(3).getUuid(), is("844436e0-e02d-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(4).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(5).getUuid(), is("38c15c7f-0718-4fd9-8dc5-2027e267faac"));
+        assertThat(dispositions.get(6).getUuid(), is("9e5558bb-9960-4585-af66-225350b1e7cf"));
 
     }
 
@@ -216,10 +227,33 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper, encounterType);
 
-        assertThat(dispositions.size(), is(3));
+        assertThat(dispositions.size(), is(4));
+        // should not include disposition.fled, 38c15c7f-0718-4fd9-8dc5-2027e267faac
         assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
         assertThat(dispositions.get(1).getUuid(), is("844436e0-e02d-11e3-8b68-0800200c9a66"));
         assertThat(dispositions.get(2).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(3).getUuid(), is("9e5558bb-9960-4585-af66-225350b1e7cf"));
+    }
+
+    @Test
+    public void shouldExcludeDispositionsByEncounterType() throws Exception {
+        dispositionService.setDispositionConfig("specifiedDispositionConfig.json");
+
+        VisitDomainWrapper visitDomainWrapper = mock(VisitDomainWrapper.class);
+        when(visitDomainWrapper.isActive()).thenReturn(true);
+        when(visitDomainWrapper.isAdmitted()).thenReturn(false);
+
+        EncounterType encounterType = mock(EncounterType.class);
+        when(encounterType.getName()).thenReturn("COVID-19");
+
+        List<Disposition> dispositions = dispositionService.getValidDispositions(visitDomainWrapper, encounterType);
+
+        assertThat(dispositions.size(), is(4));
+        // should not include disposition.angry, 9e5558bb-9960-4585-af66-225350b1e7cf
+        assertThat(dispositions.get(0).getUuid(), is("d2d89630-b698-11e2-9e96-0800200c9a66"));
+        assertThat(dispositions.get(1).getUuid(), is("844436e0-e02d-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(2).getUuid(), is("fabe3540-e0ec-11e3-8b68-0800200c9a66"));
+        assertThat(dispositions.get(3).getUuid(), is("38c15c7f-0718-4fd9-8dc5-2027e267faac"));
     }
 
     @Test

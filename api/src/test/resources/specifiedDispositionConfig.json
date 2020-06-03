@@ -55,6 +55,16 @@
         "encounterTypes": ["COVID-19"],
         "actions": [],
         "additionalObs": []
+    },
+    {
+      "uuid": "9e5558bb-9960-4585-af66-225350b1e7cf",
+      "name": "disposition.angry",
+      "conceptCode": "321",
+      "type": "TRANSFER",
+      "careSettingTypes": ["OUTPATIENT"],
+      "excludedEncounterTypes": ["COVID-19"],
+      "actions": [],
+      "additionalObs": []
     }
 
 
