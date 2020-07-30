@@ -26,14 +26,14 @@
 
     <concept concept_id="404" retired="false" datatype_id="1" class_id="5" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="589e92a0-91c4-447d-b71d-e28fd17b5865"/>
     <concept_name concept_id="404" concept_name_id="1404" name="My Diagnosis Certainty" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="589e92a0-91c4-447d-b71d-e28fd17b5865"/>
-    <concept_reference_term concept_reference_term_id="4" concept_source_id="1" code="Diagnosis Certainty" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
+    <concept_reference_term concept_reference_term_id="4" concept_source_id="1" code="Diagnosis certainty" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="4" concept_id="404" concept_reference_term_id="4" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
     <concept_set concept_set_id="4" concept_id="404" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
     <concept_numeric concept_id="404" precise="0"></concept_numeric>
                                                                                                          ‰
     <concept concept_id="405" retired="false" datatype_id="1" class_id="5" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="4256cd44-9632-4b97-afdb-9528eb1af715"/>
     <concept_name concept_id="405" concept_name_id="1405" name="My Diagnosis Order" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="4256cd44-9632-4b97-afdb-9528eb1af715"/>
-    <concept_reference_term concept_reference_term_id="5" concept_source_id="1" code="Diagnosis Order" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
+    <concept_reference_term concept_reference_term_id="5" concept_source_id="1" code="Diagnosis order" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="5" concept_id="405" concept_reference_term_id="5" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
     <concept_set concept_set_id="5" concept_id="405" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
     <concept_numeric concept_id="405" precise="0"></concept_numeric>
