@@ -129,20 +129,14 @@ public class EmrApiConstants {
     public static final String CONCEPT_CODE_CODED_DIAGNOSIS = "Coded Diagnosis";
 
     public static final String CONCEPT_CODE_NON_CODED_DIAGNOSIS = "Non-Coded Diagnosis";
-	
-	// Need to change "Diagnosis Order" to "Diagnosis order" as the concept name in db is "Diagnosis order"
-	// For MySQL, the collation is utf8_general_ci that is case insensitive so case does not matter but in other dbs like PostgreSQL
-	// we need to match the case correctly while searching for concept by concept name.
-	public static final String CONCEPT_CODE_DIAGNOSIS_ORDER = "Diagnosis order"; // e.g. Primary or Secondary
+
+    public static final String CONCEPT_CODE_DIAGNOSIS_ORDER = "Diagnosis Order"; // e.g. Primary or Secondary
 
     public static final String CONCEPT_CODE_DIAGNOSIS_ORDER_PRIMARY = "Primary";
 
     public static final String CONCEPT_CODE_DIAGNOSIS_ORDER_SECONDARY = "Secondary";
 
-	// Need to change "Diagnosis Certainty" to "Diagnosis certainty" as the concept name in db is "Diagnosis certainty"
-	// For MySQL, the collation is utf8_general_ci that is case insensitive so case does not matter but in other dbs like PostgreSQL
-	// we need to match the case correctly while searching for concept by concept name
-	public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY = "Diagnosis certainty"; // e.g. confirmed or presumed
+    public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY = "Diagnosis Certainty"; // e.g. confirmed or presumed
 
     public static final String CONCEPT_CODE_DIAGNOSIS_CERTAINTY_CONFIRMED = "Confirmed";
 
