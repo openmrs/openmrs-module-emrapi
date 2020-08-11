@@ -50,7 +50,7 @@
         <providermanagementVersion>2.5.0</providermanagementVersion>
         <metadatamappingVersion>1.2.1</metadatamappingVersion>
         <metadatasharingVersion>1.2.2</metadatasharingVersion>
-        <eventVersion>2.5</eventVersion>
+        <eventVersion>2.8.0</eventVersion>
         <allergyapiVersion>1.4</allergyapiVersion>
         <webservices.restVersion>2.16</webservices.restVersion>
         <openMRSVersion>1.11.6</openMRSVersion>
@@ -117,18 +117,6 @@
 			<dependency>
 				<groupId>org.openmrs</groupId>
 				<artifactId>event-api</artifactId>
-				<version>${eventVersion}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs</groupId>
-				<artifactId>event-api-1.x</artifactId>
-				<version>${eventVersion}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.openmrs</groupId>
-				<artifactId>event-api-2.x</artifactId>
 				<version>${eventVersion}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -214,18 +202,6 @@
         <dependency>
             <groupId>org.openmrs</groupId>
             <artifactId>event-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs</groupId>
-            <artifactId>event-api-1.x</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs</groupId>
-            <artifactId>event-api-2.x</artifactId>
             <scope>provided</scope>
         </dependency>
 
