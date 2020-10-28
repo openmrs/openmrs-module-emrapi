@@ -126,8 +126,8 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
 
         private EncounterTransaction saveInternal(EncounterTransaction encounterTransaction) {
         Patient patient = patientService.getPatientByUuid(encounterTransaction.getPatientUuid());
-        VisitWrapper visitWrapper = findOrCreateVisit(encounterTransaction, patient);
-        Encounter encounter = findOrCreateEncounter(encounterTransaction, patient, visitWrapper.getVisit());
+        Visit visit = findOrCreateVisit(encounterTransaction, patient);
+        Encounter encounter = findOrCreateEncounter(encounterTransaction, patient, visit);
 
         encounterObservationServiceHelper.update(encounter, encounterTransaction.getObservations());
         encounterObservationServiceHelper.updateDiagnoses(encounter, encounterTransaction.getDiagnoses());
@@ -139,13 +139,11 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
                 encounterTransactionHandler.forSave(encounter, encounterTransaction);
             }
         }
-        if (visitWrapper.getNewVisit())
-            visitService.saveVisit(visitWrapper.getVisit());
 
         emrOrderService.save(encounterTransaction.getDrugOrders(), encounter);
         emrOrderService.saveOrders(encounterTransaction.getOrders(), encounter);
 
-        return new EncounterTransaction(visitWrapper.getVisit().getUuid(), encounter.getUuid());
+        return new EncounterTransaction(visit.getUuid(), encounter.getUuid());
     }
 
     @Override
@@ -304,23 +302,18 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         return providers;
     }
 
-    private VisitWrapper findOrCreateVisit(EncounterTransaction encounterTransaction, Patient patient) {
-        VisitWrapper visitWrapper = new VisitWrapper();
+    private Visit findOrCreateVisit(EncounterTransaction encounterTransaction, Patient patient) {
 
         // return the visit that was explicitly asked for in the EncounterTransaction Object
         if(encounterTransaction.getVisitUuid() != null && !encounterTransaction.getVisitUuid().isEmpty()){
-            visitWrapper.setVisit(visitService.getVisitByUuid(encounterTransaction.getVisitUuid()));
-            visitWrapper.setNewVisit(false);
-            return visitWrapper;
+            return visitService.getVisitByUuid(encounterTransaction.getVisitUuid());
         }
 
         String visitLocationUuid = encounterTransaction.getVisitLocationUuid();
         Visit activeVisit = getActiveVisit(patient, visitLocationUuid);
 
         if(activeVisit != null) {
-            visitWrapper.setVisit(activeVisit);
-            visitWrapper.setNewVisit(false);
-            return visitWrapper;
+            return activeVisit;
         }
 
         Location location = locationService.getLocationByUuid(visitLocationUuid);
@@ -331,8 +324,6 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         visit.setStartDatetime(getCurrentDateIfNull(encounterTransaction.getEncounterDateTime()));
         visit.setEncounters(new HashSet<Encounter>());
         visit.setUuid(UUID.randomUUID().toString());
-        visitWrapper.setVisit(visit);
-        visitWrapper.setNewVisit(true);
-        return visitWrapper;
+        return visitService.saveVisit(visit);
     }
 }
