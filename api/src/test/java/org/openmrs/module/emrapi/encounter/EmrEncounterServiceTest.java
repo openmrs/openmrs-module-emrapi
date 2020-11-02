@@ -510,4 +510,34 @@ public class EmrEncounterServiceTest {
 
         assertNull(argumentCaptor.getValue().getLocation());
     }
+
+    @Test
+    public void shouldNotCallSaveVisitServiceIfTheVisitAlreadyExist() {
+        String encounterTypeUuid = "encounterTypeUuid";
+        EncounterType encounterType = new EncounterType();
+        encounterType.setUuid(encounterTypeUuid);
+
+        String visitUuid = "visitUuid";
+
+        EncounterTransaction encounterTransaction = new EncounterTransaction();
+        encounterTransaction.setEncounterTypeUuid(encounterTypeUuid);
+        encounterTransaction.setVisitUuid(visitUuid);
+
+        String patientUuid = "patientUuid";
+        encounterTransaction.setPatientUuid(patientUuid);
+        Patient patient = new Patient();
+        patient.setUuid(patientUuid);
+
+        Visit visit = new Visit();
+        visit.setPatient(patient);
+        visit.setUuid(visitUuid);
+
+        when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
+        when(encounterService.getEncounterTypeByUuid(encounterTypeUuid)).thenReturn(encounterType);
+        when(visitService.getVisitByUuid(visitUuid)).thenReturn(visit);
+
+        emrEncounterService.save(encounterTransaction);
+
+        verify(visitService, times(0)).saveVisit(visit);
+    }
 }
