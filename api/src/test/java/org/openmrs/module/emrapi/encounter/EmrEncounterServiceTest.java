@@ -512,7 +512,7 @@ public class EmrEncounterServiceTest {
     }
 
     @Test
-    public void shouldNotCallSaveVisitServiceIfTheVisitAlreadyExist() {
+    public void shouldNotSaveVisitIfVisitAlreadyExists() {
         String encounterTypeUuid = "encounterTypeUuid";
         EncounterType encounterType = new EncounterType();
         encounterType.setUuid(encounterTypeUuid);
