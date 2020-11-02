@@ -114,7 +114,7 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         FlushMode flushMode = DbSessionUtil.getCurrentFlushMode();
         DbSessionUtil.setManualFlushMode();
         Context.flushSession();
-        
+
         try {
             updatedEncounterTransaction = saveInternal(encounterTransaction);
         } finally {
@@ -139,8 +139,6 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
                 encounterTransactionHandler.forSave(encounter, encounterTransaction);
             }
         }
-
-        visitService.saveVisit(visit);
 
         emrOrderService.save(encounterTransaction.getDrugOrders(), encounter);
         emrOrderService.saveOrders(encounterTransaction.getOrders(), encounter);
@@ -326,6 +324,6 @@ public class EmrEncounterServiceImpl extends BaseOpenmrsService implements EmrEn
         visit.setStartDatetime(getCurrentDateIfNull(encounterTransaction.getEncounterDateTime()));
         visit.setEncounters(new HashSet<Encounter>());
         visit.setUuid(UUID.randomUUID().toString());
-        return visit;
+        return visitService.saveVisit(visit);
     }
 }

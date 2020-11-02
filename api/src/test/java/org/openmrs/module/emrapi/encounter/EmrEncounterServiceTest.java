@@ -340,11 +340,17 @@ public class EmrEncounterServiceTest {
         location.setName("hospital");
         location.setUuid("visit-location-uuid");
 
+        Visit visit = new Visit();
+        visit.setUuid("visit-uuid");
+        visit.setLocation(location);
+
+
         encounterTransactionHandler = mock(EncounterTransactionHandler.class);
         when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
         when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
         when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(location);
+        when(visitService.saveVisit(any(Visit.class))).thenReturn(visit);
 
         emrEncounterService.onStartup();
         emrEncounterService.save(encounterTransaction);
@@ -420,6 +426,10 @@ public class EmrEncounterServiceTest {
         List visits = new ArrayList();
         visits.add(visit);
 
+        Visit visit1 = new Visit();
+        visit1.setUuid("new-visit-uuid");
+
+
         encounterTransactionHandler = mock(EncounterTransactionHandler.class);
         when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
@@ -427,6 +437,7 @@ public class EmrEncounterServiceTest {
         when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(visitLocation);
         when(visitService.getVisitByUuid("visit-uuid")).thenReturn(visit);
         when(visitService.getActiveVisitsByPatient(patient)).thenReturn(visits);
+        when(visitService.saveVisit(any(Visit.class))).thenReturn(visit1);
 
         emrEncounterService.onStartup();
         EncounterTransaction savedEncounterTransaction = emrEncounterService.save(encounterTransaction);
@@ -483,9 +494,13 @@ public class EmrEncounterServiceTest {
         Patient patient = new Patient();
         patient.setUuid(newPatientUuid);
 
+        Visit visit = new Visit();
+        visit.setUuid("new-visit-uuid");
+
         when(patientService.getPatientByUuid(newPatientUuid)).thenReturn(patient);
         when(visitService.getActiveVisitsByPatient(patient)).thenReturn(null);
         when(encounterService.getEncounterTypeByUuid(encounterTypeUuid)).thenReturn(encounterType);
+        when(visitService.saveVisit(any(Visit.class))).thenReturn(visit);
 
         emrEncounterService.save(encounterTransaction);
 
@@ -494,5 +509,35 @@ public class EmrEncounterServiceTest {
         verify(locationService, times(2)).getLocationByUuid(null);
 
         assertNull(argumentCaptor.getValue().getLocation());
+    }
+
+    @Test
+    public void shouldNotSaveVisitIfVisitAlreadyExists() {
+        String encounterTypeUuid = "encounterTypeUuid";
+        EncounterType encounterType = new EncounterType();
+        encounterType.setUuid(encounterTypeUuid);
+
+        String visitUuid = "visitUuid";
+
+        EncounterTransaction encounterTransaction = new EncounterTransaction();
+        encounterTransaction.setEncounterTypeUuid(encounterTypeUuid);
+        encounterTransaction.setVisitUuid(visitUuid);
+
+        String patientUuid = "patientUuid";
+        encounterTransaction.setPatientUuid(patientUuid);
+        Patient patient = new Patient();
+        patient.setUuid(patientUuid);
+
+        Visit visit = new Visit();
+        visit.setPatient(patient);
+        visit.setUuid(visitUuid);
+
+        when(patientService.getPatientByUuid(patientUuid)).thenReturn(patient);
+        when(encounterService.getEncounterTypeByUuid(encounterTypeUuid)).thenReturn(encounterType);
+        when(visitService.getVisitByUuid(visitUuid)).thenReturn(visit);
+
+        emrEncounterService.save(encounterTransaction);
+
+        verify(visitService, times(0)).saveVisit(visit);
     }
 }
