@@ -36,10 +36,11 @@
         <module>api-2.2</module>
         <module>web-2.2</module>
         <module>condition-list</module>
+        <module>fhir-condition</module>
         <module>omod</module>
 	    <module>api-pre2.2</module>
 		<module>web-pre2.2</module>
-	</modules>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -125,6 +126,22 @@
                 <artifactId>metadatamapping-api</artifactId>
                 <version>${metadatamappingVersion}</version>
                 <scope>provided</scope>
+            </dependency>
+
+            <!--Tests -->
+            <dependency>
+                <groupId>org.openmrs.test</groupId>
+                <artifactId>openmrs-test</artifactId>
+                <version>${openMRSVersion}</version>
+                <type>pom</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.api</groupId>
+                <artifactId>openmrs-api</artifactId>
+                <version>${openMRSVersion}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

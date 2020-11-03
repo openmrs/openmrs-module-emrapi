@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<module configVersion="1.2">
+<module configVersion="1.6">
 
     <!-- Module Properties -->
     <id>${project.parent.artifactId}</id>
@@ -16,7 +16,9 @@
     <!-- TRUNK-3751 prevents saying ${openmrsCoreVersion} when version is a SNAPSHOT-->
     <!-- / Module Properties -->
 
-
+    <aware_of_modules>
+        <aware_of_module>org.openmrs.module.fhir2</aware_of_module>
+    </aware_of_modules>
     <!-- Required Modules -->
     <require_modules>
         <require_module version="${reportingModuleVersion}">org.openmrs.module.reporting</require_module>
@@ -61,6 +63,16 @@
         <conditionalResource>
             <path>/lib/emrapi-web-2.2-${project.parent.version}.jar</path>
             <openmrsVersion>2.2.* - 2.*</openmrsVersion>
+        </conditionalResource>
+        <conditionalResource>
+            <path>/lib/emrapi-fhir-condition-${project.parent.version}.jar</path>
+            <loadIfModulesPresent>
+                <openmrsModule>
+                    <moduleId>org.openmrs.module.fhir2</moduleId>
+                    <version>1.*</version>
+                </openmrsModule>
+            </loadIfModulesPresent>
+            <openmrsVersion>2.0.5 - 2.1.*</openmrsVersion>
         </conditionalResource>
     </conditionalResources>
     <!-- / Conditional Resources -->

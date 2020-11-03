@@ -33,6 +33,12 @@
         </dependency>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
+            <artifactId>${project.parent.artifactId}-fhir-condition</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>${project.parent.artifactId}-api-1.11</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
@@ -356,6 +362,7 @@
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.9</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.11</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
+                                <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-fhir-condition</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
@@ -387,6 +394,7 @@
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.10</classpathDependencyExcludes>
                                 <classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-api-1.12</classpathDependencyExcludes>
 								<classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-web-2.2</classpathDependencyExcludes>
+								<classpathDependencyExcludes>${project.parent.groupId}:${project.parent.artifactId}-fhir-condition</classpathDependencyExcludes>
                             </classpathDependencyExcludes>
                         </configuration>
                     </plugin>
