@@ -5,7 +5,7 @@
     <parent>
         <artifactId>emrapi</artifactId>
         <groupId>org.openmrs.module</groupId>
-        <version>1.24.6</version>
+        <version>1.24.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>emrapi-condition-list</artifactId>
