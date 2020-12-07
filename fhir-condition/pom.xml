@@ -68,7 +68,7 @@
     <properties>
         <lombokVersion>1.18.10</lombokVersion>
         <openMRSVersion>2.0.5</openMRSVersion>
-        <openmrsModuleFhirVersion>1.0.0</openmrsModuleFhirVersion>
+        <openmrsModuleFhirVersion>1.1.0</openmrsModuleFhirVersion>
     </properties>
 
 </project>

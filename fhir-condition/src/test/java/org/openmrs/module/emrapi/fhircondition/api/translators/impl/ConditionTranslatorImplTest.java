@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.fhir2conditions.api.translators.impl;
+package org.openmrs.module.emrapi.fhircondition.api.translators.impl;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
@@ -58,7 +58,7 @@ public class ConditionTranslatorImplTest {
 
     private static final String PRACTITIONER_UUID = "2ffb1a5f-bcd3-4243-8f40-78edc2642789";
 
-    private static final String FAMILY_NAME = "Wambua";
+    private static final String FAMILY_NAME = "Geoffry";
 
     private static final String GIVEN_NAME = "Janet";
 

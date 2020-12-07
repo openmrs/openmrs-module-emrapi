@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.fhir2conditions.api.translators.impl;
+package org.openmrs.module.emrapi.fhircondition.api.translators.impl;
 
 import javax.annotation.Nonnull;
 

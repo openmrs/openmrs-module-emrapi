@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.fhir2conditions.api.impl;
+package org.openmrs.module.emrapi.fhircondition.api.impl;
 
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.junit.Before;
