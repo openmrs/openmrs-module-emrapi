@@ -7,12 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.fhir2conditions.api.dao.impl;
-
-import static org.hibernate.criterion.Restrictions.eq;
-
-import java.util.List;
-import java.util.Optional;
+package org.openmrs.module.emrapi.fhircondition.api.dao.impl;
 
 import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.param.ReferenceAndListParam;
@@ -30,6 +25,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hibernate.criterion.Restrictions.eq;
 
 @Primary
 @Component("fhir.condition.fhirConditionDaoImpl")
@@ -106,9 +105,6 @@ public class FhirConditionDaoImpl extends BaseFhirDao<org.openmrs.module.emrapi.
         if ("active".equalsIgnoreCase(status)) {
             return Condition.Status.ACTIVE;
         }
-        if ("inactive".equalsIgnoreCase(status)) {
-            return Condition.Status.INACTIVE;
-        }
-        return Condition.Status.HISTORY_OF;
+        return Condition.Status.INACTIVE;
     }
 }
