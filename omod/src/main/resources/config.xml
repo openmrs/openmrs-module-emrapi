@@ -68,7 +68,7 @@
             <path>/lib/emrapi-fhir-condition-${project.parent.version}.jar</path>
             <loadIfModulesPresent>
                 <openmrsModule>
-                    <moduleId>org.openmrs.module.fhir2</moduleId>
+                    <moduleId>fhir2</moduleId>
                     <version>1.*</version>
                 </openmrsModule>
             </loadIfModulesPresent>
