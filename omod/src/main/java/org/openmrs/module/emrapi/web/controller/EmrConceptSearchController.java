@@ -16,23 +16,30 @@ package org.openmrs.module.emrapi.web.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
+import org.openmrs.ConceptName;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSource;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.webservices.rest.SimpleObject;
-import org.openmrs.util.LocaleUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import static org.springframework.web.bind.annotation.ValueConstants.DEFAULT_NONE;
 
 @Controller
 @RequestMapping(method = RequestMethod.GET, value = "/rest/emrapi/concept")
@@ -44,21 +51,27 @@ public class EmrConceptSearchController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public Object search(@RequestParam("term") String query, @RequestParam Integer limit) throws Exception {
+    public Object search(@RequestParam("term") String query, @RequestParam Integer limit,
+                         @RequestParam(required = false, defaultValue = DEFAULT_NONE) String locale) throws Exception {
         Collection<Concept> diagnosisSets = emrApiProperties.getDiagnosisSets();
         List<ConceptSource> conceptSources = emrApiProperties.getConceptSourcesForDiagnosisSearch();
+        Locale searchLocale = getSearchLocale(locale);
         List<ConceptSearchResult> conceptSearchResults =
-                emrService.conceptSearch(query, LocaleUtility.getDefaultLocale(), null, diagnosisSets, conceptSources, limit);
+                emrService.conceptSearch(query, searchLocale, null, diagnosisSets, conceptSources, limit);
         ConceptSource conceptSource = conceptSources.isEmpty() ? null: conceptSources.get(0);
-        return createListResponse(conceptSearchResults, conceptSource);
+        return createListResponse(conceptSearchResults, conceptSource, searchLocale);
     }
 
-    private List<SimpleObject> createListResponse(List<ConceptSearchResult> resultList, ConceptSource conceptSource) {
+    private List<SimpleObject> createListResponse(List<ConceptSearchResult> resultList, ConceptSource conceptSource, Locale searchLocale) {
         List<SimpleObject> allDiagnoses = new ArrayList<SimpleObject>();
 
         for (ConceptSearchResult diagnosis : resultList) {
             SimpleObject diagnosisObject = new SimpleObject();
-            diagnosisObject.add("conceptName", diagnosis.getConcept().getName().getName());
+            ConceptName conceptName = diagnosis.getConcept().getName(searchLocale);
+            if (conceptName == null) {
+                conceptName = diagnosis.getConcept().getName();
+            }
+            diagnosisObject.add("conceptName", conceptName.getName());
             diagnosisObject.add("conceptUuid", diagnosis.getConcept().getUuid());
             if(diagnosis.getConceptName()!=null) {
                 diagnosisObject.add("matchedName", diagnosis.getConceptName().getName());
@@ -83,5 +96,31 @@ public class EmrConceptSearchController {
             }
         }
         return null;
+    }
+
+    private Locale getSearchLocale(String localeStr) {
+        if (localeStr == null) {
+            return Context.getLocale();
+        }
+        Locale locale;
+        try {
+            locale = LocaleUtils.toLocale(localeStr);
+        }  catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(localeErrorMessage("emrapi.conceptSearch.invalidLocale", localeStr));
+        }
+        if (allowedLocale(locale)) {
+            return locale;
+        } else {
+            throw new IllegalArgumentException(localeErrorMessage("emrapi.conceptSearch.unsupportedLocale", localeStr));
+        }
+    }
+
+    private boolean allowedLocale(Locale locale) {
+        Set<Locale> allowedLocales = new HashSet<Locale>(Context.getAdministrationService().getAllowedLocales());
+        return allowedLocales.contains(locale);
+    }
+
+    private String localeErrorMessage(String msgKey, String localeStr) {
+        return Context.getMessageSourceService().getMessage(msgKey, new Object[] { localeStr }, Context.getLocale());
     }
 }
