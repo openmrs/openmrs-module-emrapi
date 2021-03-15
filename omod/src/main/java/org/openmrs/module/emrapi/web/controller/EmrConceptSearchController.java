@@ -102,17 +102,25 @@ public class EmrConceptSearchController {
         if (localeStr == null) {
             return Context.getLocale();
         }
-        Locale locale = null;
+        Locale locale;
         try {
             locale = LocaleUtils.toLocale(localeStr);
         }  catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("emrapi.conceptSearch.invalidLocale");
+            throw new IllegalArgumentException(localeErrorMessage("emrapi.conceptSearch.invalidLocale", localeStr));
         }
-        Set<Locale> allowedLocales = new HashSet<Locale>(Context.getAdministrationService().getAllowedLocales());
-        if (allowedLocales.contains(locale)) {
+        if (allowedLocale(locale)) {
             return locale;
         } else {
-            throw new IllegalArgumentException("emrapi.conceptSearch.invalidLocale");
+            throw new IllegalArgumentException(localeErrorMessage("emrapi.conceptSearch.unsupportedLocale", localeStr));
         }
+    }
+
+    private boolean allowedLocale(Locale locale) {
+        Set<Locale> allowedLocales = new HashSet<Locale>(Context.getAdministrationService().getAllowedLocales());
+        return allowedLocales.contains(locale);
+    }
+
+    private String localeErrorMessage(String msgKey, String localeStr) {
+        return Context.getMessageSourceService().getMessage(msgKey, new Object[] { localeStr }, Context.getLocale());
     }
 }
