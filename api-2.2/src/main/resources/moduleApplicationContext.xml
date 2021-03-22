@@ -4,6 +4,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+	<bean id="diagnosisConverter" class="org.openmrs.module.emrapi.diagnosis.DiagnosisConverterImpl2_2"/>
+
 	<bean id="emrDiagnosisService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager">
 			<ref bean="transactionManager"/>
@@ -14,6 +16,7 @@
 				<property name="obsService" ref="obsService"/>
 				<property name="encounterService" ref="encounterService"/>
 				<property name="adminService" ref="adminService"/>
+				<property name="diagnosisConverter" ref="diagnosisConverter"/>
 			</bean>
 		</property>
 		<property name="preInterceptors">
@@ -29,6 +32,45 @@
 			<list merge="true">
 				<value>${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisService</value>
 				<ref bean="emrDiagnosisService"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="emrDiagnosisDAO" class="org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAOImpl2_2">
+		<property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
+	</bean>
+
+	<bean id="emrVisitServiceImpl" class="${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitServiceImpl2_2">
+		<constructor-arg ref="visitService"/>
+		<constructor-arg ref="visitResponseMapper"/>
+		<property name="dao">
+			<ref bean="emrVisitDAOImpl"/>
+		</property>
+		<property name="adminService" ref="adminService"/>
+		<property name="emrDiagnosisDAO" ref="emrDiagnosisDAO"/>
+		<property name="diagnosisConverter"><ref bean="diagnosisConverter"/></property>
+	</bean>
+
+	<bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref bean="transactionManager"/>
+		</property>
+		<property name="target">
+			<ref bean="emrVisitServiceImpl"/>
+		</property>
+		<property name="preInterceptors">
+			<ref bean="serviceInterceptors"/>
+		</property>
+		<property name="transactionAttributeSource">
+			<ref bean="transactionAttributeSource"/>
+		</property>
+	</bean>
+
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list merge="true">
+				<value>${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitService</value>
+				<ref bean="emrVisitService"/>
 			</list>
 		</property>
 	</bean>
