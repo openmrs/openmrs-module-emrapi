@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface DiagnosisConverter {
 
-    Diagnosis convert(org.openmrs.Diagnosis coreDiagnosis);
+//    List<Diagnosis> convert(List<org.openmrs.Diagnosis> coreDiagnoses);
 
-    List<Diagnosis> convert(List<org.openmrs.Diagnosis> coreDiagnoses);
+    List<Diagnosis> convert(List<? extends Object> coreDiagnoses);
 }

@@ -4,7 +4,23 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	<bean id="diagnosisConverter" class="org.openmrs.module.emrapi.diagnosis.DiagnosisConverterImpl2_2"/>
+	<bean id="diagnosisConverter" class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisConverterImpl2_2"/>
+
+<!--	<bean id="diagnosisConverter" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">-->
+<!--		<property name="transactionManager">-->
+<!--			<ref bean="transactionManager"/>-->
+<!--		</property>-->
+<!--		<property name="target">-->
+<!--			<bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisConverterImpl2_2">-->
+<!--			</bean>-->
+<!--		</property>-->
+<!--		<property name="preInterceptors">-->
+<!--			<ref bean="serviceInterceptors"/>-->
+<!--		</property>-->
+<!--		<property name="transactionAttributeSource">-->
+<!--			<ref bean="transactionAttributeSource"/>-->
+<!--		</property>-->
+<!--	</bean>-->
 
 	<bean id="emrDiagnosisService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
 		<property name="transactionManager">
@@ -51,20 +67,20 @@
 		<property name="diagnosisConverter"><ref bean="diagnosisConverter"/></property>
 	</bean>
 
-	<bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name="transactionManager">
-			<ref bean="transactionManager"/>
-		</property>
-		<property name="target">
-			<ref bean="emrVisitServiceImpl"/>
-		</property>
-		<property name="preInterceptors">
-			<ref bean="serviceInterceptors"/>
-		</property>
-		<property name="transactionAttributeSource">
-			<ref bean="transactionAttributeSource"/>
-		</property>
-	</bean>
+<!--	<bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">-->
+<!--		<property name="transactionManager">-->
+<!--			<ref bean="transactionManager"/>-->
+<!--		</property>-->
+<!--		<property name="target">-->
+<!--			<ref bean="emrVisitServiceImpl"/>-->
+<!--		</property>-->
+<!--		<property name="preInterceptors">-->
+<!--			<ref bean="serviceInterceptors"/>-->
+<!--		</property>-->
+<!--		<property name="transactionAttributeSource">-->
+<!--			<ref bean="transactionAttributeSource"/>-->
+<!--		</property>-->
+<!--	</bean>-->
 
 	<bean parent="serviceContext">
 		<property name="moduleService">
