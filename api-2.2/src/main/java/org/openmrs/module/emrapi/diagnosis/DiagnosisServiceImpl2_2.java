@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Class implementing the DiagnosisService while delegating calls to the core module
- */
+ * class implementing the DiagnosisService while delegating calls to the core module
+ * */
 public class DiagnosisServiceImpl2_2 extends DiagnosisServiceImpl implements DiagnosisService {
 
 	private AdministrationService adminService;

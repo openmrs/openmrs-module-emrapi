@@ -47,13 +47,4 @@
 		<property name="emrDiagnosisDAO" ref="emrDiagnosisDAO"/>
 	</bean>
 
-	<bean parent="serviceContext">
-		<property name="moduleService">
-			<list merge="true">
-				<value>${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitService</value>
-				<ref bean="emrVisitService"/>
-			</list>
-		</property>
-	</bean>
-
 </beans>

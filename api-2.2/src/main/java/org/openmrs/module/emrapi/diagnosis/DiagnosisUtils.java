@@ -8,6 +8,10 @@ import java.util.List;
 
 public class DiagnosisUtils {
 
+    /**
+     * Method to convert the core diagnosis object into a list of diagnoses compatible with the diagnosis object in the emrapi module
+     * @return diagnoses
+     * */
     public static List<Diagnosis> convert(List<org.openmrs.Diagnosis> coreDiagnoses) {
         List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
         for (Object coreDiagnosis2 : coreDiagnoses) {
