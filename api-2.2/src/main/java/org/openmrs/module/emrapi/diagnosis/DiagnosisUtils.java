@@ -6,22 +6,9 @@ import org.openmrs.ConditionVerificationStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiagnosisConverterImpl2_2 implements DiagnosisConverter {
+public class DiagnosisUtils {
 
-//    public List<Diagnosis> convert(List<org.openmrs.Diagnosis> coreDiagnoses) {
-//        List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
-//        for (org.openmrs.Diagnosis coreDiagnosis : coreDiagnoses) {
-//            diagnoses.add(this.convert(coreDiagnosis));
-//        }
-//        return diagnoses;
-//    }
-
-    //@Override
-//    public Diagnosis convert(org.openmrs.Diagnosis coreDiagnosis) {
-//        return null;
-//    }
-
-    public List<Diagnosis> convert(List<? extends Object> coreDiagnoses) {
+    public static List<Diagnosis> convert(List<org.openmrs.Diagnosis> coreDiagnoses) {
         List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
         for (Object coreDiagnosis2 : coreDiagnoses) {
             org.openmrs.Diagnosis coreDiagnosis = (org.openmrs.Diagnosis)coreDiagnosis2;

@@ -1,29 +1,22 @@
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.openmrs.Encounter;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
+import org.openmrs.*;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 
 import java.util.Date;
 import java.util.List;
+
 /**
- * class implementing the DiagnosisService while delegating calls to the core module
- * */
+ * Class implementing the DiagnosisService while delegating calls to the core module
+ */
 public class DiagnosisServiceImpl2_2 extends DiagnosisServiceImpl implements DiagnosisService {
 
 	private AdministrationService adminService;
 
-	private DiagnosisConverter diagnosisConverter;
-
 	public void setAdminService(AdministrationService adminService) {
 		this.adminService = adminService;
-	}
-
-	public void setDiagnosisConverter(DiagnosisConverter diagnosisConverter) {
-		this.diagnosisConverter = diagnosisConverter;
 	}
 
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
@@ -31,17 +24,16 @@ public class DiagnosisServiceImpl2_2 extends DiagnosisServiceImpl implements Dia
 			return super.getDiagnoses(patient,fromDate);
 		}
 		 else {
-			return diagnosisConverter.convert(Context.getDiagnosisService().getDiagnoses(patient, fromDate));
+			return DiagnosisUtils.convert(Context.getDiagnosisService().getDiagnoses(patient, fromDate));
 		}
 	}
-
 
 	public 	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate){
 		if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true")) {
 			return super.getUniqueDiagnoses(patient, fromDate);
 		}
 		else {
-			return diagnosisConverter.convert(Context.getDiagnosisService().getUniqueDiagnoses(patient, fromDate));
+			return DiagnosisUtils.convert(Context.getDiagnosisService().getUniqueDiagnoses(patient, fromDate));
 		}
 
 	}
@@ -51,7 +43,7 @@ public class DiagnosisServiceImpl2_2 extends DiagnosisServiceImpl implements Dia
 			return super.getPrimaryDiagnoses(encounter);
 		}
 		else {
-			return diagnosisConverter.convert(Context.getDiagnosisService().getPrimaryDiagnoses(encounter));
+			return DiagnosisUtils.convert(Context.getDiagnosisService().getPrimaryDiagnoses(encounter));
 		}
 	}
 

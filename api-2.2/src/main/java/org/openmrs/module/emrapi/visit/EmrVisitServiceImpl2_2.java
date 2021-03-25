@@ -16,18 +16,12 @@ public class EmrVisitServiceImpl2_2 extends EmrVisitServiceImpl implements EmrVi
 
 	private EmrDiagnosisDAO emrDiagnosisDAO;
 
-	private DiagnosisConverter diagnosisConverter;
-
 	public void setAdminService(AdministrationService adminService) {
 		this.adminService = adminService;
 	}
 
 	public void setEmrDiagnosisDAO(EmrDiagnosisDAO emrDiagnosisDAO) {
 		this.emrDiagnosisDAO = emrDiagnosisDAO;
-	}
-
-	public void setDiagnosisConverter(DiagnosisConverter diagnosisConverter) {
-		this.diagnosisConverter = diagnosisConverter;
 	}
 
 	public EmrVisitServiceImpl2_2(VisitService visitService, VisitResponseMapper visitResponseMapper) {
@@ -41,7 +35,7 @@ public class EmrVisitServiceImpl2_2 extends EmrVisitServiceImpl implements EmrVi
 		} else {
 			List<org.openmrs.Diagnosis> diagnoses = emrDiagnosisDAO.getDiagnoses(visit, primaryOnly, confirmedOnly);
 			List<Obs> diagnosisList = new ArrayList<Obs>();
-			for (Diagnosis diagnosis : diagnosisConverter.convert(diagnoses)) {
+			for (Diagnosis diagnosis : DiagnosisUtils.convert(diagnoses)) {
 				diagnosisList.add(diagnosisMetadata.buildDiagnosisObsGroup(diagnosis));
 			}
 			return diagnosisList;
