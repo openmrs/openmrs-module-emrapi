@@ -18,7 +18,7 @@ public class EmrDiagnosisDAOImpl2_2 implements EmrDiagnosisDAO {
       this.sessionFactory = sessionFactory;
    }
 
-   public List<org.openmrs.Diagnosis> getDiagnoses(Visit visit, Boolean primaryOnly, Boolean confirmedOnly) {
+   public List<org.openmrs.Diagnosis> getDiagnoses(Visit visit, boolean primaryOnly, boolean confirmedOnly) {
       String queryString = "from Diagnosis d where d.encounter.visit.visitId = :visitId and d.voided = false";
       if (primaryOnly == true) {
          queryString += " and d.rank = :rankId";

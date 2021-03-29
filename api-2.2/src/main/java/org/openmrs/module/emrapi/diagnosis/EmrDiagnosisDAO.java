@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface EmrDiagnosisDAO {
 
-    List<org.openmrs.Diagnosis> getDiagnoses(Visit visit, Boolean primaryOnly, Boolean confirmedOnly);
+    List<org.openmrs.Diagnosis> getDiagnoses(Visit visit, boolean primaryOnly, boolean confirmedOnly);
 }
