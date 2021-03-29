@@ -6,7 +6,13 @@ import org.openmrs.api.db.hibernate.DbSessionFactory;
 
 import java.util.List;
 
+/**
+ * Hibernate implementation of the EmrDiagnosisDAO
+ */
 public class EmrDiagnosisDAOImpl2_2 implements EmrDiagnosisDAO {
+
+   // TODO: Fetching diagnosis should be delegated to core Diagnosis service.
+   // https://issues.openmrs.org/browse/TRUNK-5999
 
    private static final Integer PRIMARY_RANK = 1;
 
@@ -18,6 +24,14 @@ public class EmrDiagnosisDAOImpl2_2 implements EmrDiagnosisDAO {
       this.sessionFactory = sessionFactory;
    }
 
+   /**
+    * Gets the diagnosis for a given visit
+    *
+    * @param visit visit to get the diagnoses from
+    * @param primaryOnly whether to fetch primary diagnosis only or all diagnosis regardless of rank
+    * @param confirmedOnly whether to fetch only confirmed diagnosis or both confirmed and provisional
+    * @return list of diagnoses for a visit
+    */
    public List<org.openmrs.Diagnosis> getDiagnoses(Visit visit, boolean primaryOnly, boolean confirmedOnly) {
       String queryString = "from Diagnosis d where d.encounter.visit.visitId = :visitId and d.voided = false";
       if (primaryOnly == true) {
