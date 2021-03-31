@@ -33,4 +33,18 @@
 		</property>
 	</bean>
 
+	<bean id="emrDiagnosisDAO" class="org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAOImpl2_2">
+		<property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
+	</bean>
+
+	<bean id="emrVisitServiceImpl" class="${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitServiceImpl2_2">
+		<constructor-arg ref="visitService"/>
+		<constructor-arg ref="visitResponseMapper"/>
+		<property name="dao">
+			<ref bean="emrVisitDAOImpl"/>
+		</property>
+		<property name="adminService" ref="adminService"/>
+		<property name="emrDiagnosisDAO" ref="emrDiagnosisDAO"/>
+	</bean>
+
 </beans>
