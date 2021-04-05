@@ -47,7 +47,16 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+/*@deprecated .This class has been moved to the openmrs Metadata Sharing Module
+ * Ensure you have at least version 1.6.0 of Metadata Sharing Module
+ * Change this to call class org.openmrs.module.metadatasharing.packages.MetadataUtil.java
+ * Change your metadata files to use aliased name <MetadataPackagesConfig> 
+ *      rather than the full name <org.openmrs.module.emrapi.metadata.MetadataPackagesConfig>
+ * Change your metadata files to use aliased name <MetadataPackageConfig>
+ *      rather than the full name <org.openmrs.module.emrapi.metadata.MetadataPackageConfig>
+ * See more info at {@link https://issues.openmrs.org/browse/EA-91}
+ * */
+@Deprecated
 public class MetadataUtil {
 	
 	protected static final Log log = LogFactory.getLog(MetadataUtil.class);
