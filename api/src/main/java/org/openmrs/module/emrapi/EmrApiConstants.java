@@ -101,7 +101,7 @@ public class EmrApiConstants {
     public static final String PRIMARY_IDENTIFIER_TYPE = "emr.primaryIdentifierType";
 
     public static final String GP_EXTRA_PATIENT_IDENTIFIER_TYPES = "emr.extraPatientIdentifierTypes";
-    
+
     public static final String MM_EXTRA_PIT_SET_UUID = "e4aab2eb-5d19-496f-858b-c1269d92c549";
 
     public static final String SAME_AS_CONCEPT_MAP_TYPE_UUID = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
@@ -154,6 +154,8 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH = "Unknown Cause of Death";
 
+    public static final String CONCEPT_CODE_PATIENT_DIED = "Patient Died";
+
     public static final String CONCEPT_CODE_ADMISSION_DECISION = "Admission Decision";
 
     public static final String CONCEPT_CODE_DENY_ADMISSION = "Deny Admission";
@@ -192,7 +194,7 @@ public class EmrApiConstants {
     public static final String LOCATION_TAG_SUPPORTS_DISPENSING = "Dispensing Location";
 
     public static final String EXTRA_PATIENT_IDENTIFIER_TYPES_DESCR = "Extra Patient Identifier Types that should be displayed";
-    
+
     public static final String GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP = "emrapi.EmrApiVisitAssignmentHandler.encounterTypeToNewVisitTypeMap";
 
     public static final String GP_VISIT_ASSIGNMENT_HANDLER_ADJUST_ENCOUNTER_TIME_OF_DAY_IF_NECESSARY = "emrapi.EmrApiVisitAssignmentHandler.adjustEncounterTimeOfDayIfNecessary";

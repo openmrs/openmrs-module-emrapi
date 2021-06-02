@@ -215,6 +215,19 @@ public class EmrApiProperties extends ModuleProperties {
 		return getSingleConceptByMapping(getEmrApiConceptSource(), code);
 	}
 
+	// won't throw an exception if no concept with that mapping found
+    // Metadata Deploy should probably provide a method like this
+    protected Concept getEmrApiConceptByMappingAllowUndefined(String code) {
+        List<Concept> candidates = conceptService.getConceptsByMapping(code, getEmrApiConceptSource().getName(), false);
+        if (candidates.size() == 0) {
+           return null;
+        } else if (candidates.size() == 1) {
+            return candidates.get(0);
+        } else {
+            throw new IllegalStateException("Configuration required: found more than one concept mapped as " + getEmrApiConceptSource().getName() + ":" + code);
+        }
+	}
+
 	public Concept getUnknownCauseOfDeathConcept() {
 		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH);
 	}
@@ -225,6 +238,10 @@ public class EmrApiProperties extends ModuleProperties {
 
     public Concept getDenyAdmissionConcept()  {
         return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_DENY_ADMISSION);
+    }
+
+    public Concept getPatientDiedConcept() {
+        return getEmrApiConceptByMappingAllowUndefined(EmrApiConstants.CONCEPT_CODE_PATIENT_DIED);
     }
 
 	public List<PatientIdentifierType> getIdentifierTypesToSearch() {

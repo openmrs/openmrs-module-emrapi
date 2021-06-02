@@ -107,6 +107,10 @@
 
     <concept_reference_source concept_source_id="1001" name="org.openmrs.module.emrapi" description="EMR API Concept Source" creator="1" date_created="2009-06-03 13:41:25.0" retired="false" uuid="edd52713-8887-47b7-ba9e-6e1148824ca4"/>
 
+    <!-- add the EMR API "Patient Died" code to the "Patient Died" concept from the test database -->
+    <concept_reference_term concept_reference_term_id="1001" concept_source_id="1001" code="Patient Died" retired="0" creator="1" date_created="2004-08-12 00:00:00.0" uuid="a01ecb91-b686-4053-b2d0-233a53b1bb3c"/>
+    <concept_reference_map concept_map_id="1001" concept_id="16" concept_reference_term_id="1001" concept_map_type_id="2" creator="1" date_created="2004-08-12 00:00:00.0" uuid="ed864348-bbc0-4af6-925a-4035aedbdfaa"/>
+
     <!-- create some visits for patient 7 & 8 from the standardTestDataset to test merging visits -->
     <visit visit_id="1001" patient_id="7" visit_type_id="1" date_started="2013-04-04 00:00:00.0" date_stopped="2013-04-07 00:00:00.0" location_id="1" creator="1" date_created="2005-01-01 00:00:00.0" voided="0" uuid="1e5d5218-6b78-11e0-93c3-18a905e044dc" />
     <encounter encounter_id="1001" visit_id="1001" encounter_type="2" patient_id="7" location_id="1" form_id="1" encounter_datetime="2013-04-06 00:00:00.0" creator="1" date_created="2008-08-18 14:09:05.0" voided="false" uuid="6519d653-444b-4118-9c83-a3715b82d4ac"/>

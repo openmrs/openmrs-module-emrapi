@@ -69,6 +69,36 @@
         </property>
     </bean>
 
+   <bean id="exitFromCareService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="${project.parent.groupId}.${project.parent.artifactId}.exitfromcare.ExitFromCareServiceImpl">
+                <property name="emrApiProperties" ref="emrApiProperties"/>
+                <property name="visitService" ref="visitService"/>
+                <property name="patientService" ref="patientService"/>
+                <property name="programWorkflowService" ref="programWorkflowService"/>
+                <property name="adtService" ref="adtService"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>${project.parent.groupId}.${project.parent.artifactId}.exitfromcare.ExitFromCareService</value>
+                <ref bean="exitFromCareService"/>
+            </list>
+        </property>
+    </bean>
+
     <bean id="emrConceptService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
@@ -360,7 +390,7 @@
     <bean id="dbSessionUtil" class="org.openmrs.module.emrapi.db.DbSessionUtil">
         <property name="dbSessionDAO"><ref bean="dbSessionDAO"/></property>
     </bean>
-    
+
     <bean id="encounterTypetoVisitTypeMapper" class="org.openmrs.module.emrapi.adt.EncounterTypetoVisitTypeMapper">
         <property name="adminService">
             <ref bean="adminService"/>
