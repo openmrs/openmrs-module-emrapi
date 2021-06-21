@@ -4,12 +4,10 @@ package org.openmrs.module.emrapi.disposition.actions;
 import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
-import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
-import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.module.emrapi.exitfromcare.ExitFromCareService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +22,7 @@ import java.util.Map;
 public class MarkPatientDeadDispositionAction implements DispositionAction {
 
     @Autowired
-    private PatientService patientService;
+    private ExitFromCareService exitFromCareService;
 
     @Autowired
     private DispositionService dispositionService;
@@ -41,16 +39,11 @@ public class MarkPatientDeadDispositionAction implements DispositionAction {
         Concept causeOfDeath = emrApiProperties.getUnknownCauseOfDeathConcept();
 
         Patient patient = encounterDomainWrapper.getEncounter().getPatient();
-        patient.setDead(true);
-        if (deathDate != null) {
-            patient.setDeathDate(deathDate);
-        }
-        patient.setCauseOfDeath(causeOfDeath);
-        patientService.savePatient(patient);
+        exitFromCareService.markPatientDied(patient, causeOfDeath, deathDate);
     }
 
-    public void setPatientService(PatientService patientService) {
-        this.patientService = patientService;
+    public void setExitFromCareService(ExitFromCareService exitFromCareService) {
+        this.exitFromCareService = exitFromCareService;
     }
 
     public void setDispositionService(DispositionService dispositionService) {

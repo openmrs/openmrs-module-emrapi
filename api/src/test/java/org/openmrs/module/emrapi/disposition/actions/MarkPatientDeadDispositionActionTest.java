@@ -17,14 +17,14 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
+import org.openmrs.module.emrapi.exitfromcare.ExitFromCareService;
 import org.openmrs.module.emrapi.test.AuthenticatedUserTestHelper;
 
 import java.util.Date;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +37,7 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
     private PatientService patientService;
     private DispositionService dispositionService;
     private DispositionDescriptor dispositionDescriptor;
+    private ExitFromCareService exitFromCareService;
     private EmrApiProperties emrApiProperties;
     private Concept dispositionObsGroupConcept = new Concept();
     private Concept dateOfDeathConcept = new Concept();
@@ -45,6 +46,7 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
     public void setUp() throws Exception {
         dispositionService = mock(DispositionService.class);
         dispositionDescriptor = mock(DispositionDescriptor.class);
+        exitFromCareService = mock(ExitFromCareService.class);
         emrApiProperties = mock(EmrApiProperties.class);
 
         when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
@@ -59,7 +61,7 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
 
         action = new MarkPatientDeadDispositionAction();
         action.setEmrApiProperties(emrApiProperties);
-        action.setPatientService(patientService);
+        action.setExitFromCareService(exitFromCareService);
         action.setDispositionService(dispositionService);
     }
 
@@ -88,10 +90,7 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
 
         action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
 
-        assertThat(patient.isDead(), is(true));
-        assertThat(patient.getDeathDate(), is(expectedDeathDate));
-        assertThat(patient.getCauseOfDeath(), is(unknown));
-        verify(patientService).savePatient(patient);
+        verify(exitFromCareService, times(1)).markPatientDied(patient, unknown, expectedDeathDate);
     }
 
 }

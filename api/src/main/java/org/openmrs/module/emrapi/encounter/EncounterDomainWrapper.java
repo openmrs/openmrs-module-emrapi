@@ -219,7 +219,7 @@ public class EncounterDomainWrapper implements DomainWrapper {
         }
 
         // now associate with the visit
-        encounter.setVisit(visit.getVisit());
+        visit.getVisit().addEncounter(encounter);
     }
 
     /**
