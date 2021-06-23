@@ -20,6 +20,15 @@ public interface ExitFromCareService extends OpenmrsService {
      */
     void closePatientPrograms(Patient patient, Concept outcome, Date date);
 
+    /**
+     * Reopens (ie, sets outcome and completion date to null) any programs that have an outcome equal to
+     * the outcome parameter, and a completion date equal to the completio date parameter
+     * @param patient
+     * @param outcome
+     * @param completionDate
+     */
+    void reopenPatientPrograms(Patient patient, Concept outcome, Date completionDate);
+
 
     /**
      * Close any active visits for the specified patient
@@ -30,7 +39,7 @@ public interface ExitFromCareService extends OpenmrsService {
     void closeActiveVisits(Patient patient);
 
     /**
-     * Marks the patient date with the specified cause of dead and death date
+     * Marks the patient dead with the specified cause of dead and death date
      * Closes any active programs or visits for that patient
      * TODO: better documentation here
      *
@@ -38,6 +47,16 @@ public interface ExitFromCareService extends OpenmrsService {
      * @param causeOfDeath
      * @param deathDate
      */
-    void markPatientDied(Patient patient, Concept causeOfDeath, Date deathDate);
+    void markPatientDead(Patient patient, Concept causeOfDeath, Date deathDate);
+
+
+    /**
+     * Removes the flag that set the patient as dead, and removes any cause of death
+     * Reopens any patient programs that have been closed with an outcome of "death" on the date of death
+     * TODO: better documentation here
+     *
+     * @param patient
+     */
+    void markPatientNotDead(Patient patient);
 
 }

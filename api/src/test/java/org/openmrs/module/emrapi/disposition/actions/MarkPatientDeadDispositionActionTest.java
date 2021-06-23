@@ -90,7 +90,7 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
 
         action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
 
-        verify(exitFromCareService, times(1)).markPatientDied(patient, unknown, expectedDeathDate);
+        verify(exitFromCareService, times(1)).markPatientDead(patient, unknown, expectedDeathDate);
     }
 
 }

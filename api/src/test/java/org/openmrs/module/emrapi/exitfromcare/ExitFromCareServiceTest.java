@@ -19,6 +19,7 @@ import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -223,7 +224,7 @@ public class ExitFromCareServiceTest {
     }
 
     @Test
-    public void markPatientDied_shouldMarkPatientDied() {
+    public void markPatientDead_shouldMarkPatientDead() {
         Patient patient = new Patient();
         Concept causeOfDeath = new Concept();
         Concept patientDied = new Concept();
@@ -231,7 +232,7 @@ public class ExitFromCareServiceTest {
 
         when(mockEmrApiProperties.getPatientDiedConcept()).thenReturn(patientDied);
 
-        exitFromCareService.markPatientDied(patient, causeOfDeath, now);
+        exitFromCareService.markPatientDead(patient, causeOfDeath, now);
 
         assertTrue(patient.isDead());
         assertThat(patient.getCauseOfDeath(), is(causeOfDeath));
@@ -243,7 +244,7 @@ public class ExitFromCareServiceTest {
     }
 
     @Test
-    public void markPatientDied_shouldMarkPatientDiedOnCurrentDateIfNoDateSpecified() {
+    public void markPatientDead_shouldMarkPatientDeadOnCurrentDateIfNoDateSpecified() {
         Patient patient = new Patient();
         Concept causeOfDeath = new Concept();
         Concept patientDied = new Concept();
@@ -251,7 +252,7 @@ public class ExitFromCareServiceTest {
 
         when(mockEmrApiProperties.getPatientDiedConcept()).thenReturn(patientDied);
 
-        exitFromCareService.markPatientDied(patient, causeOfDeath, null);
+        exitFromCareService.markPatientDead(patient, causeOfDeath, null);
 
         assertTrue(patient.isDead());
         assertThat(patient.getCauseOfDeath(), is(causeOfDeath));
@@ -264,20 +265,135 @@ public class ExitFromCareServiceTest {
         Patient patient = new Patient();
         Date futureDate = new DateTime().plusDays(1).toDate();
 
-        exitFromCareService.markPatientDied(patient, null, futureDate);
+        exitFromCareService.markPatientDead(patient, null, futureDate);
 
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void markPatientDied_shouldFailIfDeathDateBeforeBirthDate() {
+    public void markPatientDead_shouldFailIfDeathDateBeforeBirthDate() {
         Patient patient = new Patient();
         Date birthDate = new DateTime().minusDays(20).toDate();
         patient.setBirthdate(birthDate);
         Date deathDate = new DateTime().minusDays(30).toDate();
 
-        exitFromCareService.markPatientDied(patient, null, deathDate);
+        exitFromCareService.markPatientDead(patient, null, deathDate);
     }
 
 
+    @Test
+    public void reopenPatientPrograms_shouldReopenClosedProgramWithMatchingOutcomeAndDate() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(2);
+
+        Date enrollmentDate = new DateTime(2018, 11, 11, 10, 10).toDate();
+        Date completionDate = new DateTime(2019, 10, 10,5, 5).toDate();
+
+        Program program = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(program);
+        pp1.setDateEnrolled(enrollmentDate);
+        pp1.setDateCompleted(completionDate);
+        pp1.setOutcome(outcome);
+
+        pp1.setPatient(patient);
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        exitFromCareService.reopenPatientPrograms(patient, outcome, new DateTime(2019, 10, 10, 10, 10).toDate()); // same date as completion date, but different time component
+
+        assertNull(pp1.getDateCompleted());
+        assertNull(pp1.getOutcome());
+
+        verify(mockProgramWorkflowService,times(1)).savePatientProgram(pp1);
+    }
+
+    @Test
+    public void reopenPatientPrograms_shouldNotReopenClosedProgramIfCompletionDateDoesNotMatch() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(2);
+
+        Date enrollmentDate = new DateTime(2018, 11, 11, 10, 10).toDate();
+        Date completionDate = new DateTime(2019, 10, 10,5, 5).toDate();
+
+        Program program = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(program);
+        pp1.setDateEnrolled(enrollmentDate);
+        pp1.setDateCompleted(completionDate);
+        pp1.setOutcome(outcome);
+
+        pp1.setPatient(patient);
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        exitFromCareService.reopenPatientPrograms(patient, outcome, new DateTime(2019, 11, 10, 10, 10).toDate()); // different date from completion date
+
+        assertThat(pp1.getDateCompleted(), is(completionDate));
+        assertThat(pp1.getOutcome(), is(outcome));
+
+        verify(mockProgramWorkflowService,times(0)).savePatientProgram(pp1);
+    }
+
+    @Test
+    public void reopenPatientPrograms_shouldNotReopenClosedProgramIfOutcomeDoesNotMatch() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(2);
+        Concept differentOutcome = new Concept(3);
+
+        Date enrollmentDate = new DateTime(2018, 11, 11, 10, 10).toDate();
+        Date completionDate = new DateTime(2019, 10, 10,5, 5).toDate();
+
+        Program program = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(program);
+        pp1.setDateEnrolled(enrollmentDate);
+        pp1.setDateCompleted(completionDate);
+        pp1.setOutcome(outcome);
+
+        pp1.setPatient(patient);
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        exitFromCareService.reopenPatientPrograms(patient, differentOutcome, completionDate); // different date from completion date
+
+        assertThat(pp1.getDateCompleted(), is(completionDate));
+        assertThat(pp1.getOutcome(), is(outcome));
+
+        verify(mockProgramWorkflowService,times(0)).savePatientProgram(pp1);
+    }
+
+    @Test
+    public void markPatientNotDead_shouldUnmarkPatientDead() {
+        Patient patient = new Patient();
+        Concept unknown = new Concept();
+        Concept patientDied = new Concept();
+        Date now = new Date();
+        patient.setCauseOfDeath(unknown);
+        patient.setDeathDate(now);
+        patient.setDead(true);
+
+        when(mockEmrApiProperties.getPatientDiedConcept()).thenReturn(patientDied);
+
+        exitFromCareService.markPatientNotDead(patient);
+
+        assertFalse(patient.isDead());
+        assertNull(patient.getCauseOfDeath());
+        assertNull(patient.getDeathDate());
+
+        verify(mockPatientService, times(1)).savePatient(patient);
+        verify(exitFromCareService, times(1)).reopenPatientPrograms(patient, patientDied, now);
+    }
 
 }

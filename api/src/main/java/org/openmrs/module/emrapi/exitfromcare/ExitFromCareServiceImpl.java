@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.exitfromcare;
 
+import org.joda.time.DateTime;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.PatientProgram;
@@ -56,6 +57,20 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
     }
 
     @Override
+    public void reopenPatientPrograms(Patient patient, Concept outcome, Date completionDate) {
+        // iterate through all programs and close those with outcome that matches outcome and completion date that matches completion date
+        for (PatientProgram patientProgram : programWorkflowService.getPatientPrograms(patient, null, null, null, null, null, false)) {
+            if (patientProgram.getDateCompleted() != null && completionDate != null
+                    && new DateTime(patientProgram.getDateCompleted()).withTimeAtStartOfDay().equals(new DateTime(completionDate).withTimeAtStartOfDay())    // just match date, not datetime
+                    && outcome.equals(patientProgram.getOutcome())) {
+                patientProgram.setOutcome(null);
+                patientProgram.setDateCompleted(null);
+                programWorkflowService.savePatientProgram(patientProgram);
+            }
+        }
+    }
+
+    @Override
     @Transactional
     public void closeActiveVisits(Patient patient) {
         List<Visit> visitList = visitService.getActiveVisitsByPatient(patient);
@@ -68,7 +83,7 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
 
     @Override
     @Transactional
-    public void markPatientDied(Patient patient, Concept causeOfDeath, Date deathDate) {
+    public void markPatientDead(Patient patient, Concept causeOfDeath, Date deathDate) {
 
         if (deathDate == null) {
             deathDate = new Date();
@@ -93,6 +108,22 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
         Concept patientDied = emrApiProperties.getPatientDiedConcept();
         if (patientDied != null) {
             closePatientPrograms(patient, patientDied, deathDate);
+        }
+    }
+
+    @Override
+    public void markPatientNotDead(Patient patient) {
+
+        Date deathDate = patient.getDeathDate();
+
+        patient.setDead(false);
+        patient.setCauseOfDeath(null);
+        patient.setDeathDate(null);
+        patientService.savePatient(patient);
+
+        Concept patientDied = emrApiProperties.getPatientDiedConcept();
+        if (patientDied != null && deathDate != null) {
+            reopenPatientPrograms(patient, patientDied, deathDate);
         }
     }
 

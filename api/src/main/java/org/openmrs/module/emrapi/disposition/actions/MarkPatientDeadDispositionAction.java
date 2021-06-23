@@ -39,7 +39,7 @@ public class MarkPatientDeadDispositionAction implements DispositionAction {
         Concept causeOfDeath = emrApiProperties.getUnknownCauseOfDeathConcept();
 
         Patient patient = encounterDomainWrapper.getEncounter().getPatient();
-        exitFromCareService.markPatientDied(patient, causeOfDeath, deathDate);
+        exitFromCareService.markPatientDead(patient, causeOfDeath, deathDate);
     }
 
     public void setExitFromCareService(ExitFromCareService exitFromCareService) {
