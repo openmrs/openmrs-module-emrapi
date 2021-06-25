@@ -22,7 +22,7 @@ public interface ExitFromCareService extends OpenmrsService {
 
     /**
      * Reopens (ie, sets outcome and completion date to null) any programs that have an outcome equal to
-     * the outcome parameter, and a completion date equal to the completio date parameter
+     * the outcome parameter, and a completion date equal to the completion date parameter
      * @param patient
      * @param outcome
      * @param completionDate
