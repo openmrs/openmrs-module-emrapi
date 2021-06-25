@@ -198,6 +198,36 @@ public class ExitFromCareServiceTest {
     }
 
     @Test
+    public void closePatientPrograms_shouldCloseActivePatientProgramIfCloseDateEqualsStartDate() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(1);
+
+        Date dateEnrolled = new DateTime(2021, 1,1,1,1,0).toDate();
+        Date dateCompleted = new DateTime(2021, 1,1,1,1,0).toDate();
+
+        Program p1 = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(p1);
+        pp1.setDateEnrolled(dateEnrolled);
+
+        pp1.setPatient(patient);
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        when(mockProgramWorkflowService.getPossibleOutcomes(pp1.getPatientProgramId())).thenReturn(Arrays.asList(outcome));
+
+        exitFromCareService.closePatientPrograms(patient, outcome, dateCompleted);
+
+        assertThat(pp1.getDateCompleted(), is(dateCompleted));
+        assertThat(pp1.getOutcome(), is(outcome));
+    }
+
+
+    @Test
     public void closeActiveVisits_shouldEndActiveVisitsForPatient() {
         Patient patient = new Patient();
 
