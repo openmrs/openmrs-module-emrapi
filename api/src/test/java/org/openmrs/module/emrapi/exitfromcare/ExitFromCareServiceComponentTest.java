@@ -44,19 +44,15 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
     @Autowired
     private ConceptService conceptService;
 
+    private Concept died;
+
     @Before
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
-    }
 
-    @Test
-    public void shouldMarkPatientDiedAndCloseActiveProgramsAndVisits() {
-
+        // hack in adding a outcome concept to the MDR-TB programs, as none of the test programs have outcomes
         Program mdrTBProgram = programWorkflowService.getProgram(2);
-        Program hivProgram = programWorkflowService.getProgram(1);
-
-        // hack in adding a outcome concept to one of the programs, as none of the test programs have outcomes
-        Concept died = conceptService.getConcept(16);  // DIED concept in the standard test dataset
+        died = conceptService.getConcept(16);  // DIED concept in the standard test dataset
         Concept outcomeSet = new Concept();
         outcomeSet.addSetMember(died);
         outcomeSet.setSet(true);
@@ -67,6 +63,14 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
         conceptService.saveConcept(outcomeSet);
         mdrTBProgram.setOutcomesConcept(outcomeSet);
         programWorkflowService.saveProgram(mdrTBProgram);
+
+    }
+
+    @Test
+    public void shouldMarkPatientDiedAndCloseActiveProgramsAndVisits() {
+
+        Program mdrTBProgram = programWorkflowService.getProgram(2);
+        Program hivProgram = programWorkflowService.getProgram(1);
 
         Patient patient = patientService.getPatient(2);
         Date now = new Date();
@@ -83,7 +87,7 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
             assertNull(pp.getOutcome());
         }
 
-        exitFromCareService.markPatientDied(patient, unknown, now);
+        exitFromCareService.markPatientDead(patient, unknown, now);
 
         assertTrue(patient.isDead());
         assertThat(patient.getCauseOfDeath(), is(unknown));
@@ -102,6 +106,41 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
 
         // assert that Malaria program has not been closed
         patientPrograms = programWorkflowService.getPatientPrograms(patient, hivProgram, null, null, null, null, false);
+        assertThat(patientPrograms.size(), is(1));
+        assertNull(patientPrograms.get(0).getDateCompleted());
+        assertNull(patientPrograms.get(0).getOutcome());
+
+    }
+
+    @Test
+    public void shouldMarkPatientAsNotDiedAndReopenActiveProgramClosedByDeath() {
+
+        Program mdrTBProgram = programWorkflowService.getProgram(2);
+
+        Patient patient = patientService.getPatient(2);
+        Date now = new Date();
+        Concept unknown = conceptService.getConcept(22);
+
+        // there are no patients in test data set that are dead, so mark this patient as dead
+        exitFromCareService.markPatientDead(patient, unknown, now);
+
+        // sanity checks
+        assertTrue(patient.isDead());
+        List<PatientProgram> patientPrograms = programWorkflowService.getPatientPrograms(patient, mdrTBProgram, null, null, null, null, false);
+        assertThat(patientPrograms.size(), is(1));
+        assertThat(patientPrograms.get(0).getDateCompleted(), is(now));
+        assertThat(patientPrograms.get(0).getOutcome(), is(died));
+
+        // now let's mark the patient as "not dead" and test the functionality this test is meant to handle
+        exitFromCareService.markPatientNotDead(patient);
+
+        // patient should no longer be marked as dead
+        assertFalse(patient.isDead());
+        assertNull(patient.getCauseOfDeath());
+        assertNull(patient.getDeathDate());
+
+        // program should be reopened
+        patientPrograms = programWorkflowService.getPatientPrograms(patient, mdrTBProgram, null, null, null, null, false);
         assertThat(patientPrograms.size(), is(1));
         assertNull(patientPrograms.get(0).getDateCompleted());
         assertNull(patientPrograms.get(0).getOutcome());
