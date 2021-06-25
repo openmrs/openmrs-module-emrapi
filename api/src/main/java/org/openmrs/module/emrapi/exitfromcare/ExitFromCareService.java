@@ -22,7 +22,8 @@ public interface ExitFromCareService extends OpenmrsService {
 
     /**
      * Reopens (ie, sets outcome and completion date to null) any programs that have an outcome equal to
-     * the outcome parameter, and a completion date equal to the completio date parameter
+     * the "outcome", and a completion date equal to the "completionDate"
+     *
      * @param patient
      * @param outcome
      * @param completionDate
@@ -41,7 +42,14 @@ public interface ExitFromCareService extends OpenmrsService {
     /**
      * Marks the patient dead with the specified cause of dead and death date
      * Closes any active programs or visits for that patient
-     * TODO: better documentation here
+     *
+     * Specifically, this method will:
+     * * Set the patient "dead" property to "true"
+     * * Set the patient "causeOfDeath" property to "causeOfDeath"
+     * * Set the patient "deathDate" property to "deathDate", or to the current Date Time if "deathDate" is null
+     * * Call ExitFromCare.closeActiveVisits method for the patient
+     * * If a concept exists with the mapping "org.openmrs.module.emrapi:Patient Died", call ExitFromCare.closePatientPrograms
+     *      with date equal deathDate and outcome equal to the concept mapped by "org.openmrs.module.emrapi:Patient Died"
      *
      * @param patient
      * @param causeOfDeath
@@ -53,7 +61,13 @@ public interface ExitFromCareService extends OpenmrsService {
     /**
      * Removes the flag that set the patient as dead, and removes any cause of death
      * Reopens any patient programs that have been closed with an outcome of "death" on the date of death
-     * TODO: better documentation here
+     *
+     * Specifically, this method will:
+     * * Set the patient "dead" property to "false"
+     * * Set the patient "causeOfDeath" property to "null"
+     * * Set the patient "deathDate" property to "null"
+     * * If a concept exists with the mapping "org.openmrs.module.emrapi:Patient Died", call ExitFromCare.reopenPatientPrograms
+     *      with date equal to patient.deathDate (before it was set to null)
      *
      * @param patient
      */
