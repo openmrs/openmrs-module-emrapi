@@ -169,7 +169,7 @@ public class ExitFromCareServiceTest {
     }
 
     @Test
-    public void closePatientPrograms_shouldCloseActivePatientProgramIfOnStartDateIfCloseDateBeforeStartDate() {
+    public void closePatientPrograms_shouldCloseActivePatientProgramOnStartDateIfCloseDateBeforeStartDate() {
 
         Patient patient = new Patient();
 
@@ -460,7 +460,7 @@ public class ExitFromCareServiceTest {
     }
 
     @Test
-    public void reopenPatientPrograms_shouldNotReopenClosedProgramIfCompletionDateDoesNotMatch() {
+    public void reopenPatientPrograms_shouldReopenClosedProgramEvenIfCompletionDateDoesNotMatch() {
 
         Patient patient = new Patient();
 
@@ -484,10 +484,9 @@ public class ExitFromCareServiceTest {
 
         exitFromCareService.reopenPatientPrograms(patient, outcome, new DateTime(2019, 11, 10, 10, 10).toDate()); // different date from completion date
 
-        assertThat(pp1.getDateCompleted(), is(completionDate));
-        assertThat(pp1.getOutcome(), is(outcome));
-
-        verify(mockProgramWorkflowService,times(0)).savePatientProgram(pp1);
+        assertNull(pp1.getDateCompleted());
+        assertNull(pp1.getOutcome());
+        verify(mockProgramWorkflowService,times(1)).savePatientProgram(pp1);
     }
 
     @Test
