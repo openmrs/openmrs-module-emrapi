@@ -51,7 +51,7 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
     }
 
     @Override
-    public void reopenPatientPrograms(Patient patient, Concept outcome, Date completionDate) {
+    public void reopenPatientPrograms(Patient patient, Concept outcome) {
         // iterate through all programs and reopen those with outcome that matches outcome
         for (PatientProgram patientProgram : programWorkflowService.getPatientPrograms(patient, null, null, null, null, null, false)) {
             if (outcome.equals(patientProgram.getOutcome())) {
@@ -127,7 +127,7 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
 
         Concept patientDied = emrApiProperties.getPatientDiedConcept();
         if (patientDied != null && deathDate != null) {
-            reopenPatientPrograms(patient, patientDied, deathDate);
+            reopenPatientPrograms(patient, patientDied);
         }
     }
 
