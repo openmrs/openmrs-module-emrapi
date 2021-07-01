@@ -169,7 +169,7 @@ public class ExitFromCareServiceTest {
     }
 
     @Test
-    public void closePatientPrograms_shouldNotCloseActivePatientProgramIfCloseDateBeforeStartDate() {
+    public void closePatientPrograms_shouldCloseActivePatientProgramIfOnStartDateIfCloseDateBeforeStartDate() {
 
         Patient patient = new Patient();
 
@@ -193,8 +193,8 @@ public class ExitFromCareServiceTest {
 
         exitFromCareService.closePatientPrograms(patient, outcome, dateCompleted);
 
-        assertNull(pp1.getDateCompleted());
-        assertNull(pp1.getOutcome());
+        assertThat(pp1.getDateCompleted(), is(dateEnrolled));
+        assertThat(pp1.getOutcome(), is(outcome));
     }
 
     @Test
