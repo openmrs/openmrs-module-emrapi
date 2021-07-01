@@ -228,6 +228,124 @@ public class ExitFromCareServiceTest {
 
 
     @Test
+    public void updatePatientProgramCompletionDate_ShouldUpdateCompletionDateForProgramWithMatchingOutcome() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(1);
+
+        Date dateEnrolled = new DateTime(2021, 1,1,1,1,0).toDate();
+        Date dateCompleted = new DateTime(2021, 2,1,1,1,0).toDate();
+
+        Program p1 = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(p1);
+        pp1.setOutcome(outcome);
+        pp1.setDateEnrolled(dateEnrolled);
+        pp1.setDateCompleted(dateCompleted);
+        pp1.setPatient(patient);
+
+        Date newDateCompleted = new DateTime(2021, 3, 1, 1, 0).toDate();
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        exitFromCareService.updatePatientProgramCompletionDate(patient, outcome, newDateCompleted);
+
+        assertThat(pp1.getDateCompleted(), is(newDateCompleted));
+    }
+
+    @Test
+    public void updatePatientProgramCompletionDate_ShouldNotUpdateCompletionDatesForProgramsWithDifferentOutcomes() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(1);
+
+        Date dateEnrolled = new DateTime(2021, 1,1,1,1,0).toDate();
+        Date dateCompleted = new DateTime(2021, 2,1,1,1,0).toDate();
+
+        Program p1 = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(p1);
+        pp1.setOutcome(outcome);
+        pp1.setDateEnrolled(dateEnrolled);
+        pp1.setDateCompleted(dateCompleted);
+        pp1.setPatient(patient);
+
+        Concept anotherOutcome = new Concept(2);
+        Date newDateCompleted = new DateTime(2021, 3, 1, 1, 0).toDate();
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        exitFromCareService.updatePatientProgramCompletionDate(patient, anotherOutcome, newDateCompleted);
+
+        assertThat(pp1.getDateCompleted(), is(dateCompleted));
+    }
+
+    @Test
+    public void updatePatientProgramCompletionDate_ShouldNotUpdateCompletionDatesForProgramsWithNoOutcome() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(1);
+
+        Date dateEnrolled = new DateTime(2021, 1,1,1,1,0).toDate();
+        Date dateCompleted = new DateTime(2021, 2,1,1,1,0).toDate();
+
+        Program p1 = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(p1);
+        // no outcome or date completed set
+        pp1.setDateEnrolled(dateEnrolled);
+        pp1.setPatient(patient);
+
+        Concept anotherOutcome = new Concept(2);
+        Date newDateCompleted = new DateTime(2021, 3, 1, 1, 0).toDate();
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        exitFromCareService.updatePatientProgramCompletionDate(patient, anotherOutcome, newDateCompleted);
+
+        assertNull(pp1.getDateCompleted());
+    }
+
+    @Test
+    public void updatePatientProgramCompletionDate_ShouldSetCompletionDatesToEnrollmentDateIfSpecifiedDateBeforeEnrollmentDate() {
+
+        Patient patient = new Patient();
+
+        Concept outcome = new Concept(1);
+
+        Date dateEnrolled = new DateTime(2021, 1,1,1,1,0).toDate();
+        Date dateCompleted = new DateTime(2021, 2,1,1,1,0).toDate();
+
+        Program p1 = new Program();
+
+        PatientProgram pp1 = new PatientProgram();
+        pp1.setProgram(p1);
+        pp1.setOutcome(outcome);
+        pp1.setDateEnrolled(dateEnrolled);
+        pp1.setDateCompleted(dateCompleted);
+        pp1.setPatient(patient);
+
+        Date newDateCompleted = new DateTime(2020, 3, 1, 1, 0).toDate();
+
+        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
+                .thenReturn(Arrays.asList(pp1));
+
+        exitFromCareService.updatePatientProgramCompletionDate(patient, outcome, newDateCompleted);
+
+        assertThat(pp1.getDateCompleted(), is(dateEnrolled));
+    }
+
+
+    @Test
     public void closeActiveVisits_shouldEndActiveVisitsForPatient() {
         Patient patient = new Patient();
 

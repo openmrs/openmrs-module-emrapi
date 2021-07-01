@@ -32,6 +32,16 @@ public interface ExitFromCareService extends OpenmrsService {
 
 
     /**
+     * Updates the completion date of all completed programs with the specified outcome to the specified date
+     *
+     * @param patient
+     * @param outcome
+     * @param completionDate
+     */
+    void updatePatientProgramCompletionDate(Patient patient, Concept outcome, Date completionDate);
+
+
+    /**
      * Close any active visits for the specified patient
      * (Finds all active visits and defers to ADTService.closeAndSaveVisit(visit) method to close
      *
