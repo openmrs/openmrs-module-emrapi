@@ -1,6 +1,5 @@
 package org.openmrs.module.emrapi.exitfromcare;
 
-import org.joda.time.DateTime;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.PatientProgram;
@@ -52,12 +51,10 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
     }
 
     @Override
-    public void reopenPatientPrograms(Patient patient, Concept outcome, Date completionDate) {
-        // iterate through all programs and close those with outcome that matches outcome and completion date that matches completion date
+    public void reopenPatientPrograms(Patient patient, Concept outcome) {
+        // iterate through all programs and reopen those with outcome that matches outcome
         for (PatientProgram patientProgram : programWorkflowService.getPatientPrograms(patient, null, null, null, null, null, false)) {
-            if (patientProgram.getDateCompleted() != null && completionDate != null
-                    && new DateTime(patientProgram.getDateCompleted()).withTimeAtStartOfDay().equals(new DateTime(completionDate).withTimeAtStartOfDay())    // just match date, not datetime
-                    && outcome.equals(patientProgram.getOutcome())) {
+            if (outcome.equals(patientProgram.getOutcome())) {
                 patientProgram.setOutcome(null);
                 patientProgram.setDateCompleted(null);
                 programWorkflowService.savePatientProgram(patientProgram);
@@ -130,7 +127,7 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
 
         Concept patientDied = emrApiProperties.getPatientDiedConcept();
         if (patientDied != null && deathDate != null) {
-            reopenPatientPrograms(patient, patientDied, deathDate);
+            reopenPatientPrograms(patient, patientDied);
         }
     }
 

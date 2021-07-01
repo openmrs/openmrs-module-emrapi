@@ -169,7 +169,7 @@ public class ExitFromCareServiceTest {
     }
 
     @Test
-    public void closePatientPrograms_shouldCloseActivePatientProgramIfOnStartDateIfCloseDateBeforeStartDate() {
+    public void closePatientPrograms_shouldCloseActivePatientProgramOnStartDateIfCloseDateBeforeStartDate() {
 
         Patient patient = new Patient();
 
@@ -429,7 +429,7 @@ public class ExitFromCareServiceTest {
 
 
     @Test
-    public void reopenPatientPrograms_shouldReopenClosedProgramWithMatchingOutcomeAndDate() {
+    public void reopenPatientPrograms_shouldReopenClosedProgramWithMatchingOutcome() {
 
         Patient patient = new Patient();
 
@@ -451,43 +451,11 @@ public class ExitFromCareServiceTest {
         when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
                 .thenReturn(Arrays.asList(pp1));
 
-        exitFromCareService.reopenPatientPrograms(patient, outcome, new DateTime(2019, 10, 10, 10, 10).toDate()); // same date as completion date, but different time component
-
+        exitFromCareService.reopenPatientPrograms(patient, outcome);
         assertNull(pp1.getDateCompleted());
         assertNull(pp1.getOutcome());
 
         verify(mockProgramWorkflowService,times(1)).savePatientProgram(pp1);
-    }
-
-    @Test
-    public void reopenPatientPrograms_shouldNotReopenClosedProgramIfCompletionDateDoesNotMatch() {
-
-        Patient patient = new Patient();
-
-        Concept outcome = new Concept(2);
-
-        Date enrollmentDate = new DateTime(2018, 11, 11, 10, 10).toDate();
-        Date completionDate = new DateTime(2019, 10, 10,5, 5).toDate();
-
-        Program program = new Program();
-
-        PatientProgram pp1 = new PatientProgram();
-        pp1.setProgram(program);
-        pp1.setDateEnrolled(enrollmentDate);
-        pp1.setDateCompleted(completionDate);
-        pp1.setOutcome(outcome);
-
-        pp1.setPatient(patient);
-
-        when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
-                .thenReturn(Arrays.asList(pp1));
-
-        exitFromCareService.reopenPatientPrograms(patient, outcome, new DateTime(2019, 11, 10, 10, 10).toDate()); // different date from completion date
-
-        assertThat(pp1.getDateCompleted(), is(completionDate));
-        assertThat(pp1.getOutcome(), is(outcome));
-
-        verify(mockProgramWorkflowService,times(0)).savePatientProgram(pp1);
     }
 
     @Test
@@ -514,7 +482,7 @@ public class ExitFromCareServiceTest {
         when(mockProgramWorkflowService.getPatientPrograms(patient, null, null, null, null, null,false))
                 .thenReturn(Arrays.asList(pp1));
 
-        exitFromCareService.reopenPatientPrograms(patient, differentOutcome, completionDate); // different date from completion date
+        exitFromCareService.reopenPatientPrograms(patient, differentOutcome);
 
         assertThat(pp1.getDateCompleted(), is(completionDate));
         assertThat(pp1.getOutcome(), is(outcome));
@@ -541,7 +509,7 @@ public class ExitFromCareServiceTest {
         assertNull(patient.getDeathDate());
 
         verify(mockPatientService, times(1)).savePatient(patient);
-        verify(exitFromCareService, times(1)).reopenPatientPrograms(patient, patientDied, now);
+        verify(exitFromCareService, times(1)).reopenPatientPrograms(patient, patientDied);
     }
 
 }
