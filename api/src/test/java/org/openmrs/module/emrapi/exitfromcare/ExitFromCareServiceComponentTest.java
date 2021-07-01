@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.exitfromcare;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Concept;
@@ -144,6 +145,36 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
         assertThat(patientPrograms.size(), is(1));
         assertNull(patientPrograms.get(0).getDateCompleted());
         assertNull(patientPrograms.get(0).getOutcome());
+
+    }
+
+    @Test
+    public void shoulUpdateProgramCompletionDatesClosedByDeath() {
+
+        Program mdrTBProgram = programWorkflowService.getProgram(2);
+
+        Patient patient = patientService.getPatient(2);
+        Date now = new Date();
+        Concept unknown = conceptService.getConcept(22);
+
+        // there are no patients in test data set that are dead, so mark this patient as dead
+        exitFromCareService.markPatientDead(patient, unknown, now);
+
+        // sanity checks
+        assertTrue(patient.isDead());
+        List<PatientProgram> patientPrograms = programWorkflowService.getPatientPrograms(patient, mdrTBProgram, null, null, null, null, false);
+        assertThat(patientPrograms.size(), is(1));
+        assertThat(patientPrograms.get(0).getDateCompleted(), is(now));
+        assertThat(patientPrograms.get(0).getOutcome(), is(died));
+
+        // now let's mark the patient as dead again but use a different date
+        Date newDeathDate = new DateTime(2021, 6, 6, 0, 0, 0, 0).toDate();
+        exitFromCareService.markPatientDead(patient, unknown, newDeathDate);
+
+        // program completion date should be updated
+        patientPrograms = programWorkflowService.getPatientPrograms(patient, mdrTBProgram, null, null, null, null, false);
+        assertThat(patientPrograms.size(), is(1));
+        assertThat(patientPrograms.get(0).getDateCompleted(), is(newDeathDate));
 
     }
 }

@@ -66,6 +66,15 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
     }
 
     @Override
+    public void updatePatientProgramCompletionDate(Patient patient, Concept outcome, Date completionDate) {
+        for (PatientProgram patientProgram : programWorkflowService.getPatientPrograms(patient, null, null, null, null, null, false)) {
+            if (patientProgram.getOutcome() != null && patientProgram.getOutcome().equals(outcome)) {
+                patientProgram.setDateCompleted(completionDate.after(patientProgram.getDateEnrolled()) ? completionDate : patientProgram.getDateEnrolled()); // if completion date is before date enrolled, just use completion date
+            }
+        }
+    }
+
+    @Override
     @Transactional
     public void closeActiveVisits(Patient patient) {
         List<Visit> visitList = visitService.getActiveVisitsByPatient(patient);
@@ -102,6 +111,9 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
 
         Concept patientDied = emrApiProperties.getPatientDiedConcept();
         if (patientDied != null) {
+            // update any programs that had previously been closed with outcome=patient died with matching death date
+            updatePatientProgramCompletionDate(patient, patientDied, deathDate);
+            // close any open programs as patient died with completion date=death date
             closePatientPrograms(patient, patientDied, deathDate);
         }
     }
