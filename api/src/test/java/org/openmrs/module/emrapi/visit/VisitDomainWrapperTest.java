@@ -215,6 +215,63 @@ public class VisitDomainWrapperTest {
         assertFalse(visitDomainWrapper.isAdmitted());
     }
 
+    @Test
+    public void shouldBeDischargedWhenAdmittedAndDischarged() throws Exception {
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType dischargeEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+
+        Encounter discharge = new Encounter();
+        discharge.setEncounterType(dischargeEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(discharge);
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertTrue(visitDomainWrapper.hasBeenDischarged());
+    }
+
+    @Test
+    public void shouldNotBeDischargedWhenAdmittedAfterDischarge() throws Exception {
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType dischargeEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(dischargeEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+
+        Encounter discharge = new Encounter();
+        discharge.setEncounterType(dischargeEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+
+        Encounter anotherAdmit = new Encounter();
+        anotherAdmit.setEncounterType(admitEncounterType);
+        anotherAdmit.setEncounterDatetime(DateUtils.addHours(new Date(), -1));
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(discharge);
+        encounters.add(admit);
+        encounters.add(anotherAdmit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertFalse(visitDomainWrapper.hasBeenDischarged());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void shouldFailIfDateOutsideOfVisit() {
         Date now = new Date();
