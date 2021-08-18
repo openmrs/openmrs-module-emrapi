@@ -14,21 +14,6 @@
 package org.openmrs.module.emrapi.visit;
 
 
-import static java.util.Collections.EMPTY_LIST;
-import static java.util.Collections.reverseOrder;
-import static java.util.Collections.sort;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.collections.CollectionUtils.select;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,6 +46,21 @@ import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.reverseOrder;
+import static java.util.Collections.sort;
+import static org.apache.commons.collections.CollectionUtils.find;
+import static org.apache.commons.collections.CollectionUtils.select;
+
 
 /**
  * Wrapper around a Visit, that provides convenience methods to find particular encounters of interest.
@@ -83,10 +83,10 @@ public class VisitDomainWrapper implements DomainWrapper {
 
     @Autowired
     protected VisitQueryService visitQueryService;
-    
+
     @Qualifier("emrVisitService")
     @Autowired
-    protected EmrVisitService emrVisitService; 
+    protected EmrVisitService emrVisitService;
 
     private Visit visit;
 
@@ -334,7 +334,7 @@ public class VisitDomainWrapper implements DomainWrapper {
         }
         return diagnoses;
     }
-    
+
     /**
      * @return the unique list of diagnoses recorded in this visit, where uniqueness is based only on
      * whether the CodedOrNonCoded diagnosis is the same, not on whether the order or certainty are the same
@@ -343,7 +343,7 @@ public class VisitDomainWrapper implements DomainWrapper {
       * will return null if diagnosis support not currently configured
      */
     public List<Diagnosis> getUniqueDiagnoses(Boolean primaryOnly, Boolean confirmedOnly) {
-       
+
        DiagnosisMetadata diagnosisMetadata;
        try {
            diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
@@ -353,9 +353,9 @@ public class VisitDomainWrapper implements DomainWrapper {
            log.warn("Diagnosis metadata not configured", ex);
            return Collections.emptyList();
        }
-       
+
        List<Obs> obsList = emrVisitService.getDiagnoses(getVisit(), diagnosisMetadata, primaryOnly, confirmedOnly);
-       
+
        Map<CodedOrFreeTextAnswer, Diagnosis> diagnoses = new LinkedHashMap<CodedOrFreeTextAnswer, Diagnosis>();
        for (Obs obs : obsList) {
           if (diagnosisMetadata.isDiagnosis(obs)) {
@@ -409,7 +409,7 @@ public class VisitDomainWrapper implements DomainWrapper {
     private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter) {
         return getDiagnosesFromEncounter(encounter, null);
     }
-    
+
     private List<Diagnosis> getDiagnosesFromEncounter(Encounter encounter, List<Diagnosis.Order> diagnosisOrders) {
 
         DiagnosisMetadata diagnosisMetadata;
@@ -482,6 +482,15 @@ public class VisitDomainWrapper implements DomainWrapper {
             return false;
         }
         return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType);
+    }
+
+    public boolean hasBeenDischarged() {
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        EncounterType dischargeEncounterType = emrApiProperties.getExitFromInpatientEncounterType();
+        if (dischargeEncounterType == null) {
+            return false;
+        }
+        return hasEncounterWithoutSubsequentEncounter(dischargeEncounterType, admissionEncounterType);
     }
 
     public boolean isAdmitted(Date onDate) {
