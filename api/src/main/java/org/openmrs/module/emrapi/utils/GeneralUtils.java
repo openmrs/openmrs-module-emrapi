@@ -29,6 +29,8 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.util.LocaleUtility;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -41,6 +43,8 @@ import java.util.Date;
  *
  */
 public class GeneralUtils {
+
+    private static Log log = LogFactory.getLog(GeneralUtils.class);
 
     /**
      * Given a user, returns the default locale (if any) for that user
@@ -259,14 +263,29 @@ public class GeneralUtils {
                 PatientService ps = Context.getPatientService();
                 lastViewedPatientIdsString = lastViewedPatientIdsString.replaceAll("\\s", "");
                 String[] patientIds = lastViewedPatientIdsString.split(",");
+
+                Integer limit = patientIds.length;
+                try{
+                    limit = Integer.valueOf(Context.getAdministrationService().getGlobalProperty(EmrApiConstants.GP_LAST_VIEWED_PATIENT_SIZE_LIMIT));
+                }
+                catch (Exception e) {
+                    limit = EmrApiConstants.DEFAULT_LAST_VIEWED_PATIENT_SIZE_LIMIT;
+                    log.warn("Global property " + EmrApiConstants.GP_LAST_VIEWED_PATIENT_SIZE_LIMIT + " is not a valid number");
+                }
+
                 for (String pId : patientIds) {
-                    try {
-                        Patient p = ps.getPatient(Integer.valueOf(pId));
-                        if (p != null && !p.isVoided() && !p.isPersonVoided()) {
-                            lastViewed.add(p);
+                    if (limit > 0) {
+                        try {
+                            Patient p = ps.getPatient(Integer.valueOf(pId));
+                            if (p != null && !p.isVoided() && !p.isPersonVoided()) {
+                                lastViewed.add(p);
+                            }
+                            if (lastViewed.size() == limit){
+                                break;
+                            }
+                        } catch (NumberFormatException e) {
                         }
                     }
-                    catch (NumberFormatException e) {}
                 }
             }
         }

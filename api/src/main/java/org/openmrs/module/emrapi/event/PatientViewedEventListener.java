@@ -90,22 +90,17 @@ public class PatientViewedEventListener implements EventListener {
 		User user = userService.getUserByUuid(userUuid);
 		if (user != null && patientToAdd != null) {
 			EmrApiProperties emrProperties = Context.getRegisteredComponents(EmrApiProperties.class).iterator().next();
-			Integer limit = emrProperties.getLastViewedPatientSizeLimit();
-			List<Integer> patientIds = new ArrayList<Integer>(limit);
-			if (limit > 0) {
-				List<Patient> lastViewedPatients = GeneralUtils.getLastViewedPatients(user);
-				patientIds.add(patientToAdd.getId());
-				for (Patient p : lastViewedPatients) {
-					if (patientIds.size() == limit)
-						break;
-					if (patientIds.contains(p.getId()))
-						continue;
-					
-					patientIds.add(p.getId());
-				}
-				
-				Collections.reverse(patientIds);
+			List<Integer> patientIds = new ArrayList<Integer>();
+			List<Patient> lastViewedPatients = GeneralUtils.getLastViewedPatients(user);
+			patientIds.add(patientToAdd.getId());
+			for (Patient p : lastViewedPatients) {
+				if (patientIds.contains(p.getId()))
+					continue;
+
+				patientIds.add(p.getId());
 			}
+
+			Collections.reverse(patientIds);
 			
 			String property = StringUtils.join(patientIds, ",");
 			if (StringUtils.isNotBlank(property) && property.length() > 255) {
