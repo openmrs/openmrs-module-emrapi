@@ -27,15 +27,14 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 import org.springframework.stereotype.Component;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
 @Component
 public class LastViewedPatientsSearchHandler implements SearchHandler {
 
-    private final SearchConfig searchConfig = new SearchConfig("default", RestConstants.VERSION_1 + "/patient", Arrays.asList(
-            "1.8.*", "1.9.*", "1.10.*", "1.11.*"), new SearchQuery.Builder("Allows you to find last viewed patients").withRequiredParameters("lastviewed")
+    private final SearchConfig searchConfig = new SearchConfig("lastViewedPatients", RestConstants.VERSION_1 + "/patient", 	Collections.singletonList("1.8.* - 9.*"), new SearchQuery.Builder("Allows you to find last viewed patients").withRequiredParameters("lastviewed")
             .build());
 
     /**
