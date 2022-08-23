@@ -29,8 +29,8 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.util.LocaleUtility;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ import java.util.Date;
  */
 public class GeneralUtils {
 
-    private static Log log = LogFactory.getLog(GeneralUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(GeneralUtils.class);
 
     /**
      * Given a user, returns the default locale (if any) for that user
