@@ -194,7 +194,8 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
 
     private boolean isApplicationPrivilege(Privilege privilege) {
         return privilege.getPrivilege().startsWith(EmrApiConstants.PRIVILEGE_PREFIX_APP)
-                || privilege.getPrivilege().startsWith(EmrApiConstants.PRIVILEGE_PREFIX_TASK);
+                || privilege.getPrivilege().startsWith(EmrApiConstants.PRIVILEGE_PREFIX_TASK)
+                || privilege.getPrivilege().startsWith(EmrApiConstants.PRIVILEGE_PREFIX_O3);
     }
 
 

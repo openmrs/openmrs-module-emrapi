@@ -86,6 +86,8 @@ public class EmrApiConstants {
 
     public static final String PRIVILEGE_PREFIX_TASK = "Task: ";
 
+    public static final String PRIVILEGE_PREFIX_O3 = "o3";
+
     public static final String PRIVILEGE_DELETE_ENCOUNTER = "Task: emr.patient.encounter.delete";
 
     public static final String PRIVILEGE_EDIT_ENCOUNTER = "Task: emr.patient.encounter.edit";

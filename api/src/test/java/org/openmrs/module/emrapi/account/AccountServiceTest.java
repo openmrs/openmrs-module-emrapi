@@ -219,8 +219,9 @@ public class AccountServiceTest {
         Privilege deletePatients = new Privilege("Delete Patients");
         Privilege vitalsApp = new Privilege(EmrApiConstants.PRIVILEGE_PREFIX_APP + " emr.vitals");
         Privilege orderEntryTask = new Privilege(EmrApiConstants.PRIVILEGE_PREFIX_TASK + " emr.orderEntry");
+        Privilege o3Privilege = new Privilege(EmrApiConstants.PRIVILEGE_PREFIX_O3 + ".some.privilege");
 
-        when(userService.getAllPrivileges()).thenReturn(Arrays.asList(getPatients, deletePatients, vitalsApp, orderEntryTask));
+        when(userService.getAllPrivileges()).thenReturn(Arrays.asList(getPatients, deletePatients, vitalsApp, orderEntryTask, o3Privilege));
 
         List<Privilege> apiPrivileges = accountService.getApiPrivileges();
         assertThat(apiPrivileges.size(), is(2));
@@ -233,12 +234,13 @@ public class AccountServiceTest {
         Privilege deletePatients = new Privilege("Delete Patients");
         Privilege vitalsApp = new Privilege(EmrApiConstants.PRIVILEGE_PREFIX_APP + " emr.vitals");
         Privilege orderEntryTask = new Privilege(EmrApiConstants.PRIVILEGE_PREFIX_TASK + " emr.orderEntry");
+        Privilege o3Privilege = new Privilege(EmrApiConstants.PRIVILEGE_PREFIX_O3 + ".some.privilege");
 
-        when(userService.getAllPrivileges()).thenReturn(Arrays.asList(getPatients, deletePatients, vitalsApp, orderEntryTask));
+        when(userService.getAllPrivileges()).thenReturn(Arrays.asList(getPatients, deletePatients, vitalsApp, orderEntryTask, o3Privilege));
 
         List<Privilege> applicationPrivileges = accountService.getApplicationPrivileges();
-        assertThat(applicationPrivileges.size(), is(2));
-        assertThat(applicationPrivileges, containsInAnyOrder(vitalsApp, orderEntryTask));
+        assertThat(applicationPrivileges.size(), is(3));
+        assertThat(applicationPrivileges, containsInAnyOrder(vitalsApp, orderEntryTask, o3Privilege));
     }
 
     private class MockDomainWrapperFactory extends DomainWrapperFactory{
