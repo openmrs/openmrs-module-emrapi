@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.CodedOrFreeText;
 import org.openmrs.Concept;
 import org.openmrs.ConceptName;
@@ -171,8 +172,7 @@ public class ConditionController extends BaseRestController {
 			Concept concept;
 
 			if (coreCondition.getCondition().getCoded() != null) {
-				concept = Context.getConceptService()
-						.getConceptByUuid(coreCondition.getCondition().getCoded().getUuid());
+				concept = conceptService.getConceptByUuid(coreCondition.getCondition().getCoded().getUuid());
 			} else {
 				concept = new Concept();
 				concept.setFullySpecifiedName(new ConceptName(coreCondition.getCondition().getNonCoded(), Context.getLocale()));
@@ -254,28 +254,40 @@ public class ConditionController extends BaseRestController {
 	 * @return cond
 	 */
 	private org.openmrs.Condition convertEmrapiContractConditionToCoreCondition(org.openmrs.module.emrapi.conditionslist.contract.Condition condition) {
-		Concept concept = Context.getConceptService().getConceptByUuid(condition.getConcept().getUuid());
-		Patient patient = Context.getPatientService().getPatientByUuid(condition.getPatientUuid());
-		String nonCodedConditionConcept = Context.getAdministrationService().getGlobalProperty(
-				ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID);
 
 		org.openmrs.Condition openmrsCondition = new org.openmrs.Condition();
-		CodedOrFreeText codedOrFreeText;
 
-		if (!isEmpty(condition.getConditionNonCoded())) {
-			concept = Context.getConceptService().getConceptByUuid(nonCodedConditionConcept);
-		}
+		Patient patient = Context.getPatientService().getPatientByUuid(condition.getPatientUuid());
+
 		if (condition.getUuid() != null) {
 			openmrsCondition.setUuid(condition.getUuid());
 		}
 
-		if (concept != null) {
-			ConceptName fullySpecifiedName = getName(concept.getNames(), condition.getConcept().getName());
-			codedOrFreeText = new CodedOrFreeText(concept, fullySpecifiedName, condition.getConditionNonCoded());
-		} else {
-			codedOrFreeText = new CodedOrFreeText(null, null, condition.getConditionNonCoded());
+		// Map coded conditions
+		CodedOrFreeText codedOrFreeText = new CodedOrFreeText();
+		if (condition.getConcept() != null) {
+			if (condition.getConcept().getUuid() != null) {
+				codedOrFreeText.setCoded(conceptService.getConceptByUuid(condition.getConcept().getUuid()));
+			}
+			if (condition.getConcept().getName() != null && codedOrFreeText.getCoded() != null) {
+				codedOrFreeText.setSpecificName(getName(codedOrFreeText.getCoded().getNames(), condition.getConcept().getName()));
+			}
 		}
 
+		// Map non-coded conditions
+		if (codedOrFreeText.getCoded() == null) {
+			if (!isEmpty(condition.getConditionNonCoded())) {
+				String gpName = ConditionListConstants.GLOBAL_PROPERTY_NON_CODED_UUID;
+				String nonCodedConditionConcept = Context.getAdministrationService().getGlobalProperty(gpName);
+				if (StringUtils.isBlank(nonCodedConditionConcept)) {
+					throw new IllegalStateException("Configuration Required: " + gpName);
+				}
+				codedOrFreeText.setCoded(conceptService.getConceptByUuid(nonCodedConditionConcept));
+			}
+		}
+		codedOrFreeText.setNonCoded(condition.getConditionNonCoded());
+
+		openmrsCondition.setCondition(codedOrFreeText);
 		openmrsCondition.setAdditionalDetail(condition.getAdditionalDetail());
 		openmrsCondition.setClinicalStatus(convertConditionListStatus(condition.getStatus()));
 		openmrsCondition.setCondition(codedOrFreeText);
@@ -336,8 +348,7 @@ public class ConditionController extends BaseRestController {
 		Concept concept;
 
 		if (coreCondition.getCondition().getCoded() != null) {
-			concept = Context.getConceptService()
-					.getConceptByUuid(coreCondition.getCondition().getCoded().getUuid());
+			concept = conceptService.getConceptByUuid(coreCondition.getCondition().getCoded().getUuid());
 
 			if(coreCondition.getCondition().getSpecificName() == null) {
 				coreCondition.getCondition().setSpecificName(coreCondition.getCondition().getCoded().getName(Context.getLocale()));
