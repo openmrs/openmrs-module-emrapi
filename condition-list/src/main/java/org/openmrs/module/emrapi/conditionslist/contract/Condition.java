@@ -17,9 +17,9 @@ public class Condition {
 	
 	private org.openmrs.module.emrapi.conditionslist.Condition.Status status;
 	
-	private Date onSetDate;
+	private String onSetDate;
 	
-	private Date endDate;
+	private String endDate;
 	
 	private Concept endReason;
 	
@@ -75,19 +75,19 @@ public class Condition {
 		this.conditionNonCoded = conditionNonCoded;
 	}
 	
-	public Date getOnSetDate() {
+	public String getOnSetDate() {
 		return onSetDate;
 	}
 	
-	public void setOnSetDate(Date onSetDate) {
+	public void setOnSetDate(String onSetDate) {
 		this.onSetDate = onSetDate;
 	}
 	
-	public Date getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 	
-	public void setEndDate(Date endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 	

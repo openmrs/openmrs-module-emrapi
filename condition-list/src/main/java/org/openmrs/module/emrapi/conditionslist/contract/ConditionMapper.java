@@ -7,6 +7,8 @@ import org.openmrs.ConceptName;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
+import org.openmrs.module.emrapi.conditionslist.DateConverter;
+
 import java.util.Locale;
 
 public class ConditionMapper {
@@ -20,10 +22,10 @@ public class ConditionMapper {
 		condition.setConcept(concept);
 		condition.setPatientUuid(openmrsCondition.getPatient().getUuid());
 		condition.setConditionNonCoded(openmrsCondition.getConditionNonCoded());
-		condition.setOnSetDate(openmrsCondition.getOnsetDate());
+		condition.setOnSetDate(DateConverter.serialize(openmrsCondition.getOnsetDate()));
 		condition.setVoided(openmrsCondition.getVoided());
 		condition.setVoidReason(openmrsCondition.getVoidReason());
-		condition.setEndDate(openmrsCondition.getEndDate());
+		condition.setEndDate(DateConverter.serialize(openmrsCondition.getEndDate()));
 		condition.setCreator(openmrsCondition.getCreator().getDisplayString());
 		condition.setDateCreated(openmrsCondition.getDateCreated());
 		if (openmrsCondition.getPreviousCondition() != null) {
@@ -59,8 +61,8 @@ public class ConditionMapper {
 		openmrsCondition.setConcept(concept);
 		openmrsCondition.setPatient(patient);
 		openmrsCondition.setConditionNonCoded(condition.getConditionNonCoded());
-		openmrsCondition.setOnsetDate(condition.getOnSetDate());
-		openmrsCondition.setEndDate(condition.getEndDate());
+		openmrsCondition.setOnsetDate(DateConverter.deserialize(condition.getOnSetDate()));
+		openmrsCondition.setEndDate(DateConverter.deserialize(condition.getEndDate()));
 		openmrsCondition.setVoided(condition.getVoided());
 		openmrsCondition.setVoidReason(condition.getVoidReason());
 		

@@ -21,6 +21,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
+import org.openmrs.module.emrapi.conditionslist.DateConverter;
 import org.openmrs.util.LocaleUtility;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -103,7 +104,7 @@ public class ConditionMapperTest {
 		assertEquals(conceptUuid, condition.getConcept().getUuid());
 		assertEquals(patientUuid, condition.getPatientUuid());
 		assertEquals(openmrsCondition.getDateCreated(), condition.getDateCreated());
-		assertEquals(today, condition.getOnSetDate());
+		assertEquals(today, DateConverter.deserialize(condition.getOnSetDate()));
 		assertEquals(additionalDetail, condition.getAdditionalDetail());
 		
 		assertEquals(null, condition.getEndDate());
@@ -123,14 +124,14 @@ public class ConditionMapperTest {
 		String endReasonUuid = "end-reason-uuid-288a-asdf";
 		
 		Condition condition = new Condition();
-		condition.setOnSetDate(today);
+		condition.setOnSetDate(DateConverter.serialize(today));
 		condition.setUuid(uuid);
 		
 		Concept concept = new Concept();
 		Concept endReason = new Concept();
 		endReason.setUuid(endReasonUuid);
 		condition.setEndReason(new org.openmrs.module.emrapi.conditionslist.contract.Concept(endReasonUuid, "somename"));
-		condition.setEndDate(today);
+		condition.setEndDate(DateConverter.serialize(today));
 		
 		concept.setUuid(conceptUuid);
 		Patient patient = new Patient();
