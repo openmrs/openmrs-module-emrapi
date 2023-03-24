@@ -1,5 +1,7 @@
 package org.openmrs.module.emrapi.conditionslist.contract;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -16,9 +18,11 @@ public class Condition {
 	private String conditionNonCoded;
 	
 	private org.openmrs.module.emrapi.conditionslist.Condition.Status status;
-	
+
+	@JsonDeserialize(using = CustomDateDeserializer.class)
 	private Date onSetDate;
-	
+
+	@JsonDeserialize(using = CustomDateDeserializer.class)
 	private Date endDate;
 	
 	private Concept endReason;
@@ -34,6 +38,8 @@ public class Condition {
 	private Date dateCreated;
 	
 	private String previousConditionUuid;
+
+	public Condition() {}
 	
 	public String getPreviousConditionUuid() {
 		return previousConditionUuid;
@@ -78,7 +84,8 @@ public class Condition {
 	public Date getOnSetDate() {
 		return onSetDate;
 	}
-	
+
+	@JsonDeserialize(using = CustomDateDeserializer.class)
 	public void setOnSetDate(Date onSetDate) {
 		this.onSetDate = onSetDate;
 	}
@@ -86,7 +93,8 @@ public class Condition {
 	public Date getEndDate() {
 		return endDate;
 	}
-	
+
+	@JsonDeserialize(using = CustomDateDeserializer.class)
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
