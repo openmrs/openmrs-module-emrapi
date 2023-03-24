@@ -1,15 +1,5 @@
 package org.openmrs.module.emrapi.web.controller;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.openmrs.util.LocaleUtility.getDefaultLocale;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Locale;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.CodedOrFreeText;
 import org.openmrs.Concept;
@@ -23,6 +13,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.conditionslist.Condition;
 import org.openmrs.module.emrapi.conditionslist.ConditionHistory;
 import org.openmrs.module.emrapi.conditionslist.ConditionListConstants;
+import org.openmrs.module.emrapi.conditionslist.DateConverter;
 import org.openmrs.module.emrapi.conditionslist.contract.ConditionHistoryMapper;
 import org.openmrs.module.emrapi.conditionslist.contract.ConditionMapper;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
@@ -33,6 +24,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.openmrs.util.LocaleUtility.getDefaultLocale;
 
 /**
  * This class specifies data manipulation methods on a Condition.
@@ -292,8 +293,8 @@ public class ConditionController extends BaseRestController {
 		openmrsCondition.setClinicalStatus(convertConditionListStatus(condition.getStatus()));
 		openmrsCondition.setCondition(codedOrFreeText);
 		openmrsCondition.setPatient(patient);
-		openmrsCondition.setOnsetDate(condition.getOnSetDate());
-		openmrsCondition.setEndDate(condition.getEndDate());
+		openmrsCondition.setOnsetDate(DateConverter.deserialize(condition.getOnSetDate()));
+		openmrsCondition.setEndDate(DateConverter.deserialize(condition.getEndDate()));
 		openmrsCondition.setVoided(condition.getVoided());
 		openmrsCondition.setVoidReason(condition.getVoidReason());
 
@@ -322,10 +323,10 @@ public class ConditionController extends BaseRestController {
 		contractCondition.setConcept(concept);
 		contractCondition.setPatientUuid(coreCondition.getPatient().getUuid());
 		contractCondition.setConditionNonCoded(codedOrFreeText.getNonCoded());
-		contractCondition.setOnSetDate(coreCondition.getOnsetDate());
+		contractCondition.setOnSetDate(DateConverter.serialize(coreCondition.getOnsetDate()));
 		contractCondition.setVoided(coreCondition.getVoided());
 		contractCondition.setVoidReason(coreCondition.getVoidReason());
-		contractCondition.setEndDate(coreCondition.getEndDate());
+		contractCondition.setEndDate(DateConverter.serialize(coreCondition.getEndDate()));
 		contractCondition.setCreator(coreCondition.getCreator().getUuid());
 		contractCondition.setDateCreated(coreCondition.getDateCreated());
 		if (coreCondition.getPreviousVersion() != null) {
