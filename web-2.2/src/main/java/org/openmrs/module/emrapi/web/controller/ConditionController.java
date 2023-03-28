@@ -265,6 +265,7 @@ public class ConditionController extends BaseRestController {
 		}
 		if (openmrsCondition == null) {
 			openmrsCondition = new org.openmrs.Condition();
+			openmrsCondition.setUuid(condition.getUuid());
 		}
 
 		// Map coded conditions
