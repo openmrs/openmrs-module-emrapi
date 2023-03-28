@@ -256,12 +256,15 @@ public class ConditionController extends BaseRestController {
 	 */
 	private org.openmrs.Condition convertEmrapiContractConditionToCoreCondition(org.openmrs.module.emrapi.conditionslist.contract.Condition condition) {
 
-		org.openmrs.Condition openmrsCondition = new org.openmrs.Condition();
+		org.openmrs.Condition openmrsCondition;
 
 		Patient patient = Context.getPatientService().getPatientByUuid(condition.getPatientUuid());
 
 		if (condition.getUuid() != null) {
-			openmrsCondition.setUuid(condition.getUuid());
+			openmrsCondition = conditionService.getConditionByUuid(condition.getUuid());
+		}
+		else {
+			openmrsCondition = new org.openmrs.Condition();
 		}
 
 		// Map coded conditions
