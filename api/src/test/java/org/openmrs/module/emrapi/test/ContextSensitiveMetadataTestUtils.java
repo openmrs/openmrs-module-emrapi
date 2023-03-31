@@ -56,6 +56,10 @@ public class ContextSensitiveMetadataTestUtils {
                 .addMapping(sameAs, emrSource, "Death")    // not a real code, just for testing
                 .saveAndGet();
 
+        Concept observation = new ConceptBuilder(conceptService, naDatatype, misc)
+                .addName("ED Observation")
+                .addMapping(sameAs, emrSource, "ED Observation")    // not a real code, just for testing
+                .saveAndGet();
 
         Concept transferOut = new ConceptBuilder(conceptService, naDatatype, misc)
                 .addName("Transfer out of hospital")
@@ -82,7 +86,7 @@ public class ContextSensitiveMetadataTestUtils {
 
         Concept disposition = new ConceptBuilder(conceptService, codedDatatype, convSet)
                 .addName("Disposition")
-                .addAnswers(admit, discharge, transferOut)
+                .addAnswers(admit, discharge, death, transferOut, observation)
                 .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DISPOSITION).saveAndGet();
 
         new ConceptBuilder(conceptService, naDatatype, convSet)
