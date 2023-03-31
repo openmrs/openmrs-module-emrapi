@@ -66,7 +66,7 @@ public class DispositionServiceTest {
 
         List<Disposition> dispositions = dispositionService.getDispositions();
 
-        assertEquals(3, dispositions.size());
+        assertEquals(4, dispositions.size());
 
         assertEquals(deathDisposition, dispositions.get(0));
         assertEquals(homeDisposition, dispositions.get(1));
