@@ -533,7 +533,7 @@ public class AdtServiceTest {
 
         Encounter encounter1 = new Encounter();
         encounter1.setEncounterType(checkInEncounterType);
-        encounter1.setEncounterDatetime(DateUtils.addHours(new Date(), -16));  // this encounter i earlier, so should not be used as the stop time
+        encounter1.setEncounterDatetime(DateUtils.addHours(new Date(), -16));  // this encounter is earlier, so should not be used as the stop time
         visit.addEncounter(encounter1);
 
         Date expectedStopDatetime = DateUtils.addHours(new Date(), -14);
