@@ -274,14 +274,16 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         Iterator<Encounter> iterator = visit.getEncounters().iterator();
-        Encounter latest = iterator.next();
+        Encounter latest = null;
         while (iterator.hasNext()) {
             Encounter candidate = iterator.next();
-            if (OpenmrsUtil.compare(candidate.getEncounterDatetime(), latest.getEncounterDatetime()) > 0) {
-                latest = candidate;
+            if (!candidate.isVoided()){
+                if (latest == null ||  OpenmrsUtil.compare(candidate.getEncounterDatetime(), latest.getEncounterDatetime()) > 0) {
+                    latest = candidate;
+                }
             }
         }
-        return latest.getEncounterDatetime();
+        return latest != null ? latest.getEncounterDatetime() : visit.getStartDatetime();
     }
 
     /**

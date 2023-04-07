@@ -520,19 +520,26 @@ public class AdtServiceTest {
     }
 
     @Test
-    public void shouldCloseInactiveVisitWithLastEncounterDateAfterVisitExpireTime() {
+    public void shouldCloseInactiveVisitWithLastNonVoidedEncounterDateAfterVisitExpireTime() {
         Visit visit = new Visit(1);
-        visit.setStartDatetime(DateUtils.addHours(new Date(), -14));
+        visit.setStartDatetime(DateUtils.addHours(new Date(), -24));
+
+        Encounter encounterVoided = new Encounter();
+        encounterVoided.setEncounterType(checkInEncounterType);
+        encounterVoided.setEncounterDatetime(DateUtils.addHours(new Date(), -8));  // this is the most recent encounter, but it has been voided, so it should not be used
+        encounterVoided.setVoided(true);
+        encounterVoided.setDateVoided(new Date());
+        visit.addEncounter(encounterVoided);
 
         Encounter encounter1 = new Encounter();
         encounter1.setEncounterType(checkInEncounterType);
-        encounter1.setEncounterDatetime(DateUtils.addHours(new Date(), -14));
+        encounter1.setEncounterDatetime(DateUtils.addHours(new Date(), -16));  // this encounter i earlier, so should not be used as the stop time
         visit.addEncounter(encounter1);
 
-        Date stopDatetime = DateUtils.addHours(new Date(), -14);
+        Date expectedStopDatetime = DateUtils.addHours(new Date(), -14);
         Encounter encounter2 = new Encounter();
         encounter2.setEncounterType(checkInEncounterType);
-        encounter2.setEncounterDatetime(stopDatetime);
+        encounter2.setEncounterDatetime(expectedStopDatetime);
         visit.addEncounter(encounter2);
 
         when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
@@ -541,7 +548,28 @@ public class AdtServiceTest {
 
         service.closeInactiveVisits();
 
-        assertThat(visit.getStopDatetime(), is(stopDatetime));
+        assertThat(visit.getStopDatetime(), is(expectedStopDatetime));
+    }
+
+    @Test
+    public void shouldCloseInactiveVisitWithStopDateEqualToStartDateIfAllEncountersVoided() {
+        Visit visit = new Visit(1);
+        visit.setStartDatetime(DateUtils.addHours(new Date(), -24));
+
+        Encounter encounterVoided = new Encounter();
+        encounterVoided.setEncounterType(checkInEncounterType);
+        encounterVoided.setEncounterDatetime(DateUtils.addHours(new Date(), -14));  // should not be considered, since it has been voided
+        encounterVoided.setVoided(true);
+        encounterVoided.setDateVoided(new Date());
+        visit.addEncounter(encounterVoided);
+
+        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
+                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class)))
+                .thenReturn(Arrays.asList(visit));
+
+        service.closeInactiveVisits();
+
+        assertThat(visit.getStopDatetime(), is(visit.getStartDatetime()));
     }
 
     @Test
