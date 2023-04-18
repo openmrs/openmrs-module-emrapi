@@ -17,7 +17,6 @@ package org.openmrs.module.emrapi.visit;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateMidnight;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -37,6 +36,7 @@ import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
+import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
 import org.openmrs.module.reporting.query.visit.VisitIdSet;
@@ -46,6 +46,7 @@ import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -563,11 +564,12 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     public Date getStartDate() {
-        return visit.getStartDatetime() != null ? new DateMidnight(visit.getStartDatetime()).toDate() : null;
+        return visit.getStartDatetime() != null ? GeneralUtils.dateTimeAtStartOfDate(visit.getStartDatetime()) : null;
     }
 
     public Date getStopDate() {
-        return visit.getStopDatetime() != null ? new DateMidnight(visit.getStopDatetime()).toDate() : null;
+        return visit.getStopDatetime() != null ?
+                GeneralUtils.dateTimeAtStartOfDate(visit.getStopDatetime())  : null;
     }
 
 

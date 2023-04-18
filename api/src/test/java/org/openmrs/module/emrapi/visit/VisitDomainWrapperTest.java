@@ -2,7 +2,6 @@ package org.openmrs.module.emrapi.visit;
 
 
 import org.apache.commons.lang.time.DateUtils;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +23,7 @@ import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
+import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -989,13 +989,13 @@ public class VisitDomainWrapperTest {
     @Test
     public void shouldReturnStartDateWithTimeComponentRemoved() {
         when(visit.getStartDatetime()).thenReturn(new Date());
-        assertThat(visitDomainWrapper.getStartDate(), is(new DateMidnight().toDate()));
+        assertThat(visitDomainWrapper.getStartDate(), is(GeneralUtils.dateTimeAtStartOfDate(new Date())));
     }
 
     @Test
     public void shouldReturnStopDateWithTimeComponentRemoved() {
         when(visit.getStopDatetime()).thenReturn(new Date());
-        assertThat(visitDomainWrapper.getStopDate(), is(new DateMidnight().toDate()));
+        assertThat(visitDomainWrapper.getStopDate(), is(GeneralUtils.dateTimeAtStartOfDate(new Date())));
     }
 
     @Test

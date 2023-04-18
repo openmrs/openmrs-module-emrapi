@@ -33,6 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -297,5 +300,21 @@ public class GeneralUtils {
 
     public static Date getCurrentDateIfNull(Date date){
         return date == null ? new Date() : date;
+    }
+
+    public static Date dateTimeAtStartOfDate(Date date) {
+        return date != null ? toDate(toLocalDate(date)): null;
+    }
+
+    public static LocalDate toLocalDate(Date date) {
+        return date != null ? date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null;
+    }
+
+    public static Date toDate(LocalDate localDate) {
+        return localDate != null ? Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()) : null;
+    }
+
+    public static LocalDateTime toLocalDateTime(Date date) {
+        return date != null ? date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime() : null;
     }
 }

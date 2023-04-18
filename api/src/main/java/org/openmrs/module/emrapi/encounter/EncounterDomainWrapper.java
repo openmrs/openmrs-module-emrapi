@@ -14,8 +14,6 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.collections.Predicate;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
@@ -29,10 +27,12 @@ import org.openmrs.Visit;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateAfterVisitStopDateException;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDateException;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
+import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
@@ -190,28 +190,28 @@ public class EncounterDomainWrapper implements DomainWrapper {
         }
         // otherwise, properly set the time component
         else {
+            // TODO better and more explicitly handle null case
+            LocalDate encounterDate = GeneralUtils.toLocalDate(encounter.getEncounterDatetime());
+            LocalDate currentDate = LocalDate.now();
+            LocalDate visitStartDate = GeneralUtils.toLocalDate(visit.getStartDatetime());
+            LocalDate visitStopDate = visit.getStopDatetime() != null ? GeneralUtils.toLocalDate(visit.getStopDatetime()) : null;
 
-            DateMidnight encounterDate = new DateMidnight(encounter.getEncounterDatetime());
-            DateMidnight currentDate = new DateMidnight();
-            DateMidnight visitStartDate = new DateMidnight(visit.getStartDatetime());
-            DateMidnight visitStopDate = visit.getStopDatetime() != null ? new DateMidnight(visit.getStopDatetime()) : null;
-
-            if (encounterDate.isBefore(visitStartDate)) {
+            if (encounterDate != null && encounterDate.isBefore(visitStartDate)) {
                 throw new EncounterDateBeforeVisitStartDateException();
             }
 
-            if (visitStopDate != null && encounterDate.isAfter(visitStopDate)) {
+            if (encounterDate != null && visitStopDate != null && encounterDate.isAfter(visitStopDate)) {
                 throw new EncounterDateAfterVisitStopDateException();
             }
 
-            // if encounter date = today and open visit, consider this a real-time transaction and timestamp with current datetime
-            if (encounterDate.equals(currentDate) && visit.isOpen()) {
+            // if encounter date is null or today and open visit, consider this a real-time transaction and timestamp with current datetime
+            if ((encounterDate == null || encounterDate.equals(currentDate)) && visit.isOpen()) {
                 setEncounterDatetimeAndPropagateToObs(encounter, new Date());
             }
 
             // otherwise, consider a retrospective encounter, and so we want an encounter date to have no time component, EXCEPT
             // if this encounter is on the first day of the visit, the encounter datetime cannot be before the visit start time
-            else if (encounterDate.isBefore(new DateTime(visit.getStartDatetime()))) {
+            else if (encounterDate == null || encounterDate.atStartOfDay().isBefore(GeneralUtils.toLocalDateTime(visit.getStartDatetime()))) {
                 setEncounterDatetimeAndPropagateToObs(encounter, visit.getStartDatetime());
             }
 
@@ -282,6 +282,6 @@ public class EncounterDomainWrapper implements DomainWrapper {
     }
 
     private boolean dateHasTimeComponent(Date date) {
-        return date != null && !new DateTime(date).equals(new DateMidnight(date));
+        return date != null && !GeneralUtils.toLocalDate(date).atStartOfDay().equals(GeneralUtils.toLocalDateTime(date));
     }
 }

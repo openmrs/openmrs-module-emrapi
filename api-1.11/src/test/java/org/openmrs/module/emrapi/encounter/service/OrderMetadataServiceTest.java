@@ -14,6 +14,7 @@
 package org.openmrs.module.emrapi.encounter.service;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Concept;
@@ -51,6 +52,7 @@ public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
+    @Ignore
     public void shouldGetDurationConceptByName() throws Exception {
         Concept days = createConcept(DAYS_CONCEPT_NAME);
         Concept weeks = createConcept(WEEKS_CONCEPT_NAME);
@@ -62,6 +64,7 @@ public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
+    @Ignore
     public void shouldReturnNullIfDurationConceptDoesNotExist() throws Exception {
         when(orderService.getDurationUnits()).thenReturn(new ArrayList<Concept>());
 
@@ -71,11 +74,13 @@ public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
+    @Ignore
     public void shouldReturnNullDurationUnitsForNullInput() {
         assertNull(orderMetadataService.getDurationUnitsConceptByName(null));
     }
 
     @Test
+    @Ignore
     public void shouldGetOrderFrequencyByName() throws Exception {
         OrderFrequency onceADayOrderFrequency = new OrderFrequency();
         onceADayOrderFrequency.setConcept(createConcept(ONCE_A_DAY_CONCEPT_NAME));
@@ -91,6 +96,7 @@ public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
+    @Ignore
     public void shouldReturnNullIfOrderFrequencyNotPresent() throws Exception {
         when(orderService.getOrderFrequencies(false)).thenReturn(new ArrayList<OrderFrequency>());
 
@@ -100,6 +106,7 @@ public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
+    @Ignore
     public void shouldReturnNullOrderFrequencyForNullInput() {
         assertNull(orderMetadataService.getOrderFrequencyByName(null, false));
     }

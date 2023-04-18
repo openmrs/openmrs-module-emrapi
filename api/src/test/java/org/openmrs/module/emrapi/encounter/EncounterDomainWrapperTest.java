@@ -1,7 +1,6 @@
 package org.openmrs.module.emrapi.encounter;
 
 
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +14,10 @@ import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateAfterVisitStopDateException;
 import org.openmrs.module.emrapi.adt.exception.EncounterDateBeforeVisitStartDateException;
+import org.openmrs.module.emrapi.utils.GeneralUtils;
 import uk.co.it.modular.hamcrest.date.DateMatchers;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -113,7 +114,7 @@ public class EncounterDomainWrapperTest {
             throws Exception {
 
         Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,12).toDate());
+        encounter.setEncounterDatetime(GeneralUtils.toDate(LocalDate.of(2012,12,12)));
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
@@ -128,7 +129,7 @@ public class EncounterDomainWrapperTest {
             throws Exception {
 
         Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,16).toDate());
+        encounter.setEncounterDatetime(GeneralUtils.toDate(LocalDate.of(2012,12,16)));
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
@@ -143,7 +144,7 @@ public class EncounterDomainWrapperTest {
             throws Exception {
 
         Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,14).toDate());
+        encounter.setEncounterDatetime(GeneralUtils.toDate(LocalDate.of(2012,12,14)));
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
@@ -152,7 +153,7 @@ public class EncounterDomainWrapperTest {
 
         encounterWrapper.attachToVisit(visit);
 
-        assertThat(encounter.getEncounterDatetime(), is(new DateMidnight(2012,12,14).toDate()));
+        assertThat(encounter.getEncounterDatetime(), is(GeneralUtils.toDate(LocalDate.of(2012,12,14))));
         assertThat(encounter.getVisit(), is(visit));
     }
 
@@ -161,7 +162,7 @@ public class EncounterDomainWrapperTest {
             throws Exception {
 
         Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,13).toDate());
+        encounter.setEncounterDatetime(GeneralUtils.toDate(LocalDate.of(2012,12,13)));
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
@@ -179,7 +180,7 @@ public class EncounterDomainWrapperTest {
             throws Exception {
 
         Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,14).toDate());
+        encounter.setEncounterDatetime(GeneralUtils.toDate(LocalDate.of(2012,12,14)));
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
@@ -187,7 +188,7 @@ public class EncounterDomainWrapperTest {
 
         encounterWrapper.attachToVisit(visit);
 
-        assertThat(encounter.getEncounterDatetime(), is(new DateMidnight(2012,12,14).toDate()));
+        assertThat(encounter.getEncounterDatetime(), is(GeneralUtils.toDate(LocalDate.of(2012,12,14))));
         assertThat(encounter.getVisit(), is(visit));
     }
 
@@ -196,7 +197,7 @@ public class EncounterDomainWrapperTest {
             throws Exception {
 
         Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(new DateMidnight(2012,12,13).toDate());
+        encounter.setEncounterDatetime(GeneralUtils.toDate(LocalDate.of(2012,12,13)));
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
@@ -213,10 +214,9 @@ public class EncounterDomainWrapperTest {
             throws Exception {
 
         DateTime currentDateTime = new DateTime();
-        DateMidnight currentDate = currentDateTime.toDateMidnight();
 
         Encounter encounter = new Encounter();
-        encounter.setEncounterDatetime(currentDate.toDate());
+        encounter.setEncounterDatetime(GeneralUtils.dateTimeAtStartOfDate(currentDateTime.toDate()));
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
@@ -240,7 +240,7 @@ public class EncounterDomainWrapperTest {
         EncounterDomainWrapper  encounterWrapper = new EncounterDomainWrapper(encounter);
 
         Visit visit = new Visit();
-        visit.setStartDatetime(currentDate.toDateMidnight().toDate());
+        visit.setStartDatetime(GeneralUtils.dateTimeAtStartOfDate(currentDate.toDate()));
 
         Date shouldBeLessThanEncounterDatetime = new Date();
         encounterWrapper.attachToVisit(visit);
@@ -274,8 +274,8 @@ public class EncounterDomainWrapperTest {
     public void test_attachToVisit_shouldPropagateEncounterDatetimeChangeToObs()
             throws Exception {
 
-        Date startOfToday = new DateMidnight(System.currentTimeMillis()).toDate();
-        Date before = new DateMidnight(2003, 10, 4).toDate();
+        Date startOfToday = GeneralUtils.dateTimeAtStartOfDate(new Date());
+        Date before = GeneralUtils.toDate(LocalDate.of(2003, 10, 4));
 
         Obs child = new Obs();
         child.setObsDatetime(startOfToday);
