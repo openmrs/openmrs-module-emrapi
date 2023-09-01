@@ -1,7 +1,5 @@
-select
-  o.obsGroup
-from
-  Obs o
+select o1 from Obs o
+inner join o.obsGroup o1	
 where
   o.voided = 'false'
   and (o.encounter.visit = :visitId)

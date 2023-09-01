@@ -239,20 +239,12 @@
         </property>
     </bean>
 
-    <bean id="emrVisitServiceImpl" class="${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitServiceImpl">
-        <constructor-arg ref="visitService"/>
-        <constructor-arg ref="visitResponseMapper"/>
-        <property name="dao">
-            <ref local="emrVisitDAOImpl"/>
-        </property>
-    </bean>
-
     <bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <ref local="emrVisitServiceImpl"/>
+            <ref bean="emrVisitServiceImpl"/>
         </property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors"/>

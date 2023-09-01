@@ -26,4 +26,12 @@
 	<obs obs_id="3" person_id="7" concept_id="159394" encounter_id="1" obs_datetime="2018-05-03 17:47:04.0" location_id="3" obs_group_id="1" value_coded="159393" creator="1" date_created="2018-05-03 17:47:04.0" voided="false" uuid="df4358f3-3070-47b9-bb5c-ff36ed112d51" status="FINAL"/>
 	<obs obs_id="4" person_id="7" concept_id="1284" encounter_id="1" obs_datetime="2018-05-03 17:47:04.0" location_id="3" obs_group_id="1" value_coded="116128" value_coded_name_id="16603" creator="1" date_created="2018-05-03 17:47:04.0" voided="false" uuid="89f02814-2c50-48ae-bca4-4b4709d42486" status="FINAL"/>
 	<obs obs_id="5" person_id="9" concept_id="159965" encounter_id="1" obs_datetime="2018-05-03 17:47:04.0" location_id="3" obs_group_id="1" value_coded="159393" creator="1" date_created="2018-05-03 17:47:04.0" voided="false" uuid="df4358f3-3070-47b9-bb5c-jhvj34Y51" status="FINAL"/>
+
+	<encounter_diagnosis diagnosis_id="1" encounter_id="1" patient_id="2" creator="1" date_created="2017-01-12 00:00:00" rank="1" certainty="CONFIRMED" voided="false" uuid="7a14b71c-df9b-41d2-ba2a-7c20250161fa"/>
+	<encounter_diagnosis diagnosis_id="2" encounter_id="1" patient_id="2" creator="1" date_created="2016-01-12 00:00:00" rank="1" certainty="PROVISIONAL" voided="false" uuid="a3650f2a-f511-4642-9895-fe26876659ca"/>
+	<encounter_diagnosis diagnosis_id="3" encounter_id="1" patient_id="2" creator="1" date_created="2016-01-12 00:00:00" rank="1" certainty="PROVISIONAL" voided="true" date_voided="2017-01-12 00:00:52" voided_by="1" void_reason="test reason" uuid="ab26abdc-e62d-4adc-9f7d-6a80e8e48cc7"/>
+	<encounter_diagnosis diagnosis_id="4" encounter_id="1" patient_id="2" creator="1" date_created="2017-01-12 00:00:00" rank="2" certainty="CONFIRMED" voided="false" uuid="1c012502-c9f0-4839-b897-791cf9ad2910"/>
+	<encounter_diagnosis diagnosis_id="5" encounter_id="1" patient_id="2" creator="1" date_created="2016-01-12 00:00:00" rank="2" certainty="PROVISIONAL" voided="false" uuid="c033f9c4-a605-4613-972f-22f045db6bc7"/>
+	<encounter_diagnosis diagnosis_id="6" encounter_id="1" patient_id="2" creator="1" date_created="2016-01-12 00:00:00" rank="2" certainty="PROVISIONAL" voided="true" date_voided="2017-01-12 00:00:52" voided_by="1" void_reason="test reason" uuid="52c70212-66e9-4fb9-be92-75805971c2aa"/>
+	
 </dataset>
