@@ -96,7 +96,9 @@ public class EmrApiConstants {
 
     public static final String TEST_PATIENT_ATTRIBUTE_UUID = "4f07985c-88a5-4abd-aa0c-f3ec8324d8e7";
 
-    public static final String TELEPHONE_ATTRIBUTE_TYPE_NAME = "Telephone Number";
+    public static final String GP_TELEPHONE_ATTRIBUTE_TYPE_NAME = "emr.telephoneAttributeType";
+
+    public static final String TELEPHONE_ATTRIBUTE_TYPE_NAME = "Telephone Number";  // Default name if not defined
 
     public static final String PRIMARY_IDENTIFIER_TYPE = "emr.primaryIdentifierType";
 

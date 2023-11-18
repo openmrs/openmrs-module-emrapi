@@ -159,8 +159,11 @@ public class EmrApiProperties extends ModuleProperties {
 	}
 
 	public PersonAttributeType getTelephoneAttributeType() {
-		PersonAttributeType type = null;
-		type = personService.getPersonAttributeTypeByName(EmrApiConstants.TELEPHONE_ATTRIBUTE_TYPE_NAME);
+		String lookup = getGlobalProperty(EmrApiConstants.GP_TELEPHONE_ATTRIBUTE_TYPE_NAME, false);
+		if (!StringUtils.hasText(lookup)) {
+			lookup = EmrApiConstants.TELEPHONE_ATTRIBUTE_TYPE_NAME;
+		}
+		PersonAttributeType type = personService.getPersonAttributeTypeByName(lookup);
 		if (type == null) {
 			throw new IllegalStateException("Configuration required: " + EmrApiConstants.TELEPHONE_ATTRIBUTE_TYPE_NAME);
 		}
