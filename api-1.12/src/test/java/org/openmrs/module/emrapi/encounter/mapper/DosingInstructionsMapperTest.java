@@ -46,7 +46,7 @@ public class DosingInstructionsMapperTest {
     public void shouldMapDosingInstructionsToDrugOrder() {
         DosingInstructions dosingInstructions = DosingInstructionsBuilder.sample();
         Concept capsuleConcept = new Concept();
-        when(conceptService.getConceptByName(dosingInstructions.getDoseUnits())).thenReturn(capsuleConcept);
+        when(orderMetadataService.getDoseUnitsConceptByName(dosingInstructions.getDoseUnits())).thenReturn(capsuleConcept);
         Concept routeConcept = new Concept();
         when(conceptService.getConceptByName(dosingInstructions.getRoute())).thenReturn(routeConcept);
         Concept frequencyConcept = new Concept();
@@ -54,7 +54,7 @@ public class DosingInstructionsMapperTest {
         OrderFrequency orderFrequency = new OrderFrequency();
         when(orderMetadataService.getOrderFrequencyByName("QDS", false)).thenReturn(orderFrequency);
         Concept quantityUnits = new Concept();
-        when(conceptService.getConceptByName(dosingInstructions.getQuantityUnits())).thenReturn(quantityUnits);
+        when(orderMetadataService.getDispenseUnitsConceptByName(dosingInstructions.getQuantityUnits())).thenReturn(quantityUnits);
 
         DrugOrder drugOrder = new DrugOrder();
         DosingInstructionsMapper dosingInstructionsMapper = new DosingInstructionsMapper(conceptService, orderMetadataService);
@@ -67,7 +67,7 @@ public class DosingInstructionsMapperTest {
         assertThat(drugOrder.getRoute(), is(equalTo(routeConcept)));
         assertThat(drugOrder.getFrequency(), is(equalTo(orderFrequency)));
         assertThat(drugOrder.getAsNeeded(), is(equalTo(false)));
-        assertThat(drugOrder.getQuantity(), is(equalTo(Double.valueOf(dosingInstructions.getQuantity()))));
+        assertThat(drugOrder.getQuantity(), is(equalTo(dosingInstructions.getQuantity())));
         assertThat(drugOrder.getQuantityUnits(), is(equalTo(quantityUnits)));
         assertThat(drugOrder.getNumRefills(), is(equalTo(dosingInstructions.getNumberOfRefills())));
     }

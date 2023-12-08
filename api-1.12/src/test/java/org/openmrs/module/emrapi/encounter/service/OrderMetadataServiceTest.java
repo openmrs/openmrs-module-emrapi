@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.service;
 
+import groovy.lang.GString;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -25,11 +26,12 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
@@ -38,6 +40,9 @@ public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
     public static final String WEEKS_CONCEPT_NAME = "Weeks";
     public static final String ONCE_A_DAY_CONCEPT_NAME = "Once A Day";
     public static final String TWICE_A_DAY_CONCEPT_NAME = "Twice A Day";
+    public static final String MG = "mg";
+    public static final String ML = "ml";
+    public static final String TABLET = "tablet";
 
     @Mock
     private OrderService orderService;
@@ -104,6 +109,56 @@ public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
         assertNull(orderMetadataService.getOrderFrequencyByName(null, false));
     }
 
+
+    @Test
+    public void shouldGetDoseUnitsConceptByName() throws Exception {
+        Concept mgConcept = createConcept(MG);
+        Concept mlConcept = createConcept(ML);
+        when(orderService.getDrugDosingUnits()).thenReturn(Arrays.asList(mgConcept, mlConcept));
+
+        Concept doseUnitsConcept = orderMetadataService.getDoseUnitsConceptByName(MG);
+
+        assertThat(doseUnitsConcept, is(mgConcept));
+    }
+
+    @Test
+    public void shouldReturnNullIfDoseUnitsConceptDoesNotExist() throws Exception {
+        when(orderService.getDrugDosingUnits()).thenReturn(new ArrayList<Concept>());
+
+        Concept doseUnitsConcept = orderMetadataService.getDoseUnitsConceptByName(MG);
+
+        assertNull(doseUnitsConcept);
+    }
+
+    @Test
+    public void shouldReturnNullDoseUnitsForNullInput() {
+        assertNull(orderMetadataService.getDoseUnitsConceptByName(null));
+    }
+
+    @Test
+    public void shouldGetDispenseUnitsConceptByName() throws Exception {
+        Concept tabletConcept = createConcept(TABLET);
+        Concept mlConcept = createConcept(ML);
+        when(orderService.getDrugDispensingUnits()).thenReturn(Arrays.asList(tabletConcept, mlConcept));
+
+        Concept dispensingUnitsConcept = orderMetadataService.getDispenseUnitsConceptByName(TABLET);
+
+        assertThat(dispensingUnitsConcept, is(tabletConcept));
+    }
+
+    @Test
+    public void shouldReturnNullIfDispenseUnitsConceptDoesNotExist() throws Exception {
+        when(orderService.getDrugDispensingUnits()).thenReturn(new ArrayList<Concept>());
+
+        Concept dispensingUnitsConcept = orderMetadataService.getDispenseUnitsConceptByName(TABLET);
+
+        assertNull(dispensingUnitsConcept);
+    }
+
+    @Test
+    public void shouldReturnNullDispenseUnitsForNullInput() {
+        assertNull(orderMetadataService.getDispenseUnitsConceptByName(null));
+    }
 
     private Concept createConcept(String conceptName) {
         Concept concept = new Concept();

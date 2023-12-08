@@ -30,13 +30,13 @@ public class DosingInstructionsMapper {
 
     public DrugOrder map(EncounterTransaction.DosingInstructions dosingInstructions, DrugOrder drugOrder) {
         drugOrder.setDose(dosingInstructions.getDose());
-        drugOrder.setDoseUnits(conceptByName(dosingInstructions.getDoseUnits()));
+        drugOrder.setDoseUnits(orderMetadataService.getDoseUnitsConceptByName(dosingInstructions.getDoseUnits()));
         drugOrder.setDosingInstructions(dosingInstructions.getAdministrationInstructions());
         drugOrder.setRoute(conceptByName(dosingInstructions.getRoute()));
         drugOrder.setAsNeeded(dosingInstructions.getAsNeeded());
         drugOrder.setFrequency(orderMetadataService.getOrderFrequencyByName(dosingInstructions.getFrequency(), false));
         drugOrder.setQuantity(Double.valueOf(dosingInstructions.getQuantity()));
-        drugOrder.setQuantityUnits(conceptByName(dosingInstructions.getQuantityUnits()));
+        drugOrder.setQuantityUnits(orderMetadataService.getDispenseUnitsConceptByName(dosingInstructions.getQuantityUnits()));
         Integer numberOfRefills = dosingInstructions.getNumberOfRefills();
         drugOrder.setNumRefills(numberOfRefills == null? 0: numberOfRefills);
         return drugOrder;
