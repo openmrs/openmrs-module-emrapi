@@ -28,6 +28,9 @@ import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
+import org.openmrs.util.LocaleUtility;
+
+import java.util.List;
 
 /**
  * OpenMRSDrugOrderMapper.
@@ -70,7 +73,18 @@ public class OpenMRSDrugOrderMapper {
         openMRSDrugOrder.setUrgency(drugOrder.getScheduledDate() != null ? Order.Urgency.ON_SCHEDULED_DATE : DEFAULT_URGENCY);
         openMRSDrugOrder.setDuration(drugOrder.getDuration());
         openMRSDrugOrder.setSortWeight(drugOrder.getSortWeight());
-        openMRSDrugOrder.setDurationUnits(orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits()));
+
+        Concept durationUnitsConcept = orderMetadataService.getDurationUnitsConceptByName(drugOrder.getDurationUnits());
+        if (durationUnitsConcept != null) {
+            openMRSDrugOrder.setDurationUnits(durationUnitsConcept);
+        }
+        else {
+            List<Concept> conceptList = conceptService.getConceptsByName(drugOrder.getDurationUnits(), LocaleUtility.getDefaultLocale(), null);
+            if (conceptList.size() > 0) {
+                openMRSDrugOrder.setDurationUnits(conceptList.get(0));
+            }
+        }
+
         openMRSDrugOrder.setAutoExpireDate(drugOrder.getAutoExpireDate());
         if(drugOrder.getOrderReasonConcept() != null) {
             conceptByUuid = conceptService.getConceptByUuid(drugOrder.getOrderReasonConcept().getUuid());

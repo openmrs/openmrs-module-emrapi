@@ -49,4 +49,24 @@ public class OrderMetadataService {
         }
         return null;
     }
+
+    public Concept getDoseUnitsConceptByName(String conceptName) {
+        List<Concept> dosingUnits = orderService.getDrugDosingUnits();
+        for (Concept doseUnit : dosingUnits) {
+            if(doseUnit.getName().getName().equals(conceptName)){
+                return doseUnit;
+            }
+        }
+        return null;
+    }
+
+    public Concept getDispenseUnitsConceptByName(String conceptName) {
+        List<Concept> dispensingUnits = orderService.getDrugDispensingUnits();
+        for (Concept dispensingUnit : dispensingUnits) {
+            if(dispensingUnit.getName().getName().equals(conceptName)){
+                return dispensingUnit;
+            }
+        }
+        return null;
+    }
 }
