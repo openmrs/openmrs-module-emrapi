@@ -632,6 +632,7 @@ public class EncounterTransaction {
         private String instructions;
         private String uuid;
         private String orderType;
+        private String accessionNumber;
         private OrderGroup orderGroup;
         private Date dateCreated;
         private Date dateChanged;
@@ -653,6 +654,14 @@ public class EncounterTransaction {
 
         public Date getAutoExpireDate() {
             return autoExpireDate;
+        }
+
+        public String getAccessionNumber() {
+            return accessionNumber;
+        }
+
+        public void setAccessionNumber(String accessionNumber) {
+            this.accessionNumber = accessionNumber;
         }
 
         public void setAutoExpireDate(Date autoExpireDate) {
