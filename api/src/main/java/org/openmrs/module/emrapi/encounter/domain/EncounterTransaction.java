@@ -656,10 +656,16 @@ public class EncounterTransaction {
             return autoExpireDate;
         }
 
+        /**
+         * @since 1.35.0
+         */
         public String getAccessionNumber() {
             return accessionNumber;
         }
 
+        /**
+         * @since 1.35.0
+         */
         public void setAccessionNumber(String accessionNumber) {
             this.accessionNumber = accessionNumber;
         }
