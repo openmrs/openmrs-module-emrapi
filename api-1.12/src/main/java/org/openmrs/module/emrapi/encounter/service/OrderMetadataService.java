@@ -69,4 +69,15 @@ public class OrderMetadataService {
         }
         return null;
     }
+
+    public Concept getRouteConceptByName(String conceptName) {
+        List<Concept> drugRoutes = orderService.getDrugRoutes();
+        for (Concept route : drugRoutes) {
+            if(route.getName().getName().equals(conceptName)){
+                return route;
+            }
+        }
+        return null;
+    }
+
 }

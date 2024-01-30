@@ -32,7 +32,7 @@ public class DosingInstructionsMapper {
         drugOrder.setDose(dosingInstructions.getDose());
         drugOrder.setDoseUnits(orderMetadataService.getDoseUnitsConceptByName(dosingInstructions.getDoseUnits()));
         drugOrder.setDosingInstructions(dosingInstructions.getAdministrationInstructions());
-        drugOrder.setRoute(conceptByName(dosingInstructions.getRoute()));
+        drugOrder.setRoute(orderMetadataService.getRouteConceptByName(dosingInstructions.getRoute()));
         drugOrder.setAsNeeded(dosingInstructions.getAsNeeded());
         drugOrder.setFrequency(orderMetadataService.getOrderFrequencyByName(dosingInstructions.getFrequency(), false));
         drugOrder.setQuantity(Double.valueOf(dosingInstructions.getQuantity()));
