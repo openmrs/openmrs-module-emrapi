@@ -48,7 +48,7 @@ public class DosingInstructionsMapperTest {
         Concept capsuleConcept = new Concept();
         when(orderMetadataService.getDoseUnitsConceptByName(dosingInstructions.getDoseUnits())).thenReturn(capsuleConcept);
         Concept routeConcept = new Concept();
-        when(conceptService.getConceptByName(dosingInstructions.getRoute())).thenReturn(routeConcept);
+        when(orderMetadataService.getRouteConceptByName(dosingInstructions.getRoute())).thenReturn(routeConcept);
         Concept frequencyConcept = new Concept();
         when(conceptService.getConceptByName(dosingInstructions.getFrequency())).thenReturn(frequencyConcept);
         OrderFrequency orderFrequency = new OrderFrequency();
