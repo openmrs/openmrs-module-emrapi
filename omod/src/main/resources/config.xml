@@ -18,6 +18,7 @@
 
     <aware_of_modules>
         <aware_of_module>org.openmrs.module.fhir2</aware_of_module>
+        <aware_of_module version="${queueVersion}">org.openmrs.module.queue</aware_of_module>
     </aware_of_modules>
     <!-- Required Modules -->
     <require_modules>

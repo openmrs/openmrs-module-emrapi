@@ -228,6 +228,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional
     public void closeAndSaveVisit(Visit visit) {
         visit.setStopDatetime(guessVisitStopDatetime(visit));
+        for (CloseVisitAction action : Context.getRegisteredComponents(CloseVisitAction.class)) {
+            action.beforeSaveVisit(visit);
+        }
         visitService.saveVisit(visit);
     }
 

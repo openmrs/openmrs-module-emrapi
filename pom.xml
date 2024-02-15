@@ -55,6 +55,7 @@
         <eventVersion>2.8.0</eventVersion>
         <allergyapiVersion>1.4</allergyapiVersion>
         <webservices.restVersion>2.16</webservices.restVersion>
+        <queueVersion>2.0.0</queueVersion>
         <openMRSVersion>1.11.6</openMRSVersion>
         <jacksonVersion>1.5.0</jacksonVersion>
         <reportingApiConditionalArtifactId>reporting-api-1.9</reportingApiConditionalArtifactId>
@@ -126,6 +127,12 @@
                 <groupId>org.openmrs.module</groupId>
                 <artifactId>metadatamapping-api</artifactId>
                 <version>${metadatamappingVersion}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openmrs.module</groupId>
+                <artifactId>queue-api</artifactId>
+                <version>${queueVersion}</version>
                 <scope>provided</scope>
             </dependency>
 
