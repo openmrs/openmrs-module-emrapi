@@ -18,12 +18,12 @@
 
     <aware_of_modules>
         <aware_of_module>org.openmrs.module.fhir2</aware_of_module>
+        <aware_of_module>org.openmrs.module.metadatasharing</aware_of_module>
     </aware_of_modules>
     <!-- Required Modules -->
     <require_modules>
         <require_module version="${reportingModuleVersion}">org.openmrs.module.reporting</require_module>
         <require_module version="${providermanagementModuleVersion}">org.openmrs.module.providermanagement</require_module>
-        <require_module version="${metadatasharingVersion}">org.openmrs.module.metadatasharing</require_module>
         <require_module version="${metadatamappingVersion}">org.openmrs.module.metadatamapping</require_module>
         <require_module version="${eventVersion}">org.openmrs.event</require_module>
         <require_module version="${webservicesRestModuleVersion}">org.openmrs.module.webservices.rest</require_module>
