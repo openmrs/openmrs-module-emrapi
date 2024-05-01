@@ -228,6 +228,7 @@ public interface AdtService extends OpenmrsService {
      * in service impls greatly slow down startup, instead we have other modules inject the beans explicitly
      * via this method)
      *
+     * @since 1.36.0
      * @param visitMergeAction
      */
     void addVisitMergeAction(VisitMergeAction visitMergeAction);
@@ -236,6 +237,7 @@ public interface AdtService extends OpenmrsService {
      * Allows another module to remove a visit merge action to the list of actions to be performed
      * when a visit is merged; (see addVisitMergeAction above)
      *
+     * @since 1.36.0
      * @param visitMergeAction
      */
     void removeVisitMergeAction(VisitMergeAction visitMergeAction);

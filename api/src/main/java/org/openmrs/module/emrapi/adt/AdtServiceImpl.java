@@ -125,7 +125,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     // for testing
-    public List<VisitMergeAction> getVisitMergeActions() {
+    List<VisitMergeAction> getVisitMergeActions() {
         return visitMergeActions;
     }
 

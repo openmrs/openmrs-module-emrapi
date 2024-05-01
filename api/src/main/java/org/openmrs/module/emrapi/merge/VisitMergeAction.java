@@ -18,7 +18,7 @@ public interface VisitMergeAction {
     void beforeSavingVisits(Visit preferred, Visit notPreferred);
 
     /**
-     * This method will be after before calling the visit service to save / void either of the given visits,
+     * This method will be called after calling the visit service to save / void either of the given visits,
      * but in the same transaction. Any thrown exception will cancel the merge
      * same transaction.
      *
