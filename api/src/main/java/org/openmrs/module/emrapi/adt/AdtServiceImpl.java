@@ -44,6 +44,7 @@ import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodExce
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
+import org.openmrs.module.emrapi.merge.VisitMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
@@ -84,6 +85,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private List<PatientMergeAction> patientMergeActions;
 
+    private List<VisitMergeAction> visitMergeActions;
+
     public void setPatientService(PatientService patientService) {
         this.patientService = patientService;
     }
@@ -119,6 +122,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     // for testing
     public List<PatientMergeAction> getPatientMergeActions() {
         return patientMergeActions;
+    }
+
+    // for testing
+    public List<VisitMergeAction> getVisitMergeActions() {
+        return visitMergeActions;
     }
 
     @Override
@@ -705,8 +713,23 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
         nonPreferred.setEncounters(null); // we need to manually the encounters from the non-preferred visit before voiding or all the encounters we just moved will also get voided!
 
+        // do any "before visit save actions" that have been registered
+        if (visitMergeActions != null) {
+            for (VisitMergeAction visitMergeAction : visitMergeActions) {
+                visitMergeAction.beforeSavingVisits(preferred, nonPreferred);
+            }
+        }
+
         visitService.voidVisit(nonPreferred, "EMR - Merge Patients: merged into visit " + preferred.getVisitId());
         visitService.saveVisit(preferred);
+
+        // do any "after visit save actions" that have been registered
+        if (visitMergeActions != null) {
+            for (VisitMergeAction visitMergeAction : visitMergeActions) {
+                visitMergeAction.afterSavingVisits(preferred, nonPreferred);
+            }
+        }
+
         return preferred;
     }
 
@@ -745,6 +768,22 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             this.patientMergeActions = new ArrayList<PatientMergeAction>();
         }
         this.patientMergeActions.remove(patientMergeAction);
+    }
+
+    @Override
+    public void addVisitMergeAction(VisitMergeAction visitMergeAction) {
+        if (this.visitMergeActions == null) {
+            this.visitMergeActions = new ArrayList<VisitMergeAction>();
+        }
+        this.visitMergeActions.add(visitMergeAction);
+    }
+
+    @Override
+    public void removeVisitMergeAction(VisitMergeAction visitMergeAction) {
+        if (this.visitMergeActions == null) {
+            this.visitMergeActions = new ArrayList<VisitMergeAction>();
+        }
+        this.visitMergeActions.remove(visitMergeAction);
     }
 
     @Transactional

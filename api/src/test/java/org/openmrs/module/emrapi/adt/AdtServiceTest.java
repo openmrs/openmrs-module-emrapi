@@ -40,11 +40,10 @@ import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
 import org.openmrs.api.EncounterService;
+import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.VisitService;
-import org.openmrs.api.LocationService;
-import org.openmrs.Concept;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -53,8 +52,8 @@ import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodExce
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
+import org.openmrs.module.emrapi.merge.VisitMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
-import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.serialization.SerializationException;
@@ -1109,6 +1108,45 @@ public class AdtServiceTest {
         assertThat(service.getPatientMergeActions().size(), is(0));
     }
 
+    @Test
+    public void test_shouldAddVisitMergeActions() throws Exception {
+        VisitMergeAction action1 = new DummyVisitMergeAction();
+        VisitMergeAction action2 = new DummyVisitMergeAction();
+
+        service.addVisitMergeAction(action1);
+        service.addVisitMergeAction(action2);
+
+        assertThat(service.getVisitMergeActions().size(), is(2));
+        assertTrue(service.getVisitMergeActions().contains(action1));
+        assertTrue(service.getVisitMergeActions().contains(action2));
+    }
+
+    @Test
+    public void test_shouldRemoveVisitMergeAction() throws Exception {
+
+        VisitMergeAction action1 = new DummyVisitMergeAction();
+        VisitMergeAction action2 = new DummyVisitMergeAction();
+
+        service.addVisitMergeAction(action1);
+        service.addVisitMergeAction(action2);
+
+        service.removeVisitMergeAction(action1);
+
+        assertThat(service.getVisitMergeActions().size(), is(1));
+        assertFalse(service.getVisitMergeActions().contains(action1));
+        assertTrue(service.getVisitMergeActions().contains(action2));
+
+    }
+
+    @Test
+    public void test_removeVisitMergeActionShouldNotFailIfActionsNotInitialized() throws Exception  {
+
+        VisitMergeAction action = new DummyVisitMergeAction();
+        service.removeVisitMergeAction(action);
+
+        assertThat(service.getVisitMergeActions().size(), is(0));
+    }
+
 
     private Encounter buildEncounter(Patient patient, Date encounterDatetime) {
         Encounter encounter = new Encounter();
@@ -1138,6 +1176,17 @@ public class AdtServiceTest {
         public void afterMergingPatients(Patient preferred, Patient notPreferred) {
         }
 
+    }
+
+    private class DummyVisitMergeAction implements VisitMergeAction {
+
+        @Override
+        public void beforeSavingVisits(Visit preferred, Visit notPreferred) {
+        }
+
+        @Override
+        public void afterSavingVisits(Visit preferred, Visit notPreferred) {
+        }
     }
 
     private class MockDomainWrapperFactory extends DomainWrapperFactory{
