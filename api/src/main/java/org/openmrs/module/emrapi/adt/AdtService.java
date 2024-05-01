@@ -24,6 +24,7 @@ import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
+import org.openmrs.module.emrapi.merge.VisitMergeAction;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.Date;
@@ -220,6 +221,26 @@ public interface AdtService extends OpenmrsService {
      * @param patientMergeAction
      */
     void removePatientMergeAction(PatientMergeAction patientMergeAction);
+
+    /**
+     * Allows another module to add a visit merge action to the list of actions to be performed
+     * when a visit is merged; (ideally, this would just happen via @Autowired, but because @Autowired
+     * in service impls greatly slow down startup, instead we have other modules inject the beans explicitly
+     * via this method)
+     *
+     * @since 1.36.0
+     * @param visitMergeAction
+     */
+    void addVisitMergeAction(VisitMergeAction visitMergeAction);
+
+    /**
+     * Allows another module to remove a visit merge action to the list of actions to be performed
+     * when a visit is merged; (see addVisitMergeAction above)
+     *
+     * @since 1.36.0
+     * @param visitMergeAction
+     */
+    void removeVisitMergeAction(VisitMergeAction visitMergeAction);
 
     /**
      * Merge a set of consecutive patient visits
