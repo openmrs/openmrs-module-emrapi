@@ -10,15 +10,12 @@ import org.openmrs.Drug;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Order;
-import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.OrderService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.exception.ConceptNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -27,8 +24,6 @@ import java.util.Set;
 
 import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
 
-@Component("obsMapper")
-@OpenmrsProfile(openmrsPlatformVersion = "[1.9.* - 1.10.*]")
 public class ObsMapper {
 
     private ConceptService conceptService;
@@ -36,7 +31,6 @@ public class ObsMapper {
     private ObsService obsService;
     private OrderService orderService;
 
-    @Autowired
     public ObsMapper(ConceptService conceptService,
                      EmrApiProperties emrApiProperties,
                      ObsService obsService, OrderService orderService) {
@@ -74,7 +68,8 @@ public class ObsMapper {
         observation.setPerson(encounter.getPatient());
         observation.setObsDatetime(observationDateTime);
         setVoidedObs(observationData, observation);
-
+        observation.setFormField(observationData.getFormNamespace(),observationData.getFormFieldPath());
+        setInterpretationAndStatus(observation, observationData);
         return observation;
     }
 
@@ -122,6 +117,14 @@ public class ObsMapper {
             observation.setOrder(getOrderByUuid(observationData.getOrderUuid()));
         }
         observation.setObsDatetime(getCurrentDateIfNull(observationData.getObservationDateTime()));
+        setInterpretationAndStatus(observation, observationData);
+    }
+
+    private void setInterpretationAndStatus(Obs obs, EncounterTransaction.Observation observationData) {
+        String interpretation = observationData.getInterpretation();
+        obs.setInterpretation(interpretation == null ? null : Obs.Interpretation.valueOf(interpretation));
+        String status = observationData.getStatus();
+        obs.setStatus(status == null ? null : Obs.Status.valueOf(status));
     }
 
     private String getUuidOfCodedObservationValue(Object codeObsVal) {

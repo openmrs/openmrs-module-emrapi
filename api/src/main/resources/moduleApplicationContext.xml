@@ -326,6 +326,13 @@
         <constructor-arg name="userMapper" ref="userMapper"/>
     </bean>
 
+    <bean id="obsMapper" class="org.openmrs.module.emrapi.encounter.mapper.ObsMapper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+        <constructor-arg name="emrApiProperties" ref="emrApiProperties"/>
+        <constructor-arg name="obsService" ref="obsService"/>
+        <constructor-arg name="orderService" ref="orderService"/>
+    </bean>
+
     <bean id="conceptMapper" class="org.openmrs.module.emrapi.encounter.ConceptMapper"/>
 
     <bean id="diagnosisMapper" class="org.openmrs.module.emrapi.encounter.DiagnosisMapper">
