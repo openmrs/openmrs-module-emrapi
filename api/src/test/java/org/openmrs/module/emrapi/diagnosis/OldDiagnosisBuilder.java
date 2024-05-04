@@ -1,10 +1,8 @@
-package org.openmrs.emrapi.diagnosis;
+package org.openmrs.module.emrapi.diagnosis;
 
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
 import org.openmrs.module.reporting.common.DateUtil;
 

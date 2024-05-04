@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import openmrs.module.emrapi.diagnosis.MigrateDiagnosis;
+import org.openmrs.module.emrapi.diagnosis.MigrateDiagnosis;
 
 @Controller
 public class MigrateDiagnosisController {

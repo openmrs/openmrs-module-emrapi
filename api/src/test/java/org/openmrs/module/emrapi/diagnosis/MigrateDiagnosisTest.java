@@ -1,10 +1,11 @@
-package org.openmrs.emrapi.diagnosis;
+package org.openmrs.module.emrapi.diagnosis;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,17 +16,12 @@ import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
 import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import openmrs.module.emrapi.diagnosis.MigrateDiagnosis;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -77,11 +73,11 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 		List<Diagnosis> emrapiDiagnoses = MigrateDiagnosis.getDeprecatedDiagnosisService().getDiagnoses(patient, null);
 		assertEquals(2, emrapiDiagnoses.size());
 		// before migration
-		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
+		Assert.assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
 		
 		new MigrateDiagnosis().migrate(diagnosisMetadata);
 		// after migration
-		assertEquals(2, diagnosisService.getDiagnoses(patient, null).size());
+		Assert.assertEquals(2, diagnosisService.getDiagnoses(patient, null).size());
 		assertTrue(obs.getVoided());
 		
 	}

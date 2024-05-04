@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package openmrs.module.emrapi.diagnosis;
+package org.openmrs.module.emrapi.diagnosis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +17,6 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisServiceImpl;
 import org.openmrs.module.emrapi.visit.EmrVisitService;
 
 /**
