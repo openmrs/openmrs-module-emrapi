@@ -16,23 +16,18 @@ package org.openmrs.module.emrapi.encounter;
 import org.openmrs.Concept;
 import org.openmrs.Drug;
 import org.openmrs.Obs;
-import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.UserMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 
-@Component("observationMapper")
-@OpenmrsProfile(openmrsPlatformVersion = "[1.9.* - 1.11.*]")
 public class ObservationMapper {
-    private ConceptMapper conceptMapper;
-    private DrugMapper drugMapper;
-    private UserMapper userMapper;
 
-    @Autowired(required = false)
+    private final ConceptMapper conceptMapper;
+    private final DrugMapper drugMapper;
+    private final UserMapper userMapper;
+
     public ObservationMapper(ConceptMapper conceptMapper, DrugMapper drugMapper, UserMapper userMapper) {
         this.conceptMapper = conceptMapper;
         this.drugMapper = drugMapper;
@@ -59,6 +54,18 @@ public class ObservationMapper {
                 observation.addGroupMember(map(obsGroupMember));
             }
         }
+        observation.setFormNamespace(obs.getFormFieldNamespace());
+        observation.setFormFieldPath(obs.getFormFieldPath());
+
+        Obs.Interpretation obsInterpretation = obs.getInterpretation();
+        Obs.Status obsStatus = obs.getStatus();
+
+        String interpretation = (obsInterpretation != null) ? obsInterpretation.name() : null;
+        String status = (obsStatus != null) ? obsStatus.name() : null;
+
+        observation.setInterpretation(interpretation);
+        observation.setStatus(status);
+
         return observation;
     }
 

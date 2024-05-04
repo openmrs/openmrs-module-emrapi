@@ -70,12 +70,14 @@ public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldMapObservationWithNumericValue(){
         when(conceptDatatype.isNumeric()).thenReturn(true);
-        Obs obs = obsBuilder.setValue(100.0).get();
+        Obs obs = obsBuilder.setValue(100.0).setFormField("form uuid", "formFieldPath").get();
 
         EncounterTransaction.Observation observation = observationMapper.map(obs);
 
         assertEquals(obs.getUuid(), observation.getUuid());
         assertEquals(100.0, observation.getValue());
+        assertEquals(observation.getFormNamespace(), "form uuid");
+        assertEquals(observation.getFormFieldPath(), "formFieldPath");
     }
 
     @Test
