@@ -17,7 +17,7 @@ import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
+import org.openmrs.module.emrapi.encounter.OrderMetadataService;
 
 public class DosingInstructionsMapper {
     private ConceptService conceptService;

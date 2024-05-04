@@ -27,7 +27,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
+import org.openmrs.module.emrapi.encounter.OrderMetadataService;
 import org.openmrs.util.LocaleUtility;
 
 import java.util.List;

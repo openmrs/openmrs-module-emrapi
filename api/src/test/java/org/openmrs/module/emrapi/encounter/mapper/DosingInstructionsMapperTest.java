@@ -21,7 +21,7 @@ import org.openmrs.DrugOrder;
 import org.openmrs.OrderFrequency;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.encounter.builder.DosingInstructionsBuilder;
-import org.openmrs.module.emrapi.encounter.service.OrderMetadataService;
+import org.openmrs.module.emrapi.encounter.OrderMetadataService;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;

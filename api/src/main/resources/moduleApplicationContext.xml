@@ -421,7 +421,7 @@
         </property>
     </bean>
 
-    <bean id="orderMetadataService" class="org.openmrs.module.emrapi.encounter.service.OrderMetadataService">
+    <bean id="orderMetadataService" class="org.openmrs.module.emrapi.encounter.OrderMetadataService">
         <constructor-arg name="orderService" ref="orderService"/>
     </bean>
 

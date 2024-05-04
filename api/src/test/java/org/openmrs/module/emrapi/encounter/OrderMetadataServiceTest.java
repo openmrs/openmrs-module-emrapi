@@ -11,7 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.encounter.service;
+package org.openmrs.module.emrapi.encounter;
 
 import org.junit.Before;
 import org.junit.Test;
