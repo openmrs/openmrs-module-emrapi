@@ -11,7 +11,7 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.encounter.service;
+package org.openmrs.module.emrapi.encounter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.DrugOrder;
@@ -20,31 +20,28 @@ import org.openmrs.Order;
 import org.openmrs.OrderGroup;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.OrderSetService;
-import org.openmrs.module.emrapi.encounter.EmrOrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderGroupMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-@Service(value = "emrOrderService")
-public class EmrOrderServiceImpl_1_12 implements EmrOrderService {
+@Transactional
+public class EmrOrderServiceImpl implements EmrOrderService {
 
-    private final EncounterService encounterService;
-    private final OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
-    private final OpenMRSOrderMapper openMRSOrderMapper;
-    private final OrderSetService orderSetService;
-    private final OpenMRSOrderGroupMapper openMRSOrderGroupMapper;
+    private EncounterService encounterService;
+    private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
+    private OpenMRSOrderMapper openMRSOrderMapper;
+    private OrderSetService orderSetService;
+    private OpenMRSOrderGroupMapper openMRSOrderGroupMapper;
 
-    @Autowired
-    public EmrOrderServiceImpl_1_12(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService,
-                                    OpenMRSOrderMapper openMRSOrderMapper, OrderSetService orderSetService,
-                                    OpenMRSOrderGroupMapper openMRSOrderGroupMapper) {
+    public EmrOrderServiceImpl(OpenMRSDrugOrderMapper openMRSDrugOrderMapper, EncounterService encounterService,
+                               OpenMRSOrderMapper openMRSOrderMapper, OrderSetService orderSetService,
+                               OpenMRSOrderGroupMapper openMRSOrderGroupMapper) {
         this.openMRSDrugOrderMapper = openMRSDrugOrderMapper;
         this.encounterService = encounterService;
         this.openMRSOrderMapper = openMRSOrderMapper;
