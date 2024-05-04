@@ -11,16 +11,16 @@
  *
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
-package org.openmrs.module.emrapi.encounter;
+package org.openmrs.module.emrapi.encounter.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.OrderGroup;
-import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.OrderSetService;
+import org.openmrs.module.emrapi.encounter.EmrOrderService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper;
 import org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderGroupMapper;
@@ -31,10 +31,8 @@ import org.springframework.stereotype.Service;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Service(value = "emrOrderService")
-@OpenmrsProfile(openmrsPlatformVersion = "1.12.0 - 2.*")
 public class EmrOrderServiceImpl_1_12 implements EmrOrderService {
 
     private final EncounterService encounterService;

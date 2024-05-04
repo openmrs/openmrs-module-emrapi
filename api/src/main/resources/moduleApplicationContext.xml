@@ -400,4 +400,30 @@
         </property>
     </bean>
 
+    <bean id="orderMetadataService" class="org.openmrs.module.emrapi.encounter.service.OrderMetadataService">
+        <constructor-arg name="orderService" ref="orderService"/>
+    </bean>
+
+    <bean id="dosingInstructionsMapper" class="org.openmrs.module.emrapi.encounter.mapper.DosingInstructionsMapper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+        <constructor-arg name="orderMetadataService" ref="orderMetadataService"/>
+    </bean>
+
+    <bean id="openMRSDrugOrderMapper" class="org.openmrs.module.emrapi.encounter.mapper.OpenMRSDrugOrderMapper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+        <constructor-arg name="dosingInstructionsMapper" ref="dosingInstructionsMapper"/>
+        <constructor-arg name="orderMetadataService" ref="orderMetadataService"/>
+        <constructor-arg name="orderService" ref="orderService"/>
+    </bean>
+
+    <bean id="openMRSOrderMapper" class="org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderMapper">
+        <constructor-arg name="conceptService" ref="conceptService"/>
+        <constructor-arg name="orderService" ref="orderService"/>
+    </bean>
+
+    <bean id="openMRSOrderGroupMapper" class="org.openmrs.module.emrapi.encounter.mapper.OpenMRSOrderGroupMapper">
+        <constructor-arg name="orderSetService" ref="orderSetService"/>
+        <constructor-arg name="orderService" ref="orderService"/>
+    </bean>
+
 </beans>

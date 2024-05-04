@@ -28,7 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 @Component(value = "observationMapper")
-@OpenmrsProfile(openmrsPlatformVersion = "1.12.0 - 2.*")
 public class ObservationMapper1_12 extends ObservationMapper {
 
     private Log log = LogFactory.getLog(this.getClass());

@@ -31,7 +31,6 @@
 
     <modules>
         <module>api</module>
-        <module>api-1.12</module>
         <module>api-2.2</module>
         <module>web-2.2</module>
         <module>condition-list</module>
