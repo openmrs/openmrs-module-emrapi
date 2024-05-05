@@ -411,7 +411,7 @@ public class AccountDomainWrapperTest {
         assertThat(account.getUser().getUserProperty(USER_PROPERTY_LOCKOUT_TIMESTAMP), is(""));
         assertThat(account.getUser().getUserProperty(USER_PROPERTY_LOGIN_ATTEMPTS), is(""));
 
-        verify(userService).createUser(account.getUser(), null);
+        verify(userService).saveUser(account.getUser());
     }
 
 
@@ -475,7 +475,7 @@ public class AccountDomainWrapperTest {
         account.getUser().setUserId(1);    // mimic making this user persistent
         account.save();
 
-        verify(userService).createUser(account.getUser(), "abc");
+        verify(userService).saveUser(account.getUser());
         verify(userService).changePassword(account.getUser(), "abc");
     }
 
