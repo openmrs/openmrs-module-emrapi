@@ -17,7 +17,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
+import org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAO;
 import org.openmrs.module.emrapi.encounter.exception.VisitNotFoundException;
 import org.openmrs.module.emrapi.visit.contract.VisitRequest;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
@@ -34,13 +36,17 @@ public class EmrVisitServiceImplTest {
     private VisitService visitService;
     @Mock
     private VisitResponseMapper visitResponseMapper;
+    @Mock
+    private AdministrationService adminService;
+    @Mock
+    private EmrDiagnosisDAO emrDiagnosisDAO;
 
     private EmrVisitService emrVisitService;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        emrVisitService = new EmrVisitServiceImpl(visitService, visitResponseMapper);
+        emrVisitService = new EmrVisitServiceImpl(visitService, visitResponseMapper, adminService, emrDiagnosisDAO);
     }
 
     @Test
