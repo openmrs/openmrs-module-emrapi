@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.CareSetting;
 import org.openmrs.Concept;
+import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptName;
@@ -28,13 +29,12 @@ import org.openmrs.ConceptSource;
 import org.openmrs.Drug;
 import org.openmrs.DrugOrder;
 import org.openmrs.Duration;
+import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.OrderFrequency;
 import org.openmrs.OrderType;
 import org.openmrs.Patient;
-import org.openmrs.Encounter;
 import org.openmrs.SimpleDosingInstructions;
-import org.openmrs.ConceptDatatype;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -44,21 +44,19 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
-import java.util.Locale;
-import java.util.List;
-import java.util.HashSet;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LocaleUtility.class, Context.class})
-public class OrderMapper1_12Test {
+public class DefaultOrderMapperTest {
 
     private static final CareSettingType OUT_PATIENT_CARE_SETTING = CareSettingType.OUTPATIENT;
     private static final String DRUG_ORDER_TYPE = "Drug Order";
@@ -73,14 +71,13 @@ public class OrderMapper1_12Test {
     private static final String TWICE_A_DAY_FREQUENCY = "Twice a day";
     private static final String FREE_TEXT_DRUG_NAME = "Free Text Drug";
 
-    private OrderMapper1_12 orderMapper1_12;
+    private DefaultOrderMapper orderMapper;
 
     @Before
     public void setup() {
         mockStatic(LocaleUtility.class);
         mockStatic(Context.class);
-
-        orderMapper1_12 = new OrderMapper1_12();
+        orderMapper = new DefaultOrderMapper();
     }
 
     @Test
@@ -88,7 +85,7 @@ public class OrderMapper1_12Test {
 
         Order openMrsOrder = order("boil in water", "comments", "ORD-99", "ORD-100", ORDER_TYPE,"STAT");
         openMrsOrder.setUuid(ORDER_UUID);
-        EncounterTransaction.Order order = orderMapper1_12.mapOrder(openMrsOrder);
+        EncounterTransaction.Order order = orderMapper.mapOrder(openMrsOrder);
 
         assertThat(order.getAction(), is(equalTo(Order.Action.NEW.name())));
         assertThat(order.getUuid(), is(equalTo(ORDER_UUID)));
@@ -105,7 +102,7 @@ public class OrderMapper1_12Test {
     @Test
     public void shouldSetPreviousOrder() throws NoSuchFieldException, IllegalAccessException {
         Order openMrsOrder = order("boil in water", "comments", "Previous Order Uuid", "ORD-100", ORDER_TYPE,"ROUTINE");
-        EncounterTransaction.Order order = orderMapper1_12.mapOrder(openMrsOrder);
+        EncounterTransaction.Order order = orderMapper.mapOrder(openMrsOrder);
 
         assertThat(order.getPreviousOrderUuid(), is(equalTo("Previous Order Uuid")));
     }
@@ -118,7 +115,7 @@ public class OrderMapper1_12Test {
 
         Encounter encounter = new Encounter();
         encounter.setOrders(new HashSet<Order>(Arrays.asList(order350, order100, order201)));
-        List<EncounterTransaction.Order> ordersList = orderMapper1_12.mapOrders(encounter);
+        List<EncounterTransaction.Order> ordersList = orderMapper.mapOrders(encounter);
 
         assertEquals(3, ordersList.size());
     }
@@ -130,7 +127,7 @@ public class OrderMapper1_12Test {
         Concept concept = concept("newConcept", "newConceptDataType", "newConceptUuid");
 
         openMrsDrugOrder.setConcept(concept);
-        EncounterTransaction.DrugOrder drugOrder = orderMapper1_12.mapDrugOrder(openMrsDrugOrder);
+        EncounterTransaction.DrugOrder drugOrder = orderMapper.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getCareSetting(), is(equalTo(OUT_PATIENT_CARE_SETTING)));
         assertThat(drugOrder.getAction(), is(equalTo(Order.Action.NEW.name())));
@@ -170,7 +167,7 @@ public class OrderMapper1_12Test {
         DrugOrder nonCodedDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", null, "ORD-100");
         nonCodedDrugOrder.setDrugNonCoded(FREE_TEXT_DRUG_NAME);
         nonCodedDrugOrder.setDrug(null);
-        EncounterTransaction.DrugOrder drugOrder = orderMapper1_12.mapDrugOrder(nonCodedDrugOrder);
+        EncounterTransaction.DrugOrder drugOrder = orderMapper.mapDrugOrder(nonCodedDrugOrder);
 
         assertThat(drugOrder.getDrugNonCoded(), is(equalTo(FREE_TEXT_DRUG_NAME)));
         assertThat(drugOrder.getDrug(), is(equalTo(null)));
@@ -179,7 +176,7 @@ public class OrderMapper1_12Test {
     @Test
     public void shouldSetPreviousDrugOrder() throws NoSuchFieldException, IllegalAccessException {
         DrugOrder openMrsDrugOrder = drugOrder(CareSetting.CareSettingType.OUTPATIENT, 3, "3-0-2", 5, "before meals", "boil in water", "previousOrderUuid", "ORD-100");
-        EncounterTransaction.DrugOrder drugOrder = orderMapper1_12.mapDrugOrder(openMrsDrugOrder);
+        EncounterTransaction.DrugOrder drugOrder = orderMapper.mapDrugOrder(openMrsDrugOrder);
 
         assertThat(drugOrder.getPreviousOrderUuid(), is(equalTo("previousOrderUuid")));
     }
@@ -192,7 +189,7 @@ public class OrderMapper1_12Test {
 
         Encounter encounter = new Encounter();
         encounter.setOrders(new HashSet<Order>(Arrays.asList(drugOrder350, drugOrder100, drugOrder201)));
-        List<EncounterTransaction.DrugOrder> sortedDrugOrders = orderMapper1_12.mapDrugOrders(encounter);
+        List<EncounterTransaction.DrugOrder> sortedDrugOrders = orderMapper.mapDrugOrders(encounter);
 
         assertEquals("ORD-100", sortedDrugOrders.get(0).getOrderNumber());
         assertEquals("ORD-201", sortedDrugOrders.get(1).getOrderNumber());
