@@ -50,7 +50,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-public class OpenMRSDrugOrderMapper1_12Test {
+public class OpenMRSDrugOrderMapperTest {
 
     public static final String OUT_PATIENT_CARE_SETTING = "OUTPATIENT";
     public static final String DAY_DURATION_UNIT = "day";

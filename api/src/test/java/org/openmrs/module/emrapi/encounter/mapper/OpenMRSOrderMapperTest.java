@@ -38,7 +38,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class OpenMRSOrderMapper_1_12_Test {
+public class OpenMRSOrderMapperTest {
 
     @Mock
     private OrderService orderService;
