@@ -13,30 +13,21 @@
  */
 package org.openmrs.module.emrapi.visit;
 
+import java.util.List;
+
 import org.openmrs.Obs;
 import org.openmrs.Visit;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.db.EmrVisitDAO;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisUtils;
-import org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAO;
 import org.openmrs.module.emrapi.encounter.exception.VisitNotFoundException;
 import org.openmrs.module.emrapi.visit.contract.VisitRequest;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitService {
-
-    private final VisitService visitService;
-    private final VisitResponseMapper visitResponseMapper;
-    private final AdministrationService adminService;
-    private final EmrDiagnosisDAO emrDiagnosisDAO;
+    private VisitService visitService;
+    private VisitResponseMapper visitResponseMapper;
 
     protected EmrVisitDAO dao;
 
@@ -48,12 +39,9 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
        this.dao = dao;
     }
 
-    public EmrVisitServiceImpl(VisitService visitService, VisitResponseMapper visitResponseMapper,
-                               AdministrationService adminService, EmrDiagnosisDAO emrDiagnosisDAO) {
+    public EmrVisitServiceImpl(VisitService visitService, VisitResponseMapper visitResponseMapper) {
         this.visitService = visitService;
         this.visitResponseMapper = visitResponseMapper;
-        this.adminService = adminService;
-        this.emrDiagnosisDAO = emrDiagnosisDAO;
     }
 
     @Override
@@ -64,34 +52,25 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
         return visitResponseMapper.map(visit);
     }
 
-    @Override
-    public List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
-        if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true")) {
-            if (primaryOnly == true) {
-                if (confirmedOnly == false) {
-                    return dao.getPrimaryDiagnoses(visit, diagnosisMetadata);
-                }
-                else {
-                    return dao.getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
-                }
-            }
-            else {
-                if (confirmedOnly == false) {
-                    return dao.getDiagnoses(visit, diagnosisMetadata);
-                }
-                else {
-                    return dao.getConfirmedDiagnoses(visit, diagnosisMetadata);
-                }
-            }
-        } else {
-            List<org.openmrs.Diagnosis> diagnoses = emrDiagnosisDAO.getDiagnoses(visit, primaryOnly, confirmedOnly);
-            List<Obs> diagnosisList = new ArrayList<Obs>();
-            for (Diagnosis diagnosis : DiagnosisUtils.convert(diagnoses)) {
-                diagnosisList.add(diagnosisMetadata.buildDiagnosisObsGroup(diagnosis));
-            }
-            return diagnosisList;
-        }
-    }
+   @Override
+   public List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
+      if (primaryOnly == true) {
+         if (confirmedOnly == false) {
+            return dao.getPrimaryDiagnoses(visit, diagnosisMetadata);
+         }
+         else {
+            return dao.getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
+         }
+      }
+      else {
+         if (confirmedOnly == false) {
+            return dao.getDiagnoses(visit, diagnosisMetadata);
+         }
+         else {
+            return dao.getConfirmedDiagnoses(visit, diagnosisMetadata);
+         }
+      }
+   }
 
     @Override
     public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {

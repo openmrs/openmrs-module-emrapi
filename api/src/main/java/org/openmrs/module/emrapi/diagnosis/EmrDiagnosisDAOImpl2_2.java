@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Hibernate implementation of the EmrDiagnosisDAO
  */
-public class EmrDiagnosisDAOImpl implements EmrDiagnosisDAO {
+public class EmrDiagnosisDAOImpl2_2 implements EmrDiagnosisDAO {
 
    // TODO: Fetching diagnosis should be delegated to core Diagnosis service.
    // https://issues.openmrs.org/browse/TRUNK-5999

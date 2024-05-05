@@ -465,7 +465,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisServiceImpl">
+            <bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisServiceImpl2_2">
                 <property name="emrApiProperties" ref="emrApiProperties"/>
                 <property name="obsService" ref="obsService"/>
                 <property name="encounterService" ref="encounterService"/>
@@ -489,18 +489,18 @@
         </property>
     </bean>
 
-    <bean id="emrDiagnosisDAO" class="org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAOImpl">
+    <bean id="emrDiagnosisDAO" class="org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAOImpl2_2">
         <property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
     </bean>
 
-    <bean id="emrVisitServiceImpl" class="${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitServiceImpl">
+    <bean id="emrVisitServiceImpl" class="${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitServiceImpl2_2">
         <constructor-arg ref="visitService"/>
         <constructor-arg ref="visitResponseMapper"/>
-        <constructor-arg ref="adminService"/>
-        <constructor-arg ref="emrDiagnosisDAO"/>
         <property name="dao">
             <ref bean="emrVisitDAOImpl"/>
         </property>
+        <property name="adminService" ref="adminService"/>
+        <property name="emrDiagnosisDAO" ref="emrDiagnosisDAO"/>
     </bean>
 
 </beans>

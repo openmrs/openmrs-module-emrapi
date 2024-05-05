@@ -7,12 +7,9 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Person;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
-import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 
 import java.util.ArrayList;
@@ -38,8 +35,6 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 
     private EncounterService encounterService;
 
-    private AdministrationService adminService;
-
 	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
 		this.emrApiProperties = emrApiProperties;
 	}
@@ -52,19 +47,9 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
         this.encounterService = encounterService;
     }
 
-    public void setAdminService(AdministrationService adminService) {
-        this.adminService = adminService;
-    }
-
-    protected boolean useCoreDiagnosisService() {
-        return !adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE,"false").equalsIgnoreCase("true");
-    }
-
     @Override
     public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses) {
-        if (useCoreDiagnosisService()) {
-            return null;
-        }
+
         List<Obs> newDiagnoses = null;
         if ( (nonCodedObs != null) && (diagnoses != null && diagnoses.size() > 0) ){
             newDiagnoses = new ArrayList<Obs>();
@@ -110,9 +95,6 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 
     @Override
     public List<Diagnosis> getPrimaryDiagnoses(Encounter encounter) {
-        if (useCoreDiagnosisService()) {
-            return DiagnosisUtils.convert(Context.getDiagnosisService().getPrimaryDiagnoses(encounter));
-        }
         List<Diagnosis> diagnoses = null;
         if (encounter != null && !encounter.isVoided()){
             DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
@@ -136,9 +118,6 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 
     @Override
     public boolean hasDiagnosis(Encounter encounter, Diagnosis diagnosis) {
-        if (useCoreDiagnosisService()) {
-            return true; // TODO: This does not look right, but this is what was in place.  Needs review
-        }
         boolean hasDiagnosis = false;
         if (encounter != null && !encounter.isVoided()){
             DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
@@ -163,9 +142,6 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 
     @Override
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
-        if (useCoreDiagnosisService()) {
-            return DiagnosisUtils.convert(Context.getDiagnosisService().getDiagnoses(patient, fromDate));
-        }
 		List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
 
 		DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
@@ -206,9 +182,6 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 
 	@Override
 	public List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate) {
-        if (useCoreDiagnosisService()) {
-            return DiagnosisUtils.convert(Context.getDiagnosisService().getUniqueDiagnoses(patient, fromDate));
-        }
 		List<Diagnosis> diagnoses = getDiagnoses(patient, fromDate);
 
 		Set<CodedOrFreeTextAnswer> answers = new HashSet<CodedOrFreeTextAnswer>();
