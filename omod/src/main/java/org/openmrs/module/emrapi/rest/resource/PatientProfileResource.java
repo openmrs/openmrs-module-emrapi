@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Resource(name = RestConstants.VERSION_1 + "/patientprofile", supportedClass = PatientProfile.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*", "2.4.*", "2.5.*"})
+@Resource(name = RestConstants.VERSION_1 + "/patientprofile", supportedClass = PatientProfile.class, supportedOpenmrsVersions = { "2.2 - 9.*" })
 public class PatientProfileResource extends DelegatingCrudResource<PatientProfile> {
 
     @Override
