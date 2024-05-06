@@ -13,22 +13,29 @@
  */
 package org.openmrs.module.emrapi.visit;
 
-import java.util.List;
-
 import org.openmrs.Obs;
 import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.db.EmrVisitDAO;
+import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisUtils;
+import org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAO;
 import org.openmrs.module.emrapi.encounter.exception.VisitNotFoundException;
 import org.openmrs.module.emrapi.visit.contract.VisitRequest;
 import org.openmrs.module.emrapi.visit.contract.VisitResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitService {
     private VisitService visitService;
     private VisitResponseMapper visitResponseMapper;
-
+    private AdministrationService adminService;
+    private EmrDiagnosisDAO emrDiagnosisDAO;
     protected EmrVisitDAO dao;
 
     public EmrVisitDAO getDao() {
@@ -37,6 +44,14 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
 
     public void setDao(EmrVisitDAO dao) {
        this.dao = dao;
+    }
+
+    public void setAdminService(AdministrationService adminService) {
+        this.adminService = adminService;
+    }
+
+    public void setEmrDiagnosisDAO(EmrDiagnosisDAO emrDiagnosisDAO) {
+        this.emrDiagnosisDAO = emrDiagnosisDAO;
     }
 
     public EmrVisitServiceImpl(VisitService visitService, VisitResponseMapper visitResponseMapper) {
@@ -52,24 +67,30 @@ public class EmrVisitServiceImpl extends BaseOpenmrsService implements EmrVisitS
         return visitResponseMapper.map(visit);
     }
 
-   @Override
    public List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
-      if (primaryOnly == true) {
-         if (confirmedOnly == false) {
-            return dao.getPrimaryDiagnoses(visit, diagnosisMetadata);
-         }
-         else {
-            return dao.getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
-         }
-      }
-      else {
-         if (confirmedOnly == false) {
-            return dao.getDiagnoses(visit, diagnosisMetadata);
-         }
-         else {
-            return dao.getConfirmedDiagnoses(visit, diagnosisMetadata);
-         }
-      }
+       if (adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true")) {
+           if (primaryOnly == true) {
+               if (confirmedOnly == false) {
+                   return dao.getPrimaryDiagnoses(visit, diagnosisMetadata);
+               } else {
+                   return dao.getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
+               }
+           } else {
+               if (confirmedOnly == false) {
+                   return dao.getDiagnoses(visit, diagnosisMetadata);
+               } else {
+                   return dao.getConfirmedDiagnoses(visit, diagnosisMetadata);
+               }
+           }
+       }
+       else {
+           List<org.openmrs.Diagnosis> diagnoses = emrDiagnosisDAO.getDiagnoses(visit, primaryOnly, confirmedOnly);
+           List<Obs> diagnosisList = new ArrayList<Obs>();
+           for (Diagnosis diagnosis : DiagnosisUtils.convert(diagnoses)) {
+               diagnosisList.add(diagnosisMetadata.buildDiagnosisObsGroup(diagnosis));
+           }
+           return diagnosisList;
+       }
    }
 
     @Override
