@@ -143,6 +143,7 @@ public class DiagnosisServiceComponentTest extends BaseModuleContextSensitiveTes
         Obs expectedFirstObs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
 
         List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, DateUtil.parseDate("2001-09-01", "yyyy-MM-dd"));
+		assertThat(diagnoses.size(), is(3));
         assertThat(diagnoses.get(0).getExistingObs(), is(expectedFirstObs));
         assertThat(diagnoses.get(1).getExistingObs(), is(expectedSecondObs));
         assertThat(diagnoses.get(2).getExistingObs(), is(expectedThirdObs));
