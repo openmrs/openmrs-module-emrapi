@@ -73,6 +73,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
         ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
         ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
         Context.getAdministrationService().setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
+        Context.flushSession();
     }
 
     @Test
@@ -250,7 +251,6 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
        /*
         * Setup
         */
-       
        Patient patient = testDataManager.randomPatient().birthdate("1970-03-15").save();
 
        Location visitLocation = testDataManager.location().name("Visit Location")
@@ -271,8 +271,8 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
        // Adding a bunch of encounters to the test visit
        List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visit, patient, emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
        for (Encounter e : encounters) {
-           Context.getEncounterService().saveEncounter(e);
            visit.addEncounter(e);
+           Context.getEncounterService().saveEncounter(e);
        }
        visit = Context.getVisitService().saveVisit(visit);
        VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper( visit );

@@ -87,20 +87,10 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
    @SuppressWarnings("unchecked")
    @Override
    public List<Obs> getConfirmedPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
-      String queryString = "";
-      try {
-         queryString = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(CONFIRMED_PRIMARY_DIAGNOSES_HQL));
-      } catch (IOException e) {
-         log.error(RESOURCE_NOT_FOUND, e);
-         return Collections.emptyList();
-      }
-      Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-      query.setInteger("visitId", visit.getId());
-      query.setInteger("diagnosisOrderConceptId", diagnosisMetadata.getDiagnosisOrderConcept().getId());
-      query.setInteger("primaryOrderConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Order.PRIMARY).getId());
-      query.setInteger("diagnosisCertaintyConceptId", diagnosisMetadata.getDiagnosisCertaintyConcept().getId());
-      query.setInteger("confirmedCertaintyConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Certainty.CONFIRMED).getId());
-      return (List<Obs>) query.list();
+      List<Obs> confirmedDiagnoses = getConfirmedDiagnoses(visit, diagnosisMetadata);
+      List<Obs> primaryDiagnoses = getPrimaryDiagnoses(visit, diagnosisMetadata);
+      confirmedDiagnoses.retainAll(primaryDiagnoses);
+      return confirmedDiagnoses;
    }
 
    @Override
