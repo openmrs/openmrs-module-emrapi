@@ -234,6 +234,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 lastTime = obs.getObsDatetime().getTime();
              }
           }
+          Context.getEncounterService().saveEncounter(e);
           encounters.add(e);
        }
        
@@ -272,7 +273,6 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
        List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visit, patient, emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
        for (Encounter e : encounters) {
            visit.addEncounter(e);
-           Context.getEncounterService().saveEncounter(e);
        }
        visit = Context.getVisitService().saveVisit(visit);
        VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper( visit );
