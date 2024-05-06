@@ -11,7 +11,9 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.context.Context;
 import org.openmrs.contrib.testdata.TestDataManager;
+import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.reporting.definition.MostRecentAdmissionRequestVisitDataDefinition;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
@@ -69,6 +71,8 @@ public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseModule
         dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         diagnosisMetadata = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
         context = new VisitEvaluationContext();
+        Context.getAdministrationService().setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
+        Context.flushSession();
     }
 
     @Test
