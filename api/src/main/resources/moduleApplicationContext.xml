@@ -290,21 +290,6 @@
         </property>
     </bean>
 
-    <bean id="emrVisitService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager">
-            <ref bean="transactionManager"/>
-        </property>
-        <property name="target">
-            <ref bean="emrVisitServiceImpl"/>
-        </property>
-        <property name="preInterceptors">
-            <ref bean="serviceInterceptors"/>
-        </property>
-        <property name="transactionAttributeSource">
-            <ref bean="transactionAttributeSource"/>
-        </property>
-    </bean>
-
     <bean id="visitResponseMapper" class="org.openmrs.module.emrapi.visit.VisitResponseMapper">
         <constructor-arg name="encounterTransactionMapper" ref="encounterTransactionMapper"/>
     </bean>
@@ -403,15 +388,6 @@
         </property>
     </bean>
 
-    <bean parent="serviceContext">
-        <property name="moduleService">
-            <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitService</value>
-                <ref bean="emrVisitService"/>
-            </list>
-        </property>
-    </bean>
-
     <bean id="emrEncounterDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrEncounterDAO">
         <property name="sessionFactory">
             <ref bean="dbSessionFactory"/>
@@ -460,12 +436,19 @@
         <constructor-arg name="orderService" ref="orderService"/>
     </bean>
 
-    <bean id="coreDiagnosisService" class="org.openmrs.module.emrapi.diagnosis.CoreDiagnosisService" />
+    <bean id="emrDiagnosisDAO" class="org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAOImpl">
+        <property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
+    </bean>
+
+    <bean id="coreDiagnosisService" class="org.openmrs.module.emrapi.diagnosis.CoreDiagnosisService">
+        <property name="emrDiagnosisDAO" ref="emrDiagnosisDAO"/>
+    </bean>
 
     <bean id="obsGroupDiagnosisService" class="org.openmrs.module.emrapi.diagnosis.ObsGroupDiagnosisService">
         <property name="emrApiProperties" ref="emrApiProperties"/>
         <property name="obsService" ref="obsService"/>
         <property name="encounterService" ref="encounterService"/>
+        <property name="emrVisitDAO" ref="emrVisitDAOImpl"/>
     </bean>
 
     <bean id="emrDiagnosisService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -494,20 +477,6 @@
                 <ref bean="emrDiagnosisService"/>
             </list>
         </property>
-    </bean>
-
-    <bean id="emrDiagnosisDAO" class="org.openmrs.module.emrapi.diagnosis.EmrDiagnosisDAOImpl">
-        <property name="sessionFactory"><ref bean="dbSessionFactory"/></property>
-    </bean>
-
-    <bean id="emrVisitServiceImpl" class="${project.parent.groupId}.${project.parent.artifactId}.visit.EmrVisitServiceImpl">
-        <constructor-arg ref="visitService"/>
-        <constructor-arg ref="visitResponseMapper"/>
-        <property name="dao">
-            <ref bean="emrVisitDAOImpl"/>
-        </property>
-        <property name="adminService" ref="adminService"/>
-        <property name="emrDiagnosisDAO" ref="emrDiagnosisDAO"/>
     </bean>
 
 </beans>

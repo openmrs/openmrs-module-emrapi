@@ -3,6 +3,7 @@ package org.openmrs.module.emrapi.diagnosis;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
@@ -80,6 +81,15 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 		}
 		else {
 			return coreDiagnosisService.codeNonCodedDiagnosis(nonCodedObs, diagnoses);
+		}
+	}
+
+	public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
+		if (useDiagnosesAsObs()) {
+			return obsGroupDiagnosisService.getDiagnosesAsObs(visit, diagnosisMetadata, primaryOnly, confirmedOnly);
+		}
+		else {
+			return coreDiagnosisService.getDiagnosesAsObs(visit, diagnosisMetadata, primaryOnly, confirmedOnly);
 		}
 	}
 

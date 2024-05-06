@@ -3,6 +3,7 @@ package org.openmrs.module.emrapi.diagnosis;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
 
 
@@ -60,4 +61,9 @@ public interface DiagnosisService extends OpenmrsService {
 	 * @return the list of diagnoses
 	 */
 	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate);
+
+	/**
+	 * @return diagnoses as obs, for the given metadata and primary/confirmed specification
+	 */
+	List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly);
 }

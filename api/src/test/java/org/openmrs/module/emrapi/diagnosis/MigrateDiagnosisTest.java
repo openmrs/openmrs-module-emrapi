@@ -1,10 +1,5 @@
 package org.openmrs.module.emrapi.diagnosis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +13,13 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
-import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -36,7 +34,7 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 	EncounterService encounterService;
 
 	@Autowired
-	EmrVisitService emrVisitService;
+	ObsGroupDiagnosisService obsGroupDiagnosisService;
 
 	@Autowired
 	org.openmrs.api.DiagnosisService diagnosisService;
@@ -58,7 +56,7 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 	@Test
 	public void getAllPatientsWithDiagnosis_shouldReturnListOfPatientIdsWithADiagnosis() {
 		diagnosisMetadata.setDiagnosisSetConcept(conceptService.getConcept(159965));
-		List<Integer> patientIds = emrVisitService.getAllPatientsWithDiagnosis(diagnosisMetadata);
+		List<Integer> patientIds = obsGroupDiagnosisService.getAllPatientsWithDiagnosis(diagnosisMetadata);
 		
 		assertEquals(2, patientIds.size());
 	}

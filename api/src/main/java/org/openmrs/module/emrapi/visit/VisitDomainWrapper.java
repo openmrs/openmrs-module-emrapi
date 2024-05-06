@@ -31,6 +31,7 @@ import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
@@ -84,9 +85,9 @@ public class VisitDomainWrapper implements DomainWrapper {
     @Autowired
     protected VisitQueryService visitQueryService;
 
-    @Qualifier("emrVisitService")
+    @Qualifier("emrDiagnosisService")
     @Autowired
-    protected EmrVisitService emrVisitService;
+    protected DiagnosisService diagnosisService;
 
     private Visit visit;
 
@@ -354,7 +355,7 @@ public class VisitDomainWrapper implements DomainWrapper {
            return Collections.emptyList();
        }
 
-       List<Obs> obsList = emrVisitService.getDiagnoses(getVisit(), diagnosisMetadata, primaryOnly, confirmedOnly);
+       List<Obs> obsList = diagnosisService.getDiagnosesAsObs(getVisit(), diagnosisMetadata, primaryOnly, confirmedOnly);
 
        Map<CodedOrFreeTextAnswer, Diagnosis> diagnoses = new LinkedHashMap<CodedOrFreeTextAnswer, Diagnosis>();
        for (Obs obs : obsList) {

@@ -14,7 +14,6 @@ import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.visit.EmrVisitService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +31,11 @@ public class MigrateDiagnosis {
 	public Boolean migrate(DiagnosisMetadata diagnosisMetadata) {
 		// Flag that identifies whether atleast one Diagnosis was migrated
 		Boolean migratedAtleastOneEncounterDiagosis = false;
-		
-		EmrVisitService emrVisitService = Context.getService(EmrVisitService.class);
+
 		ObsGroupDiagnosisService oldDiagnosisService = getDeprecatedDiagnosisService();
 		
 		org.openmrs.api.DiagnosisService newDiagnosisService = Context.getService(org.openmrs.api.DiagnosisService.class);
-		List<Integer> patientsIds = emrVisitService.getAllPatientsWithDiagnosis(diagnosisMetadata);
+		List<Integer> patientsIds = oldDiagnosisService.getAllPatientsWithDiagnosis(diagnosisMetadata);
 		
 		for (int id : patientsIds) {
 			Patient patient = Context.getPatientService().getPatient(id);

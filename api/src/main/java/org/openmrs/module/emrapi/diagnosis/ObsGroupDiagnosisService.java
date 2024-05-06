@@ -7,9 +7,11 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Person;
+import org.openmrs.Visit;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.db.EmrVisitDAO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +32,8 @@ public class ObsGroupDiagnosisService {
 
     private EncounterService encounterService;
 
+    private EmrVisitDAO emrVisitDAO;
+
 	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
 		this.emrApiProperties = emrApiProperties;
 	}
@@ -40,6 +44,10 @@ public class ObsGroupDiagnosisService {
 
     public void setEncounterService(EncounterService encounterService) {
         this.encounterService = encounterService;
+    }
+
+    public void setEmrVisitDAO(EmrVisitDAO emrVisitDAO) {
+        this.emrVisitDAO = emrVisitDAO;
     }
 
     public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses) {
@@ -187,4 +195,24 @@ public class ObsGroupDiagnosisService {
 
 		return diagnoses;
 	}
+
+    public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
+        if (primaryOnly == true) {
+            if (confirmedOnly == false) {
+                return emrVisitDAO.getPrimaryDiagnoses(visit, diagnosisMetadata);
+            } else {
+                return emrVisitDAO.getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
+            }
+        } else {
+            if (confirmedOnly == false) {
+                return emrVisitDAO.getDiagnoses(visit, diagnosisMetadata);
+            } else {
+                return emrVisitDAO.getConfirmedDiagnoses(visit, diagnosisMetadata);
+            }
+        }
+    }
+
+    public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
+        return emrVisitDAO.getAllPatientsWithDiagnosis(diagnosisMetadata);
+    }
 }

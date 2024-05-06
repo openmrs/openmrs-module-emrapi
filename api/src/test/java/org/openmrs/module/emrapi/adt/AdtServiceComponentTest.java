@@ -43,7 +43,6 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
-import org.openmrs.module.emrapi.visit.EmrVisitService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,16 +59,11 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
@@ -97,9 +91,6 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     VisitService visitService;
-
-    @Autowired
-    EmrVisitService emrVisitService;
 
     @Autowired
     ConceptService conceptService;
