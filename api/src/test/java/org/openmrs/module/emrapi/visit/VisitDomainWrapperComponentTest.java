@@ -1,24 +1,5 @@
 package org.openmrs.module.emrapi.visit;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-//import static org.junit.Assert.assertThat;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +26,20 @@ import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
 
@@ -94,22 +89,22 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .location(visitLocation)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .location(visitLocation)
+                .save();
+        Encounter encounter = testDataManager.encounter()
+                .patient(patient)
+                .visit(visit)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .obs(testDataManager.obs()
+                        .concept(dispositionDescriptor.getDispositionConcept())
+                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
+                        .get())
+                .save();
 
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(true));
@@ -124,25 +119,25 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
         // a visit with a single *voided* visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .location(visitLocation)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .voided(true)
-                                .dateVoided(new Date())
-                                .voidReason("test")
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .location(visitLocation)
+                .save();
+        Encounter encounter = testDataManager.encounter()
+                .patient(patient)
+                .visit(visit)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .voided(true)
+                .dateVoided(new Date())
+                .voidReason("test")
+                .obs(testDataManager.obs()
+                        .concept(dispositionDescriptor.getDispositionConcept())
+                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
+                        .get())
+                .save();
 
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(false));
