@@ -65,6 +65,7 @@
     <concept_set concept_set_id="7" concept_id="409" concept_set="402" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
 
     <global_property property="emr.concept.diagnosisSetOfSets" property_value="baef67ac-b24e-4b04-ac83-c3b994132b85" uuid="4f55827e-26fe-102b-hacb-0017a47871b3"/>
+    <global_property property="emrapi.conceptSourcesForDiagnosisSearch" property_value="ICD-10-WHO" uuid="4f55827e-26fe-999b-hacb-0017a47871b3"/>
 
 
 </dataset>
