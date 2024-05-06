@@ -4,9 +4,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.patient.PatientProfile;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -23,7 +21,7 @@ import java.util.Map;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
-public class PatientProfileResource_1_9_Test extends BaseModuleWebContextSensitiveTest {
+public class PatientProfileResourceTest extends BaseModuleWebContextSensitiveTest {
 
     private PatientProfileResource resource;
 
@@ -42,8 +40,8 @@ public class PatientProfileResource_1_9_Test extends BaseModuleWebContextSensiti
         Assert.assertEquals("id-B - Ram Kabir", ((Map) created.get("patient")).get("display"));
         List<Object> relationships = (List)created.get("relationships");
         Assert.assertEquals(1,relationships.size());
-        Assert.assertEquals("72d3bdef-fee5-11e4-b9a3-005056823b95",((Map)(((Map)relationships.get(0)).get("personB"))).get("uuid"));
-        Assert.assertEquals("8d919b58-c2cc-11de-8d13-0010c6dffd0f",((Map)(((Map)relationships.get(0)).get("relationshipType"))).get("uuid"));
+        Assert.assertEquals("ba1b19c2-3ed6-4f63-b8c0-f762dc8d7562",((Map)(((Map)relationships.get(0)).get("personB"))).get("uuid"));
+        Assert.assertEquals("6d9002ea-a96b-4889-af78-82d48c57a110",((Map)(((Map)relationships.get(0)).get("relationshipType"))).get("uuid"));
     }
 
     @Test

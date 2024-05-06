@@ -92,16 +92,18 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
     private List<Relationship> getRelationships(SimpleObject propertiesToCreate, Person currentPerson) {
         Object relationshipsList = propertiesToCreate.get("relationships");
         List<Relationship> relationships = new ArrayList<Relationship>();
-        List<Map<String, Object>> relationshipProperties = (List<Map<String, Object>>) relationshipsList;
-        for (final Map<String, Object> relationshipProperty : relationshipProperties) {
-            String uuid = getValueFromMap(relationshipProperty, "uuid");
-            Relationship relationship;
-            if (StringUtils.isBlank(uuid)) {
-                relationship = createRelationship(currentPerson, relationshipProperty);
-            } else {
-                relationship = updateRelationship(relationshipProperty);
+        if (relationshipsList != null) {
+            List<Map<String, Object>> relationshipProperties = (List<Map<String, Object>>) relationshipsList;
+            for (final Map<String, Object> relationshipProperty : relationshipProperties) {
+                String uuid = getValueFromMap(relationshipProperty, "uuid");
+                Relationship relationship;
+                if (StringUtils.isBlank(uuid)) {
+                    relationship = createRelationship(currentPerson, relationshipProperty);
+                } else {
+                    relationship = updateRelationship(relationshipProperty);
+                }
+                relationships.add(relationship);
             }
-            relationships.add(relationship);
         }
         return relationships;
     }

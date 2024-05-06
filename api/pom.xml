@@ -80,5 +80,5 @@
                 <filtering>false</filtering>
             </testResource>
         </testResources>
-	</build>
+    </build>
 </project>

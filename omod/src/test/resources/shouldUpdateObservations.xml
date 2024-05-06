@@ -21,8 +21,8 @@
     <concept concept_id="1001" retired="false" datatype_id="1" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="0.1" changed_by="1" date_changed="2006-06-09 14:57:33.0" uuid="z09ab2c5-878e-4905-b25d-5784167d0216"/>
     <concept concept_id="1002" retired="false" datatype_id="1" class_id="1" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="0.1" changed_by="1" date_changed="2006-06-09 14:57:33.0" uuid="b09ab2c5-878e-4905-b25d-5784167d0216"/>
     
-    <obs obs_id="1" person_id="1" concept_id="1000" encounter_id="1" obs_datetime="2008-07-01 00:00:00.0" value_numeric="50.0" comments="c" creator="1" date_created="2008-08-18 14:09:35.0" voided="false"  uuid="z9fb7f47-e80a-4056-9285-bd798be13c63"/>
-    <obs obs_id="2" person_id="1" concept_id="1001" encounter_id="1" obs_datetime="2008-08-01 00:00:00.0" obs_group_id="1" value_numeric="150.0" comments="c" creator="1" date_created="2008-08-18 14:11:13.0" voided="false" uuid="ze48cdcb-6a76-47e3-9f2e-2635032f3a9a"/>
-    <obs obs_id="3" person_id="1" concept_id="1002" encounter_id="1" obs_datetime="2008-08-15 00:00:00.0" value_numeric="55.0" comments="c" creator="1" date_created="2008-08-18 14:22:47.0" voided="false" uuid="zf616900-5e7c-4667-9a7f-dcb260abf1de"/>
+    <obs obs_id="1" person_id="1" concept_id="1000" encounter_id="1" obs_datetime="2008-07-01 00:00:00.0" value_numeric="50.0" status="FINAL" comments="c" creator="1" date_created="2008-08-18 14:09:35.0" voided="false"  uuid="z9fb7f47-e80a-4056-9285-bd798be13c63"/>
+    <obs obs_id="2" person_id="1" concept_id="1001" encounter_id="1" obs_datetime="2008-08-01 00:00:00.0" obs_group_id="1" value_numeric="150.0" status="FINAL" comments="c" creator="1" date_created="2008-08-18 14:11:13.0" voided="false" uuid="ze48cdcb-6a76-47e3-9f2e-2635032f3a9a"/>
+    <obs obs_id="3" person_id="1" concept_id="1002" encounter_id="1" obs_datetime="2008-08-15 00:00:00.0" value_numeric="55.0" status="FINAL" comments="c" creator="1" date_created="2008-08-18 14:22:47.0" voided="false" uuid="zf616900-5e7c-4667-9a7f-dcb260abf1de"/>
 
 </dataset>

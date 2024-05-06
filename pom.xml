@@ -48,8 +48,9 @@
         <metadatasharingVersion>1.9.0</metadatasharingVersion>
         <eventVersion>2.8.0</eventVersion>
         <allergyapiVersion>1.4</allergyapiVersion>
-        <webservices.restVersion>2.16</webservices.restVersion>
+        <webservices.restVersion>2.42.0</webservices.restVersion>
         <jacksonVersion>1.5.0</jacksonVersion>
+        <javaxVersion>4.0.1</javaxVersion>
     </properties>
 
     <dependencies>
@@ -207,8 +208,8 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
-                        <target>1.6</target>
-                        <source>1.6</source>
+                        <target>8</target>
+                        <source>8</source>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
