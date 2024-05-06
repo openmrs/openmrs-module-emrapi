@@ -12,8 +12,8 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.VisitService;
+import org.openmrs.api.context.Context;
 import org.openmrs.contrib.testdata.TestDataManager;
-import org.openmrs.contrib.testdata.builder.VisitBuilder;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
@@ -193,21 +193,21 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
      * @param count The number of random encounters to generate.
      * @param density The percentage of encounters containing diagnoses obs.
      * @param diagnosisInEncounter Average number of diagnoses (for encounters that are added diagnoses).
-     * @param visitStartDate Encounters need to occur after the visit start date.
+     * @param visit the Visit to assign the encounters to
      * @param patient
      * @param encounterType
      * @param diagnosisList A sample of diagnosis obs groups to be randomly "recorded" within the encounters.
      * @return
      * @throws ParseException
      */
-    protected List<Encounter> createRandomEncountersWithDiagnoses(int count, double density, int diagnosisInEncounter, Date visitStartDate, Patient patient, EncounterType encounterType, List<Obs> diagnosisList) throws ParseException {
+    protected List<Encounter> createRandomEncountersWithDiagnoses(int count, double density, int diagnosisInEncounter, Visit visit, Patient patient, EncounterType encounterType, List<Obs> diagnosisList) throws ParseException {
        assertThat(density, allOf(greaterThan(0.),lessThanOrEqualTo(1.)));
        assertThat(count, greaterThan(0));
        
        List<Encounter> encounters = new ArrayList<Encounter>();
        
        // http://stackoverflow.com/a/11016689/321797
-       long startMilli = visitStartDate.getTime();
+       long startMilli = visit.getStartDatetime().getTime();
        final long hourInMilli = 1000 * 60 * 60;
        final long yearInMilli = hourInMilli * 24 * 365 + 1000; // Have to account for the leap second!
        
@@ -218,6 +218,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                          .patient(patient)
                          .encounterDatetime(new Date(startMilli + Math.round(yearInMilli * Math.random()))) // An encounter in 'startYear'
                          .encounterType(encounterType)
+                         .visit(visit)
                          .get();
           
           if (Math.random() <= density) {
@@ -249,7 +250,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
         * Setup
         */
        
-       Patient patient = testDataManager.randomPatient().save();
+       Patient patient = testDataManager.randomPatient().birthdate("1970-03-15").save();
 
        Location visitLocation = testDataManager.location().name("Visit Location")
                .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
@@ -258,19 +259,22 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
        List<Obs> sampleDiagnoses = createRandomDiagnosisObsGroups(200, 125, diagnosisMetadata);
        
        final Date visitStartDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
-       VisitBuilder visitBuilder =
+       Visit visit =
              testDataManager.visit()
                      .patient(patient)
                      .visitType(emrApiProperties.getAtFacilityVisitType())
                      .started(visitStartDate)
-                     .location(visitLocation);
+                     .location(visitLocation)
+                     .save();
        
        // Adding a bunch of encounters to the test visit
-       List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visitStartDate, patient, emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
+       List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visit, patient, emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
        for (Encounter e : encounters) {
-          visitBuilder.encounter(e);
+           Context.getEncounterService().saveEncounter(e);
+           visit.addEncounter(e);
        }
-       VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper( visitBuilder.save() );
+       visit = Context.getVisitService().saveVisit(visit);
+       VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper( visit );
        
        /*
         * Replay & Asserts
