@@ -16,7 +16,6 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@org.springframework.test.context.ContextConfiguration(locations = {"classpath:moduleApplicationContext.xml"}, inheritLocations = true)
 public class EmrEncounterServiceImpIT extends BaseModuleWebContextSensitiveTest{
 
     @Autowired
