@@ -31,7 +31,6 @@
 
     <modules>
         <module>api</module>
-        <module>condition-list</module>
         <module>omod</module>
     </modules>
 
