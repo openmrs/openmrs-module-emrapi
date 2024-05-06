@@ -14,7 +14,6 @@ import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
-import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +31,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class DiagnosisServiceComponentTest extends BaseModuleContextSensitiveTest {
+public class ObsGroupDiagnosisServiceComponentTest extends BaseModuleContextSensitiveTest {
 
 	@Autowired
 	ConceptService conceptService;
@@ -47,7 +46,7 @@ public class DiagnosisServiceComponentTest extends BaseModuleContextSensitiveTes
 	PatientService patientService;
 
 	@Autowired
-	DiagnosisService diagnosisService;
+	ObsGroupDiagnosisService diagnosisService;
 
 	DiagnosisMetadata dmd;
 

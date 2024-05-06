@@ -460,15 +460,22 @@
         <constructor-arg name="orderService" ref="orderService"/>
     </bean>
 
+    <bean id="coreDiagnosisService" class="org.openmrs.module.emrapi.diagnosis.CoreDiagnosisService" />
+
+    <bean id="obsGroupDiagnosisService" class="org.openmrs.module.emrapi.diagnosis.ObsGroupDiagnosisService">
+        <property name="emrApiProperties" ref="emrApiProperties"/>
+        <property name="obsService" ref="obsService"/>
+        <property name="encounterService" ref="encounterService"/>
+    </bean>
+
     <bean id="emrDiagnosisService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisServiceImpl2_2">
-                <property name="emrApiProperties" ref="emrApiProperties"/>
-                <property name="obsService" ref="obsService"/>
-                <property name="encounterService" ref="encounterService"/>
+            <bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisServiceImpl">
+                <property name="coreDiagnosisService" ref="coreDiagnosisService"/>
+                <property name="obsGroupDiagnosisService" ref="obsGroupDiagnosisService"/>
                 <property name="adminService" ref="adminService"/>
             </bean>
         </property>

@@ -9,15 +9,15 @@
  */
 package org.openmrs.module.emrapi.diagnosis;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.openmrs.CodedOrFreeText;
 import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.visit.EmrVisitService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Migrates existing Diagnosis from the obs table to the new encounter_diagnosis table by getting all existing diagnosis
@@ -34,7 +34,7 @@ public class MigrateDiagnosis {
 		Boolean migratedAtleastOneEncounterDiagosis = false;
 		
 		EmrVisitService emrVisitService = Context.getService(EmrVisitService.class);
-		DiagnosisService oldDiagnosisService = getDeprecatedDiagnosisService();
+		ObsGroupDiagnosisService oldDiagnosisService = getDeprecatedDiagnosisService();
 		
 		org.openmrs.api.DiagnosisService newDiagnosisService = Context.getService(org.openmrs.api.DiagnosisService.class);
 		List<Integer> patientsIds = emrVisitService.getAllPatientsWithDiagnosis(diagnosisMetadata);
@@ -99,11 +99,7 @@ public class MigrateDiagnosis {
 	 * 
 	 * @return the deprecated diagnosis service
 	 */
-	public static DiagnosisService getDeprecatedDiagnosisService() {
-		DiagnosisService oldDiagnosisService = new DiagnosisServiceImpl();
-		((DiagnosisServiceImpl)oldDiagnosisService).setEncounterService(Context.getEncounterService());
-		((DiagnosisServiceImpl)oldDiagnosisService).setObsService(Context.getObsService());
-		((DiagnosisServiceImpl)oldDiagnosisService).setEmrApiProperties(Context.getRegisteredComponent("emrApiProperties", EmrApiProperties.class));
-		return oldDiagnosisService;
+	public static ObsGroupDiagnosisService getDeprecatedDiagnosisService() {
+		return Context.getRegisteredComponent("obsGroupDiagnosisService", ObsGroupDiagnosisService.class);
 	}
 }
