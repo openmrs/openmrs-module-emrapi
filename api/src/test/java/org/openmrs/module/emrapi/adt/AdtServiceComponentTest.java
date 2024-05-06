@@ -60,6 +60,7 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -118,10 +119,10 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    public void integrationTest_ADT_workflow() {
+    public void integrationTest_ADT_workflow() throws Exception {
 
         ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
-        Date startOfTest = new Date();
+        Date startOfTest = DateUtils.setMilliseconds(new Date(), 0);
 
         Provider provider = Context.getProviderService().getProvider(1);
         Patient patient = Context.getPatientService().getPatient(7);
@@ -162,7 +163,8 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         providers.put(Context.getEncounterService().getEncounterRole(1), Collections.singleton(provider));
 
         // step 2: admit the patient (which should create an encounter)
-        Date admitDatetime = new Date();
+        Thread.sleep(1000);
+        Date admitDatetime = DateUtils.setMilliseconds(new Date(), 0);
         AdtAction admission = new AdtAction(checkInEncounter.getVisit(), inpatientWard, providers, ADMISSION);
         admission.setActionDatetime(admitDatetime);
         Encounter admitEncounter = service.createAdtEncounterFor(admission);
@@ -178,7 +180,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         // TODO transfer the patient within the hospital
 
         // step 3: discharge the patient (which should create an encounter)
-
+        Thread.sleep(1000);
         AdtAction discharge = new AdtAction(admitEncounter.getVisit(), inpatientWard, providers, DISCHARGE);
         Encounter dischargeEncounter = service.createAdtEncounterFor(discharge);
 
