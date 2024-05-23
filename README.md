@@ -7,11 +7,9 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 
 # Dependencies
 
-## Required core versions
+## Required core version
 
-* 1.9.9 - 1.9.*
-* 1.10.2 - 1.10.*
-* 1.11.3+
+* 2.2.1
 
 ## Required modules
 
@@ -144,31 +142,6 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 * Service methods to get diagnoses obs and patients with particular diagnoses
 * VisitDomainWrapper - convenience wrapper to get info around active / open status, encounters contained, diagnoses, dispositions, ADT status
 
-# api-1.10, api-1.11, api-1.12
-
-These exist only to provide mapping implementations for things that changed between 1.x releases, mostly order-related.
-The 1.10 and 1.11 packages are only activated when used with core versions 1.10.* and 1.11.*, so can likely be removed,
-and api-1.12 can be removed and incorporated as default functionality
-
-# api-pre2.2
-
-This appears to wire in pre-2.2 diagnosis handling, and to add a liquibase changeset that adds in the condition table
-The 1.10 and 1.11 packages are only activated when used with core versions 1.9.* - 2.1.*, so can likely be removed,
-
-# api-2.2
-
-This exists only to provide migration and mapping and conversion utilities between pre-2.2 emrapi diagnoses and 2.2 diagnoses.
-It can be moved into api if still needed, or removed entirely
-
 # condition-list
 
 This provides an implementation of condition list functionality, but condition was added to core in 2.2, so this is likely no longer needed
-
-# fhir-condition
-
-This provides an implementation of condition for FHIR if running OpenMRS 2.0-2.1, but is not relevant for 2.2+, so can likely be removed.
-
-# web-pre2.2 and web-2.2
-
-Contains REST endpoints for /rest/emrapi/condition and /rest/emrapi/conditionhistory that consider both emrapi and core conditions
-This can likely be removed in favor of just using core implementations at this point.
