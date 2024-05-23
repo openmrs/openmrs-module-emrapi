@@ -2,7 +2,7 @@ package org.openmrs.module.emrapi.disposition;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.openmrs.module.emrapi.CareSettingType;
+import org.openmrs.CareSetting;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class Disposition {
     private DispositionType type;
 
     @JsonProperty
-    private List<CareSettingType> careSettingTypes;
+    private List<CareSetting.CareSettingType> careSettingTypes;
 
     @JsonProperty
     private List<String> encounterTypes;
@@ -119,11 +119,11 @@ public class Disposition {
         this.type = type;
     }
 
-    public List<CareSettingType> getCareSettingTypes() {
+    public List<CareSetting.CareSettingType> getCareSettingTypes() {
         return careSettingTypes;
     }
 
-    public void setCareSettingTypes(List<CareSettingType> careSettingTypes) {
+    public void setCareSettingTypes(List<CareSetting.CareSettingType> careSettingTypes) {
         this.careSettingTypes = careSettingTypes;
     }
 

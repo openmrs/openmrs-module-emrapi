@@ -12,6 +12,7 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.CareSetting;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
@@ -20,7 +21,6 @@ import org.openmrs.Provider;
 import org.openmrs.api.APIException;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.OrderService;
-import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.Iterator;
@@ -44,7 +44,7 @@ public class OpenMRSOrderMapper {
 
         Order openMRSOrder = createOrder(order);
         openMRSOrder.setUrgency(getOrderUrgency(order));
-        openMRSOrder.setCareSetting(orderService.getCareSettingByName(CareSettingType.OUTPATIENT.toString()));
+        openMRSOrder.setCareSetting(orderService.getCareSettingByName(CareSetting.CareSettingType.OUTPATIENT.toString()));
         openMRSOrder.setEncounter(encounter);
         openMRSOrder.setAutoExpireDate(order.getAutoExpireDate());
         openMRSOrder.setCommentToFulfiller(order.getCommentToFulfiller());

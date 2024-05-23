@@ -14,13 +14,13 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openmrs.CareSetting;
 import org.openmrs.Concept;
 import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Order;
 import org.openmrs.OrderGroup;
 import org.openmrs.api.db.hibernate.HibernateUtil;
-import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.encounter.ConceptMapper;
 import org.openmrs.module.emrapi.encounter.OrderMapper;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -76,7 +76,7 @@ public class DefaultOrderMapper implements OrderMapper {
         EncounterTransaction.DrugOrder drugOrder = new EncounterTransaction.DrugOrder();
         drugOrder.setUuid(openMRSDrugOrder.getUuid());
         if (openMRSDrugOrder.getCareSetting() != null) {
-            drugOrder.setCareSetting(CareSettingType.valueOf(openMRSDrugOrder.getCareSetting().getCareSettingType().toString()));
+            drugOrder.setCareSetting(CareSetting.CareSettingType.valueOf(openMRSDrugOrder.getCareSetting().getCareSettingType().toString()));
         }
         drugOrder.setAction(openMRSDrugOrder.getAction().name());
         drugOrder.setOrderType(openMRSDrugOrder.getOrderType().getName());

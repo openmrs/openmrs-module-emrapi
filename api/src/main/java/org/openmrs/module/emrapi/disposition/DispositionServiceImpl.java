@@ -2,11 +2,11 @@ package org.openmrs.module.emrapi.disposition;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.openmrs.CareSetting;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
@@ -99,11 +99,11 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
             boolean isAdmitted = visitDomainWrapper.isAdmitted();
 
             for (Disposition candidate : getDispositions()) {
-                List<CareSettingType> careSettingTypes = candidate.getCareSettingTypes();
+                List<CareSetting.CareSettingType> careSettingTypes = candidate.getCareSettingTypes();
 
                 if (careSettingTypes == null
-                        || (isAdmitted && careSettingTypes.contains(CareSettingType.INPATIENT))
-                        || (!isAdmitted && careSettingTypes.contains(CareSettingType.OUTPATIENT)) )  {
+                        || (isAdmitted && careSettingTypes.contains(CareSetting.CareSettingType.INPATIENT))
+                        || (!isAdmitted && careSettingTypes.contains(CareSetting.CareSettingType.OUTPATIENT)) )  {
                     dispositions.add(candidate);
                 }
             }

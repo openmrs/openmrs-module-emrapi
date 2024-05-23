@@ -13,7 +13,7 @@
  */
 package org.openmrs.module.emrapi.encounter.builder;
 
-import org.openmrs.module.emrapi.CareSettingType;
+import org.openmrs.CareSetting;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 
 import java.util.Calendar;
@@ -26,7 +26,7 @@ public class DrugOrderBuilder {
 
     public DrugOrderBuilder() {
         drugOrder = new EncounterTransaction.DrugOrder();
-        drugOrder.setCareSetting(CareSettingType.OUTPATIENT);
+        drugOrder.setCareSetting(CareSetting.CareSettingType.OUTPATIENT);
         drugOrder.setOrderType("Drug Order");
         withDrugUuid(UUID.randomUUID().toString());
         drugOrder.setDosingInstructionType("org.openmrs.SimpleDosingInstructions");

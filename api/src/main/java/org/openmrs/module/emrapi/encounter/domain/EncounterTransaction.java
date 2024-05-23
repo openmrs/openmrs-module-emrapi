@@ -16,8 +16,8 @@ package org.openmrs.module.emrapi.encounter.domain;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.openmrs.CareSetting;
 import org.openmrs.ConceptMap;
-import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 
 import java.util.ArrayList;
@@ -638,7 +638,7 @@ public class EncounterTransaction {
         private Date dateChanged;
         private Date dateStopped;
         private String orderNumber;
-        private CareSettingType careSetting;
+        private CareSetting.CareSettingType careSetting;
         private String action;
         private String commentToFulfiller;
         private Date autoExpireDate;
@@ -748,11 +748,11 @@ public class EncounterTransaction {
             return orderNumber;
         }
 
-        public void setCareSetting(CareSettingType careSetting) {
+        public void setCareSetting(CareSetting.CareSettingType careSetting) {
             this.careSetting = careSetting;
         }
 
-        public CareSettingType getCareSetting() {
+        public CareSetting.CareSettingType getCareSetting() {
             return careSetting;
         }
 
