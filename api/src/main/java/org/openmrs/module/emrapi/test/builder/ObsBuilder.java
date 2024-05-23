@@ -129,4 +129,9 @@ public class ObsBuilder {
         obs.setEncounter(encounter);
         return this;
     }
+
+    public ObsBuilder setFormField(String formNameSpace, String formFieldPath){
+        obs.setFormField(formNameSpace, formFieldPath);
+        return this;
+    }
 }

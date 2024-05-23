@@ -338,15 +338,7 @@ public class AccountDomainWrapper implements DomainWrapper {
         }
         user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
         user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS);
-
-        // hack to work-around change to service methods for saving users in Core 2.x
-        try {
-            Method saveUser = UserService.class.getDeclaredMethod("saveUser", User.class);
-            saveUser.invoke(userService, user);
-        }
-        catch (Exception e) {
-            userService.createUser(user, password);
-        };
+        userService.saveUser(user);
     }
 
     public void save() {
@@ -362,14 +354,7 @@ public class AccountDomainWrapper implements DomainWrapper {
                 userService.createUser(user, password);
             }
             else {
-                // hack to work-around change to service methods for saving users in Core 2.x
-                try {
-                    Method saveUser = UserService.class.getDeclaredMethod("saveUser", User.class);
-                    saveUser.invoke(userService, user);
-                }
-                catch (Exception e) {
-                    userService.createUser(user, password);
-                }
+                userService.saveUser(user);
             }
 
             // the saveUser(user, password) method will *only* set a password for a new user, it won't change an existing one

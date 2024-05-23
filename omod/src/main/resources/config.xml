@@ -12,15 +12,13 @@
         ${project.parent.description}
     </description>
     <updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
-	<require_version>1.11.3, 1.10.2 - 1.10.*, 1.9.9 - 1.9.*</require_version>
-    <!-- TRUNK-3751 prevents saying ${openmrsCoreVersion} when version is a SNAPSHOT-->
-    <!-- / Module Properties -->
+	<require_version>${openMRSVersion}</require_version>
 
     <aware_of_modules>
-        <aware_of_module>org.openmrs.module.fhir2</aware_of_module>
+        <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
         <aware_of_module>org.openmrs.module.metadatasharing</aware_of_module>
     </aware_of_modules>
-    <!-- Required Modules -->
+
     <require_modules>
         <require_module version="${reportingModuleVersion}">org.openmrs.module.reporting</require_module>
         <require_module version="${providermanagementModuleVersion}">org.openmrs.module.providermanagement</require_module>
@@ -28,56 +26,7 @@
         <require_module version="${eventVersion}">org.openmrs.event</require_module>
         <require_module version="${webservicesRestModuleVersion}">org.openmrs.module.webservices.rest</require_module>
     </require_modules>
-    <!-- / Required Modules -->
 
-    <!-- Conditional Resources -->
-    <conditionalResources>
-    	<conditionalResource>
-            <path>/lib/emrapi-api-1.12-${project.parent.version}.jar</path>
-            <openmrsVersion>1.12.0 - 2.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-api-1.11-${project.parent.version}.jar</path>
-            <openmrsVersion>1.11.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-api-1.10-${project.parent.version}.jar</path>
-            <openmrsVersion>1.10.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-api-1.9-${project.parent.version}.jar</path>
-            <openmrsVersion>1.9.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-api-2.2-${project.parent.version}.jar</path>
-            <openmrsVersion>2.2.* - 2.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-api-pre2.2-${project.parent.version}.jar</path>
-            <openmrsVersion>1.9.* - 2.1.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-web-pre2.2-${project.parent.version}.jar</path>
-            <openmrsVersion>1.9.* - 2.1.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-web-2.2-${project.parent.version}.jar</path>
-            <openmrsVersion>2.2.* - 2.*</openmrsVersion>
-        </conditionalResource>
-        <conditionalResource>
-            <path>/lib/emrapi-fhir-condition-${project.parent.version}.jar</path>
-            <loadIfModulesPresent>
-                <openmrsModule>
-                    <moduleId>fhir2</moduleId>
-                    <version>1.*</version>
-                </openmrsModule>
-            </loadIfModulesPresent>
-            <openmrsVersion>2.0.5 - 2.1.*</openmrsVersion>
-        </conditionalResource>
-    </conditionalResources>
-    <!-- / Conditional Resources -->
-
-    <!-- Module Activator -->
     <activator>${project.parent.groupId}.${project.parent.artifactId}.EmrApiActivator</activator>
 
 
@@ -107,7 +56,7 @@
 		<point>org.openmrs.admin.list</point>
 		<class>${project.parent.groupId}.${project.parent.artifactId}.extension.html.AdminList</class>
 	</extension>
-	
+
     <globalProperty>
         <property>emr.encounterMatcher</property>
         <defaultValue></defaultValue>

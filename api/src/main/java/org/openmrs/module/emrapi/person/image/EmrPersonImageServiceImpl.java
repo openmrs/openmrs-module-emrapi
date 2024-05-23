@@ -22,10 +22,10 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 
 import javax.imageio.ImageIO;
-import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.Base64;
 
 public class EmrPersonImageServiceImpl extends BaseOpenmrsService implements EmrPersonImageService {
 
@@ -45,7 +45,7 @@ public class EmrPersonImageServiceImpl extends BaseOpenmrsService implements Emr
         try {
             File imageFile = new File(String.format("%s/%s.%s", emrApiProperties.getPersonImageDirectory().getAbsolutePath(), person.getUuid(), imageFormat));
 
-            byte[] decodedBytes = DatatypeConverter.parseBase64Binary(base64EncodedImage);
+            byte[] decodedBytes = Base64.getDecoder().decode(base64EncodedImage);
             BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(decodedBytes));
             ImageIO.write(bufferedImage, imageFormat, imageFile);
             bufferedImage.flush();

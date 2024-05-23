@@ -4,7 +4,10 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Cohort;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
@@ -55,35 +58,42 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
 
     private AwaitingAdmissionVisitQuery query;
 
+    private Patient patient;
+
+    private Concept admitToHospital;
+
     @Before
     public void setup() throws Exception {
         executeDataSet("baseTestDataset.xml");
         dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
         query = new AwaitingAdmissionVisitQuery();
+        admitToHospital = emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital");
+        patient = testDataManager.randomPatient().birthdate("2010-01-01").save();
     }
 
     @Test
     public void shouldFindVisitAwaitingAdmission() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                    .patient(patient)
-                    .visitType(emrApiProperties.getAtFacilityVisitType())
-                    .started(new Date())
-                    .encounter(testDataManager.encounter()
-                            .patient(patient)
-                            .encounterDatetime(new Date())
-                            .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                            .obs(testDataManager.obs()
-                                    .concept(dispositionDescriptor.getDispositionConcept())
-                                    .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                    .get())
-                            .get())
-                    .save();
+        Date now = new Date();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(now)
+                .save();
+        Encounter encounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(now)
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        Obs obs = testDataManager.obs()
+                .person(patient)
+                .encounter(encounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
@@ -94,27 +104,28 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
     @Test
     public void shouldNotCountDispositionOnVoidedEncounter() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a single *voided* visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .voided(true)
-                                .dateVoided(new Date())
-                                .voidReason("test")
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Date now = new Date();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(now)
+                .save();
+        Encounter encounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(now)
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .voided(true)
+                .dateVoided(new Date())
+                .voidReason("test")
+                .save();
+        Obs obs = testDataManager.obs()
+                .person(patient)
+                .encounter(encounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
@@ -124,114 +135,116 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
     @Test
     public void shouldNotFindVisitIfPatientAdmitted() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
         Date visitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
         Date admitDatetime = new DateTime(2014,2,2,11,0,0).toDate();
 
         // a visit with a visit note encounter with dispo = ADMIT and an admission encounter
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(visitDatetime)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(visitNoteDatetime)
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                    .concept(dispositionDescriptor.getDispositionConcept())
-                                    .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                    .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(admitDatetime)
-                                .encounterType(emrApiProperties.getAdmissionEncounterType())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(visitDatetime)
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(visitNoteDatetime)
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter admissionEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(admitDatetime)
+                .encounterType(emrApiProperties.getAdmissionEncounterType())
+                .visit(visit)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
-
     }
 
     @Test
     public void shouldNotConsiderVoidedAdmissionEncounter() throws Exception {
-
-        Patient patient = testDataManager.randomPatient().save();
 
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
         Date visitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
         Date admitDatetime = new DateTime(2014,2,2,11,0,0).toDate();
 
         // a visit with a visit note encounter with dispo = ADMIT and a *voided* admission encounter
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(visitDatetime)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(visitNoteDatetime)
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(admitDatetime)
-                                .encounterType(emrApiProperties.getAdmissionEncounterType())
-                                .voided(true)
-                                .dateVoided(new Date())
-                                    .voidReason("test")
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(visitDatetime)
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(visitNoteDatetime)
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter admissionEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(admitDatetime)
+                .encounterType(emrApiProperties.getAdmissionEncounterType())
+                .visit(visit)
+                .voided(true)
+                .dateVoided(new Date())
+                .voidReason("test")
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
-
     }
-
 
     @Test
     public void shouldFindVisitEvenIfPatientHasMoreRecentVisitNoteWithoutAdmissionDisposition() throws Exception {
-
-        Patient patient = testDataManager.randomPatient().save();
 
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
         Date firstVisitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
         Date secondVisitNoteDatetime = new DateTime(2014,2,2,11,0,0).toDate();
 
         // a visit with a visit note encounter with dispo = ADMIT and followed by a visit note with dispo = DEATH
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(visitDatetime)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(firstVisitNoteDatetime)
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(secondVisitNoteDatetime)
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                            .concept(dispositionDescriptor.getDispositionConcept())
-                                            .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
-                                            .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(visitDatetime)
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(firstVisitNoteDatetime)
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter secondVisitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(secondVisitNoteDatetime)
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(secondVisitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
@@ -241,27 +254,27 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
     @Test
     public void shouldNotFindVisitIfNoAdmitDisposition() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         Date visitDatetime = new DateTime(2014,2,2,9,0,0).toDate();
         Date visitNoteDatetime = new DateTime(2014,2,2,10,0,0).toDate();
 
         // a visit with a visit note with dispo = DEATH
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(visitDatetime)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(visitNoteDatetime)
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(visitDatetime)
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(visitNoteDatetime)
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
@@ -270,29 +283,30 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
     @Test
     public void shouldNotFindVisitIfAtAnotherLocation() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
         Location visitLocation = testDataManager.location().name("Visit Location")
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
         Location queryLocation = testDataManager.location().name("Query Location")
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .location(visitLocation)
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .location(visitLocation)
+                .started(new Date())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         query.setLocation(queryLocation);
         VisitQueryResult result = visitQueryService.evaluate(query, null);
@@ -302,412 +316,434 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
     @Test
     public void shouldFindVisitIfAtSameLocation() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
         Location visitLocation = testDataManager.location().name("Visit Location")
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
         Location queryLocation = visitLocation;
 
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .location(visitLocation)
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .location(visitLocation)
+                .started(new Date())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         query.setLocation(queryLocation);
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
-
     }
 
     @Test
     public void shouldNotReturnSameVisitTwice() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with two visit note encounters with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter2 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter2)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
-
     }
 
 
     @Test
     public void shouldNotFindVisitAwaitingAdmissionIfPatientNotInContext() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         EvaluationContext context = new EvaluationContext();
         context.setBaseCohort(new Cohort(Collections.singleton(2)));
 
         VisitQueryResult result = visitQueryService.evaluate(query, context);
         assertThat(result.getMemberIds().size(), is(0));
-
     }
 
     @Test
     public void shouldNotFindVisitAwaitingAdmissionIfVisitNotInContext() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         VisitEvaluationContext context = new VisitEvaluationContext();
         context.setBaseVisits(new VisitIdSet(10101));  // random visit id
 
         VisitQueryResult result = visitQueryService.evaluate(query, context);
         assertThat(result.getMemberIds().size(), is(0));
-
     }
 
     @Test
     public void shouldNotFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObs() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a dispo = ADMIT and DENY admit decision obs after it
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,11,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(emrApiProperties.getAdmissionDecisionConcept())
-                                        .value(emrApiProperties.getDenyAdmissionConcept())
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new DateTime(2014,10,10,9,0,0).toDate())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter2 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter2)
+                .concept(emrApiProperties.getAdmissionDecisionConcept())
+                .value(emrApiProperties.getDenyAdmissionConcept())
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
-
     }
 
     @Test
     public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsFollowedByAnotherAdmissionDisposition() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a dispo = ADMIT and DENY admit decision obs after it
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,11,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(emrApiProperties.getAdmissionDecisionConcept())
-                                        .value(emrApiProperties.getDenyAdmissionConcept())
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,12,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new DateTime(2014,10,10,9,0,0).toDate())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter2 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter2)
+                .concept(emrApiProperties.getAdmissionDecisionConcept())
+                .value(emrApiProperties.getDenyAdmissionConcept())
+                .save();
+        Encounter visitNoteEncounter3 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,12,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter3)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
-
     }
 
     @Test
     public void shouldNotFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsFollowedByAnotherAdmissionDispositionFollowedByAnotherAdmissionDenial() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a dispo = ADMIT and DENY admit decision obs after it
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,11,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(emrApiProperties.getAdmissionDecisionConcept())
-                                        .value(emrApiProperties.getDenyAdmissionConcept())
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,12,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,13,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(emrApiProperties.getAdmissionDecisionConcept())
-                                        .value(emrApiProperties.getDenyAdmissionConcept())
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new DateTime(2014,10,10,9,0,0).toDate())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter2 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter2)
+                .concept(emrApiProperties.getAdmissionDecisionConcept())
+                .value(emrApiProperties.getDenyAdmissionConcept())
+                .save();
+        Encounter visitNoteEncounter3 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,12,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter3)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter4 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,13,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter4)
+                .concept(emrApiProperties.getAdmissionDecisionConcept())
+                .value(emrApiProperties.getDenyAdmissionConcept())
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
-
     }
 
     @Test
     public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDecisionThatIsNotDeny() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a dispo = ADMIT and DENY admit decision obs after it
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,11,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(emrApiProperties.getAdmissionDecisionConcept())
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new DateTime(2014,10,10,9,0,0).toDate())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter2 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter2)
+                .concept(emrApiProperties.getAdmissionDecisionConcept())
+                .value(admitToHospital)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
-
     }
 
     @Test
     public void shouldFindVisitWithDispositionOfAdmitIfPrecededByAdmissionDenialObs() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a dispo = ADMIT and DENY admit decision obs before it
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,9,10,0,0).toDate())   // this time is *before* the admission request
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(emrApiProperties.getAdmissionDecisionConcept())
-                                        .value(emrApiProperties.getDenyAdmissionConcept())
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new DateTime(2014,10,9,10,0,0).toDate())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter2 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,9,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter2)
+                .concept(emrApiProperties.getAdmissionDecisionConcept())
+                .value(emrApiProperties.getDenyAdmissionConcept())
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
-
     }
 
     @Test
     public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsThatIsVoided() throws Exception {
 
-        Patient patient = testDataManager.randomPatient().save();
-
         // a visit with a dispo = ADMIT and DENY admit decision obs after it
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new DateTime(2014,10,11,10,0,0).toDate())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(emrApiProperties.getAdmissionDecisionConcept())
-                                        .value(emrApiProperties.getDenyAdmissionConcept())
-                                        .voided(true)
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new DateTime(2014,10,9,10,0,0).toDate())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,10,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
+        Encounter visitNoteEncounter2 = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new DateTime(2014,10,11,10,0,0).toDate())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter2)
+                .concept(emrApiProperties.getAdmissionDecisionConcept())
+                .value(emrApiProperties.getDenyAdmissionConcept())
+                .voided(true)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
         assertThat(result.getMemberIds().iterator().next(), is(visit.getId()));
-
     }
 
 
     @Test
     public void shouldNotFindVisitAwaitingAdmissionIfPatientIsDead() throws Exception {
 
-        Patient patient = testDataManager.randomPatient()
+        patient = testDataManager.randomPatient()
+                .birthdate("2010-01-01")
                 .dead(true)
                 .deathDate(new Date())
                 .causeOfDeath(conceptService.getConcept(3))   // a random concept, this doesn't matter
                 .save();
 
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .save();
+        Encounter visitNoteEncounter = testDataManager.encounter()
+                .patient(patient)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .visit(visit)
+                .save();
+        testDataManager.obs()
+                .person(patient)
+                .encounter(visitNoteEncounter)
+                .concept(dispositionDescriptor.getDispositionConcept())
+                .value(admitToHospital)
+                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
-
     }
-
-
 }

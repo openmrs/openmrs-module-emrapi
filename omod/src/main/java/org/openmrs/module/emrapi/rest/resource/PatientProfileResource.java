@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Resource(name = RestConstants.VERSION_1 + "/patientprofile", supportedClass = PatientProfile.class, supportedOpenmrsVersions = {"1.9.*", "1.10.*", "1.11.*", "1.12.*", "2.0.*", "2.1.*", "2.2.*", "2.3.*", "2.4.*", "2.5.*"})
+@Resource(name = RestConstants.VERSION_1 + "/patientprofile", supportedClass = PatientProfile.class, supportedOpenmrsVersions = { "2.2 - 9.*" })
 public class PatientProfileResource extends DelegatingCrudResource<PatientProfile> {
 
     @Override
@@ -92,16 +92,18 @@ public class PatientProfileResource extends DelegatingCrudResource<PatientProfil
     private List<Relationship> getRelationships(SimpleObject propertiesToCreate, Person currentPerson) {
         Object relationshipsList = propertiesToCreate.get("relationships");
         List<Relationship> relationships = new ArrayList<Relationship>();
-        List<Map<String, Object>> relationshipProperties = (List<Map<String, Object>>) relationshipsList;
-        for (final Map<String, Object> relationshipProperty : relationshipProperties) {
-            String uuid = getValueFromMap(relationshipProperty, "uuid");
-            Relationship relationship;
-            if (StringUtils.isBlank(uuid)) {
-                relationship = createRelationship(currentPerson, relationshipProperty);
-            } else {
-                relationship = updateRelationship(relationshipProperty);
+        if (relationshipsList != null) {
+            List<Map<String, Object>> relationshipProperties = (List<Map<String, Object>>) relationshipsList;
+            for (final Map<String, Object> relationshipProperty : relationshipProperties) {
+                String uuid = getValueFromMap(relationshipProperty, "uuid");
+                Relationship relationship;
+                if (StringUtils.isBlank(uuid)) {
+                    relationship = createRelationship(currentPerson, relationshipProperty);
+                } else {
+                    relationship = updateRelationship(relationshipProperty);
+                }
+                relationships.add(relationship);
             }
-            relationships.add(relationship);
         }
         return relationships;
     }

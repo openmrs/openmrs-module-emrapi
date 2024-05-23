@@ -3,11 +3,11 @@ package org.openmrs.module.emrapi.disposition;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.CareSetting;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
 import org.openmrs.api.ConceptService;
-import org.openmrs.module.emrapi.CareSettingType;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
@@ -102,7 +102,7 @@ public class DispositionServiceTest {
         assertNull(home.getKeepsVisitOpen());
         assertThat(home.getType(), is(DispositionType.DISCHARGE));
         assertThat(home.getCareSettingTypes().size(), is(1));
-        assertTrue(home.getCareSettingTypes().contains(CareSettingType.INPATIENT));
+        assertTrue(home.getCareSettingTypes().contains(CareSetting.CareSettingType.INPATIENT));
 
         Disposition transfer = dispositionMap.get("799820d0-e02d-11e3-8b68-0800200c9a66");
         assertThat(transfer, notNullValue());
@@ -111,7 +111,7 @@ public class DispositionServiceTest {
         assertNull(transfer.getKeepsVisitOpen());
         assertThat(transfer.getType(), is(DispositionType.TRANSFER));
         assertThat(transfer.getCareSettingTypes(), hasSize(1));
-        assertTrue(transfer.getCareSettingTypes().contains(CareSettingType.INPATIENT));
+        assertTrue(transfer.getCareSettingTypes().contains(CareSetting.CareSettingType.INPATIENT));
 
         Disposition admit = dispositionMap.get("844436e0-e02d-11e3-8b68-0800200c9a66");
         assertThat(admit, notNullValue());
@@ -120,7 +120,7 @@ public class DispositionServiceTest {
         assertThat(admit.getKeepsVisitOpen(), is(true));
         assertThat(admit.getType(), is(DispositionType.ADMIT));
         assertThat(admit.getCareSettingTypes().size(), is(1));
-        assertThat(admit.getCareSettingTypes(), contains(CareSettingType.OUTPATIENT));
+        assertThat(admit.getCareSettingTypes(), contains(CareSetting.CareSettingType.OUTPATIENT));
 
         Disposition encounterType = dispositionMap.get("38c15c7f-0718-4fd9-8dc5-2027e267faac");
         assertThat(encounterType, notNullValue());

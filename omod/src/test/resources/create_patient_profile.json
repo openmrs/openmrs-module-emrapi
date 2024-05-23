@@ -60,10 +60,10 @@
     "relationships": [
       {
         "personB":{
-          "uuid": "72d3bdef-fee5-11e4-b9a3-005056823b95"
+          "uuid": "ba1b19c2-3ed6-4f63-b8c0-f762dc8d7562"
         },
         "relationshipType": {
-          "uuid" : "8d919b58-c2cc-11de-8d13-0010c6dffd0f"
+          "uuid" : "6d9002ea-a96b-4889-af78-82d48c57a110"
         },
         "voided":false
       }

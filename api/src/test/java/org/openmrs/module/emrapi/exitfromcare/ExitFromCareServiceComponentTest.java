@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.exitfromcare;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +48,8 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
 
     private Concept died;
 
+    Date now = DateUtils.setMilliseconds(new Date(), 0);
+
     @Before
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
@@ -61,6 +64,8 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
         outcomeSetName.setName("Program Outcomes");
         outcomeSetName.setLocale(Locale.ENGLISH);
         outcomeSet.setFullySpecifiedName(outcomeSetName);
+        outcomeSet.setDatatype(conceptService.getConceptDatatype(4));
+        outcomeSet.setConceptClass(conceptService.getConceptClass(10));
         conceptService.saveConcept(outcomeSet);
         mdrTBProgram.setOutcomesConcept(outcomeSet);
         programWorkflowService.saveProgram(mdrTBProgram);
@@ -74,7 +79,6 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
         Program hivProgram = programWorkflowService.getProgram(1);
 
         Patient patient = patientService.getPatient(2);
-        Date now = new Date();
         Concept unknown = conceptService.getConcept(22);
 
         // sanity checks
@@ -119,7 +123,6 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
         Program mdrTBProgram = programWorkflowService.getProgram(2);
 
         Patient patient = patientService.getPatient(2);
-        Date now = new Date();
         Concept unknown = conceptService.getConcept(22);
 
         // there are no patients in test data set that are dead, so mark this patient as dead
@@ -154,7 +157,7 @@ public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitive
         Program mdrTBProgram = programWorkflowService.getProgram(2);
 
         Patient patient = patientService.getPatient(2);
-        Date now = new Date();
+
         Concept unknown = conceptService.getConcept(22);
 
         // there are no patients in test data set that are dead, so mark this patient as dead

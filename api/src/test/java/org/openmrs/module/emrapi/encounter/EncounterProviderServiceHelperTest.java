@@ -13,6 +13,7 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -28,6 +29,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Context.class)
+@PowerMockIgnore("jdk.internal.reflect.*")
 public class EncounterProviderServiceHelperTest {
 
     private EncounterProviderServiceHelper encounterProviderServiceHelper;
@@ -76,7 +78,6 @@ public class EncounterProviderServiceHelperTest {
         Encounter encounter = new Encounter();
         EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
         provider.setUuid("provider-uuid");
-        provider.setName("provider-name");
         provider.setEncounterRoleUuid("role-uuid");
 
         encounterProviderServiceHelper.update(encounter, Collections.singleton(provider));
@@ -85,7 +86,6 @@ public class EncounterProviderServiceHelperTest {
 
         EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
         assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
-        assertThat(encounterProvider.getProvider().getName(), is(equalTo("provider-name")));
         assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
     }
 
@@ -94,7 +94,6 @@ public class EncounterProviderServiceHelperTest {
         Encounter encounter = new Encounter();
         EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
         provider.setUuid("provider-uuid");
-        provider.setName("provider-name");
 
         encounterProviderServiceHelper.update(encounter, Collections.singleton(provider));
 
@@ -102,7 +101,6 @@ public class EncounterProviderServiceHelperTest {
 
         EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
         assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
-        assertThat(encounterProvider.getProvider().getName(), is(equalTo("provider-name")));
         assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID)));
     }
 

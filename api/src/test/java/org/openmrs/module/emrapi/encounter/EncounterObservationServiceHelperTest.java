@@ -42,17 +42,9 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterObservationServiceHelperTest {
@@ -445,6 +437,35 @@ public class EncounterObservationServiceHelperTest {
 
         assertEquals(new Double(value), textObservation.getValueNumeric());
         assertTrue(textObservation.getVoided());
+    }
+
+    @Test
+    public void shouldCreateNewObservationWithNamespace() throws ParseException {
+
+        newConcept(new ConceptDataTypeBuilder().text(), TEXT_CONCEPT_UUID);
+        List<EncounterTransaction.Observation> observations = asList(
+                new EncounterTransaction.Observation()
+                        .setConcept(getConcept(TEXT_CONCEPT_UUID))
+                        .setValue("text value")
+                        .setComment("overweight")
+                        .setFormNamespace("formNamespace")
+                        .setFormFieldPath("formFieldPath")
+        );
+
+        Date encounterDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").parse("2005-01-01T00:00:00.000+0000");
+        Patient patient = new Patient();
+
+        Encounter encounter = new Encounter();
+        encounter.setUuid("e-uuid");
+        encounter.setPatient(patient);
+        encounter.setEncounterDatetime(encounterDateTime);
+
+        encounterObservationServiceHelper.update(encounter, observations);
+
+        assertEquals(1, encounter.getObs().size());
+        Obs textObservation = encounter.getObs().iterator().next();
+        assertEquals("formNamespace",textObservation.getFormFieldNamespace());
+        assertEquals("formFieldPath",textObservation.getFormFieldPath());
     }
 
     private Concept newConcept(ConceptDatatype conceptDatatype, String conceptUuid) {

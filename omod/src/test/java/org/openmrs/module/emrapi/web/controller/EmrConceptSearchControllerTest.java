@@ -1,7 +1,5 @@
 package org.openmrs.module.emrapi.web.controller;
 
-import org.apache.poi.util.SystemOutLogger;
-import org.codehaus.jackson.type.TypeReference;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,9 +7,9 @@ import org.openmrs.ConceptSource;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.webservices.rest.SimpleObject;
+import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +18,13 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-@org.springframework.test.context.ContextConfiguration(locations = {"classpath:moduleApplicationContext.xml"}, inheritLocations = true)
-public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
+public class EmrConceptSearchControllerTest  extends BaseModuleWebContextSensitiveTest {
 
 	@Autowired
 	EmrApiProperties emrApiProperties;
+
+	@Autowired
+	EmrConceptSearchController conceptSearchController;
 
 	@Autowired
 	@Qualifier("conceptService")
@@ -38,14 +38,14 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 
 	@Test
 	public void shouldSearchByName() throws Exception {
-		List<SimpleObject> response = deserialize(handle(newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")})), new TypeReference<List>() {});
+		List<SimpleObject> response = (List<SimpleObject>)conceptSearchController.search("Diabetes", 100, null);
 		assertEquals(2, response.size());
 	}
 
 
 	@Test
 	public void shouldSearchByCodeExact() throws Exception {
-		List<SimpleObject> response = deserialize(handle(newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "ABC123"), new Parameter("limit", "100")})), new TypeReference<List>() {});
+		List<SimpleObject> response = (List<SimpleObject>)conceptSearchController.search("ABC123", 100, null);
 		assertEquals(1, response.size());
 		assertEquals("Diabetes", ((Map)response.get(0)).get("conceptName"));
 		Map diagnosisResponse = response.get(0);
@@ -58,7 +58,7 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 
 	@Test
 	public void shouldNotDoLikeSearchByCode() throws Exception {
-		List<SimpleObject> response = deserialize(handle(newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "ABC12"), new Parameter("limit", "100")})), new TypeReference<List>() {});
+		List<SimpleObject> response = (List<SimpleObject>)conceptSearchController.search("ABC12", 100, null);
 		assertEquals(0, response.size());
 	}
 
@@ -72,9 +72,7 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
         Assert.assertEquals(0, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
 
-		MockHttpServletRequest getRequest = newGetRequest("/rest/emrapi/concept",new Parameter[]{new Parameter("term", "Diabetes"), new Parameter("limit", "100")});
-        @SuppressWarnings("unchecked")
-        List<SimpleObject> response = deserialize(handle(getRequest), new TypeReference<List>() {});
+		List<SimpleObject> response = (List<SimpleObject>)conceptSearchController.search("Diabetes", 100, null);
         Assert.assertEquals(2, response.size());
 
         List<String> actualUuids = new ArrayList<String>();
@@ -90,7 +88,7 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
 		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
 		Assert.assertEquals(1, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
 
-		response = deserialize(handle(getRequest), new TypeReference<List>() {});
+		response = (List<SimpleObject>)conceptSearchController.search("Diabetes", 100, null);
         Assert.assertEquals(2, response.size());
 
         List<String> expectedUuids = new ArrayList<String>();
@@ -102,5 +100,4 @@ public class EmrConceptSearchControllerTest  extends BaseEmrControllerTest {
         //both lists shall have the same concepts identified by the unique UUID.
         Assert.assertArrayEquals(expectedUuids.toArray(), actualUuids.toArray());
 	}
-
 }

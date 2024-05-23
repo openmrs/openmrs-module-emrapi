@@ -1,24 +1,5 @@
 package org.openmrs.module.emrapi.visit;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-//import static org.junit.Assert.assertThat;
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,8 +12,8 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.VisitService;
+import org.openmrs.api.context.Context;
 import org.openmrs.contrib.testdata.TestDataManager;
-import org.openmrs.contrib.testdata.builder.VisitBuilder;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
@@ -45,6 +26,20 @@ import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
 
@@ -77,6 +72,8 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
         dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
         ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
+        Context.getAdministrationService().setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
+        Context.flushSession();
     }
 
     @Test
@@ -94,22 +91,22 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .location(visitLocation)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .location(visitLocation)
+                .save();
+        Encounter encounter = testDataManager.encounter()
+                .patient(patient)
+                .visit(visit)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .obs(testDataManager.obs()
+                        .concept(dispositionDescriptor.getDispositionConcept())
+                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
+                        .get())
+                .save();
 
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(true));
@@ -124,25 +121,25 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
         // a visit with a single *voided* visit note encounter with dispo = ADMIT
-        Visit visit =
-                testDataManager.visit()
-                        .patient(patient)
-                        .visitType(emrApiProperties.getAtFacilityVisitType())
-                        .started(new Date())
-                        .location(visitLocation)
-                        .encounter(testDataManager.encounter()
-                                .patient(patient)
-                                .encounterDatetime(new Date())
-                                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                                .voided(true)
-                                .dateVoided(new Date())
-                                .voidReason("test")
-                                .obs(testDataManager.obs()
-                                        .concept(dispositionDescriptor.getDispositionConcept())
-                                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                                        .get())
-                                .get())
-                        .save();
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .location(visitLocation)
+                .save();
+        Encounter encounter = testDataManager.encounter()
+                .patient(patient)
+                .visit(visit)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .voided(true)
+                .dateVoided(new Date())
+                .voidReason("test")
+                .obs(testDataManager.obs()
+                        .concept(dispositionDescriptor.getDispositionConcept())
+                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
+                        .get())
+                .save();
 
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(false));
@@ -198,21 +195,21 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
      * @param count The number of random encounters to generate.
      * @param density The percentage of encounters containing diagnoses obs.
      * @param diagnosisInEncounter Average number of diagnoses (for encounters that are added diagnoses).
-     * @param visitStartDate Encounters need to occur after the visit start date.
+     * @param visit the Visit to assign the encounters to
      * @param patient
      * @param encounterType
      * @param diagnosisList A sample of diagnosis obs groups to be randomly "recorded" within the encounters.
      * @return
      * @throws ParseException
      */
-    protected List<Encounter> createRandomEncountersWithDiagnoses(int count, double density, int diagnosisInEncounter, Date visitStartDate, Patient patient, EncounterType encounterType, List<Obs> diagnosisList) throws ParseException {
+    protected List<Encounter> createRandomEncountersWithDiagnoses(int count, double density, int diagnosisInEncounter, Visit visit, Patient patient, EncounterType encounterType, List<Obs> diagnosisList) throws ParseException {
        assertThat(density, allOf(greaterThan(0.),lessThanOrEqualTo(1.)));
        assertThat(count, greaterThan(0));
        
        List<Encounter> encounters = new ArrayList<Encounter>();
        
        // http://stackoverflow.com/a/11016689/321797
-       long startMilli = visitStartDate.getTime();
+       long startMilli = visit.getStartDatetime().getTime();
        final long hourInMilli = 1000 * 60 * 60;
        final long yearInMilli = hourInMilli * 24 * 365 + 1000; // Have to account for the leap second!
        
@@ -223,6 +220,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                          .patient(patient)
                          .encounterDatetime(new Date(startMilli + Math.round(yearInMilli * Math.random()))) // An encounter in 'startYear'
                          .encounterType(encounterType)
+                         .visit(visit)
                          .get();
           
           if (Math.random() <= density) {
@@ -236,6 +234,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 lastTime = obs.getObsDatetime().getTime();
              }
           }
+          Context.getEncounterService().saveEncounter(e);
           encounters.add(e);
        }
        
@@ -253,8 +252,7 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
        /*
         * Setup
         */
-       
-       Patient patient = testDataManager.randomPatient().save();
+       Patient patient = testDataManager.randomPatient().birthdate("1970-03-15").save();
 
        Location visitLocation = testDataManager.location().name("Visit Location")
                .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
@@ -263,19 +261,21 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
        List<Obs> sampleDiagnoses = createRandomDiagnosisObsGroups(200, 125, diagnosisMetadata);
        
        final Date visitStartDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
-       VisitBuilder visitBuilder =
+       Visit visit =
              testDataManager.visit()
                      .patient(patient)
                      .visitType(emrApiProperties.getAtFacilityVisitType())
                      .started(visitStartDate)
-                     .location(visitLocation);
+                     .location(visitLocation)
+                     .save();
        
        // Adding a bunch of encounters to the test visit
-       List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visitStartDate, patient, emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
+       List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visit, patient, emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
        for (Encounter e : encounters) {
-          visitBuilder.encounter(e);
+           visit.addEncounter(e);
        }
-       VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper( visitBuilder.save() );
+       visit = Context.getVisitService().saveVisit(visit);
+       VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper( visit );
        
        /*
         * Replay & Asserts

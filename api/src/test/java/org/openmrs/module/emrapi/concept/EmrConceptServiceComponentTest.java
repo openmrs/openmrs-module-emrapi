@@ -122,7 +122,7 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
     @Test
     public void testConceptSearchByIcd10Code() throws Exception {
         ConceptClass diagnosis = conceptService.getConceptClassByName("Diagnosis");
-        ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10");
+        ConceptSource icd10 = conceptService.getConceptSource(2);
 
         Map<String, Concept> concepts = setupConcepts();
 
@@ -153,7 +153,7 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
     public void testConceptSearchByNameFromSpecificSources() throws Exception {
         Map<String, Concept> concepts = setupConcepts();
         ConceptClass diagnosis = conceptService.getConceptClassByName("Diagnosis");
-        ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10");
+        ConceptSource icd10 = conceptService.getConceptSource(2);
 
         List<ConceptSearchResult> searchResults = emrConceptService.conceptSearch("ia", Locale.ENGLISH, Collections.singleton(diagnosis), null, Collections.singleton(icd10), null);
 
@@ -177,8 +177,8 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
         Map<String, Concept> concepts = new HashMap<String, Concept>();
 
         ConceptMapType sameAs = conceptService.getConceptMapTypeByName("same-as");
-        ConceptSource icd10 = conceptService.getConceptSourceByName("ICD-10");
-        ConceptSource snomed = conceptService.getConceptSourceByName("SNOMED CT");
+        ConceptSource icd10 = conceptService.getConceptSource(2);
+        ConceptSource snomed = conceptService.getConceptSource(3);
 
         ConceptDatatype na = conceptService.getConceptDatatypeByName("N/A");
         ConceptClass diagnosis = conceptService.getConceptClassByName("Diagnosis");

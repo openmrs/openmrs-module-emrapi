@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 public class DiagnosisServiceTest {
 
-    private DiagnosisServiceImpl service;
+    private ObsGroupDiagnosisService service;
 
     private EmrApiProperties emrApiProperties;
     private ConceptService conceptService;
@@ -67,7 +67,7 @@ public class DiagnosisServiceTest {
             }
         });
 
-        DiagnosisServiceImpl service = new DiagnosisServiceImpl();
+        ObsGroupDiagnosisService service = new ObsGroupDiagnosisService();
         service.setEmrApiProperties(emrApiProperties);
         service.setObsService(obsService);
         service.setEncounterService(encounterService);
