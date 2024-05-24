@@ -462,12 +462,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter3)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter3, admitToHospital);
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
