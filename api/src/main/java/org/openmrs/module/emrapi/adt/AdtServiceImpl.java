@@ -545,7 +545,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
         Concept admissionDecision = emrApiProperties.getAdmissionDecisionConcept();
         Concept admissionDeny = emrApiProperties.getDenyAdmissionConcept();
-        Concept admissionAdmit = emrApiProperties.getAdmitToHospitalConcept();
 
         for (Encounter e : visit.getNonVoidedEncounters()) {
             if (isAdmissionEncounter(e)) {
@@ -578,8 +577,15 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
                         if (obs.getValueCoded().equals(admissionDeny)) {
                             adtVisit.addEvent(new AdtEvent(AdtEventType.ADMISSION_DECISION_DENY, e));
                         }
-                        else if (obs.getValueCoded().equals(admissionAdmit)) {
-                            adtVisit.addEvent(new AdtEvent(AdtEventType.ADMISSION_DECISION_ADMIT, e));
+                        else {
+                            if (dispositionDescriptor != null) {
+                                Disposition disposition = dispositionService.getDispositionFromObs(obs);
+                                if (disposition != null) {
+                                    if (disposition.getType() == DispositionType.ADMIT) {
+                                        adtVisit.addEvent(new AdtEvent(AdtEventType.ADMISSION_DECISION_ADMIT, e));
+                                    }
+                                }
+                            }
                         }
                     }
                 }
