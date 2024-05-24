@@ -38,7 +38,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <openMRSVersion>2.2.1</openMRSVersion>
         <legacyuiVersion>1.16.0</legacyuiVersion>
-        <openmrsTestutilsVersion>1.7.0</openmrsTestutilsVersion>
+        <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
         <reportingVersion>1.25.0</reportingVersion>
         <serialization.xstreamVersion>0.2.16</serialization.xstreamVersion>
         <calculationVersion>1.3.0</calculationVersion>

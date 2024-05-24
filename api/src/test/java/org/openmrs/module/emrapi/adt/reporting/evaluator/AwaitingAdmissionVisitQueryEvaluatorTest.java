@@ -11,8 +11,8 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.PatientService;
 import org.openmrs.contrib.testdata.TestDataManager;
+import org.openmrs.contrib.testdata.builder.ObsBuilder;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
@@ -72,6 +72,12 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
         patient = testDataManager.randomPatient().birthdate("2010-01-01").save();
     }
 
+    private Obs createDispositionObs(Encounter encounter, Concept disposition) {
+        ObsBuilder groupBuilder = testDataManager.obs().encounter(encounter).concept(dispositionDescriptor.getDispositionSetConcept());
+        groupBuilder.member(testDataManager.obs().encounter(encounter).concept(dispositionDescriptor.getDispositionConcept()).value(disposition).get());
+        return groupBuilder.save();
+    }
+
     @Test
     public void shouldFindVisitAwaitingAdmission() throws Exception {
 
@@ -88,12 +94,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        Obs obs = testDataManager.obs()
-                .person(patient)
-                .encounter(encounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(encounter, admitToHospital);
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));
@@ -120,12 +121,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .dateVoided(new Date())
                 .voidReason("test")
                 .save();
-        Obs obs = testDataManager.obs()
-                .person(patient)
-                .encounter(encounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(encounter, admitToHospital);
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
@@ -151,12 +147,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter admissionEncounter = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(admitDatetime)
@@ -187,12 +178,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter admissionEncounter = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(admitDatetime)
@@ -227,12 +213,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter secondVisitNoteEncounter = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(secondVisitNoteDatetime)
@@ -269,12 +250,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
-                .save();
+        createDispositionObs(visitNoteEncounter, emrConceptService.getConcept("org.openmrs.module.emrapi:Death"));
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
@@ -301,12 +277,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
 
         query.setLocation(queryLocation);
         VisitQueryResult result = visitQueryService.evaluate(query, null);
@@ -333,12 +304,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
 
         query.setLocation(queryLocation);
         VisitQueryResult result = visitQueryService.evaluate(query, null);
@@ -361,12 +327,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter visitNoteEncounter2 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new Date())
@@ -401,12 +362,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
 
         EvaluationContext context = new EvaluationContext();
         context.setBaseCohort(new Cohort(Collections.singleton(2)));
@@ -430,12 +386,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
 
         VisitEvaluationContext context = new VisitEvaluationContext();
         context.setBaseVisits(new VisitIdSet(10101));  // random visit id
@@ -459,12 +410,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter visitNoteEncounter2 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
@@ -497,12 +443,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter visitNoteEncounter2 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
@@ -548,12 +489,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter visitNoteEncounter2 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
@@ -572,12 +508,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter3)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter3, admitToHospital);
         Encounter visitNoteEncounter4 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new DateTime(2014,10,10,13,0,0).toDate())
@@ -610,12 +541,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter visitNoteEncounter2 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new DateTime(2014,10,10,11,0,0).toDate())
@@ -649,12 +575,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter visitNoteEncounter2 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new DateTime(2014,10,9,10,0,0).toDate())
@@ -688,12 +609,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
         Encounter visitNoteEncounter2 = testDataManager.encounter()
                 .patient(patient)
                 .encounterDatetime(new DateTime(2014,10,11,10,0,0).toDate())
@@ -736,12 +652,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter, admitToHospital);
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(0));
