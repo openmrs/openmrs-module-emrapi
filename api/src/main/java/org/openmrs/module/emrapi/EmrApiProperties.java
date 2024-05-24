@@ -243,6 +243,10 @@ public class EmrApiProperties extends ModuleProperties {
         return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_DENY_ADMISSION);
     }
 
+	public Concept getAdmitToHospitalConcept() {
+		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_ADMIT_TO_HOSPITAL);
+	}
+
     public Concept getPatientDiedConcept() {
         return getEmrApiConceptByMappingAllowUndefined(EmrApiConstants.CONCEPT_CODE_PATIENT_DIED);
     }

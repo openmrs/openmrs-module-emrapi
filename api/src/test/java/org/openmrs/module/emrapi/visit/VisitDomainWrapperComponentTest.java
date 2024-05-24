@@ -91,22 +91,33 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit = testDataManager.visit()
-                .patient(patient)
-                .visitType(emrApiProperties.getAtFacilityVisitType())
-                .started(new Date())
-                .location(visitLocation)
-                .save();
-        Encounter encounter = testDataManager.encounter()
-                .patient(patient)
-                .visit(visit)
-                .encounterDatetime(new Date())
-                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                .obs(testDataManager.obs()
-                        .concept(dispositionDescriptor.getDispositionConcept())
-                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                        .get())
-                .save();
+        Visit visit = new Visit();
+        visit.setPatient(patient);
+        visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
+        visit.setStartDatetime(new Date());
+        visit.setLocation(visitLocation);
+
+        Encounter encounter = new Encounter();
+        encounter.setPatient(patient);
+        encounter.setVisit(visit);
+        encounter.setEncounterDatetime(new Date());
+        encounter.setEncounterType(emrApiProperties.getVisitNoteEncounterType());
+        visit.addEncounter(encounter);
+
+        Obs obs = new Obs();
+        obs.setPerson(patient);
+        obs.setEncounter(encounter);
+        obs.setConcept(dispositionDescriptor.getDispositionConcept());
+        obs.setValueCoded(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
+
+        Obs obsGroup = new Obs();
+        obsGroup.setPerson(patient);
+        obsGroup.setEncounter(encounter);
+        obsGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
+        obsGroup.addGroupMember(obs);
+        encounter.addObs(obsGroup);
+
+        visitService.saveVisit(visit);
 
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(true));

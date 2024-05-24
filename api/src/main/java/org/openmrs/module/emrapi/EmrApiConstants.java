@@ -162,6 +162,8 @@ public class EmrApiConstants {
 
     public static final String CONCEPT_CODE_DENY_ADMISSION = "Deny Admission";
 
+    public static final String CONCEPT_CODE_ADMIT_TO_HOSPITAL = "Admit to hospital";
+
     public static final String USER_PROPERTY_NAME_LAST_VIEWED_PATIENT_IDS = "emrapi.lastViewedPatientIds";
 
     public static final String EVENT_TOPIC_NAME_PATIENT_VIEWED = "org.openmrs.module.emrapi.event.PatientViewed";
