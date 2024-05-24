@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -14,6 +15,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.contrib.testdata.TestDataManager;
+import org.openmrs.contrib.testdata.builder.ObsBuilder;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
@@ -76,6 +78,12 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
         Context.flushSession();
     }
 
+    private Obs createDispositionObs(Encounter encounter, Concept disposition) {
+        ObsBuilder groupBuilder = testDataManager.obs().encounter(encounter).concept(dispositionDescriptor.getDispositionSetConcept());
+        groupBuilder.member(testDataManager.obs().encounter(encounter).concept(dispositionDescriptor.getDispositionConcept()).value(disposition).get());
+        return groupBuilder.save();
+    }
+
     @Test
     public void testThatBeanCanHavePropertiesAutowired() throws Exception {
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper();
@@ -91,33 +99,19 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
 
         // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit = new Visit();
-        visit.setPatient(patient);
-        visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
-        visit.setStartDatetime(new Date());
-        visit.setLocation(visitLocation);
-
-        Encounter encounter = new Encounter();
-        encounter.setPatient(patient);
-        encounter.setVisit(visit);
-        encounter.setEncounterDatetime(new Date());
-        encounter.setEncounterType(emrApiProperties.getVisitNoteEncounterType());
-        visit.addEncounter(encounter);
-
-        Obs obs = new Obs();
-        obs.setPerson(patient);
-        obs.setEncounter(encounter);
-        obs.setConcept(dispositionDescriptor.getDispositionConcept());
-        obs.setValueCoded(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
-
-        Obs obsGroup = new Obs();
-        obsGroup.setPerson(patient);
-        obsGroup.setEncounter(encounter);
-        obsGroup.setConcept(dispositionDescriptor.getDispositionSetConcept());
-        obsGroup.addGroupMember(obs);
-        encounter.addObs(obsGroup);
-
-        visitService.saveVisit(visit);
+        Visit visit = testDataManager.visit()
+                .patient(patient)
+                .visitType(emrApiProperties.getAtFacilityVisitType())
+                .started(new Date())
+                .location(visitLocation)
+                .save();
+        Encounter encounter = testDataManager.encounter()
+                .patient(patient)
+                .visit(visit)
+                .encounterDatetime(new Date())
+                .encounterType(emrApiProperties.getVisitNoteEncounterType())
+                .save();
+        createDispositionObs(encounter, emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
 
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(true));
@@ -146,11 +140,8 @@ public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveT
                 .voided(true)
                 .dateVoided(new Date())
                 .voidReason("test")
-                .obs(testDataManager.obs()
-                        .concept(dispositionDescriptor.getDispositionConcept())
-                        .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"))
-                        .get())
                 .save();
+        createDispositionObs(encounter, emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
 
         VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
         assertThat(visitDomainWrapper.isAwaitingAdmission(), is(false));
