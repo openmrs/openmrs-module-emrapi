@@ -1,31 +1,20 @@
 package org.openmrs.module.emrapi.db;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
-import org.openmrs.Obs;
-import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
 public class EmrVisitDAOImpl implements EmrVisitDAO {
 
    protected final Log log = LogFactory.getLog(getClass());
-
-   protected static String RESOURCE_NOT_FOUND = "The HQL query resource file was not found.";
-
-   protected static String DIAGNOSES_HQL                    = "hql/visit_diagnoses.hql";
-   protected static String PRIMARY_DIAGNOSES_HQL            = "hql/visit_primary_diagnoses.hql";
-   protected static String CONFIRMED_DIAGNOSES_HQL          = "hql/visit_confirmed_diagnoses.hql";
-   protected static String CONFIRMED_PRIMARY_DIAGNOSES_HQL  = "hql/visit_confirmed_primary_diagnoses.hql";
-   protected static String PATIENTS_DIAGNOSES_HQL           = "hql/patients_diagnoses.hql";
 
    private DbSessionFactory sessionFactory;
 
@@ -33,77 +22,31 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
       this.sessionFactory = sessionFactory;
    }
 
+   @Override
    @SuppressWarnings("unchecked")
-   @Override
-   public List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
-      String queryString = "";
-      try {
-         queryString = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(DIAGNOSES_HQL));
-      } catch (IOException e) {
-         log.error(RESOURCE_NOT_FOUND, e);
-         return Collections.emptyList();
-      }
+   public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz) {
       Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-      query.setInteger("visitId", visit.getId());
-      query.setInteger("diagnosisOrderConceptId", diagnosisMetadata.getDiagnosisOrderConcept().getId());
-
-      return (List<Obs>) query.list();
-   }
-
-   @SuppressWarnings("unchecked")
-   @Override
-   public List<Obs> getPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
-      String queryString = "";
-      try {
-         queryString = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(PRIMARY_DIAGNOSES_HQL));
-      } catch (IOException e) {
-         log.error(RESOURCE_NOT_FOUND, e);
-         return Collections.emptyList();
+      for (String parameter : parameters.keySet()) {
+         Object value = parameters.get(parameter);
+         query.setParameter(parameter, value);
       }
-      Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-      query.setInteger("visitId", visit.getId());
-      query.setInteger("diagnosisOrderConceptId", diagnosisMetadata.getDiagnosisOrderConcept().getId());
-      query.setInteger("primaryOrderConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Order.PRIMARY).getId());
-      return (List<Obs>) query.list();
-   }
-
-   @SuppressWarnings("unchecked")
-   @Override
-   public List<Obs> getConfirmedDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
-      String queryString = "";
-      try {
-         queryString = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(CONFIRMED_DIAGNOSES_HQL));
-      } catch (IOException e) {
-         log.error(RESOURCE_NOT_FOUND, e);
-         return Collections.emptyList();
-      }
-      Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-      query.setInteger("visitId", visit.getId());
-      query.setInteger("diagnosisCertaintyConceptId", diagnosisMetadata.getDiagnosisCertaintyConcept().getId());
-      query.setInteger("confirmedCertaintyConceptId", diagnosisMetadata.getConceptFor(Diagnosis.Certainty.CONFIRMED).getId());
-      return (List<Obs>) query.list();
-   }
-
-   @SuppressWarnings("unchecked")
-   @Override
-   public List<Obs> getConfirmedPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
-      List<Obs> confirmedDiagnoses = getConfirmedDiagnoses(visit, diagnosisMetadata);
-      List<Obs> primaryDiagnoses = getPrimaryDiagnoses(visit, diagnosisMetadata);
-      confirmedDiagnoses.retainAll(primaryDiagnoses);
-      return confirmedDiagnoses;
-   }
-
-   @Override
-   public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
-      String queryString = "";
-      try {
-    	  queryString = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(PATIENTS_DIAGNOSES_HQL));
-      } catch (IOException e) {
-         log.error(RESOURCE_NOT_FOUND, e);
-         return Collections.emptyList();
-      }
-      Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-      query.setInteger("diagnosisSetConceptId", diagnosisMetadata.getDiagnosisSetConcept().getConceptId());
       return query.list();
+   }
+
+   @Override
+   public <T> List<T> executeHqlFromResource(String resource, Map<String, Object> parameters, Class<T> clazz) {
+      String hql = null;
+      try (InputStream is = getClass().getClassLoader().getResourceAsStream(resource)) {
+         if (is != null) {
+            hql = IOUtils.toString(is, StandardCharsets.UTF_8);
+         }
+      }
+      catch (IOException e) {
+         throw new RuntimeException("Error loading " + resource, e);
+      }
+      if (hql == null) {
+         throw new RuntimeException("No resource found for " + resource);
+      }
+      return executeHql(hql, parameters, clazz);
    }
 }

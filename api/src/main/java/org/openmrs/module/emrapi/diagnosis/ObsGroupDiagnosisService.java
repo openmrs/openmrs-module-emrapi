@@ -17,9 +17,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ObsGroupDiagnosisService {
@@ -196,23 +198,55 @@ public class ObsGroupDiagnosisService {
 		return diagnoses;
 	}
 
-    public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
-        if (primaryOnly == true) {
-            if (confirmedOnly == false) {
-                return emrVisitDAO.getPrimaryDiagnoses(visit, diagnosisMetadata);
-            } else {
-                return emrVisitDAO.getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
-            }
-        } else {
-            if (confirmedOnly == false) {
-                return emrVisitDAO.getDiagnoses(visit, diagnosisMetadata);
-            } else {
-                return emrVisitDAO.getConfirmedDiagnoses(visit, diagnosisMetadata);
-            }
-        }
+    public List<Obs> getDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("visit", visit);
+        parameters.put("diagnosisOrderConcept", diagnosisMetadata.getDiagnosisOrderConcept());
+        return emrVisitDAO.executeHqlFromResource("hql/visit_diagnoses.hql", parameters, Obs.class);
+    }
+
+    public List<Obs> getPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("visit", visit);
+        parameters.put("diagnosisOrderConcept", diagnosisMetadata.getDiagnosisOrderConcept());
+        parameters.put("primaryOrderConcept", diagnosisMetadata.getConceptFor(Diagnosis.Order.PRIMARY));
+        return emrVisitDAO.executeHqlFromResource("hql/visit_primary_diagnoses.hql", parameters, Obs.class);
+    }
+
+    public List<Obs> getConfirmedDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("visit", visit);
+        parameters.put("diagnosisCertaintyConcept", diagnosisMetadata.getDiagnosisCertaintyConcept());
+        parameters.put("confirmedCertaintyConcept", diagnosisMetadata.getConceptFor(Diagnosis.Certainty.CONFIRMED));
+        return emrVisitDAO.executeHqlFromResource("hql/visit_confirmed_diagnoses.hql", parameters, Obs.class);
+    }
+
+    public List<Obs> getConfirmedPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
+        List<Obs> confirmedDiagnoses = getConfirmedDiagnoses(visit, diagnosisMetadata);
+        List<Obs> primaryDiagnoses = getPrimaryDiagnoses(visit, diagnosisMetadata);
+        confirmedDiagnoses.retainAll(primaryDiagnoses);
+        return confirmedDiagnoses;
     }
 
     public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
-        return emrVisitDAO.getAllPatientsWithDiagnosis(diagnosisMetadata);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("diagnosisSetConcept", diagnosisMetadata.getDiagnosisSetConcept());
+        return emrVisitDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, Integer.class);
+    }
+
+    public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
+        if (primaryOnly == true) {
+            if (confirmedOnly == false) {
+                return getPrimaryDiagnoses(visit, diagnosisMetadata);
+            } else {
+                return getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
+            }
+        } else {
+            if (confirmedOnly == false) {
+                return getDiagnoses(visit, diagnosisMetadata);
+            } else {
+                return getConfirmedDiagnoses(visit, diagnosisMetadata);
+            }
+        }
     }
 }
