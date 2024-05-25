@@ -9,6 +9,7 @@ import org.openmrs.api.db.hibernate.DbSessionFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,12 @@ public class EmrVisitDAOImpl implements EmrVisitDAO {
       Query query = sessionFactory.getCurrentSession().createQuery(queryString);
       for (String parameter : parameters.keySet()) {
          Object value = parameters.get(parameter);
-         query.setParameter(parameter, value);
+         if (value instanceof Collection) {
+            query.setParameterList(parameter, (Collection) value);
+         }
+         else {
+            query.setParameter(parameter, value);
+         }
       }
       return query.list();
    }
