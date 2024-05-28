@@ -14,8 +14,10 @@
 
 package org.openmrs.module.emrapi.adt;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -40,8 +42,14 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.adt.domain.AdtEvent;
+import org.openmrs.module.emrapi.adt.domain.AdtEventType;
+import org.openmrs.module.emrapi.adt.domain.AdtVisit;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.merge.VisitMergeAction;
@@ -81,6 +89,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private LocationService locationService;
 
+    private DispositionService dispositionService;
+
     private DomainWrapperFactory domainWrapperFactory;
 
     private List<PatientMergeAction> patientMergeActions;
@@ -109,6 +119,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     public void setProviderService(ProviderService providerService) {
         this.providerService = providerService;
+    }
+
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
     }
 
     public void setDomainWrapperFactory(DomainWrapperFactory domainWrapperFactory) {
@@ -490,6 +504,95 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         return active;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AdtVisit> getAdtEventsForActiveVisits(Location location) {
+        List<AdtVisit> ret = new ArrayList<>();
+        Set<Location> locations = null;
+        if (location != null) {
+            locations = getChildLocationsRecursively(location, null);
+        }
+        List<Visit> visits = visitService.getVisits(null, null, locations, null, null, null, null, null, null, false, false);
+        for (Visit visit : visits) {
+            if (itBelongsToARealPatient(visit)) {
+                if (BooleanUtils.isNotTrue(visit.getPatient().getDead())) {
+                    ret.add(getAdtVisitEvents(visit));
+                }
+            }
+        }
+        return ret;
+    }
+
+    public boolean isAdmissionEncounter(Encounter encounter) {
+        return encounter.getEncounterType().equals(emrApiProperties.getAdmissionEncounterType());
+    }
+
+    public boolean isTransferEncounter(Encounter encounter) {
+        return encounter.getEncounterType().equals(emrApiProperties.getTransferWithinHospitalEncounterType());
+    }
+
+    public boolean isDischargeEncounter(Encounter encounter) {
+        return encounter.getEncounterType().equals(emrApiProperties.getExitFromInpatientEncounterType());
+    }
+
+    public AdtVisit getAdtVisitEvents(Visit visit) {
+        AdtVisit adtVisit = new AdtVisit(visit);
+        DispositionDescriptor dispositionDescriptor = null;
+        if (dispositionService.dispositionsSupported()) {
+            dispositionDescriptor = dispositionService.getDispositionDescriptor();
+        }
+        Concept admissionDecision = emrApiProperties.getAdmissionDecisionConcept();
+        Concept admissionDeny = emrApiProperties.getDenyAdmissionConcept();
+
+        for (Encounter e : visit.getNonVoidedEncounters()) {
+            if (isAdmissionEncounter(e)) {
+                adtVisit.addEvent(new AdtEvent(AdtEventType.ADMISSION, e));
+            }
+            else if (isTransferEncounter(e)) {
+                adtVisit.addEvent(new AdtEvent(AdtEventType.TRANSFER, e));
+            }
+            else if (isDischargeEncounter(e)) {
+                adtVisit.addEvent(new AdtEvent(AdtEventType.DISCHARGE, e));
+            }
+            else {
+                for (Obs obs : e.getAllObs(false)) {
+                    if (dispositionDescriptor != null) {
+                        if (dispositionDescriptor.isDisposition(obs)) {
+                            Disposition disposition = dispositionService.getDispositionFromObsGroup(obs);
+                            if (disposition.getType() == DispositionType.ADMIT) {
+                                Location location = dispositionDescriptor.getAdmissionLocation(obs, locationService);
+                                adtVisit.addEvent(new AdtEvent(AdtEventType.ADMISSION_REQUEST, e, obs, location));
+                            } else if (disposition.getType() == DispositionType.TRANSFER) {
+                                Location location = dispositionDescriptor.getInternalTransferLocation(obs, locationService);
+                                adtVisit.addEvent(new AdtEvent(AdtEventType.TRANSFER_REQUEST, e, obs, location));
+                            } else if (disposition.getType() == DispositionType.DISCHARGE) {
+                                Location location = e.getLocation();
+                                adtVisit.addEvent(new AdtEvent(AdtEventType.DISCHARGE_REQUEST, e, obs, location));
+                            }
+                        }
+                    }
+                    if (obs.getConcept().equals(admissionDecision)) {
+                        if (obs.getValueCoded().equals(admissionDeny)) {
+                            adtVisit.addEvent(new AdtEvent(AdtEventType.ADMISSION_DECISION_DENY, e));
+                        }
+                        else {
+                            if (dispositionDescriptor != null) {
+                                Disposition disposition = dispositionService.getDispositionFromObs(obs);
+                                if (disposition != null) {
+                                    if (disposition.getType() == DispositionType.ADMIT) {
+                                        adtVisit.addEvent(new AdtEvent(AdtEventType.ADMISSION_DECISION_ADMIT, e));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        adtVisit.getAdtEvents().sort(Comparator.comparing(e -> e.getEventEncounter().getEncounterDatetime()));
+        return adtVisit;
     }
 
     @Override

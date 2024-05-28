@@ -22,6 +22,7 @@ import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.emrapi.adt.domain.AdtVisit;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.merge.VisitMergeAction;
@@ -157,6 +158,8 @@ public interface AdtService extends OpenmrsService {
      * @return
      */
     List<VisitDomainWrapper> getActiveVisits(Location location);
+
+    List<AdtVisit> getAdtEventsForActiveVisits(Location location);
 
     /**
      * If any currently-open visits are now inactive per our business logic, close them

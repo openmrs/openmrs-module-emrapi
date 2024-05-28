@@ -49,6 +49,7 @@
                 <property name="locationService" ref="locationService"/>
                 <property name="providerService" ref="providerService"/>
                 <property name="patientService" ref="patientService"/>
+                <property name="dispositionService" ref="dispositionService"/>
                 <property name="domainWrapperFactory" ref="domainWrapperFactory"/>
             </bean>
         </property>
