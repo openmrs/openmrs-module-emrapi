@@ -124,7 +124,7 @@ public class ObsMapper {
         String interpretation = observationData.getInterpretation();
         obs.setInterpretation(interpretation == null ? null : Obs.Interpretation.valueOf(interpretation));
         String status = observationData.getStatus();
-        obs.setStatus(status == null ? null : Obs.Status.valueOf(status));
+        obs.setStatus(status == null ? Obs.Status.FINAL : Obs.Status.valueOf(status));
     }
 
     private String getUuidOfCodedObservationValue(Object codeObsVal) {
