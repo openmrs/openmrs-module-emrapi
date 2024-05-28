@@ -13,6 +13,7 @@ import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.contrib.testdata.TestDataManager;
+import org.openmrs.module.emrapi.BaseReportingTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.reporting.definition.MostRecentAdmissionRequestVisitDataDefinition;
@@ -26,7 +27,6 @@ import org.openmrs.module.reporting.data.visit.EvaluatedVisitData;
 import org.openmrs.module.reporting.data.visit.service.VisitDataService;
 import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
 import org.openmrs.module.reporting.query.visit.VisitIdSet;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -36,7 +36,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseModuleContextSensitiveTest {
+public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseReportingTest {
 
     @Autowired
     private VisitDataService visitDataService;

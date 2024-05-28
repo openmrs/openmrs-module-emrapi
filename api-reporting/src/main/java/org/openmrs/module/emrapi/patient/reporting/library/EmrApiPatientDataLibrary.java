@@ -14,6 +14,7 @@
 package org.openmrs.module.emrapi.patient.reporting.library;
 
 import org.openmrs.PatientIdentifier;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.reporting.data.converter.PropertyConverter;
 import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
 /**
  * Basic patient data columns provided by emr-api module
  */
-@Component
+@OpenmrsProfile(modules = { "reporting:*" })
 public class EmrApiPatientDataLibrary extends BaseDefinitionLibrary<PatientDataDefinition> {
 
     @Autowired

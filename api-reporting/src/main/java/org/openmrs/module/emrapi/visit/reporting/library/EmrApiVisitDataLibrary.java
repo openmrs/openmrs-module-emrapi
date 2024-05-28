@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.visit.reporting.library;
 
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.adt.reporting.definition.MostRecentAdmissionRequestVisitDataDefinition;
 import org.openmrs.module.reporting.data.visit.definition.VisitDataDefinition;
 import org.openmrs.module.reporting.definition.library.BaseDefinitionLibrary;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * Basic visit data columns provided by module
  */
-@Component
+@OpenmrsProfile(modules = { "reporting:*" })
 public class EmrApiVisitDataLibrary extends BaseDefinitionLibrary<VisitDataDefinition> {
 
 

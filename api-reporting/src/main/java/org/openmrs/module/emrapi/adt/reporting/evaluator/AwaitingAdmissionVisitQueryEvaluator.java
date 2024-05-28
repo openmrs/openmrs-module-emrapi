@@ -3,6 +3,7 @@ package org.openmrs.module.emrapi.adt.reporting.evaluator;
 import org.openmrs.Location;
 import org.openmrs.Visit;
 import org.openmrs.annotation.Handler;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Handler(supports = AwaitingAdmissionVisitQuery.class)
+@OpenmrsProfile(modules = { "reporting:*" })
 public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator {
 
     @Autowired
