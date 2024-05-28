@@ -14,13 +14,25 @@
     <updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
 	<require_version>${openMRSVersion}</require_version>
 
+    <conditionalResources>
+        <conditionalResource>
+            <path>/lib/emr-api-reporting-${project.version}.jar</path>
+            <modules>
+                <module>
+                    <moduleId>reporting</moduleId>
+                    <version>*.*</version>
+                </module>
+            </modules>
+        </conditionalResource>
+    </conditionalResources>
+
     <aware_of_modules>
         <aware_of_module>org.openmrs.module.legacyui</aware_of_module>
         <aware_of_module>org.openmrs.module.metadatasharing</aware_of_module>
+        <aware_of_module version="${reportingModuleVersion}">org.openmrs.module.reporting</aware_of_module>
     </aware_of_modules>
 
     <require_modules>
-        <require_module version="${reportingModuleVersion}">org.openmrs.module.reporting</require_module>
         <require_module version="${providermanagementModuleVersion}">org.openmrs.module.providermanagement</require_module>
         <require_module version="${metadatamappingVersion}">org.openmrs.module.metadatamapping</require_module>
         <require_module version="${eventVersion}">org.openmrs.event</require_module>
@@ -28,12 +40,6 @@
     </require_modules>
 
     <activator>${project.parent.groupId}.${project.parent.artifactId}.EmrApiActivator</activator>
-
-
-    <!-- Maps hibernate files, if present -->
-    <mappingFiles>
-        Condition.hbm.xml
-    </mappingFiles>
 
     <!-- Internationalization -->
     <!-- All message codes should start with ${project.parent.artifactId}. -->

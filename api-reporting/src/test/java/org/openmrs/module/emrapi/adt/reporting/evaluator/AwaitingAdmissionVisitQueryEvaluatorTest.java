@@ -27,6 +27,7 @@ import org.openmrs.module.reporting.query.visit.VisitQueryResult;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Collections;
 import java.util.Date;
@@ -45,6 +46,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
     @Autowired
     private DispositionService dispositionService;
 
+    @Qualifier("reportingVisitQueryService")
     @Autowired
     private VisitQueryService visitQueryService;
 
