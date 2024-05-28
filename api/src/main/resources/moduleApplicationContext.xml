@@ -9,7 +9,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.account.AccountServiceImpl">
+            <bean class="org.openmrs.module.emrapi.account.AccountServiceImpl">
                 <property name="userService" ref="userService"/>
                 <property name="personService" ref="personService"/>
                 <property name="providerService" ref="providerService"/>
@@ -29,7 +29,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.account.AccountService</value>
+                <value>org.openmrs.module.emrapi.account.AccountService</value>
                 <ref bean="accountService"/>
             </list>
         </property>
@@ -42,7 +42,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.adt.AdtServiceImpl">
+            <bean class="org.openmrs.module.emrapi.adt.AdtServiceImpl">
                 <property name="emrApiProperties" ref="emrApiProperties"/>
                 <property name="encounterService" ref="encounterService"/>
                 <property name="visitService" ref="visitService"/>
@@ -63,7 +63,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.adt.AdtService</value>
+                <value>org.openmrs.module.emrapi.adt.AdtService</value>
                 <ref bean="adtService"/>
             </list>
         </property>
@@ -74,7 +74,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.exitfromcare.ExitFromCareServiceImpl">
+            <bean class="org.openmrs.module.emrapi.exitfromcare.ExitFromCareServiceImpl">
                 <property name="emrApiProperties" ref="emrApiProperties"/>
                 <property name="visitService" ref="visitService"/>
                 <property name="patientService" ref="patientService"/>
@@ -93,7 +93,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.exitfromcare.ExitFromCareService</value>
+                <value>org.openmrs.module.emrapi.exitfromcare.ExitFromCareService</value>
                 <ref bean="exitFromCareService"/>
             </list>
         </property>
@@ -106,7 +106,7 @@
         <property name="target">
             <bean class="org.openmrs.module.emrapi.concept.EmrConceptServiceImpl">
                 <property name="dao">
-                    <bean class="${project.parent.groupId}.${project.parent.artifactId}.concept.HibernateEmrConceptDAO">
+                    <bean class="org.openmrs.module.emrapi.concept.HibernateEmrConceptDAO">
                         <property name="sessionFactory">
                             <ref bean="dbSessionFactory"/>
                         </property>
@@ -131,7 +131,7 @@
         <property name="target">
             <bean class="org.openmrs.module.emrapi.patient.EmrPatientServiceImpl">
                 <property name="dao">
-                    <bean class="${project.parent.groupId}.${project.parent.artifactId}.patient.HibernateEmrPatientDAO">
+                    <bean class="org.openmrs.module.emrapi.patient.HibernateEmrPatientDAO">
                         <property name="sessionFactory">
                             <ref bean="dbSessionFactory"/>
                         </property>
@@ -155,7 +155,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.event.ApplicationEventServiceImpl" />
+            <bean class="org.openmrs.module.emrapi.event.ApplicationEventServiceImpl" />
         </property>
         <property name="preInterceptors">
             <ref bean="serviceInterceptors"/>
@@ -284,7 +284,7 @@
         <constructor-arg ref="encounterService"/>
     </bean>
 
-    <bean id="emrVisitDAOImpl" class="${project.parent.groupId}.${project.parent.artifactId}.db.EmrVisitDAOImpl">
+    <bean id="emrApiDAOImpl" class="org.openmrs.module.emrapi.db.EmrApiDAOImpl">
         <property name="sessionFactory">
             <ref bean="dbSessionFactory"/>
         </property>
@@ -336,7 +336,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.encounter.EmrEncounterService</value>
+                <value>org.openmrs.module.emrapi.encounter.EmrEncounterService</value>
                 <ref bean="emrEncounterService"/>
             </list>
         </property>
@@ -345,7 +345,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.concept.EmrConceptService</value>
+                <value>org.openmrs.module.emrapi.concept.EmrConceptService</value>
                 <ref bean="emrConceptService"/>
             </list>
         </property>
@@ -354,7 +354,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.patient.EmrPatientService</value>
+                <value>org.openmrs.module.emrapi.patient.EmrPatientService</value>
                 <ref bean="emrPatientService"/>
             </list>
         </property>
@@ -363,7 +363,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.event.ApplicationEventService</value>
+                <value>org.openmrs.module.emrapi.event.ApplicationEventService</value>
                 <ref bean="applicationEventService"/>
             </list>
         </property>
@@ -373,7 +373,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.person.image.EmrPersonImageService</value>
+                <value>org.openmrs.module.emrapi.person.image.EmrPersonImageService</value>
                 <ref bean="emrPersonImageService"/>
             </list>
         </property>
@@ -382,13 +382,13 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.disposition.DispositionService</value>
+                <value>org.openmrs.module.emrapi.disposition.DispositionService</value>
                 <ref bean="dispositionService"/>
             </list>
         </property>
     </bean>
 
-    <bean id="emrEncounterDAO" class="${project.parent.groupId}.${project.parent.artifactId}.db.HibernateEmrEncounterDAO">
+    <bean id="emrEncounterDAO" class="org.openmrs.module.emrapi.db.HibernateEmrEncounterDAO">
         <property name="sessionFactory">
             <ref bean="dbSessionFactory"/>
         </property>
@@ -448,7 +448,7 @@
         <property name="emrApiProperties" ref="emrApiProperties"/>
         <property name="obsService" ref="obsService"/>
         <property name="encounterService" ref="encounterService"/>
-        <property name="emrVisitDAO" ref="emrVisitDAOImpl"/>
+        <property name="emrApiDAO" ref="emrApiDAOImpl"/>
     </bean>
 
     <bean id="emrDiagnosisService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
@@ -456,7 +456,7 @@
             <ref bean="transactionManager"/>
         </property>
         <property name="target">
-            <bean class="${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisServiceImpl">
+            <bean class="org.openmrs.module.emrapi.diagnosis.DiagnosisServiceImpl">
                 <property name="coreDiagnosisService" ref="coreDiagnosisService"/>
                 <property name="obsGroupDiagnosisService" ref="obsGroupDiagnosisService"/>
                 <property name="adminService" ref="adminService"/>
@@ -473,7 +473,7 @@
     <bean parent="serviceContext">
         <property name="moduleService">
             <list merge="true">
-                <value>${project.parent.groupId}.${project.parent.artifactId}.diagnosis.DiagnosisService</value>
+                <value>org.openmrs.module.emrapi.diagnosis.DiagnosisService</value>
                 <ref bean="emrDiagnosisService"/>
             </list>
         </property>

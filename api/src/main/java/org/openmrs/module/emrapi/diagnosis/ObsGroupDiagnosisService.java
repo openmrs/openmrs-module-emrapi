@@ -11,7 +11,7 @@ import org.openmrs.Visit;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.db.EmrVisitDAO;
+import org.openmrs.module.emrapi.db.EmrApiDAO;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class ObsGroupDiagnosisService {
 
     private EncounterService encounterService;
 
-    private EmrVisitDAO emrVisitDAO;
+    private EmrApiDAO emrApiDAO;
 
 	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
 		this.emrApiProperties = emrApiProperties;
@@ -48,8 +48,8 @@ public class ObsGroupDiagnosisService {
         this.encounterService = encounterService;
     }
 
-    public void setEmrVisitDAO(EmrVisitDAO emrVisitDAO) {
-        this.emrVisitDAO = emrVisitDAO;
+    public void setEmrApiDAO(EmrApiDAO emrApiDAO) {
+        this.emrApiDAO = emrApiDAO;
     }
 
     public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses) {
@@ -202,7 +202,7 @@ public class ObsGroupDiagnosisService {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("visit", visit);
         parameters.put("diagnosisOrderConcept", diagnosisMetadata.getDiagnosisOrderConcept());
-        return emrVisitDAO.executeHqlFromResource("hql/visit_diagnoses.hql", parameters, Obs.class);
+        return emrApiDAO.executeHqlFromResource("hql/visit_diagnoses.hql", parameters, Obs.class);
     }
 
     public List<Obs> getPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
@@ -210,7 +210,7 @@ public class ObsGroupDiagnosisService {
         parameters.put("visit", visit);
         parameters.put("diagnosisOrderConcept", diagnosisMetadata.getDiagnosisOrderConcept());
         parameters.put("primaryOrderConcept", diagnosisMetadata.getConceptFor(Diagnosis.Order.PRIMARY));
-        return emrVisitDAO.executeHqlFromResource("hql/visit_primary_diagnoses.hql", parameters, Obs.class);
+        return emrApiDAO.executeHqlFromResource("hql/visit_primary_diagnoses.hql", parameters, Obs.class);
     }
 
     public List<Obs> getConfirmedDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
@@ -218,7 +218,7 @@ public class ObsGroupDiagnosisService {
         parameters.put("visit", visit);
         parameters.put("diagnosisCertaintyConcept", diagnosisMetadata.getDiagnosisCertaintyConcept());
         parameters.put("confirmedCertaintyConcept", diagnosisMetadata.getConceptFor(Diagnosis.Certainty.CONFIRMED));
-        return emrVisitDAO.executeHqlFromResource("hql/visit_confirmed_diagnoses.hql", parameters, Obs.class);
+        return emrApiDAO.executeHqlFromResource("hql/visit_confirmed_diagnoses.hql", parameters, Obs.class);
     }
 
     public List<Obs> getConfirmedPrimaryDiagnoses(Visit visit, DiagnosisMetadata diagnosisMetadata) {
@@ -231,7 +231,7 @@ public class ObsGroupDiagnosisService {
     public List<Integer> getAllPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("diagnosisSetConcept", diagnosisMetadata.getDiagnosisSetConcept());
-        return emrVisitDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, Integer.class);
+        return emrApiDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, Integer.class);
     }
 
     public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {

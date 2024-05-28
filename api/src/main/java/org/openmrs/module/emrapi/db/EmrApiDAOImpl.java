@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class EmrVisitDAOImpl implements EmrVisitDAO {
+public class EmrApiDAOImpl implements EmrApiDAO {
 
    protected final Log log = LogFactory.getLog(getClass());
 

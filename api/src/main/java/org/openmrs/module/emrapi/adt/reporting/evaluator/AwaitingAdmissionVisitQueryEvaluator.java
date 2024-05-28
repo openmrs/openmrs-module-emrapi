@@ -7,7 +7,7 @@ import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
 import org.openmrs.module.emrapi.adt.util.AdtUtil;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
-import org.openmrs.module.emrapi.db.EmrVisitDAO;
+import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
@@ -37,7 +37,7 @@ public class AwaitingAdmissionVisitQueryEvaluator implements VisitQueryEvaluator
     EmrApiProperties emrApiProperties;
 
     @Autowired
-    EmrVisitDAO visitDAO;
+    EmrApiDAO visitDAO;
 
     @Override
     public VisitQueryResult evaluate(VisitQuery visitQuery, EvaluationContext evaluationContext) throws EvaluationException {
