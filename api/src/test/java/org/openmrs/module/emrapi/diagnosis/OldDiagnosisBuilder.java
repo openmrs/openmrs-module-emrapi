@@ -4,7 +4,9 @@ import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
-import org.openmrs.module.reporting.common.DateUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class OldDiagnosisBuilder {
 
@@ -18,7 +20,7 @@ public class OldDiagnosisBuilder {
 		ObsBuilder builder = new ObsBuilder()
 				.setPerson(patient)
 				.setEncounter(encounter)
-				.setObsDatetime(DateUtil.parseDate(dateYmd, "yyyy-MM-dd"))
+				.setObsDatetime(parseYmd(dateYmd))
 				.setConcept(dmd.getDiagnosisSetConcept())
 				.addMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(order))
 				.addMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(certainty));
@@ -30,5 +32,14 @@ public class OldDiagnosisBuilder {
 			throw new IllegalArgumentException("Diagnosis value must be a Concept or String");
 		}
 		return builder;
+	}
+
+	private Date parseYmd(String ymd) {
+		try {
+			return new SimpleDateFormat("yyyy-MM-dd").parse(ymd);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

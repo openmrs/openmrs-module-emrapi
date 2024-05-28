@@ -47,6 +47,9 @@
                 <property name="encounterService" ref="encounterService"/>
                 <property name="visitService" ref="visitService"/>
                 <property name="locationService" ref="locationService"/>
+                <property name="dispositionService" ref="dispositionService"/>
+                <property name="emrApiDAO" ref="emrApiDAOImpl"/>
+                <property name="emrConceptService" ref="emrConceptService"/>
                 <property name="providerService" ref="providerService"/>
                 <property name="patientService" ref="patientService"/>
                 <property name="domainWrapperFactory" ref="domainWrapperFactory"/>

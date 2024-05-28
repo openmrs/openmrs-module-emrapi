@@ -45,7 +45,6 @@ import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -75,9 +74,6 @@ public class PatientDomainWrapper implements DomainWrapper {
 	@Qualifier("emrDiagnosisService")
 	@Autowired
 	protected DiagnosisService diagnosisService;
-
-   @Autowired
-   protected VisitQueryService visitQueryService;
     
    @Qualifier("domainWrapperFactory")
    @Autowired
@@ -121,12 +117,6 @@ public class PatientDomainWrapper implements DomainWrapper {
     public void setDiagnosisService(DiagnosisService diagnosisService) {
         this.diagnosisService = diagnosisService;
     }
-
-    public void setVisitQueryService(VisitQueryService visitQueryService) {
-        this.visitQueryService = visitQueryService;
-    }
-
-
 
     public Patient getPatient() {
 		return patient;

@@ -1,5 +1,5 @@
 select
-    distinct visit.visitId
+    distinct visit
 from
     Obs as dispo
 inner join dispo.encounter as dispoEncounter
