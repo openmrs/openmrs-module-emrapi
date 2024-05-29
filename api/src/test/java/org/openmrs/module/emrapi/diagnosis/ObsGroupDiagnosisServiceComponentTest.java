@@ -14,11 +14,11 @@ import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
-import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -56,11 +56,20 @@ public class ObsGroupDiagnosisServiceComponentTest extends BaseModuleContextSens
 		dmd = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
 
 	}
+	
+	private Date parseYmd(String ymd) {
+		try {
+			return new SimpleDateFormat("yyyy-MM-dd").parse(ymd);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	private ObsBuilder buildDiagnosis(Patient patient, String dateYmd, Diagnosis.Order order, Diagnosis.Certainty certainty, Object diagnosis) {
 		ObsBuilder builder = new ObsBuilder()
 				.setPerson(patient)
-				.setObsDatetime(DateUtil.parseDate(dateYmd, "yyyy-MM-dd"))
+				.setObsDatetime(parseYmd(dateYmd))
 				.setConcept(dmd.getDiagnosisSetConcept())
 				.addMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(order))
 				.addMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(certainty));
@@ -128,7 +137,7 @@ public class ObsGroupDiagnosisServiceComponentTest extends BaseModuleContextSens
 		Obs obs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
 		buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded disease").save();
 
-		List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, DateUtil.parseDate("2013-09-01", "yyyy-MM-dd"));
+		List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, parseYmd("2013-09-01"));
 		assertThat(diagnoses, contains(hasObs(obs)));
 	}
 
@@ -141,7 +150,7 @@ public class ObsGroupDiagnosisServiceComponentTest extends BaseModuleContextSens
         Obs expectedThirdObs =  buildDiagnosis(patient, "2013-07-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded disease").save().get();
         Obs expectedFirstObs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
 
-        List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, DateUtil.parseDate("2001-09-01", "yyyy-MM-dd"));
+        List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, parseYmd("2001-09-01"));
 		assertThat(diagnoses.size(), is(3));
         assertThat(diagnoses.get(0).getExistingObs(), is(expectedFirstObs));
         assertThat(diagnoses.get(1).getExistingObs(), is(expectedSecondObs));
@@ -154,7 +163,7 @@ public class ObsGroupDiagnosisServiceComponentTest extends BaseModuleContextSens
         Obs olderObs = buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
 		Obs mostRecentObs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save().get();
 
-		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, DateUtil.parseDate("2013-01-01", "yyyy-MM-dd"));
+		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, parseYmd("2013-01-01"));
         assertThat(diagnoses.size(), is(1));
 		assertThat(diagnoses.get(0).getExistingObs(), is(mostRecentObs));
 	}
@@ -166,7 +175,7 @@ public class ObsGroupDiagnosisServiceComponentTest extends BaseModuleContextSens
 		Obs olderObs = buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
         Obs mostRecentObs = buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, malaria).save().get();
 
-		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, DateUtil.parseDate("2013-01-01", "yyyy-MM-dd"));
+		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, parseYmd("2013-01-01"));
         assertThat(diagnoses.size(), is(1));
         assertThat(diagnoses.get(0).getExistingObs(), is(mostRecentObs));
 	}

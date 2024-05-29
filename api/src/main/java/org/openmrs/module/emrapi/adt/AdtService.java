@@ -27,6 +27,7 @@ import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.merge.VisitMergeAction;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -336,4 +337,12 @@ public interface AdtService extends OpenmrsService {
      */
     List<Location> getInpatientLocations();
 
+    /**
+     * returns patients awaiting admission
+     * @param location - if supplied, only checks waiting admissions at the visit location associated with this location
+     * @param patientIds - if non-null, only returns matches for patients with the given ids
+     * @param visitIds - if non-null, only returns matches for visits with the given ids
+     * @return List<Visit></Visit> of the matching visits
+     */
+    List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds);
 }

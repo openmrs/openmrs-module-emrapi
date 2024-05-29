@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Cohort;
 import org.openmrs.api.PatientService;
+import org.openmrs.module.emrapi.BaseReportingTest;
 import org.openmrs.module.emrapi.patient.reporting.library.EmrApiPatientDataLibrary;
 import org.openmrs.module.reporting.common.DateUtil;
 import org.openmrs.module.reporting.data.patient.EvaluatedPatientData;
@@ -11,7 +12,6 @@ import org.openmrs.module.reporting.data.patient.definition.PatientDataDefinitio
 import org.openmrs.module.reporting.data.patient.service.PatientDataService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
 import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class EmrApiPatientDataLibraryComponentTest extends BaseModuleContextSensitiveTest {
+public class EmrApiPatientDataLibraryComponentTest extends BaseReportingTest {
 
     @Autowired
     private PatientDataService pds;

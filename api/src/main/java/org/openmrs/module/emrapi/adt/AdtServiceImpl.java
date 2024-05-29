@@ -41,7 +41,11 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
+import org.openmrs.module.emrapi.adt.util.AdtUtil;
+import org.openmrs.module.emrapi.concept.EmrConceptService;
+import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.merge.VisitMergeAction;
@@ -58,6 +62,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -81,6 +86,12 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     private LocationService locationService;
 
+    private EmrApiDAO emrApiDAO;
+
+    private DispositionService dispositionService;
+
+    private EmrConceptService emrConceptService;
+
     private DomainWrapperFactory domainWrapperFactory;
 
     private List<PatientMergeAction> patientMergeActions;
@@ -93,6 +104,18 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     public void setLocationService(LocationService locationService) {
         this.locationService = locationService;
+    }
+
+    public void setEmrApiDAO(EmrApiDAO emrApiDAO) {
+        this.emrApiDAO = emrApiDAO;
+    }
+
+    public void setDispositionService(DispositionService dispositionService) {
+        this.dispositionService = dispositionService;
+    }
+
+    public void setEmrConceptService(EmrConceptService emrConceptService) {
+        this.emrConceptService = emrConceptService;
     }
 
     public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
@@ -871,8 +894,27 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Location> getInpatientLocations() {
         return locationService.getLocationsByTag(emrApiProperties.getSupportsAdmissionLocationTag());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds) {
+        Location visitLocation = null ;
+        if (location != null ) {
+            visitLocation = getLocationThatSupportsVisits(location);
+        }
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("dispositionConcept", dispositionService.getDispositionDescriptor().getDispositionConcept());
+        parameters.put("admissionDispositions", AdtUtil.getAdmissionDispositionsConcepts(emrConceptService, dispositionService));
+        parameters.put("visitLocation", visitLocation);
+        parameters.put("admissionEncounterType", emrApiProperties.getAdmissionEncounterType());
+        parameters.put("admissionDecisionConcept", emrApiProperties.getAdmissionDecisionConcept());
+        parameters.put("denyAdmissionConcept", emrApiProperties.getDenyAdmissionConcept());
+        parameters.put("patientIds", patientIds);
+        parameters.put("visitIds", visitIds);
+        return emrApiDAO.executeHqlFromResource("hql/visits_awaiting_admission.hql", parameters, Visit.class);
+    }
 }

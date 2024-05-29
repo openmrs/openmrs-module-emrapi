@@ -13,6 +13,7 @@ import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
 import org.openmrs.contrib.testdata.TestDataManager;
 import org.openmrs.contrib.testdata.builder.ObsBuilder;
+import org.openmrs.module.emrapi.BaseReportingTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
@@ -25,8 +26,8 @@ import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
 import org.openmrs.module.reporting.query.visit.VisitIdSet;
 import org.openmrs.module.reporting.query.visit.VisitQueryResult;
 import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Collections;
 import java.util.Date;
@@ -34,7 +35,7 @@ import java.util.Date;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextSensitiveTest {
+public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseReportingTest {
 
     @Autowired
     private ConceptService conceptService;
@@ -45,6 +46,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseModuleContextS
     @Autowired
     private DispositionService dispositionService;
 
+    @Qualifier("reportingVisitQueryService")
     @Autowired
     private VisitQueryService visitQueryService;
 

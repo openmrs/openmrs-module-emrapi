@@ -6,8 +6,8 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Provider;
 import org.openmrs.annotation.Handler;
+import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.LocationService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.adt.reporting.definition.MostRecentAdmissionRequestVisitDataDefinition;
 import org.openmrs.module.emrapi.adt.util.AdtUtil;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
@@ -31,7 +31,8 @@ import java.util.Map;
 /**
  * Evaluates a MostRecentAdmissionRequestVisitDataDefinition to produce a VisitData
  */
-@Handler(supports=MostRecentAdmissionRequestVisitDataDefinition.class, order=50)
+@Handler(supports= MostRecentAdmissionRequestVisitDataDefinition.class, order=50)
+@OpenmrsProfile(modules = { "reporting:*" })
 public class MostRecentAdmissionRequestVisitDataEvaluator implements VisitDataEvaluator {
 
     @Autowired

@@ -12,47 +12,6 @@
 	<name>EMR API Module API</name>
 	<description>API project for EMRAPI</description>
 
-    <dependencies>
-
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <version>${openMRSVersion}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-            <exclusions>
-                 <exclusion>
-                     <groupId>javassist</groupId>
-                     <artifactId>javassist</artifactId>
-                 </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <version>${openMRSVersion}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-            <exclusions>
-                 <exclusion>
-                     <groupId>javassist</groupId>
-                     <artifactId>javassist</artifactId>
-                 </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openmrs.test</groupId>
-            <artifactId>openmrs-test</artifactId>
-            <version>${openMRSVersion}</version>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-        <!-- End OpenMRS core -->
-
-    </dependencies>
-
 	<build>
 		<resources>
 			<resource>
@@ -60,8 +19,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-
-
 		<testResources>
             <testResource>
                 <directory>src/test/resources</directory>

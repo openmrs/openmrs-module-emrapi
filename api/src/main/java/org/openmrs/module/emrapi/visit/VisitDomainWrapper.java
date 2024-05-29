@@ -26,7 +26,7 @@ import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.VisitAttribute;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.adt.reporting.query.AwaitingAdmissionVisitQuery;
+import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
@@ -38,11 +38,6 @@ import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
-import org.openmrs.module.reporting.evaluation.EvaluationException;
-import org.openmrs.module.reporting.evaluation.context.VisitEvaluationContext;
-import org.openmrs.module.reporting.query.visit.VisitIdSet;
-import org.openmrs.module.reporting.query.visit.VisitQueryResult;
-import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -82,12 +77,12 @@ public class VisitDomainWrapper implements DomainWrapper {
     @Autowired
     protected DispositionService dispositionService;
 
-    @Autowired
-    protected VisitQueryService visitQueryService;
-
     @Qualifier("emrDiagnosisService")
     @Autowired
     protected DiagnosisService diagnosisService;
+
+    @Autowired
+    protected AdtService adtService;
 
     private Visit visit;
 
@@ -136,10 +131,6 @@ public class VisitDomainWrapper implements DomainWrapper {
 
     public void setDispositionService(DispositionService dispositionService) {
         this.dispositionService = dispositionService;
-    }
-
-    public void setVisitQueryService(VisitQueryService visitQueryService) {
-        this.visitQueryService = visitQueryService;
     }
 
     public Encounter getAdmissionEncounter() {
@@ -514,23 +505,9 @@ public class VisitDomainWrapper implements DomainWrapper {
         if (!isActive() || !dispositionService.dispositionsSupported()) {  // prevents a stack trace if dispositions are supported
             return false;
         }
-
-        VisitQueryResult result = null;
-
-        VisitEvaluationContext context = new VisitEvaluationContext();
-        context.setBaseVisits(new VisitIdSet(getVisitId()));
-
-        AwaitingAdmissionVisitQuery query = new AwaitingAdmissionVisitQuery();
-        query.setLocation(visit.getLocation());
-
-        try {
-            result = visitQueryService.evaluate(query, context);
-        }
-        catch (EvaluationException e) {
-            throw new IllegalStateException("Unable to evaluate awaiting admission query", e);
-        }
-
-        return result != null && result.getMemberIds().size() > 0;
+        List<Integer> visitIds = Collections.singletonList(getVisitId());
+        List<Visit> matches = adtService.getVisitsAwaitingAdmission(visit.getLocation(), null, visitIds);
+        return matches.contains(visit);
     }
 
     public Location getInpatientLocation(Date onDate) {

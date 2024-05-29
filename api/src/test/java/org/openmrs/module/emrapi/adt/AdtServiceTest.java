@@ -55,7 +55,6 @@ import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.merge.VisitMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.openmrs.module.reporting.query.visit.service.VisitQueryService;
 import org.openmrs.serialization.SerializationException;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -112,7 +111,6 @@ public class AdtServiceTest {
     private ProviderService mockProviderService;
     private PatientService mockPatientService;
     private DispositionService mockDispositionService;
-    private VisitQueryService mockVisitQueryService;
     private DomainWrapperFactory mockDomainWrapperFactory;
     private EmrApiProperties emrApiProperties;
 
@@ -155,7 +153,6 @@ public class AdtServiceTest {
         mockLocationService = mock(LocationService.class);
         mockPatientService = mock(PatientService.class);
         mockDispositionService = mock(DispositionService.class);
-        mockVisitQueryService = mock(VisitQueryService.class);
 
         mockDomainWrapperFactory = new MockDomainWrapperFactory();
 
@@ -1194,7 +1191,6 @@ public class AdtServiceTest {
         @Override
         public VisitDomainWrapper newVisitDomainWrapper() {
             VisitDomainWrapper visitDomainWrapper = new VisitDomainWrapper();
-            visitDomainWrapper.setVisitQueryService(mockVisitQueryService);
             visitDomainWrapper.setEmrApiProperties(emrApiProperties);
             visitDomainWrapper.setDispositionService(mockDispositionService);
             return visitDomainWrapper;
@@ -1212,7 +1208,6 @@ public class AdtServiceTest {
         public PatientDomainWrapper newPatientDomainWrapper() {
             PatientDomainWrapper patientDomainWrapper = new PatientDomainWrapper();
             patientDomainWrapper.setEmrApiProperties(emrApiProperties);
-            patientDomainWrapper.setVisitQueryService(mockVisitQueryService);
             patientDomainWrapper.setAdtService(service);
             return patientDomainWrapper;
         }
