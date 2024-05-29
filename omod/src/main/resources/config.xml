@@ -17,12 +17,12 @@
     <conditionalResources>
         <conditionalResource>
             <path>/lib/emrapi-api-reporting-${project.version}.jar</path>
-            <loadIfModulesPresent>
-                <openmrsModule>
+            <modules>
+                <module>
                     <moduleId>reporting</moduleId>
                     <version>*.*</version>
-                </openmrsModule>
-            </loadIfModulesPresent>
+                </module>
+            </modules>
         </conditionalResource>
     </conditionalResources>
 
