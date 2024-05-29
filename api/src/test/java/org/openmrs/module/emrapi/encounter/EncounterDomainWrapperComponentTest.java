@@ -1,15 +1,11 @@
 package org.openmrs.module.emrapi.encounter;
 
 import org.junit.Test;
-import org.openmrs.module.emrapi.account.AccountDomainWrapper;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
-
-public class EncounterDomainWrapperComponentTest extends BaseModuleContextSensitiveTest{
+public class EncounterDomainWrapperComponentTest extends EmrApiContextSensitiveTest {
 
     @Autowired
     private DomainWrapperFactory factory;

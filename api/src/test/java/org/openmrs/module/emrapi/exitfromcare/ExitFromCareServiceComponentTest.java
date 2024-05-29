@@ -14,7 +14,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.VisitService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 
-public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitiveTest {
+public class ExitFromCareServiceComponentTest extends EmrApiContextSensitiveTest {
 
     @Autowired
     private ExitFromCareService exitFromCareService;

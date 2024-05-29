@@ -29,8 +29,8 @@ import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTest {
+public class EmrConceptServiceComponentTest extends EmrApiContextSensitiveTest {
 
     @Autowired
     private ConceptService conceptService;

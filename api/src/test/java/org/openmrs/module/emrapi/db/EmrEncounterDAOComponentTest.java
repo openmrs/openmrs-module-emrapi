@@ -10,15 +10,15 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.PatientService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.is;
 
 import java.util.List;
 
-public class EmrEncounterDAOComponentTest extends BaseModuleContextSensitiveTest {
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+public class EmrEncounterDAOComponentTest extends EmrApiContextSensitiveTest {
 
     @Autowired
     private EmrEncounterDAO emrEncounterDAO;

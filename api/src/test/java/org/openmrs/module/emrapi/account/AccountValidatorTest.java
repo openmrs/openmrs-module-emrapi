@@ -13,10 +13,13 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
+import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.providermanagement.ProviderRole;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsUtil;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.validation.BindException;
@@ -36,6 +39,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"javax.management.*", "jdk.internal.reflect.*"})
 @PrepareForTest(OpenmrsUtil.class)
 public class AccountValidatorTest {
 
@@ -50,6 +54,8 @@ public class AccountValidatorTest {
     private ProviderService providerService;
 
     private ProviderManagementService providerManagementService;
+
+    private ProviderServiceFacade providerServiceFacade;
 
     private PersonService personService;
 
@@ -70,12 +76,12 @@ public class AccountValidatorTest {
         userService = Mockito.mock(UserService.class);
         providerService = Mockito.mock(ProviderService.class);
         providerManagementService = Mockito.mock(ProviderManagementService.class);
+        providerServiceFacade = new ProviderManagementProviderService(providerService, providerManagementService);
         personService = Mockito.mock(PersonService.class);
 
         validator = new AccountValidator();
         validator.setMessageSourceService(Mockito.mock(MessageSourceService.class));
         validator.setUserService(userService);
-        validator.setProviderManagementService(providerManagementService);
 
         fullPrivileges = new Role(EmrApiConstants.PRIVILEGE_LEVEL_FULL_ROLE);
         when(accountService.getAllPrivilegeLevels()).thenReturn(Collections.singletonList(fullPrivileges));
@@ -91,7 +97,7 @@ public class AccountValidatorTest {
         someProviderRole = new ProviderRole();
 
         account = new AccountDomainWrapper(person, accountService, userService, providerService,
-                providerManagementService, personService, providerIdentifierGenerator);
+                providerServiceFacade, personService, providerIdentifierGenerator);
     }
 
     /**

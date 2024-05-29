@@ -21,7 +21,7 @@ import org.openmrs.ConceptName;
 import org.openmrs.OrderFrequency;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
-public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
+public class OrderMetadataServiceTest extends EmrApiContextSensitiveTest {
 
     public static final String DAYS_CONCEPT_NAME = "Days";
     public static final String WEEKS_CONCEPT_NAME = "Weeks";

@@ -12,7 +12,10 @@ import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
+import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.providermanagement.Provider;
 import org.openmrs.module.providermanagement.ProviderRole;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
@@ -42,7 +45,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS;
 
-public class AccountDomainWrapperTest {
+public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
 
     private AccountService accountService;
 
@@ -53,6 +56,8 @@ public class AccountDomainWrapperTest {
     private ProviderService providerService;
 
     private ProviderManagementService providerManagementService;
+
+    private ProviderServiceFacade providerServiceFacade;
 
     private ProviderIdentifierGenerator providerIdentifierGenerator = null;
 
@@ -73,6 +78,7 @@ public class AccountDomainWrapperTest {
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
         providerManagementService = mock(ProviderManagementService.class);
+        providerServiceFacade = new MockProviderServiceFacade(new ProviderManagementProviderService(providerService, providerManagementService));
 
         fullPrivileges = new Role();
         fullPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Full");
@@ -328,8 +334,7 @@ public class AccountDomainWrapperTest {
         Provider provider = new Provider();
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-
-        when(providerManagementService.getProvidersByPerson(eq(person), eq(false))).thenReturn(Collections.singletonList(provider));
+        providerServiceFacade.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         ProviderRole newProviderRole = new ProviderRole();
@@ -346,8 +351,6 @@ public class AccountDomainWrapperTest {
         Provider provider = new Provider();
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-
-        when(providerManagementService.getProvidersByPerson(eq(person), eq(false))).thenReturn(Collections.singletonList(provider));
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
@@ -485,8 +488,6 @@ public class AccountDomainWrapperTest {
         Person person = new Person();
         person.setId(1);
 
-        when(providerManagementService.getProvidersByPerson(eq(person), eq(false))).thenReturn(null);
-
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
         account.save();
@@ -507,8 +508,7 @@ public class AccountDomainWrapperTest {
         provider.setId(1);  // to mimic persistence
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-
-        when(providerManagementService.getProvidersByPerson(eq(person), eq(false))).thenReturn(Collections.singletonList(provider));
+        providerServiceFacade.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
@@ -525,8 +525,7 @@ public class AccountDomainWrapperTest {
         Provider provider = new Provider();
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-
-        when(providerManagementService.getProvidersByPerson(eq(person), eq(false))).thenReturn(Collections.singletonList(provider));
+        providerServiceFacade.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
@@ -603,7 +602,7 @@ public class AccountDomainWrapperTest {
 
     private AccountDomainWrapper initializeNewAccountDomainWrapper(Person person) {
         return new AccountDomainWrapper(person, accountService, userService,
-                providerService, providerManagementService, personService, providerIdentifierGenerator);
+                providerService, providerServiceFacade, personService, providerIdentifierGenerator);
     }
 
     private class IsExpectedProvider extends ArgumentMatcher<Provider> {

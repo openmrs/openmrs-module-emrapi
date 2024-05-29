@@ -6,7 +6,6 @@ import org.openmrs.annotation.Handler;
 import org.openmrs.api.PasswordException;
 import org.openmrs.api.UserService;
 import org.openmrs.messagesource.MessageSourceService;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,10 +23,6 @@ public class AccountValidator implements Validator {
     @Qualifier("userService")
     private UserService userService;
 
-    @Autowired
-    @Qualifier("providerManagementService")
-    private ProviderManagementService providerManagementService;
-
     public static final String USERNAME_MIN_LENGTH = "2";
     public static final String USERNAME_MAX_LENGTH = "50";
 
@@ -40,10 +35,6 @@ public class AccountValidator implements Validator {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
-    }
-
-    public void setProviderManagementService(ProviderManagementService providerManagementService) {
-        this.providerManagementService = providerManagementService;
     }
 
     /**

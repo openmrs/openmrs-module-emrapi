@@ -26,11 +26,11 @@ import org.openmrs.Obs;
 import org.openmrs.Drug;
 import org.openmrs.User;
 import org.openmrs.PersonName;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.UserMapper;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.UUID;
 
@@ -38,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
+public class ObservationMapperTest extends EmrApiContextSensitiveTest {
 
     @Mock
     private Concept concept;

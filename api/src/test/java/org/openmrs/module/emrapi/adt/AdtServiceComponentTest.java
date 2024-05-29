@@ -39,6 +39,7 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
@@ -68,7 +69,7 @@ import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 
-public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
+public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
 
     public static final Predicate NON_VOIDED = new Predicate() {
         @Override

@@ -12,9 +12,12 @@ import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
+import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
+import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
@@ -31,7 +34,7 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AccountServiceTest {
+public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
     private AccountServiceImpl accountService;
 
@@ -43,6 +46,8 @@ public class AccountServiceTest {
 
     private ProviderManagementService providerManagementService;
 
+    private ProviderServiceFacade providerServiceFacade;
+
     private EmrApiProperties emrApiProperties;
 
     private DomainWrapperFactory domainWrapperFactory;
@@ -53,6 +58,7 @@ public class AccountServiceTest {
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
         providerManagementService = mock(ProviderManagementService.class);
+        providerServiceFacade = new ProviderManagementProviderService(providerService, providerManagementService);
         emrApiProperties = mock(EmrApiProperties.class);
 
         domainWrapperFactory = new MockDomainWrapperFactory();
@@ -61,7 +67,6 @@ public class AccountServiceTest {
         accountService.setUserService(userService);
         accountService.setPersonService(personService);
         accountService.setProviderService(providerService);
-        accountService.setProviderManagementService(providerManagementService);
         accountService.setEmrApiProperties(emrApiProperties);
         accountService.setDomainWrapperFactory(domainWrapperFactory);
     }
@@ -249,7 +254,7 @@ public class AccountServiceTest {
             accountDomainWrapper.setAccountService(accountService);
             accountDomainWrapper.setUserService(userService);
             accountDomainWrapper.setPersonService(personService);
-            accountDomainWrapper.setProviderManagementService(providerManagementService);
+            accountDomainWrapper.setProviderServiceFacade(providerServiceFacade);
             accountDomainWrapper.setProviderService(providerService);
             return accountDomainWrapper;
         }

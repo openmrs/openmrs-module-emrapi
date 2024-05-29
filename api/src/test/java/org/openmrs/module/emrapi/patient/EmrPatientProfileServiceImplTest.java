@@ -7,8 +7,8 @@ import org.openmrs.Person;
 import org.openmrs.Relationship;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.person.image.EmrPersonImageService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EmrPatientProfileServiceImplTest extends BaseModuleContextSensitiveTest {
+public class EmrPatientProfileServiceImplTest extends EmrApiContextSensitiveTest {
 
     private EmrPatientProfileServiceImpl emrPatientProfileService;
 
