@@ -329,6 +329,30 @@ public interface AdtService extends OpenmrsService {
      */
     boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
 
+    /**
+     * Gets all active visits for the patient at the visit location associated with the specified location
+     * during the specified datetime range
+     *
+     * @param patient
+     * @param location
+     * @param startDatetime
+     * @param stopDatetime
+     * @return
+     */
+    List<VisitDomainWrapper> getActiveVisits(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+
+    /**
+     * Returns true/false whether or not the patient has any active visits at the visit location associated with
+     * the specified location during the specified datetime range
+     *
+     * @param patient
+     * @param location
+     * @param startDatetime
+     * @param stopDatetime
+     * @return
+     */
+    boolean hasActiveVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+
 
     /**
      * @return all locations that are tagged to support admissions

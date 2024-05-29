@@ -871,6 +871,28 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<VisitDomainWrapper> getActiveVisits(Patient patient, Location location, Date startDatetime, Date endDatetime) {
+
+        List<VisitDomainWrapper> visitDomainWrappers = new ArrayList<VisitDomainWrapper>();
+
+        for (Visit visit : visitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
+                Collections.singletonList(patient), Collections.singletonList(getLocationThatSupportsVisits(location)), null,
+                null, endDatetime, startDatetime, null, null, false, false)) {
+            visitDomainWrappers.add(wrap(visit));
+        }
+
+        return visitDomainWrappers;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasActiveVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
+        List<VisitDomainWrapper> visits = getActiveVisits(patient, location, startDatetime, stopDatetime);
+        return visits == null || visits.size() == 0 ? false : true;
+    }
+    
+    @Override
     public List<Location> getInpatientLocations() {
         return locationService.getLocationsByTag(emrApiProperties.getSupportsAdmissionLocationTag());
     }
