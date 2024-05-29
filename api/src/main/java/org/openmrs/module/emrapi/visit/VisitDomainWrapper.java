@@ -51,7 +51,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.*;
+import static java.util.Collections.EMPTY_LIST;
+import static java.util.Collections.reverseOrder;
+import static java.util.Collections.sort;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.collections.CollectionUtils.select;
 
