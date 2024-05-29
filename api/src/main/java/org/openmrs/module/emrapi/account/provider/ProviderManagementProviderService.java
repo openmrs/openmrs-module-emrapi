@@ -57,26 +57,41 @@ public class ProviderManagementProviderService implements ProviderServiceFacade 
                 p.setProviderRole(null);
             }
             else {
+                ProviderRole role = null;
                 if (providerRole instanceof ProviderRole) {
-                    p.setProviderRole((ProviderRole) providerRole);
+                    role = (ProviderRole) providerRole;
                 }
                 else if (providerRole instanceof String) {
-                    p.setProviderRole(providerManagementService.getProviderRoleByUuid((String) providerRole));
+                    role = getProviderRole((String) providerRole);
                 }
                 else if (providerRole instanceof Integer) {
-                    p.setProviderRole(providerManagementService.getProviderRole((Integer) providerRole));
+                    role = providerManagementService.getProviderRole((Integer) providerRole);
                 }
                 else if (providerRole instanceof String[]) {
-                    String[] uuids = (String[]) providerRole;
-                    if (uuids.length > 1) {
+                    String[] roles = (String[]) providerRole;
+                    if (roles.length > 1) {
                         throw new IllegalArgumentException("Only one provider role may be provided");
                     }
-                    p.setProviderRole(providerManagementService.getProviderRoleByUuid(uuids[0]));
+                    role = getProviderRole(roles[0]);
                 }
-                else {
+                if (role == null) {
                     throw new IllegalArgumentException("Unable to set provider role from " + providerRole);
                 }
+                ((org.openmrs.module.providermanagement.Provider) provider).setProviderRole(role);
             }
         }
+    }
+
+    private ProviderRole getProviderRole(String ref) {
+        ProviderRole role = providerManagementService.getProviderRoleByUuid(ref);
+        if (role == null) {
+            try {
+                Integer roleId = Integer.parseInt(ref);
+                role = providerManagementService.getProviderRole(roleId);
+            }
+            catch (Exception ignored) {
+            }
+        }
+        return role;
     }
 }
