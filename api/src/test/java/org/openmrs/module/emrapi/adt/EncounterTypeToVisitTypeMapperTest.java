@@ -1,8 +1,5 @@
 package org.openmrs.module.emrapi.adt;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,11 +8,13 @@ import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.VisitService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 
-public class EncounterTypeToVisitTypeMapperTest extends BaseModuleContextSensitiveTest {
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTest {
 	
 	private EncounterTypetoVisitTypeMapper encounterTypetoVisitTypeMapper;
 	private EncounterService encounterService;

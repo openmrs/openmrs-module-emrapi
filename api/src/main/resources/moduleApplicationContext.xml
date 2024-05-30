@@ -13,7 +13,6 @@
                 <property name="userService" ref="userService"/>
                 <property name="personService" ref="personService"/>
                 <property name="providerService" ref="providerService"/>
-                <property name="providerManagementService" ref="providerManagementService"/>
                 <property name="domainWrapperFactory" ref="domainWrapperFactory"/>
                 <property name="emrApiProperties" ref="emrApiProperties"/>
             </bean>

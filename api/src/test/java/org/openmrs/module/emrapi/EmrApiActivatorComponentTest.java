@@ -42,7 +42,7 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest {
+public class EmrApiActivatorComponentTest extends EmrApiContextSensitiveTest {
 
     @Autowired
     @Qualifier("adminService")

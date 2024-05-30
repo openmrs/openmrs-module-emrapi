@@ -13,7 +13,6 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -29,8 +28,6 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
     private PersonService personService;
 
     private ProviderService providerService;
-
-    private ProviderManagementService providerManagementService;
 
     private DomainWrapperFactory domainWrapperFactory;
 
@@ -48,13 +45,6 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
      */
     public void setProviderService(ProviderService providerService) {
         this.providerService = providerService;
-    }
-
-    /**
-     * @param providerManagementService
-     */
-    public void setProviderManagementService(ProviderManagementService providerManagementService) {
-        this.providerManagementService = providerManagementService;
     }
 
     /**

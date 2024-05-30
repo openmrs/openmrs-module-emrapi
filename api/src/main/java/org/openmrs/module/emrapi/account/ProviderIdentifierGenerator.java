@@ -1,6 +1,6 @@
 package org.openmrs.module.emrapi.account;
 
-import org.openmrs.module.providermanagement.Provider;
+import org.openmrs.Provider;
 
 /**
  * Implementers can provide implementations of this interface if they wish

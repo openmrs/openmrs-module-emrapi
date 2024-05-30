@@ -23,10 +23,10 @@ import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.providermanagement.Provider;
 import org.openmrs.module.providermanagement.ProviderRole;
 import org.openmrs.module.providermanagement.api.ProviderManagementService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class AccountComponentTest extends BaseModuleContextSensitiveTest {
+public class AccountComponentTest extends EmrApiContextSensitiveTest {
 
     @Autowired
     private AccountService accountService;

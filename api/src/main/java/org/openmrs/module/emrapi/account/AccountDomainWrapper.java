@@ -3,6 +3,7 @@ package org.openmrs.module.emrapi.account;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
+import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
@@ -10,16 +11,14 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
-import org.openmrs.module.providermanagement.Provider;
-import org.openmrs.module.providermanagement.ProviderRole;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,9 +54,8 @@ public class AccountDomainWrapper implements DomainWrapper {
     @Autowired
     protected ProviderService providerService;
 
-    @Qualifier("providerManagementService")
     @Autowired
-    protected ProviderManagementService providerManagementService;
+    protected ProviderServiceFacade providerServiceFacade;
 
     @Autowired(required = false)
     protected ProviderIdentifierGenerator providerIdentifierGenerator;
@@ -67,12 +65,11 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     @Deprecated  // use DomainWrapperFactory instead
     public AccountDomainWrapper(Person person, AccountService accountService, UserService userService, ProviderService providerService,
-                                ProviderManagementService providerManagementService, PersonService personService,
-                                ProviderIdentifierGenerator providerIdentifierGenerator) {
+                                ProviderServiceFacade providerServiceFacade, PersonService personService, ProviderIdentifierGenerator providerIdentifierGenerator) {
         this.accountService = accountService;
         this.userService = userService;
         this.providerService = providerService;
-        this.providerManagementService = providerManagementService;
+        this.providerServiceFacade = providerServiceFacade;
         this.personService = personService;
         this.providerIdentifierGenerator = providerIdentifierGenerator;
 
@@ -95,8 +92,8 @@ public class AccountDomainWrapper implements DomainWrapper {
         this.personService = personService;
     }
 
-    public void setProviderManagementService(ProviderManagementService providerManagementService) {
-        this.providerManagementService = providerManagementService;
+    public void setProviderServiceFacade(ProviderServiceFacade providerServiceFacade) {
+        this.providerServiceFacade = providerServiceFacade;
     }
 
     public void setProviderIdentifierGenerator(ProviderIdentifierGenerator providerIdentifierGenerator) {
@@ -125,21 +122,23 @@ public class AccountDomainWrapper implements DomainWrapper {
         return provider;
     }
 
-    public void setProviderRole(ProviderRole providerRole) {
-
+    public void setProviderRole(Object providerRole) {
         if (providerRole != null) {
             initializeProviderIfNecessary();
-            this.provider.setProviderRole(providerRole);
+            providerServiceFacade.setProviderRole(this.provider, providerRole);
         } else {
             // this prevents us from creating a new provider if we are only setting the provider role to null
             if (this.provider != null) {
-                provider.setProviderRole(null);
+                providerServiceFacade.setProviderRole(this.provider, null);
             }
         }
     }
 
-    public ProviderRole getProviderRole() {
-        return this.provider != null ? this.provider.getProviderRole() : null;
+    public Object getProviderRole() {
+        if (this.provider == null) {
+            return null;
+        }
+        return providerServiceFacade.getProviderRole(this.provider);
     }
 
     public void setGivenName(String givenName) {
@@ -388,7 +387,7 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     private void initializeProviderIfNecessary() {
         if (provider == null) {
-            provider = new Provider();
+            provider = providerServiceFacade.newProvider();
             provider.setPerson(person);
         }
     }
@@ -417,16 +416,14 @@ public class AccountDomainWrapper implements DomainWrapper {
     }
 
     private Provider getProviderByPerson(Person person) {
-        List<Provider> providers = providerManagementService.getProvidersByPerson(person, false);
-
-        if (providers != null && providers.size() > 0) {
+        Collection<? extends Provider> providers = providerServiceFacade.getProvidersByPerson(person);
+        if (providers != null && !providers.isEmpty()) {
             if (providers.size() == 1) {
-                return providers.get(0);
+                return providers.iterator().next();
             } else {
                 throw new APIException("Multiple provider/provider roles per person not supported");
             }
         }
-
         return null;
     }
 

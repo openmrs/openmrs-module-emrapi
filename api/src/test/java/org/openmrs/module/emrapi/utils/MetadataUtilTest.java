@@ -15,14 +15,14 @@ package org.openmrs.module.emrapi.utils;
 
 import org.junit.Test;
 import org.openmrs.api.context.Context;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MetadataUtilTest extends BaseModuleContextSensitiveTest {
+public class MetadataUtilTest extends EmrApiContextSensitiveTest {
 	
 	@Test
 	public void testSetupStandardMetadata() throws Exception {

@@ -2,13 +2,13 @@ package org.openmrs.module.emrapi.adt;
 
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 // Probably delete this test class, and its associated resources
 @Ignore("This was never completed, and it isn't possible to easily migrate from the EMR module due to PIH-specific data")
 @RunWith(SpringJUnit4ClassRunner.class)
-public class RetrospectiveCheckinComponentTest extends BaseModuleContextSensitiveTest {
+public class RetrospectiveCheckinComponentTest extends EmrApiContextSensitiveTest {
 
     /*
     @Autowired

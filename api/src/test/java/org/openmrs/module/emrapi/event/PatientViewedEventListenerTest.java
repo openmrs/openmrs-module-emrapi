@@ -24,8 +24,8 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.jms.MapMessage;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTest {
+public class PatientViewedEventListenerTest extends EmrApiContextSensitiveTest {
 	
 	@Autowired
 	private PatientService patientService;

@@ -6,16 +6,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Visit;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class EmrDiagnosisDAOTest extends BaseModuleContextSensitiveTest {
+public class EmrDiagnosisDAOTest extends EmrApiContextSensitiveTest {
 
     private static final String DIAGNOSIS_DATASET = "DiagnosisDataset.xml";
 
