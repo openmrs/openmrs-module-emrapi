@@ -1,6 +1,5 @@
 package org.openmrs.module.emrapi.account.provider;
 
-import org.openmrs.OpenmrsMetadata;
 import org.openmrs.Person;
 import org.openmrs.Provider;
 import org.openmrs.annotation.OpenmrsProfile;
