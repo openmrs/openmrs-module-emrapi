@@ -18,6 +18,8 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
@@ -54,6 +56,7 @@ import java.util.Map;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.reverseOrder;
 import static java.util.Collections.sort;
+import static org.apache.commons.collections.CollectionUtils.filter;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.collections.CollectionUtils.select;
 
@@ -530,6 +533,35 @@ public class VisitDomainWrapper implements DomainWrapper {
 
         // should never get here if isAdmitted == true
         return null;
+    }
+
+    public Integer timeSinceAdmissionInMinutes() {
+        if (getAdmissionEncounter() == null) {
+            return null;
+        } else {
+            return Minutes.minutesBetween(new DateTime(getAdmissionEncounter().getEncounterDatetime()), new DateTime()).getMinutes();
+        }
+    }
+
+    public Integer timeAtLocationInMinutes() {
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        EncounterType transferEncounterType = emrApiProperties.getTransferWithinHospitalEncounterType();
+
+        Location ward = null;
+        Integer time = null;
+
+        for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
+            if (encounter.getEncounterType().equals(admissionEncounterType) || encounter.getEncounterType().equals(transferEncounterType)) {
+                time = Minutes.minutesBetween(new DateTime(encounter.getEncounterDatetime()), new DateTime()).getMinutes();
+                if (ward == null) {
+                    ward = encounter.getLocation();
+                }
+                else if (!ward.equals(encounter.getLocation())) {
+                    break;
+                }
+            }
+        }
+        return time;
     }
 
     public Date getStartDatetime() {
