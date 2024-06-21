@@ -920,7 +920,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Visit> getVisitsAwaitingTransfer(Location location, Location transferLocation) {
+    public List<Visit> getVisitsAwaitingTransfer(Location transferLocation) {
         // TODO implement!
         return Collections.emptyList();
     }

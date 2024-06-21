@@ -29,22 +29,24 @@ public class InpatientVisitsController {
     @ResponseBody
     public List<SimpleObject> getInpatientVisits(@RequestParam(value = "currentLocation") Location currentLocation) {
 
-        // TODO expand to allow null current location
+        if (currentLocation == null) {
+            throw new IllegalArgumentException("currentLocation is required");
+        }
 
-        // TODO handle null response if possible
-        // TODO this getInpatentVisits method is almost certainly not performant enough for production use and will likely need to be refactored into a HQL query
         List<VisitDomainWrapper> visits = adtService.getInpatientVisits(adtService.getLocationThatSupportsVisits(currentLocation), currentLocation);
-
-        // TODO type this?
         List<SimpleObject> response = new ArrayList<SimpleObject>();
+
+        if (visits == null) {
+            return response;
+        }
 
         for (VisitDomainWrapper visit : visits) {
             SimpleObject inpatientVisit = new SimpleObject();
             inpatientVisit.put("visit", ConversionUtil.convertToRepresentation(visit.getVisit(), Representation.DEFAULT));
             inpatientVisit.put("patient", ConversionUtil.convertToRepresentation(visit.getVisit().getPatient(), Representation.DEFAULT));
             inpatientVisit.put("currentLocation", ConversionUtil.convertToRepresentation(currentLocation, Representation.DEFAULT));
-            inpatientVisit.put("timeSinceAdmissionInMinutes",  visit.timeSinceAdmissionInMinutes());
-            inpatientVisit.put("timeAtLocationdInMinutes", visit.timeAtLocationInMinutes());
+            inpatientVisit.put("timeSinceAdmissionInMinutes",  visit.getTimeSinceAdmissionInMinutes());
+            inpatientVisit.put("timeAtInpatientLocationdInMinutes", visit.getTimeAtCurrentInpatientLocationInMinutes());
             response.add(inpatientVisit);
         }
 
@@ -71,10 +73,8 @@ public class InpatientVisitsController {
         return response;
     }
 
-
     private List<SimpleObject> getVisitsAwaitingAdmissionHelper(Location admissionLocation) {
-        // TODO note that this service method *only* returns admission requests, while we will need to expand this to include transfer requests (which will be slightly non-trivial)
-        // TODO note also that this service method does *not* actually limit by admission location; we will need to expand the underlying service method/hql query to do this
+        // TODO note also that this service method does *not* actually limit by admission location; we will need to expand the underlying service method/hql query to do this, see: https://openmrs.atlassian.net/browse/O3-3464
         List<Visit> visits = adtService.getVisitsAwaitingAdmission(admissionLocation, null, null);
         List<SimpleObject> visitObjects = new ArrayList<SimpleObject>();
         for (Visit visit : visits) {
@@ -88,7 +88,7 @@ public class InpatientVisitsController {
     }
 
     private List<SimpleObject> getVisitsAwaitingTransferHelper(Location transferLocation) {
-        List<Visit> visits = adtService.getVisitsAwaitingTransfer(null, transferLocation);
+        List<Visit> visits = adtService.getVisitsAwaitingTransfer(transferLocation);
         List<SimpleObject> visitObjects = new ArrayList<SimpleObject>();
         for (Visit visit : visits) {
             SimpleObject inpatientVisit = new SimpleObject();

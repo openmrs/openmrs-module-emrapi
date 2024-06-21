@@ -1010,6 +1010,154 @@ public class VisitDomainWrapperTest {
         assertNull(visitDomainWrapper.getStopDate());
     }
 
+    @Test
+    public void timeSinceAdmissionInMinutes_shouldReturnTimeSinceAdmissionInMinutes() {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType transferEncounterType = new EncounterType();
+
+        Location icu = new Location();
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getTransferWithinHospitalEncounterType()).thenReturn(transferEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        admit.setLocation(icu);
+
+        Encounter transfer = new Encounter();
+        transfer.setEncounterType(transferEncounterType);
+        transfer.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+        transfer.setLocation(icu);
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(admit);
+        encounters.add(transfer);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertThat(visitDomainWrapper.getTimeSinceAdmissionInMinutes(), is(180));
+    }
+
+    @Test
+    public void timeSinceAdmissionInMinutes_shouldReturnNullIfPatientNeverAdmitted() {
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+        assertNull(visitDomainWrapper.getTimeSinceAdmissionInMinutes());
+    }
+
+    @Test
+    public void timeSinceAdmissionInMinutes_shouldReturnNullIfPatientNoLongerAdmitted() {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType exitFromInpatientEncounterType = new EncounterType();
+
+        Location icu = new Location();
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(exitFromInpatientEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        admit.setLocation(icu);
+
+        Encounter discharge = new Encounter();
+        discharge.setEncounterType(exitFromInpatientEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+        discharge.setLocation(icu);
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(admit);
+        encounters.add(discharge);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertNull(visitDomainWrapper.getTimeSinceAdmissionInMinutes());
+    }
+
+    @Test
+    public void timeAtCurrentInpatientLocationInMinutes_shouldReturnTimeAtCurrentInpatientLocationInMinutesEvenWhenMostRecentAdtEncounterDoesNotResultInLocationChange() {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType transferEncounterType = new EncounterType();
+
+        Location icu = new Location();
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getTransferWithinHospitalEncounterType()).thenReturn(transferEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        admit.setLocation(icu);
+
+        // not sure if this is a real use case, transfer to same location, but just in case
+        Encounter transfer = new Encounter();
+        transfer.setEncounterType(transferEncounterType);
+        transfer.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+        transfer.setLocation(icu);
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(admit);
+        encounters.add(transfer);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertThat(visitDomainWrapper.getTimeAtCurrentInpatientLocationInMinutes(), is(180));
+    }
+
+
+
+    @Test
+    public void timeAtCurrentInpatientLocationInMinutes_shouldReturnNullIfPatientNeverAdmitted() {
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+        assertNull(visitDomainWrapper.getTimeAtCurrentInpatientLocationInMinutes());
+    }
+
+    @Test
+    public void timeAtCurrentInpatientLocationInMinutes_shouldReturnNullIfPatientNoLongerAdmitted() {
+
+        EncounterType admitEncounterType = new EncounterType();
+        EncounterType exitFromInpatientEncounterType = new EncounterType();
+
+        Location icu = new Location();
+
+        when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -5));
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        when(props.getExitFromInpatientEncounterType()).thenReturn(exitFromInpatientEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(DateUtils.addHours(new Date(), -3));
+        admit.setLocation(icu);
+
+        Encounter discharge = new Encounter();
+        discharge.setEncounterType(exitFromInpatientEncounterType);
+        discharge.setEncounterDatetime(DateUtils.addHours(new Date(), -2));
+        discharge.setLocation(icu);
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(admit);
+        encounters.add(discharge);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertNull(visitDomainWrapper.getTimeAtCurrentInpatientLocationInMinutes());
+    }
+
+
     private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
 
         private Diagnosis expectedDiagnosis;

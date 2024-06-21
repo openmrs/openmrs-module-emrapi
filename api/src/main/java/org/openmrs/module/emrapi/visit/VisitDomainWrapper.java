@@ -56,7 +56,6 @@ import java.util.Map;
 import static java.util.Collections.EMPTY_LIST;
 import static java.util.Collections.reverseOrder;
 import static java.util.Collections.sort;
-import static org.apache.commons.collections.CollectionUtils.filter;
 import static org.apache.commons.collections.CollectionUtils.find;
 import static org.apache.commons.collections.CollectionUtils.select;
 
@@ -535,15 +534,20 @@ public class VisitDomainWrapper implements DomainWrapper {
         return null;
     }
 
-    public Integer timeSinceAdmissionInMinutes() {
-        if (getAdmissionEncounter() == null) {
+    public Integer getTimeSinceAdmissionInMinutes() {
+        if (!isAdmitted() || getAdmissionEncounter() == null) {
             return null;
         } else {
             return Minutes.minutesBetween(new DateTime(getAdmissionEncounter().getEncounterDatetime()), new DateTime()).getMinutes();
         }
     }
 
-    public Integer timeAtLocationInMinutes() {
+    public Integer getTimeAtCurrentInpatientLocationInMinutes() {
+
+        if (!isAdmitted()) {
+            return null;
+        }
+
         EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
         EncounterType transferEncounterType = emrApiProperties.getTransferWithinHospitalEncounterType();
 
@@ -552,13 +556,13 @@ public class VisitDomainWrapper implements DomainWrapper {
 
         for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (encounter.getEncounterType().equals(admissionEncounterType) || encounter.getEncounterType().equals(transferEncounterType)) {
-                time = Minutes.minutesBetween(new DateTime(encounter.getEncounterDatetime()), new DateTime()).getMinutes();
                 if (ward == null) {
                     ward = encounter.getLocation();
                 }
                 else if (!ward.equals(encounter.getLocation())) {
                     break;
                 }
+                time = Minutes.minutesBetween(new DateTime(encounter.getEncounterDatetime()), new DateTime()).getMinutes();
             }
         }
         return time;

@@ -349,9 +349,8 @@ public interface AdtService extends OpenmrsService {
 
     /**
      * Returns all patient awaiting transfer
-     * @param location - if non-null, only checks awaiting transfers at the visit location associated with this location  TODO do we need this?
-     * @param transferLocation - if non-null, only returns matches for patients awaiting transfer to this location
+     * @param transferLocation - if non-null, only return matches for patients awaiting transfer to this location
      * @return List<Visit> of the matching visits<
      */
-    List<Visit> getVisitsAwaitingTransfer(Location location, Location transferLocation);
+    List<Visit> getVisitsAwaitingTransfer(Location transferLocation);
 }
