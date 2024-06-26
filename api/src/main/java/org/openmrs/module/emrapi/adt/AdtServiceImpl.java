@@ -917,4 +917,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         parameters.put("visitIds", visitIds);
         return emrApiDAO.executeHqlFromResource("hql/visits_awaiting_admission.hql", parameters, Visit.class);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Visit> getVisitsAwaitingTransfer(Location transferLocation) {
+        // TODO implement!
+        return Collections.emptyList();
+    }
 }
