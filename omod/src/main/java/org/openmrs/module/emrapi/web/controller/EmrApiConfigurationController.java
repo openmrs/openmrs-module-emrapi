@@ -21,14 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 public class EmrApiConfigurationController {
 
     @Autowired
-    private EmrApiProperties emrApiProperties;
+    private EmrApiConfiguration emrApiConfiguration;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public SimpleObject getEmrApiConfig(HttpServletRequest request, HttpServletResponse response) {
+    public SimpleObject getEmrApiConfiguration(HttpServletRequest request, HttpServletResponse response) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.REF);
-        EmrApiConfiguration config = new EmrApiConfiguration();
-        config.setProperties(emrApiProperties);
-        return (SimpleObject) ConversionUtil.convertToRepresentation(config, context.getRepresentation());
+        return (SimpleObject) ConversionUtil.convertToRepresentation(emrApiConfiguration, context.getRepresentation());
     }
 }

@@ -26,6 +26,12 @@
             retired = "false" code = "emr.unknownProvider" name = "Unknown Provider"
     />
 
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3246" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid=""
+                                           retired = "false" code = "emr.unknownLocation" name = "Unknown Location"
+                                           metadata_uuid = "8d6c993e-c2cc-11de-8d13-0010c6dffd0f" metadata_class = "org.openmrs.Location"
+    />
+
     <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "32245" metadata_source_id = "2134"
                                            creator = "1" date_created="2008-08-18 12:38:58.0" uuid="cf25712e-f193-48d5-aaaa-5fd8d0244c71"
                                            retired = "false" code = "emr.admissionForm" name = "Admission Form"
