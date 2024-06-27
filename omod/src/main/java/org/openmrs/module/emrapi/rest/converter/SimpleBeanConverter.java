@@ -36,10 +36,8 @@ public class SimpleBeanConverter<T> implements Converter<T> {
      * @return a resource description that represents a custom representation, or one that represents all bean properties in the class
      */
     public DelegatingResourceDescription getResourceDescription(T o, Representation representation) {
-        boolean isCustomRep = (representation instanceof CustomRepresentation);
-        if (isCustomRep) {
-            CustomRepresentation customRep = (CustomRepresentation) representation;
-            return ConversionUtil.getCustomRepresentationDescription(customRep);
+        if (representation instanceof CustomRepresentation) {
+            return ConversionUtil.getCustomRepresentationDescription((CustomRepresentation) representation);
         }
         DelegatingResourceDescription ret = new DelegatingResourceDescription();
         for (PropertyDescriptor pd : PropertyUtils.getPropertyDescriptors(o.getClass())) {
