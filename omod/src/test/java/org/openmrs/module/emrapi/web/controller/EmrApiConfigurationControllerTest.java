@@ -37,7 +37,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 	EmrApiProperties emrApiProperties;
 
 	@Autowired
-    EmrApiConfigurationController emrApiConfigurationController;
+	EmrApiConfigurationController emrApiConfigurationController;
 
 	@Autowired
 	MetadataMappingService metadataMappingService;
