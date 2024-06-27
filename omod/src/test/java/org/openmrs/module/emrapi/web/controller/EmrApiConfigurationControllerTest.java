@@ -1,9 +1,8 @@
 package org.openmrs.module.emrapi.web.controller;
 
-import org.apache.commons.beanutils.PropertyUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.module.emrapi.EmrApiConfiguration;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -12,15 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.beans.PropertyDescriptor;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensitiveTest {
 
@@ -47,13 +42,8 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 	@Test
 	public void shouldGetDefaultRepresentation() throws Exception {
 		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
-		List<String> propertyNames = new ArrayList<>();
-		for (PropertyDescriptor pd : PropertyUtils.getPropertyDescriptors(EmrApiConfiguration.class)) {
-			propertyNames.add(pd.getName());
-		}
-		propertyNames.remove("class");
-		assertEquals(41, config.keySet().size());
-		assertTrue(config.keySet().containsAll(propertyNames));
+		System.out.println(new ObjectMapper().writeValueAsString(config));
+		assertEquals(46, config.keySet().size());
 		assertEquals("org.openmrs.module.emrapi", config.get("metadataSourceName"));
 		assertEquals("50", config.get("lastViewedPatientSizeLimit").toString());
 		assertEquals("Unknown Location", mapNode(config, "unknownLocation").get("display"));

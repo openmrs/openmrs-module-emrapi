@@ -1,6 +1,5 @@
 package org.openmrs.module.emrapi.web.controller;
 
-import org.openmrs.module.emrapi.EmrApiConfiguration;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
@@ -21,12 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 public class EmrApiConfigurationController {
 
     @Autowired
-    private EmrApiConfiguration emrApiConfiguration;
+    private EmrApiProperties emrApiProperties;
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public SimpleObject getEmrApiConfiguration(HttpServletRequest request, HttpServletResponse response) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.REF);
-        return (SimpleObject) ConversionUtil.convertToRepresentation(emrApiConfiguration, context.getRepresentation());
+        return (SimpleObject) ConversionUtil.convertToRepresentation(emrApiProperties, context.getRepresentation());
     }
 }

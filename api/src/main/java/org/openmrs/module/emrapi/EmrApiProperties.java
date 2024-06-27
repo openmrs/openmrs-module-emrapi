@@ -29,8 +29,12 @@ import org.openmrs.Provider;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.metadatamapping.util.ModuleProperties;
 import org.openmrs.util.OpenmrsUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -46,6 +50,9 @@ import static org.openmrs.module.emrapi.EmrApiConstants.GP_VISIT_ASSIGNMENT_HAND
  */
 @Component("emrApiProperties")
 public class EmrApiProperties extends ModuleProperties {
+
+	@Autowired
+	protected DispositionService dispositionService;
 
 	@Override
 	public String getMetadataSourceName() {
@@ -191,7 +198,6 @@ public class EmrApiProperties extends ModuleProperties {
 		return new DiagnosisMetadata(conceptService, getEmrApiConceptSource());
 	}
 
-
 	public List<ConceptSource> getConceptSourcesForDiagnosisSearch() {
 		//The results can very well be cached to reduce calls to database.
 		//however the compatibility requirement to core 1.9.9 do not allow this currently
@@ -330,4 +336,11 @@ public class EmrApiProperties extends ModuleProperties {
 		return "TRUE".equalsIgnoreCase(getGlobalProperty(GP_VISIT_ASSIGNMENT_HANDLER_ADJUST_ENCOUNTER_TIME_OF_DAY_IF_NECESSARY, false));
 	}
 
+	public List<Disposition> getDispositions() {
+		return dispositionService.getDispositions();
+	}
+
+	public DispositionDescriptor getDispositionDescriptor() {
+		return dispositionService.getDispositionDescriptor();
+	}
 }
