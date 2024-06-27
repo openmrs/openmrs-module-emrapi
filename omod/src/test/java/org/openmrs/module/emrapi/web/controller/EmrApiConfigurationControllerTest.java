@@ -4,7 +4,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
@@ -39,9 +42,14 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 	@Autowired
 	MetadataMappingService metadataMappingService;
 
+	@Autowired
+	ConceptService conceptService;
+
+	@Autowired
+	DispositionService dispositionService;
+
 	@Before
 	public void setUp() {
-		executeDataSet("baseMetaData.xml");
 		executeDataSet("baseTestDataset.xml");
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
@@ -129,13 +137,54 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		}
 	}
 
+	@Test
+	public void shouldGetDispositionDescriptor() {
+		ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
+		request.addParameter("v", "custom:(dispositionDescriptor:full)");
+		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
+		Map<String, Object> descriptor = mapNode(config, "dispositionDescriptor");
+		assertThat(descriptor.keySet().size(), equalTo(5));
+		assertThat(mapNode(descriptor, "dispositionSetConcept", "name").get("name"), equalTo("Disposition Construct"));
+		assertThat(mapNode(descriptor, "dispositionConcept", "name").get("name"), equalTo("Disposition"));
+		assertThat(mapNode(descriptor, "admissionLocationConcept", "name").get("name"), equalTo("Admission Location"));
+		assertThat(mapNode(descriptor, "internalTransferLocationConcept", "name").get("name"), equalTo("Internal Transfer Location"));
+		assertThat(mapNode(descriptor, "dateOfDeathConcept", "name").get("name"), equalTo("Date of Death"));
+	}
+
+	@Test
+	public void shouldGetDiagnosisMetadata() {
+		ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
+		request.addParameter("v", "custom:(diagnosisMetadata:full)");
+		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
+		Map<String, Object> dm = mapNode(config, "diagnosisMetadata");
+		assertThat(dm.keySet().size(), equalTo(5));
+		assertThat(mapNode(dm, "diagnosisSetConcept", "name").get("name"), equalTo("Visit diagnoses"));
+		assertThat(mapNode(dm, "codedDiagnosisConcept", "name").get("name"), equalTo("Coded diagnosis"));
+		assertThat(mapNode(dm, "nonCodedDiagnosisConcept", "name").get("name"), equalTo("Non-coded diagnosis"));
+		assertThat(mapNode(dm, "diagnosisOrderConcept", "name").get("name"), equalTo("Diagnosis order"));
+		assertThat(mapNode(dm, "diagnosisCertaintyConcept", "name").get("name"), equalTo("Diagnosis certainty"));
+	}
+
 	@SuppressWarnings("unchecked")
-	private Map<String, Object> mapNode(Map<String, Object> o, String key) {
-		return (Map<String, Object>)o.get(key);
+	private Map<String, Object> mapNode(Map<String, Object> o, String... keys) {
+		Map<String, Object> ret = o;
+		for (String key : keys) {
+			ret = (Map<String, Object>) ret.get(key);
+		}
+		return ret;
 	}
 
 	@SuppressWarnings("unchecked")
 	private List<Map<String, Object>> listNode(Map<String, Object> o, String key) {
 		return (List<Map<String, Object>>)o.get(key);
+	}
+
+	private void printAsJson(Object o) {
+		try {
+			System.out.println(new ObjectMapper().writeValueAsString(o));
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
