@@ -8,6 +8,7 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
+import org.openmrs.module.emrapi.disposition.DispositionObs;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.representation.CustomRepresentation;
@@ -24,6 +25,7 @@ import java.util.Map;
         EmrApiProperties.class,
         DiagnosisMetadata.class,
         Disposition.class,
+        DispositionObs.class,
         DispositionDescriptor.class
 }, order = 0)
 public class SimpleBeanConverter<T> implements Converter<T> {

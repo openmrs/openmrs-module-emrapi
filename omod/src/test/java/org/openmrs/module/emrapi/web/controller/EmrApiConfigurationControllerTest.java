@@ -15,10 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -93,7 +95,47 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		assertEquals("Admission", mapNode(config, "admissionEncounterType").get("name"));
 	}
 
-	private Map<String, Object> mapNode(SimpleObject o, String key) {
-		return o.get(key);
+	@Test
+	public void shouldGetDispositions() {
+		request.addParameter("v", "custom:(dispositions)");
+		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
+		List<Map<String, Object>> dispositions = listNode(config, "dispositions");
+		assertThat(dispositions.size(), equalTo(4));
+		for (Map<String, Object> d : dispositions) {
+			if (d.get("uuid").equals("d2d89630-b698-11e2-9e96-0800200c9a66")) {
+				assertThat(d.get("name"), equalTo("disposition.death"));
+				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Death"));
+				assertThat(listNode(d, "additionalObs").size(), equalTo(1));
+				assertThat(listNode(d, "additionalObs").get(0).get("conceptCode"), equalTo("org.openmrs.module.emrapi:Date of death"));
+			}
+			else if (d.get("uuid").equals("66de7f60-b73a-11e2-9e96-0800200c9a66")) {
+				assertThat(d.get("name"), equalTo("disposition.admit"));
+				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Admit to hospital"));
+				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
+			}
+			else if (d.get("uuid").equals("687d966bb-9c91-4886-b8b0-e63361f495f0")) {
+				assertThat(d.get("name"), equalTo("disposition.observation"));
+				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:ED Observation"));
+				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
+			}
+			else if (d.get("uuid").equals("12129630-b698-11e2-9e96-0800200c9a66")) {
+				assertThat(d.get("name"), equalTo("disposition.discharge"));
+				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Discharged"));
+				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
+			}
+			else {
+				Assert.fail("Unexpected disposition uuid: " + d.get("uuid"));
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> mapNode(Map<String, Object> o, String key) {
+		return (Map<String, Object>)o.get(key);
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<Map<String, Object>> listNode(Map<String, Object> o, String key) {
+		return (List<Map<String, Object>>)o.get(key);
 	}
 }
