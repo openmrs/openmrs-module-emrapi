@@ -46,7 +46,7 @@ public class InpatientVisitsController {
             inpatientVisit.put("patient", ConversionUtil.convertToRepresentation(visit.getVisit().getPatient(), Representation.DEFAULT));
             inpatientVisit.put("currentLocation", ConversionUtil.convertToRepresentation(currentLocation, Representation.DEFAULT));
             inpatientVisit.put("timeSinceAdmissionInMinutes",  visit.getTimeSinceAdmissionInMinutes());
-            inpatientVisit.put("timeAtInpatientLocationdInMinutes", visit.getTimeAtCurrentInpatientLocationInMinutes());
+            inpatientVisit.put("timeAtInpatientLocationInMinutes", visit.getTimeAtCurrentInpatientLocationInMinutes());
             response.add(inpatientVisit);
         }
 
