@@ -4,6 +4,7 @@ import lombok.Data;
 import org.openmrs.Location;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +12,22 @@ import java.util.List;
  */
 @Data
 public class InpatientRequestSearchCriteria {
+
     private Location visitLocation;
     private List<Location> dispositionLocations;
     private List<DispositionType> dispositionTypes;
+
+    public void addDispositionLocation(Location location) {
+        if (dispositionLocations == null) {
+            dispositionLocations = new ArrayList<>();
+        }
+        dispositionLocations.add(location);
+    }
+
+    public void addDispositionType(DispositionType dispositionType) {
+        if (dispositionTypes == null) {
+            dispositionTypes = new ArrayList<>();
+        }
+        dispositionTypes.add(dispositionType);
+    }
 }

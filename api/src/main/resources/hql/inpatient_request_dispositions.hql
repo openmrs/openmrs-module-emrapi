@@ -12,8 +12,6 @@ where
     and dispo.concept = :dispositionConcept
     and dispo.valueCoded in :dispositionValues
     and (:visitLocation is null or visit.location = :visitLocation)
-    and (:patientIds is null or person.personId in :patientIds)
-    and (:visitIds is null or visit.visitId in :visitIds)
     and person.dead = false
     and visit.stopDatetime is null
     and (
