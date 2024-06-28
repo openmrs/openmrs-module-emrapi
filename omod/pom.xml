@@ -23,6 +23,14 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>${project.parent.artifactId}-api</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>test</scope>
+			<type>test-jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>${project.parent.artifactId}-api-reporting</artifactId>
 			<version>${project.parent.version}</version>
 			<scope>compile</scope>
