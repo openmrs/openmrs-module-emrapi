@@ -163,6 +163,18 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
+    public void shouldGetAdmissionRequestIfAdmissionEncounterIsVoided() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumRequests(criteria, 1);
+        Encounter e = createAdmissionEncounter(DateUtils.addHours(visitDate, 3));
+        assertNumRequests(criteria, 0);
+        testDataManager.getEncounterService().voidEncounter(e, "Unknown");
+        assertNumRequests(criteria, 1);
+    }
+
+    @Test
     public void shouldNotGetAdmissionRequestIfPatientHasBeenDenied() {
         criteria.addDispositionType(DispositionType.ADMIT);
         assertNumRequests(criteria, 0);
@@ -243,27 +255,57 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldNotConsiderVoidedAdmissionEncounter() throws Exception {
+    public void shouldGetAdmissionRequestIfPatientHasAnAdmissionRequestAfterADenial() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumRequests(criteria, 1);
+        createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 3));
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 4));
+        assertNumRequests(criteria, 1);
     }
 
     @Test
-    public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsFollowedByAnotherAdmissionDisposition() throws Exception {
+    public void shouldGetAdmissionRequestIfPatientHasAnAdmissionDecisionThatIsNotDeny() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumRequests(criteria, 1);
+        Encounter e = createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 3));
+        assertNumRequests(criteria, 0);
+        for (Obs o : e.getAllObs()) {
+            if (o.getConcept().equals(emrApiProperties.getAdmissionDecisionConcept())) {
+                o.setValueCoded(emrApiProperties.getPatientDiedConcept());
+                testDataManager.getObsService().saveObs(o, "Unknown");
+            }
+        }
+        assertNumRequests(criteria, 1);
     }
 
     @Test
-    public void shouldNotFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsFollowedByAnotherAdmissionDispositionFollowedByAnotherAdmissionDenial() throws Exception {
+    public void shouldFindVisitWithDispositionOfAdmitIfPrecededByAdmissionDenialObs() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 1));
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumRequests(criteria, 1);
     }
 
     @Test
-    public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDecisionThatIsNotDeny() throws Exception {
-    }
-
-    @Test
-    public void shouldFindVisitWithDispositionOfAdmitIfPrecededByAdmissionDenialObs() throws Exception {
-    }
-
-    @Test
-    public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsThatIsVoided() throws Exception {
+    public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsThatIsVoided() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumRequests(criteria, 1);
+        Encounter e = createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 3));
+        assertNumRequests(criteria, 0);
+        for (Obs o : e.getAllObs()) {
+            if (o.getConcept().equals(emrApiProperties.getAdmissionDecisionConcept())) {
+                testDataManager.getObsService().voidObs(o, "Unknown");
+            }
+        }
+        assertNumRequests(criteria, 1);
     }
 
 }
