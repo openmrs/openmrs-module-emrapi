@@ -347,6 +347,11 @@ public interface AdtService extends OpenmrsService {
     @Deprecated
     List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds);
 
+    /**
+     * Returns all List of InpatientRequest that match the given search criteria
+     * @param criteria - represents the criteria by which inpatient requests are searched and returned
+     * @return List<InpatientRequest> of the matching InpatientRequests that match the criteria
+     */
     List<InpatientRequest> getInpatientRequests(InpatientRequestSearchCriteria criteria);
 
     /**
