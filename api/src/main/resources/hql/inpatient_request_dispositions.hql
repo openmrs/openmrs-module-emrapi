@@ -22,6 +22,14 @@ where
     and visit.stopDatetime is null
     and (
         select count(*)
+         from Obs as laterDispoObs
+         where laterDispoObs.encounter.visit = visit
+           and laterDispoObs.voided = false
+           and laterDispoObs.concept = :dispositionConcept
+           and laterDispoObs.obsDatetime > dispo.obsDatetime
+    ) = 0
+    and (
+        select count(*)
         from Encounter as adtEncounter
         where adtEncounter.visit = visit
           and adtEncounter.voided = false

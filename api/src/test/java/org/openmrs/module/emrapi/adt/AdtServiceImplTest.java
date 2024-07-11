@@ -308,4 +308,25 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
         assertNumRequests(criteria, 1);
     }
 
+    @Test
+    public void shouldOnlyReturnLatestDispositionRequestWithinAGivenVisit() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumRequests(criteria, 1);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 3));
+        assertNumRequests(criteria, 1);
+    }
+
+    @Test
+    public void shouldOnlyReturnAdmitIfItIsLaterThanDischarge() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumRequests(criteria, 1);
+        createDischargeRequest(DateUtils.addHours(visitDate, 3), preAdmissionLocation);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 4));
+        assertNumRequests(criteria, 1);
+    }
 }

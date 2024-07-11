@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Represents criteria for searching for AdtRequests
+ * Currently the assumption is that all requests returned are active, and this will be the default regardless
  */
 @Data
 public class InpatientRequestSearchCriteria {
