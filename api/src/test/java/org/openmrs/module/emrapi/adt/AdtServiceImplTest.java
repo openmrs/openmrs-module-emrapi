@@ -284,7 +284,7 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldFindVisitWithDispositionOfAdmitIfPrecededByAdmissionDenialObs() {
+    public void shouldGetAdmissionRequestWithDispositionOfAdmitIfPrecededByAdmissionDenialObs() {
         criteria.addDispositionType(DispositionType.ADMIT);
         createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 1));
         assertNumRequests(criteria, 0);
@@ -293,7 +293,7 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldFindVisitWithDispositionOfAdmitIfFollowedByAdmissionDenialObsThatIsVoided() {
+    public void shouldGetAdmissionRequestWithDispositionOfAdmitIfFollowedByAdmissionDenialObsThatIsVoided() {
         criteria.addDispositionType(DispositionType.ADMIT);
         assertNumRequests(criteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
@@ -325,6 +325,15 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
         assertNumRequests(criteria, 1);
         createDischargeRequest(DateUtils.addHours(visitDate, 3), preAdmissionLocation);
+        assertNumRequests(criteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 4));
+        assertNumRequests(criteria, 1);
+    }
+
+    @Test
+    public void shouldGetAdmissionRequestIfAfterAdmissionEncounter() {
+        criteria.addDispositionType(DispositionType.ADMIT);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
         assertNumRequests(criteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 4));
         assertNumRequests(criteria, 1);

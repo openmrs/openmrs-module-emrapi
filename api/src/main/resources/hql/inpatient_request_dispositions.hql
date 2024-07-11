@@ -37,6 +37,7 @@ where
         where adtEncounter.visit = visit
           and adtEncounter.voided = false
           and adtEncounter.encounterType in (:adtEncounterTypes)
+          and adtEncounter.encounterDatetime >= dispo.obsDatetime
     ) = 0
     and (
         select count(*)
