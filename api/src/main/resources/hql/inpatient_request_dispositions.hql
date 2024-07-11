@@ -26,7 +26,10 @@ where
          where laterDispoObs.encounter.visit = visit
            and laterDispoObs.voided = false
            and laterDispoObs.concept = :dispositionConcept
-           and laterDispoObs.obsDatetime > dispo.obsDatetime
+           and (
+             laterDispoObs.obsDatetime > dispo.obsDatetime or
+             (laterDispoObs.obsDatetime = dispo.obsDatetime and laterDispoObs.obsId > dispo.obsId)
+           )
     ) = 0
     and (
         select count(*)
