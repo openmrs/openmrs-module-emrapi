@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/rest/emrapi/inpatient")
+@RequestMapping(value = "/rest/**/emrapi/inpatient")
 public class InpatientVisitsController {
 
     @Autowired

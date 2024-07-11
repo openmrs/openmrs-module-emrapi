@@ -43,7 +43,7 @@ import java.util.Set;
 import static org.springframework.web.bind.annotation.ValueConstants.DEFAULT_NONE;
 
 @Controller
-@RequestMapping(method = RequestMethod.GET, value = "/rest/emrapi/concept")
+@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/concept")
 public class EmrConceptSearchController {
     @Autowired
     EmrApiProperties emrApiProperties;
