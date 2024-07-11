@@ -34,7 +34,7 @@ where
           and admission.voided = false
           and admission.encounterType = :admissionEncounterType
           and admission.encounterDatetime >= dispo.obsDatetime
-        ) = 0
+    ) = 0
     and (
         select count(*)
         from Obs as admitDecision
