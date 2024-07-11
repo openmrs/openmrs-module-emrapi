@@ -1,5 +1,11 @@
 select
-    dispo
+    visit,
+    dispoEncounter.patient,
+    dispoEncounter,
+    dispo.obsGroup,
+    dispo,
+    (select o from Obs o where o.obsGroup = dispo.obsGroup and o.voided = 0 and o.concept = :admitLocationConcept) as admitLocation,
+    (select o from Obs o where o.obsGroup = dispo.obsGroup and o.voided = 0 and o.concept = :transferLocationConcept) as transferLocation
 from
     Obs as dispo
 inner join dispo.encounter as dispoEncounter
@@ -40,3 +46,4 @@ where
             and locationObs.valueText in (:dispositionLocationIds)
         ) > 0
     )
+order by dispo.obsId

@@ -88,16 +88,7 @@ public class InpatientVisitsController {
     }
 
     private List<SimpleObject> getVisitsAwaitingTransferHelper(Location transferLocation) {
-        List<Visit> visits = adtService.getVisitsAwaitingTransfer(transferLocation);
-        List<SimpleObject> visitObjects = new ArrayList<SimpleObject>();
-        for (Visit visit : visits) {
-            SimpleObject inpatientVisit = new SimpleObject();
-            inpatientVisit.put("visit", ConversionUtil.convertToRepresentation(visit, Representation.DEFAULT));
-            inpatientVisit.put("patient", ConversionUtil.convertToRepresentation(visit.getPatient(), Representation.DEFAULT));
-            inpatientVisit.put("type", AdtAction.Type.TRANSFER);
-            visitObjects.add(inpatientVisit);
-        }
-        return visitObjects;
+        return new ArrayList<>();
     }
 
 }

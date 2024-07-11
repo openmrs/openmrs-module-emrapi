@@ -23,5 +23,4 @@ public class InpatientRequest {
     private Obs dispositionObsGroup;
     private Concept disposition;
     private Location dispositionLocation;
-    private Date dispositionDate;
 }

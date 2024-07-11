@@ -5,6 +5,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.adt.InpatientRequest;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
@@ -26,7 +27,8 @@ import java.util.Map;
         DiagnosisMetadata.class,
         Disposition.class,
         DispositionObs.class,
-        DispositionDescriptor.class
+        DispositionDescriptor.class,
+        InpatientRequest.class
 }, order = 0)
 public class SimpleBeanConverter<T> implements Converter<T> {
 

@@ -943,9 +943,11 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         // Get all disposition concepts based on the given disposition type(s)
         Map<Concept, DispositionType> dispositionValuesToType = new HashMap<>();
         List<Disposition> dispositions = dispositionService.getDispositions();
-        for (Disposition d : dispositions) {
-            if (dispositionTypes.contains(d.getType())) {
-                dispositionValuesToType.put(emrConceptService.getConcept(d.getConceptCode()), d.getType());
+        if (dispositions != null) {
+            for (Disposition d : dispositions) {
+                if (dispositionTypes.contains(d.getType())) {
+                    dispositionValuesToType.put(emrConceptService.getConcept(d.getConceptCode()), d.getType());
+                }
             }
         }
 
@@ -978,38 +980,29 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         parameters.put("adtDecisionConcept", emrApiProperties.getAdmissionDecisionConcept());
         parameters.put("denyConcept", emrApiProperties.getDenyAdmissionConcept());
         parameters.put("dispositionLocationIds", dispositionLocationIds);
+        parameters.put("admitLocationConcept", descriptor.getAdmissionLocationConcept());
+        parameters.put("transferLocationConcept", descriptor.getInternalTransferLocationConcept());
 
-        List<Obs> dispositionObs = emrApiDAO.executeHqlFromResource("hql/inpatient_request_dispositions.hql", parameters, Obs.class);
+        List<?> reqs = emrApiDAO.executeHqlFromResource("hql/inpatient_request_dispositions.hql", parameters, List.class);
         List<InpatientRequest> ret = new ArrayList<>();
-        for (Obs o : dispositionObs) {
+        for (Object req : reqs) {
+            Object[] o = (Object[]) req;
             InpatientRequest r = new InpatientRequest();
-            r.setVisit(o.getEncounter().getVisit());
-            r.setPatient(o.getEncounter().getPatient());
-            r.setDispositionEncounter(o.getEncounter());
-            r.setDispositionObsGroup(o.getObsGroup());
-            r.setDispositionType(dispositionValuesToType.get(o.getValueCoded()));
-            r.setDisposition(o.getValueCoded());
-
-            Location dispositionLocation = null;
-            if (r.getDispositionType() == DispositionType.ADMIT) {
-                dispositionLocation = descriptor.getAdmissionLocation(o.getObsGroup(), locationService);
+            r.setVisit((Visit)o[0]);
+            r.setPatient((Patient)o[1]);
+            r.setDispositionEncounter((Encounter)o[2]);
+            r.setDispositionObsGroup((Obs)o[3]);
+            Obs dispositionObs = (Obs)o[4];
+            if (dispositionObs != null) {
+                r.setDisposition(dispositionObs.getValueCoded());
+                r.setDispositionType(dispositionValuesToType.get(dispositionObs.getValueCoded()));
             }
-            else if (r.getDispositionType() == DispositionType.TRANSFER) {
-                dispositionLocation = descriptor.getInternalTransferLocation(o.getObsGroup(), locationService);
+            Obs locationObs = (Obs)(o[5] != null ? o[5] : o[6]);
+            if (locationObs != null) {
+                r.setDispositionLocation(locationService.getLocation(Integer.parseInt(locationObs.getValueText())));
             }
-            r.setDispositionLocation(dispositionLocation);
-
-            Date deathDate = descriptor.getDateOfDeath(o.getObsGroup());
-            r.setDispositionDate(deathDate == null ? o.getObsDatetime() : deathDate);
             ret.add(r);
         }
         return ret;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Visit> getVisitsAwaitingTransfer(Location transferLocation) {
-        // TODO implement!
-        return Collections.emptyList();
     }
 }
