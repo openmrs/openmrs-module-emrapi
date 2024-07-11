@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Controller
-@RequestMapping(value = "/rest/emrapi/configuration")
+@RequestMapping(value = "/rest/**/emrapi/configuration")
 public class EmrApiConfigurationController {
 
     @Autowired
