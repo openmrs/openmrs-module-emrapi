@@ -22,6 +22,14 @@
         "additionalObs": []
     },
     {
+        "uuid": "8297651b-4046-11ef-ba6a-0242ac120002",
+        "name": "disposition.transfer",
+        "type": "TRANSFER",
+        "conceptCode": "org.openmrs.module.emrapi:Transfer out of hospital",
+        "actions": [],
+        "additionalObs": []
+    },
+    {
         "uuid": "687d966bb-9c91-4886-b8b0-e63361f495f0",
         "name": "disposition.observation",
         "conceptCode": "org.openmrs.module.emrapi:ED Observation",

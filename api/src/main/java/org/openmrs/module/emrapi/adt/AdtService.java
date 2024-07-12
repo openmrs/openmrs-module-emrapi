@@ -344,13 +344,13 @@ public interface AdtService extends OpenmrsService {
      * @param visitIds - if non-null, only returns matches for visits with the given ids
      * @return List<Visit></Visit> of the matching visits
      */
-    // TODO expand this to take in an admissionLocation parameter and limit to admissions at that location
+    @Deprecated
     List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds);
 
     /**
-     * Returns all patient awaiting transfer
-     * @param transferLocation - if non-null, only return matches for patients awaiting transfer to this location
-     * @return List<Visit> of the matching visits<
+     * Returns all List of InpatientRequest that match the given search criteria
+     * @param criteria - represents the criteria by which inpatient requests are searched and returned
+     * @return List<InpatientRequest> of the matching InpatientRequests that match the criteria
      */
-    List<Visit> getVisitsAwaitingTransfer(Location transferLocation);
+    List<InpatientRequest> getInpatientRequests(InpatientRequestSearchCriteria criteria);
 }

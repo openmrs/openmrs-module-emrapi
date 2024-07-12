@@ -16,6 +16,7 @@ package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
+import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -45,7 +46,9 @@ import org.openmrs.module.emrapi.adt.util.AdtUtil;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.module.emrapi.disposition.Disposition;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.merge.VisitMergeAction;
@@ -58,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -920,8 +924,90 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Visit> getVisitsAwaitingTransfer(Location transferLocation) {
-        // TODO implement!
-        return Collections.emptyList();
+    public List<InpatientRequest> getInpatientRequests(InpatientRequestSearchCriteria criteria) {
+
+        DispositionDescriptor descriptor = dispositionService.getDispositionDescriptor();
+
+        // Determine whether to filter visits at a particular location
+        Location visitLocation = null ;
+        if (criteria.getVisitLocation() != null ) {
+            visitLocation = getLocationThatSupportsVisits(criteria.getVisitLocation());
+        }
+
+        // Determine what type of dispositions to include.  If none specified, default to all
+        List<DispositionType> dispositionTypes = criteria.getDispositionTypes();
+        if (dispositionTypes == null) {
+            dispositionTypes = Arrays.asList(DispositionType.values());
+        }
+
+        // Get all disposition concepts based on the given disposition type(s)
+        Map<Concept, DispositionType> dispositionValuesToType = new HashMap<>();
+        List<Disposition> dispositions = dispositionService.getDispositions();
+        if (dispositions != null) {
+            for (Disposition d : dispositions) {
+                if (dispositionTypes.contains(d.getType())) {
+                    dispositionValuesToType.put(emrConceptService.getConcept(d.getConceptCode()), d.getType());
+                }
+            }
+        }
+
+        // Get all encounter types that might cause a request to be fulfilled
+        List<EncounterType> adtEncounterTypes = new ArrayList<>();
+        if (dispositionTypes.contains(DispositionType.ADMIT)) {
+            adtEncounterTypes.add(emrApiProperties.getAdmissionEncounterType());
+        }
+        if (dispositionTypes.contains(DispositionType.TRANSFER)) {
+            adtEncounterTypes.add(emrApiProperties.getTransferWithinHospitalEncounterType());
+        }
+        if (dispositionTypes.contains(DispositionType.DISCHARGE)) {
+            adtEncounterTypes.add(emrApiProperties.getExitFromInpatientEncounterType());
+        }
+
+        // Disposition Locations are stored as Obs where the valueText is the location id.  Collect these values
+        List<String> dispositionLocationIds = null;
+        if (criteria.getDispositionLocations() != null) {
+            dispositionLocationIds = new ArrayList<>();
+            for (Location l : criteria.getDispositionLocations()) {
+                dispositionLocationIds.add(l.getLocationId().toString());
+            }
+        }
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("dispositionConcept", descriptor.getDispositionConcept());
+        parameters.put("dispositionValues", dispositionValuesToType.keySet());
+        parameters.put("visitLocation", visitLocation);
+        parameters.put("adtEncounterTypes", adtEncounterTypes);
+        parameters.put("adtDecisionConcept", emrApiProperties.getAdmissionDecisionConcept());
+        parameters.put("denyConcept", emrApiProperties.getDenyAdmissionConcept());
+        parameters.put("dispositionLocationIds", dispositionLocationIds);
+        parameters.put("limitByDispositionLocation", dispositionLocationIds != null);
+        parameters.put("admitLocationConcept", descriptor.getAdmissionLocationConcept());
+        parameters.put("transferLocationConcept", descriptor.getInternalTransferLocationConcept());
+        parameters.put("patientIds", criteria.getPatientIds());
+        parameters.put("limitByPatient", criteria.getPatientIds() != null);
+        parameters.put("visitIds", criteria.getVisitIds());
+        parameters.put("limitByVisit", criteria.getVisitIds() != null);
+
+        List<?> reqs = emrApiDAO.executeHqlFromResource("hql/inpatient_request_dispositions.hql", parameters, List.class);
+        List<InpatientRequest> ret = new ArrayList<>();
+        for (Object req : reqs) {
+            Object[] o = (Object[]) req;
+            InpatientRequest r = new InpatientRequest();
+            r.setVisit((Visit)o[0]);
+            r.setPatient((Patient)o[1]);
+            r.setDispositionEncounter((Encounter)o[2]);
+            r.setDispositionObsGroup((Obs)o[3]);
+            Obs dispositionObs = (Obs)o[4];
+            if (dispositionObs != null) {
+                r.setDisposition(dispositionObs.getValueCoded());
+                r.setDispositionType(dispositionValuesToType.get(dispositionObs.getValueCoded()));
+            }
+            Obs locationObs = (Obs)(o[5] != null ? o[5] : o[6]);
+            if (locationObs != null) {
+                r.setDispositionLocation(locationService.getLocation(Integer.parseInt(locationObs.getValueText())));
+            }
+            ret.add(r);
+        }
+        return ret;
     }
 }

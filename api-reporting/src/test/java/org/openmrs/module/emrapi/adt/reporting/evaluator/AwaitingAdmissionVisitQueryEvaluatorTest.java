@@ -222,12 +222,6 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseReportingTest 
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(secondVisitNoteEncounter)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(emrConceptService.getConcept("org.openmrs.module.emrapi:Death"))
-                .save();
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));

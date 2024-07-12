@@ -108,7 +108,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		request.addParameter("v", "custom:(dispositions)");
 		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
 		List<Map<String, Object>> dispositions = listNode(config, "dispositions");
-		assertThat(dispositions.size(), equalTo(4));
+		assertThat(dispositions.size(), equalTo(5));
 		for (Map<String, Object> d : dispositions) {
 			if (d.get("uuid").equals("d2d89630-b698-11e2-9e96-0800200c9a66")) {
 				assertThat(d.get("name"), equalTo("disposition.death"));
@@ -119,6 +119,11 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 			else if (d.get("uuid").equals("66de7f60-b73a-11e2-9e96-0800200c9a66")) {
 				assertThat(d.get("name"), equalTo("disposition.admit"));
 				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Admit to hospital"));
+				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
+			}
+			else if (d.get("uuid").equals("8297651b-4046-11ef-ba6a-0242ac120002")) {
+				assertThat(d.get("name"), equalTo("disposition.transfer"));
+				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Transfer out of hospital"));
 				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
 			}
 			else if (d.get("uuid").equals("687d966bb-9c91-4886-b8b0-e63361f495f0")) {

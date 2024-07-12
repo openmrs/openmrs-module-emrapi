@@ -39,6 +39,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <openMRSVersion>2.2.1</openMRSVersion>
         <legacyuiVersion>1.16.0</legacyuiVersion>
+        <lombokVersion>1.18.26</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
         <providermanagementVersion>2.5.0</providermanagementVersion>
         <metadatamappingVersion>1.6.0</metadatamappingVersion>
@@ -120,6 +121,12 @@
             <artifactId>testutils</artifactId>
             <version>${openmrsTestutilsVersion}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombokVersion}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Needed because the UI Framework module uses HttpSession in its api project -->
