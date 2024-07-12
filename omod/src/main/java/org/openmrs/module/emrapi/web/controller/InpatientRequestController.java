@@ -5,7 +5,7 @@ import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.adt.InpatientRequest;
 import org.openmrs.module.emrapi.adt.InpatientRequestSearchCriteria;
 import org.openmrs.module.emrapi.disposition.DispositionType;
-import org.openmrs.module.emrapi.rest.converter.SimpleBeanConverter;
+import org.openmrs.module.emrapi.rest.converter.InpatientRequestConverter;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestUtil;
@@ -43,6 +43,6 @@ public class InpatientRequestController {
         criteria.setDispositionLocations(dispositionLocations);
         criteria.setDispositionTypes(dispositionTypes);
         List<InpatientRequest> requests = adtService.getInpatientRequests(criteria);
-        return new NeedsPaging<>(requests, context).toSimpleObject(new SimpleBeanConverter<InpatientRequest>());
+        return new NeedsPaging<>(requests, context).toSimpleObject(new InpatientRequestConverter());
     }
 }

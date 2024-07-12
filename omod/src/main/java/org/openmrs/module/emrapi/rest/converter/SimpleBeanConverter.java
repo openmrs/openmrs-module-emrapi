@@ -27,8 +27,7 @@ import java.util.Map;
         DiagnosisMetadata.class,
         Disposition.class,
         DispositionObs.class,
-        DispositionDescriptor.class,
-        InpatientRequest.class
+        DispositionDescriptor.class
 }, order = 0)
 public class SimpleBeanConverter<T> implements Converter<T> {
 
