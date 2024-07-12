@@ -37,7 +37,7 @@ public class InpatientRequestController {
             @RequestParam(required = false, value = "dispositionLocation") List<Location> dispositionLocations,
             @RequestParam(required = false, value = "dispositionType") List<DispositionType> dispositionTypes
     ) {
-        RequestContext context = RestUtil.getRequestContext(request, response, Representation.REF);
+        RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         InpatientRequestSearchCriteria criteria = new InpatientRequestSearchCriteria();
         criteria.setVisitLocation(visitLocation);
         criteria.setDispositionLocations(dispositionLocations);
