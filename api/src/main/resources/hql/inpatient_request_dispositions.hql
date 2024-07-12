@@ -51,11 +51,13 @@ where
             and encounterInVisit.encounterDatetime > dispoEncounter.encounterDatetime
     ) = 0
     and (
-        :dispositionLocationIds is null or (
+        :limitByDispositionLocation = false or (
             select count(*)
             from Obs as locationObs
             where locationObs.obsGroup = dispo.obsGroup
             and locationObs.valueText in (:dispositionLocationIds)
         ) > 0
     )
+    and (:limitByPatient is false or dispoEncounter.patient.patientId in (:patientIds))
+    and (:limitByVisit is false or visit.visitId in (:visitIds))
 order by dispo.obsId

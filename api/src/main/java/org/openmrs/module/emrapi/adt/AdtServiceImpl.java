@@ -980,8 +980,13 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         parameters.put("adtDecisionConcept", emrApiProperties.getAdmissionDecisionConcept());
         parameters.put("denyConcept", emrApiProperties.getDenyAdmissionConcept());
         parameters.put("dispositionLocationIds", dispositionLocationIds);
+        parameters.put("limitByDispositionLocation", dispositionLocationIds != null);
         parameters.put("admitLocationConcept", descriptor.getAdmissionLocationConcept());
         parameters.put("transferLocationConcept", descriptor.getInternalTransferLocationConcept());
+        parameters.put("patientIds", criteria.getPatientIds());
+        parameters.put("limitByPatient", criteria.getPatientIds() != null);
+        parameters.put("visitIds", criteria.getVisitIds());
+        parameters.put("limitByVisit", criteria.getVisitIds() != null);
 
         List<?> reqs = emrApiDAO.executeHqlFromResource("hql/inpatient_request_dispositions.hql", parameters, List.class);
         List<InpatientRequest> ret = new ArrayList<>();
