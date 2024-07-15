@@ -253,6 +253,10 @@ public class EmrApiProperties extends ModuleProperties {
         return getEmrApiConceptByMappingAllowUndefined(EmrApiConstants.CONCEPT_CODE_PATIENT_DIED);
     }
 
+	public Concept getConsultFreeTextCommentsConcept() {
+		return getEmrApiConceptByMapping(EmrApiConstants.CONCEPT_CODE_CONSULT_FREE_TEXT_COMMENTS);
+	}
+
 	public List<PatientIdentifierType> getIdentifierTypesToSearch() {
 		ArrayList<PatientIdentifierType> types = new ArrayList<PatientIdentifierType>();
 		types.add(getPrimaryIdentifierType());
