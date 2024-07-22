@@ -87,7 +87,7 @@ public class InpatientAdmission {
                 return ret;
             }
         }
-        return null;
+        return ret;
     }
 
     public boolean isDischarged() {
