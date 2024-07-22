@@ -63,8 +63,9 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
     private Concept transferDisposition;
     private Concept dischargeDisposition;
     private Date visitDate;
-    InpatientRequestSearchCriteria criteria;
+    InpatientRequestSearchCriteria requestCriteria;
     List<InpatientRequest> requests;
+    InpatientAdmissionSearchCriteria admissionCriteria;
 
     @Before
     public void setup() throws Exception {
@@ -88,7 +89,8 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
         patient = testDataManager.randomPatient().birthdate("2010-01-01").save();
         visit = testDataManager.visit().patient(patient).visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).started("2020-10-30").save();
         visitDate = visit.getStartDatetime();
-        criteria = new InpatientRequestSearchCriteria();
+        requestCriteria = new InpatientRequestSearchCriteria();
+        admissionCriteria = new InpatientAdmissionSearchCriteria();
     }
 
     private Encounter createEncounter(EncounterType encounterType, Location location, Date date) {
@@ -142,11 +144,19 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
         return requests;
     }
 
+    private List<InpatientAdmission> assertNumAdmissions(InpatientAdmissionSearchCriteria criteria, int expected) {
+        List<InpatientAdmission> admissions = adtService.getInpatientAdmissions(criteria);
+        assertThat(admissions.size(), equalTo(expected));
+        return admissions;
+    }
+
+    //*********** INPATIENT REQUEST TESTS *****************
+
     @Test
     public void shouldGetInpatientRequest() {
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        requests = adtService.getInpatientRequests(criteria);
+        requests = adtService.getInpatientRequests(requestCriteria);
         assertThat(requests.size(), equalTo(1));
         assertThat(requests.get(0).getDispositionType(), equalTo(DispositionType.ADMIT));
         assertThat(requests.get(0).getDisposition(), equalTo(admitDisposition));
@@ -157,305 +167,432 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
 
     @Test
     public void shouldGetAdmissionRequestForVisitLocation() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        criteria.setVisitLocation(visitLocation);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        requestCriteria.setVisitLocation(visitLocation);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldGetAdmissionRequestForParentVisitLocation() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        criteria.setVisitLocation(admissionLocation);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        requestCriteria.setVisitLocation(admissionLocation);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldNotGetAdmissionRequestForDifferentVisitLocation() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
-        criteria.setVisitLocation(otherVisitLocation);
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setVisitLocation(otherVisitLocation);
+        assertNumRequests(requestCriteria, 0);
     }
 
     // Filter based on Disposition Type
 
     @Test
     public void shouldGetInpatientRequestsBasedOnDispositionType() {
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
 
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.ADMIT));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.TRANSFER));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.TRANSFER));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.TRANSFER, DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(null);
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.ADMIT));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.TRANSFER));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.TRANSFER));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.TRANSFER, DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(null);
 
         createTransferRequest(DateUtils.addHours(visitDate, 4));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.ADMIT));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.TRANSFER));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.TRANSFER));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.TRANSFER, DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(null);
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.ADMIT));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.TRANSFER));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.TRANSFER));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.TRANSFER, DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(null);
 
         createDischargeRequest(DateUtils.addHours(visitDate, 6), preAdmissionLocation);
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.ADMIT));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.TRANSFER));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Collections.singletonList(DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.TRANSFER));
-        assertNumRequests(criteria, 0);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 1);
-        criteria.setDispositionTypes(Arrays.asList(DispositionType.TRANSFER, DispositionType.DISCHARGE));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.ADMIT));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.TRANSFER));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Collections.singletonList(DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.TRANSFER));
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.ADMIT, DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.setDispositionTypes(Arrays.asList(DispositionType.TRANSFER, DispositionType.DISCHARGE));
+        assertNumRequests(requestCriteria, 1);
     }
 
     // Filter based on disposition location
 
     @Test
     public void shouldGetInpatientRequestsBasedOnDispositionLocation() {
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
-        criteria.addDispositionLocation(preAdmissionLocation);
-        assertNumRequests(criteria, 0);
-        criteria.addDispositionLocation(transferLocation);
-        assertNumRequests(criteria, 0);
-        criteria.addDispositionLocation(admissionLocation);
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.addDispositionLocation(preAdmissionLocation);
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.addDispositionLocation(transferLocation);
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.addDispositionLocation(admissionLocation);
+        assertNumRequests(requestCriteria, 1);
     }
 
     // Filter based on patient ids
 
     @Test
     public void shouldGetInpatientRequestsBasedOnPatient() {
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
-        criteria.addPatientId(patient.getPatientId() + 1);
-        assertNumRequests(criteria, 0);
-        criteria.addPatientId(patient.getPatientId() + 2);
-        assertNumRequests(criteria, 0);
-        criteria.addPatientId(patient.getPatientId());
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.addPatientId(patient.getPatientId() + 1);
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.addPatientId(patient.getPatientId() + 2);
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.addPatientId(patient.getPatientId());
+        assertNumRequests(requestCriteria, 1);
     }
 
     // Filter based on visit ids
 
     @Test
     public void shouldGetInpatientRequestsBasedOnVisit() {
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
-        criteria.addVisitId(visit.getVisitId() + 1);
-        assertNumRequests(criteria, 0);
-        criteria.addVisitId(visit.getVisitId() + 2);
-        assertNumRequests(criteria, 0);
-        criteria.addVisitId(visit.getVisitId());
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
+        requestCriteria.addVisitId(visit.getVisitId() + 1);
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.addVisitId(visit.getVisitId() + 2);
+        assertNumRequests(requestCriteria, 0);
+        requestCriteria.addVisitId(visit.getVisitId());
+        assertNumRequests(requestCriteria, 1);
     }
 
     // Filter based on timeline of disposition obs and encounters within visit
 
     @Test
     public void shouldNotGetAdmissionRequestIfPatientHasBeenAdmitted() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         createAdmissionEncounter(DateUtils.addHours(visitDate, 3));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
     }
 
     @Test
     public void shouldGetAdmissionRequestIfAdmissionEncounterIsVoided() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         Encounter e = createAdmissionEncounter(DateUtils.addHours(visitDate, 3));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         testDataManager.getEncounterService().voidEncounter(e, "Unknown");
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldOnlyReturnLatestDispositionRequestWithinAGivenVisit() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         createAdmissionRequest(DateUtils.addHours(visitDate, 3));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldOnlyReturnAdmitIfItIsLaterThanDischarge() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         createDischargeRequest(DateUtils.addHours(visitDate, 3), preAdmissionLocation);
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 4));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldGetAdmissionRequestIfAfterAdmissionEncounter() {
-        criteria.addDispositionType(DispositionType.ADMIT);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
         createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 4));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     // Filter based on timeline of disposition obs and denial obs within visit
 
     @Test
     public void shouldNotGetAdmissionRequestIfPatientHasBeenDenied() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 3));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
     }
 
     @Test
     public void shouldGetAdmissionRequestIfPatientHasAnAdmissionRequestAfterADenial() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 3));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 4));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldGetAdmissionRequestIfPatientHasAnAdmissionDecisionThatIsNotDeny() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         Encounter e = createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 3));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         for (Obs o : e.getAllObs()) {
             if (o.getConcept().equals(emrApiProperties.getAdmissionDecisionConcept())) {
                 o.setValueCoded(emrApiProperties.getPatientDiedConcept());
                 testDataManager.getObsService().saveObs(o, "Unknown");
             }
         }
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldGetAdmissionRequestWithDispositionOfAdmitIfPrecededByAdmissionDenialObs() {
-        criteria.addDispositionType(DispositionType.ADMIT);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
         createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 1));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     @Test
     public void shouldGetAdmissionRequestWithDispositionOfAdmitIfFollowedByAdmissionDenialObsThatIsVoided() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         Encounter e = createAdmissionDeniedEncounter(DateUtils.addHours(visitDate, 3));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
         for (Obs o : e.getAllObs()) {
             if (o.getConcept().equals(emrApiProperties.getAdmissionDecisionConcept())) {
                 testDataManager.getObsService().voidObs(o, "Unknown");
             }
         }
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
     }
 
     // Filter out patients who have died or whose visit is ended
 
     @Test
     public void shouldNotGetAdmissionRequestIfPatientHasDied() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         patient.setDead(true);
         patient.setCauseOfDeathNonCoded("Unknown");
         testDataManager.getPatientService().savePatient(patient);
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
     }
 
     @Test
-    public void shouldGetInpatientRequestsForEndedVisits() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+    public void shouldNotGetInpatientRequestsForEndedVisits() {
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         testDataManager.getVisitService().endVisit(visit, DateUtils.addHours(visitDate, 4));
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
     }
 
     // Filter out voided data
 
     @Test
     public void shouldNotGetAdmissionRequestIfPatientIsVoided() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        assertNumRequests(criteria, 1);
+        assertNumRequests(requestCriteria, 1);
         testDataManager.getPatientService().voidPatient(patient, "Unknown");
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
     }
 
     @Test
     public void shouldNotGetAdmissionRequestIfEncounterIsVoided() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         Obs o = createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        requests = assertNumRequests(criteria, 1);
+        requests = assertNumRequests(requestCriteria, 1);
         testDataManager.getEncounterService().voidEncounter(o.getEncounter(), "Unknown");
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
     }
 
     @Test
     public void shouldNotGetAdmissionRequestIfObsIsVoided() {
-        criteria.addDispositionType(DispositionType.ADMIT);
-        assertNumRequests(criteria, 0);
+        requestCriteria.addDispositionType(DispositionType.ADMIT);
+        assertNumRequests(requestCriteria, 0);
         Obs o = createAdmissionRequest(DateUtils.addHours(visitDate, 2));
-        requests = assertNumRequests(criteria, 1);
+        requests = assertNumRequests(requestCriteria, 1);
         testDataManager.getObsService().voidObs(o, "Unknown");
-        assertNumRequests(criteria, 0);
+        assertNumRequests(requestCriteria, 0);
     }
+
+    //*********** INPATIENT ADMISSION TESTS *****************
+
+    @Test
+    public void shouldNotGetAdmissionIfNoAdtEncounters() {
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        assertNumAdmissions(admissionCriteria, 0);
+    }
+
+    @Test
+    public void shouldGetAdmissionIfAdmissionEncounters() {
+        assertNumAdmissions(admissionCriteria, 0);
+        Encounter e = createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        List<InpatientAdmission> admissions = assertNumAdmissions(admissionCriteria, 1);
+        InpatientAdmission admission = admissions.get(0);
+        assertThat(admission.getAdmissionEncounters().size(), equalTo(1));
+        assertThat(admission.getTransferEncounters().size(), equalTo(0));
+        assertThat(admission.getDischargeEncounters().size(), equalTo(0));
+        assertThat(admission.getAdmissionEncounters().iterator().next(), equalTo(e));
+    }
+
+    @Test
+    public void shouldGetAdmissionIfTransferEncounters() {
+        assertNumAdmissions(admissionCriteria, 0);
+        Encounter e = createTransferEncounter(DateUtils.addHours(visitDate, 2));
+        List<InpatientAdmission> admissions = assertNumAdmissions(admissionCriteria, 1);
+        InpatientAdmission admission = admissions.get(0);
+        assertThat(admission.getAdmissionEncounters().size(), equalTo(0));
+        assertThat(admission.getTransferEncounters().size(), equalTo(1));
+        assertThat(admission.getDischargeEncounters().size(), equalTo(0));
+        assertThat(admission.getTransferEncounters().iterator().next(), equalTo(e));
+    }
+
+    @Test
+    public void shouldGetAdmissionIfDischargeEncounters() {
+        admissionCriteria.setIncludeDischarged(true);
+        assertNumAdmissions(admissionCriteria, 0);
+        Encounter e = createDischarge(DateUtils.addHours(visitDate, 2), visitLocation);
+        List<InpatientAdmission> admissions = assertNumAdmissions(admissionCriteria, 1);
+        InpatientAdmission admission = admissions.get(0);
+        assertThat(admission.getAdmissionEncounters().size(), equalTo(0));
+        assertThat(admission.getTransferEncounters().size(), equalTo(0));
+        assertThat(admission.getDischargeEncounters().size(), equalTo(1));
+        assertThat(admission.getDischargeEncounters().iterator().next(), equalTo(e));
+    }
+
+    @Test
+    public void shouldGetAdmissionForVisitLocation() {
+        admissionCriteria.setVisitLocation(visitLocation);
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        admissionCriteria.setVisitLocation(visitLocation);
+        assertNumAdmissions(admissionCriteria, 1);
+    }
+
+    @Test
+    public void shouldGetAdmissionForParentVisitLocation() {
+        admissionCriteria.setVisitLocation(visitLocation);
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        admissionCriteria.setVisitLocation(admissionLocation);
+        assertNumAdmissions(admissionCriteria, 1);
+    }
+
+    @Test
+    public void shouldNotGetAdmissionForDifferentVisitLocation() {
+        admissionCriteria.setVisitLocation(visitLocation);
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        admissionCriteria.setVisitLocation(otherVisitLocation);
+        assertNumAdmissions(admissionCriteria, 0);
+    }
+
+    @Test
+    public void shouldGetAdmissionForInpatientLocation() {
+        admissionCriteria.addCurrentInpatientLocation(admissionLocation);
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        assertNumAdmissions(admissionCriteria, 1);
+        createTransferEncounter(DateUtils.addHours(visitDate, 4));
+        assertNumAdmissions(admissionCriteria, 0);
+        admissionCriteria.addCurrentInpatientLocation(transferLocation);
+        assertNumAdmissions(admissionCriteria, 1);
+    }
+
+    @Test
+    public void shouldGetAdmissionForPatient() {
+        admissionCriteria.addPatientId(patient.getPatientId());
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        assertNumAdmissions(admissionCriteria, 1);
+        admissionCriteria.setPatientIds(Collections.singletonList(patient.getPatientId() + 1));
+        assertNumAdmissions(admissionCriteria, 0);
+    }
+
+    @Test
+    public void shouldGetAdmissionForVisit() {
+        admissionCriteria.addVisitId(visit.getVisitId());
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        assertNumAdmissions(admissionCriteria, 1);
+        admissionCriteria.setVisitIds(Collections.singletonList(visit.getVisitId() + 1));
+        assertNumAdmissions(admissionCriteria, 0);
+    }
+
+    @Test
+    public void shouldGetAdmissionThatHasBeenDischarged() {
+        admissionCriteria.addVisitId(visit.getVisitId());
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        assertNumAdmissions(admissionCriteria, 1);
+        createDischarge(DateUtils.addHours(visitDate, 4), admissionLocation);
+        assertNumAdmissions(admissionCriteria, 0);
+        admissionCriteria.setIncludeDischarged(true);
+        assertNumAdmissions(admissionCriteria, 1);
+    }
+
+    @Test
+    public void shouldNotGetAdmissionsForEndedVisits() {
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
+        assertNumAdmissions(admissionCriteria, 1);
+        testDataManager.getVisitService().endVisit(visit, DateUtils.addHours(visitDate, 4));
+        assertNumAdmissions(admissionCriteria, 0);
+    }
+
 }

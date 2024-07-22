@@ -68,6 +68,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -988,7 +989,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         parameters.put("visitIds", criteria.getVisitIds());
         parameters.put("limitByVisit", criteria.getVisitIds() != null);
 
-        List<?> reqs = emrApiDAO.executeHqlFromResource("hql/inpatient_request_dispositions.hql", parameters, List.class);
+        List<?> reqs = emrApiDAO.executeHqlFromResource("hql/inpatient_requests.hql", parameters, List.class);
         List<InpatientRequest> ret = new ArrayList<>();
         for (Object req : reqs) {
             Object[] o = (Object[]) req;
@@ -1007,6 +1008,66 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
                 r.setDispositionLocation(locationService.getLocation(Integer.parseInt(locationObs.getValueText())));
             }
             ret.add(r);
+        }
+        return ret;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<InpatientAdmission> getInpatientAdmissions(InpatientAdmissionSearchCriteria criteria) {
+
+        // Determine whether to filter visits at a particular location
+        Location visitLocation = null ;
+        if (criteria.getVisitLocation() != null ) {
+            visitLocation = getLocationThatSupportsVisits(criteria.getVisitLocation());
+        }
+
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        EncounterType transferEncounterType = emrApiProperties.getTransferWithinHospitalEncounterType();
+        EncounterType dischargeEncounterType = emrApiProperties.getExitFromInpatientEncounterType();
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("visitLocation", visitLocation);
+        parameters.put("admissionEncounterType", emrApiProperties.getAdmissionEncounterType());
+        parameters.put("transferEncounterType", emrApiProperties.getTransferWithinHospitalEncounterType());
+        parameters.put("dischargeEncounterType", emrApiProperties.getExitFromInpatientEncounterType());
+        parameters.put("patientIds", criteria.getPatientIds());
+        parameters.put("limitByPatient", criteria.getPatientIds() != null);
+        parameters.put("visitIds", criteria.getVisitIds());
+        parameters.put("limitByVisit", criteria.getVisitIds() != null);
+
+        List<?> l = emrApiDAO.executeHqlFromResource("hql/inpatient_admissions.hql", parameters, List.class);
+        Map<Visit, InpatientAdmission> m = new LinkedHashMap<>();
+        for (Object req : l) {
+            Object[] o = (Object[]) req;
+            Visit visit = (Visit)o[0];
+            Patient patient = (Patient)o[1];
+            Encounter encounter = (Encounter)o[2];
+            InpatientAdmission admission = m.get(visit);
+            if (admission == null) {
+                admission = new InpatientAdmission();
+                admission.setVisit(visit);
+                admission.setPatient(patient);
+                m.put(visit, admission);
+            }
+            if (encounter.getEncounterType().equals(admissionEncounterType)) {
+                admission.getAdmissionEncounters().add(encounter);
+            }
+            else if (encounter.getEncounterType().equals(transferEncounterType)) {
+                admission.getTransferEncounters().add(encounter);
+            }
+            else if (encounter.getEncounterType().equals(dischargeEncounterType)) {
+                admission.getDischargeEncounters().add(encounter);
+            }
+        }
+
+        List<InpatientAdmission> ret = new ArrayList<>();
+        for (InpatientAdmission admission : m.values()) {
+            if (criteria.getCurrentInpatientLocations() == null || criteria.getCurrentInpatientLocations().contains(admission.getCurrentInpatientLocation())) {
+                if (criteria.isIncludeDischarged() || !admission.isDischarged()) {
+                    ret.add(admission);
+                }
+            }
         }
         return ret;
     }
