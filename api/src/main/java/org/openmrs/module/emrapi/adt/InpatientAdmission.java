@@ -7,6 +7,7 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class InpatientAdmission {
         encounters.addAll(admissionEncounters);
         encounters.addAll(transferEncounters);
         encounters.sort(getEncounterComparator());
-        return encounters;
+        return Collections.unmodifiableList(encounters);
     }
 
     public List<Encounter> getAdtEncounters() {
@@ -38,7 +39,7 @@ public class InpatientAdmission {
         encounters.addAll(transferEncounters);
         encounters.addAll(dischargeEncounters);
         encounters.sort(getEncounterComparator());
-        return encounters;
+        return Collections.unmodifiableList(encounters);
     }
 
     public Encounter getFirstAdmissionOrTransferEncounter() {
