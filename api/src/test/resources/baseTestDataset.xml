@@ -90,6 +90,15 @@
     <encounter_type encounter_type_id="1004" name="Admission" description="Admit to Inpatient" creator="1"
                     date_created="2012-10-23 18:04:14" retired="0" uuid="06087111-222-11e3-9c1a-0800200c9a66"/>
 
+    <encounter_type encounter_type_id="1005" name="Transfer" description="Transfer within hospital" creator="1"
+                    date_created="2012-10-23 18:04:14" retired="0" uuid="095e5033-4846-11ef-8186-0242ac120002"/>
+
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3289" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="2936c86f-4846-11ef-8186-0242ac120002"
+                                           retired = "false" code = "emr.transferWithinHospitalEncounterType" name = "emr.transferWithinHospitalEncounterType"
+                                           metadata_uuid = "095e5033-4846-11ef-8186-0242ac120002" metadata_class = "org.openmrs.EncounterType"
+    />
+
     <global_property property="provider.unknownProviderUuid" property_value=""
                      uuid="984628b0-e914-11e4-b571-0800200c9a66"/>
 

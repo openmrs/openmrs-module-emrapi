@@ -18,6 +18,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping(value = "/rest/**/emrapi/inpatient")
+@Deprecated
 public class InpatientVisitsController {
 
     @Autowired

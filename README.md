@@ -13,16 +13,16 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 
 ## Required modules
 
-* reporting (+ serialization.xstream, htmlwidgets, calculation)
-* providermanagement
-* metadatamapping
 * event
+* metadatamapping
 * webservices.rest
 
 ## Aware of modules
 
 * fhir2
 * metadatasharing
+* providermanagement
+* reporting
 
 # Configuration
 
@@ -37,6 +37,9 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 * Sets default visit assignment handler via global property
 * Sets up the patient viewed event listener subscription
 * Ensures the person image folder exists
+
+# REST API
+See https://github.com/openmrs/openmrs-contrib-rest-api-docs
 
 # API
 
@@ -57,10 +60,6 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 * Provides additional service methods to manage visits, ensure active visit, deal with overlapping visits, manage visit locations, enter retrospective visits
 * Provides implementations for merging patients and merging visits
 * Provides APIs for creating checkin encounters, adt encounters, and identify and get inpatient visits
-
-* (reporting module) definitions and evaluators for getting:
-  * AwaitingAdmissionVisitQuery - any Visits that are in the state of "awaiting admission"
-  * MostRecentAdmissionRequestVisitDataDefinition - data from a Visit relevant for "admission request"
 
 ## concept
 
@@ -141,7 +140,3 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 * Service and parameter objects to find visits and return associated EncounterTransactions in that visit
 * Service methods to get diagnoses obs and patients with particular diagnoses
 * VisitDomainWrapper - convenience wrapper to get info around active / open status, encounters contained, diagnoses, dispositions, ADT status
-
-# condition-list
-
-This provides an implementation of condition list functionality, but condition was added to core in 2.2, so this is likely no longer needed

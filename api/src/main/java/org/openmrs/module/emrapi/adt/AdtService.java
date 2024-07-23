@@ -288,6 +288,7 @@ public interface AdtService extends OpenmrsService {
      * @param visitLocation
      * @return
      */
+    @Deprecated
     List<VisitDomainWrapper> getInpatientVisits(Location visitLocation, Location ward);
 
     /**
@@ -353,4 +354,11 @@ public interface AdtService extends OpenmrsService {
      * @return List<InpatientRequest> of the matching InpatientRequests that match the criteria
      */
     List<InpatientRequest> getInpatientRequests(InpatientRequestSearchCriteria criteria);
+
+    /**
+     * Returns all List of InpatientAdmission that match the given search criteria
+     * @param criteria - represents the criteria by which inpatient admissions are searched and returned
+     * @return List<InpatientAdmission> of the matching InpatientAdmissions that match the criteria
+     */
+    List<InpatientAdmission> getInpatientAdmissions(InpatientAdmissionSearchCriteria criteria);
 }
