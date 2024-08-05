@@ -1061,14 +1061,32 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
         }
 
-        List<InpatientAdmission> ret = new ArrayList<>();
-        for (InpatientAdmission admission : m.values()) {
-            if (criteria.getCurrentInpatientLocations() == null || criteria.getCurrentInpatientLocations().contains(admission.getCurrentInpatientLocation())) {
-                if (criteria.isIncludeDischarged() || !admission.isDischarged()) {
-                    ret.add(admission);
-                }
+        // Filter out any admissions that do not match the search criteria
+        List<Integer> visitIds = new ArrayList<>();
+        for (Iterator<Map.Entry<Visit, InpatientAdmission>> i = m.entrySet().iterator(); i.hasNext(); ) {
+            InpatientAdmission admission = i.next().getValue();
+            if (criteria.getCurrentInpatientLocations() != null && !criteria.getCurrentInpatientLocations().contains(admission.getCurrentInpatientLocation())) {
+                i.remove();
+            }
+            else if (!criteria.isIncludeDischarged() && admission.isDischarged()) {
+                i.remove();
+            }
+            else {
+                visitIds.add(admission.getVisit().getVisitId());
             }
         }
-        return ret;
+
+        // Retrieve InpatientRequests associated with these admissions prior to returning them
+        InpatientRequestSearchCriteria requestCriteria = new InpatientRequestSearchCriteria();
+        requestCriteria.setVisitIds(visitIds);
+        List<InpatientRequest> requests = getInpatientRequests(requestCriteria);
+        for (InpatientRequest r : requests) {
+            InpatientAdmission admission = m.get(r.getVisit());
+            if (admission != null) {
+                admission.setCurrentInpatientRequest(r);
+            }
+        }
+
+        return new ArrayList<>(m.values());
     }
 }

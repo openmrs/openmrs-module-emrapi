@@ -1,7 +1,5 @@
 package org.openmrs.module.emrapi.rest.converter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.annotation.Handler;
 import org.openmrs.module.emrapi.adt.InpatientAdmission;
 import org.openmrs.module.webservices.rest.web.representation.CustomRepresentation;
@@ -13,8 +11,6 @@ import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceD
 @Handler(supports = InpatientAdmission.class, order = 0)
 public class InpatientAdmissionConverter extends SimpleBeanConverter<InpatientAdmission> {
 
-    private final Log log = LogFactory.getLog(getClass());
-
     @Override
     public DelegatingResourceDescription getResourceDescription(InpatientAdmission req, Representation representation) {
         DelegatingResourceDescription ret = super.getResourceDescription(req, representation);
@@ -25,6 +21,7 @@ public class InpatientAdmissionConverter extends SimpleBeanConverter<InpatientAd
             rep.addProperty("firstAdmissionOrTransferEncounter", getEncounterRepresentation());
             rep.addProperty("latestAdmissionOrTransferEncounter", getEncounterRepresentation());
             rep.addProperty("encounterAssigningToCurrentInpatientLocation", getEncounterRepresentation());
+            rep.addProperty("currentInpatientRequest", getInpatientRequestRepresentation());
             rep.addProperty("discharged");
             return rep;
         }
@@ -40,5 +37,9 @@ public class InpatientAdmissionConverter extends SimpleBeanConverter<InpatientAd
 
     public Representation getEncounterRepresentation() {
         return new CustomRepresentation("uuid,display,encounterDatetime,location:ref,encounterType:ref");
+    }
+
+    public Representation getInpatientRequestRepresentation() {
+        return new CustomRepresentation("dispositionType,dispositionEncounter:(uuid,display,encounterDatetime),dispositionLocation:ref");
     }
 }
