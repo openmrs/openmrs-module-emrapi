@@ -21,6 +21,7 @@ public class InpatientAdmission {
 
     private Visit visit;
     private Patient patient;
+    private InpatientRequest currentInpatientRequest;
     private Set<Encounter> admissionEncounters = new TreeSet<>(getEncounterComparator());
     private Set<Encounter> transferEncounters = new TreeSet<>(getEncounterComparator());
     private Set<Encounter> dischargeEncounters = new TreeSet<>(getEncounterComparator());

@@ -28,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
@@ -593,6 +595,26 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
         assertNumAdmissions(admissionCriteria, 1);
         testDataManager.getVisitService().endVisit(visit, DateUtils.addHours(visitDate, 4));
         assertNumAdmissions(admissionCriteria, 0);
+    }
+
+    @Test
+    public void shouldGetInpatientRequestsAssociatedWithAdmission() {
+        assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionRequest(DateUtils.addHours(visitDate, 2));
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 3));
+        List<InpatientAdmission> l = assertNumAdmissions(admissionCriteria, 1);
+        assertNull(l.get(0).getCurrentInpatientRequest());
+        Obs transferRequest = createTransferRequest(DateUtils.addHours(visitDate, 4));
+        l = assertNumAdmissions(admissionCriteria, 1);
+        assertNotNull(l.get(0).getCurrentInpatientRequest());
+        assertThat(l.get(0).getCurrentInpatientRequest().getDispositionObsGroup(), equalTo(transferRequest));
+        Obs dischargeRequest = createDischargeRequest(DateUtils.addHours(visitDate, 5), admissionLocation);
+        l = assertNumAdmissions(admissionCriteria, 1);
+        assertNotNull(l.get(0).getCurrentInpatientRequest());
+        assertThat(l.get(0).getCurrentInpatientRequest().getDispositionObsGroup(), equalTo(dischargeRequest));
+        createTransferEncounter(DateUtils.addHours(visitDate, 6));
+        l = assertNumAdmissions(admissionCriteria, 1);
+        assertNull(l.get(0).getCurrentInpatientRequest());
     }
 
 }

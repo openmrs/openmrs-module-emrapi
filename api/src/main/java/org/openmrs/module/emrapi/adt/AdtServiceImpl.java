@@ -1005,7 +1005,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
             Obs locationObs = (Obs)(o[5] != null ? o[5] : o[6]);
             if (locationObs != null) {
-                r.setDispositionLocation(locationService.getLocation(Integer.parseInt(locationObs.getValueText())));
+                    r.setDispositionLocation(locationService.getLocation(Integer.parseInt(locationObs.getValueText())));
             }
             ret.add(r);
         }
@@ -1061,14 +1061,33 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
         }
 
-        List<InpatientAdmission> ret = new ArrayList<>();
-        for (InpatientAdmission admission : m.values()) {
-            if (criteria.getCurrentInpatientLocations() == null || criteria.getCurrentInpatientLocations().contains(admission.getCurrentInpatientLocation())) {
-                if (criteria.isIncludeDischarged() || !admission.isDischarged()) {
-                    ret.add(admission);
-                }
+        // Filter out any admissions that do not match the search criteria
+        List<Integer> visitIds = new ArrayList<>();
+        for (Iterator<Visit> i = m.keySet().iterator(); i.hasNext(); ) {
+            Visit visit = i.next();
+            InpatientAdmission admission = m.get(visit);
+            if (criteria.getCurrentInpatientLocations() != null && !criteria.getCurrentInpatientLocations().contains(admission.getCurrentInpatientLocation())) {
+                i.remove();
+            }
+            else if (!criteria.isIncludeDischarged() && admission.isDischarged()) {
+                i.remove();
+            }
+            else {
+                visitIds.add(admission.getVisit().getVisitId());
             }
         }
-        return ret;
+
+        // Retrieve InpatientRequests associated with these admissions prior to returning them
+        InpatientRequestSearchCriteria requestCriteria = new InpatientRequestSearchCriteria();
+        requestCriteria.setVisitIds(visitIds);
+        List<InpatientRequest> requests = getInpatientRequests(requestCriteria);
+        for (InpatientRequest r : requests) {
+            InpatientAdmission admission = m.get(r.getVisit());
+            if (admission != null) {
+                admission.setCurrentInpatientRequest(r);
+            }
+        }
+
+        return new ArrayList<>(m.values());
     }
 }
