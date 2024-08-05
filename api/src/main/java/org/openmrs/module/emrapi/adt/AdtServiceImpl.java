@@ -1005,7 +1005,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             }
             Obs locationObs = (Obs)(o[5] != null ? o[5] : o[6]);
             if (locationObs != null) {
-                    r.setDispositionLocation(locationService.getLocation(Integer.parseInt(locationObs.getValueText())));
+                r.setDispositionLocation(locationService.getLocation(Integer.parseInt(locationObs.getValueText())));
             }
             ret.add(r);
         }
@@ -1063,9 +1063,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         // Filter out any admissions that do not match the search criteria
         List<Integer> visitIds = new ArrayList<>();
-        for (Iterator<Visit> i = m.keySet().iterator(); i.hasNext(); ) {
-            Visit visit = i.next();
-            InpatientAdmission admission = m.get(visit);
+        for (Iterator<Map.Entry<Visit, InpatientAdmission>> i = m.entrySet().iterator(); i.hasNext(); ) {
+            InpatientAdmission admission = i.next().getValue();
             if (criteria.getCurrentInpatientLocations() != null && !criteria.getCurrentInpatientLocations().contains(admission.getCurrentInpatientLocation())) {
                 i.remove();
             }
