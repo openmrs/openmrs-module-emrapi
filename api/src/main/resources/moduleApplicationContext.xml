@@ -71,6 +71,33 @@
         </property>
     </bean>
 
+    <bean id="maternalService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.maternal.MaternalServiceImpl">
+                <property name="emrApiProperties" ref="emrApiProperties"/>
+                <property name="emrApiDAO" ref="emrApiDAOImpl"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.openmrs.module.emrapi.maternal.MaternalService</value>
+                <ref bean="maternalService"/>
+            </list>
+        </property>
+    </bean>
+
    <bean id="exitFromCareService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
