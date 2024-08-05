@@ -107,7 +107,7 @@
 
     <global_property property="visits.assignmentHandler"
                      property_value="org.openmrs.module.emrapi.adt.EmrApiVisitAssignmentHandler"
-                     uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>emrapiProp
+                     uuid="2561da10-2229-11e2-9b1a-423440a3714c"/>
 
     <!-- this sets the identifier type with id=1 in the standard test dataset to the "primary identifier type" -->
     <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3288676" metadata_source_id = "2134"
