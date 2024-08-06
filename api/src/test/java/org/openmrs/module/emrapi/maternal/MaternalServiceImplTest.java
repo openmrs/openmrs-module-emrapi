@@ -20,12 +20,15 @@ import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Relationship;
 import org.openmrs.Visit;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.VisitService;
 import org.openmrs.contrib.testdata.TestDataManager;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.disposition.DispositionService;
+import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
@@ -43,6 +46,12 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     private VisitService visitService;
 
     @Autowired
+    private ConceptService conceptService;
+
+    @Autowired
+    private DispositionService dispositionService;
+
+    @Autowired
     private EmrApiProperties emrApiProperties;
 
     @Autowired
@@ -51,6 +60,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     @Before
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
+        ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
     }
 
     @Test
