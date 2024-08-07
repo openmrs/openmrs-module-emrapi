@@ -62,6 +62,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
         ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
+        ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
     }
 
     @Test
