@@ -57,6 +57,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     @Autowired
     private TestDataManager testDataManager;
 
+
     @Before
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
@@ -64,100 +65,88 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetNewbornByMother() throws Exception {
+    public void shouldGetChildByMother() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
-
-        assertThat(newborns.size(), equalTo(1));
-        assertThat(newborns.get(0).getNewborn(), equalTo(baby));
-        assertThat(newborns.get(0).getMother(), equalTo(mother));
-        assertNull(newborns.get(0).getNewbornAdmission());
+        assertThat(children.size(), equalTo(1));
+        assertThat(children.get(0).getChild(), equalTo(child));
+        assertThat(children.get(0).getMother(), equalTo(mother));
+        assertNull(children.get(0).getChildAdmission());
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfMotherDoesNotHaveActiveVisit() throws Exception {
+    public void shouldNotGetChildByMotherIfMotherDoesNotHaveActiveVisitAndMotherHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).stopped(now).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
 
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfNewbornDoesNotHaveActiveVisit() throws Exception {
+    public void shouldNotGetChildByMotherIfChildDoesNotHaveActiveVisitAndChildHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).stopped(now).save();
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).stopped(now).save();
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
 
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfNewbornNotLinkedByMotherChildRelationship() throws Exception {
+    public void shouldNotGetChildByMotherIfChildNotLinkedByMotherChildRelationship() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
-
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfNewbornBornADayOrMoreBeforeVisit() throws Exception {
+    public void shouldNotGetChildByMotherIfChildBornADayOrMoreBeforeVisitAndChildBornDuringMothersActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
         Date oneDayAgo = new DateTime().minusDays(1).toDate();
@@ -165,597 +154,533 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(oneDayAgo).save();
+        Patient child = testDataManager.randomPatient().birthdate(oneDayAgo).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
 
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     // this test will fail when run *exactly* at midnight, on the second
     @Test
-    public void shouldGetNewbornByMotherIfNewbornBornBeforeVisitStartButSameDay() throws Exception {
+    public void shouldGetChildByMotherIfChildBornBeforeVisitStartButSameDayAndChildBornDuringMothersActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneSecondAgo = new DateTime().minusSeconds(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(oneSecondAgo).save();
+        Patient child = testDataManager.randomPatient().birthdate(oneSecondAgo).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(now).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
 
-        assertThat(newborns.size(),equalTo(1));
-        assertThat(newborns.get(0).getNewborn(),equalTo(baby));
-        assertThat(newborns.get(0).getMother(), equalTo(mother));
-        assertNull(newborns.get(0).getNewbornAdmission());
+        assertThat(children.size(),equalTo(1));
+        assertThat(children.get(0).getChild(),equalTo(child));
+        assertThat(children.get(0).getMother(), equalTo(mother));
+        assertNull(children.get(0).getChildAdmission());
     }
 
     @Test
-    public void shouldGetMultipleNewbornByMother() throws Exception {
+    public void shouldGetMultipleChildByMother() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby1 = testDataManager.randomPatient().birthdate(now).save();
-        Patient baby2= testDataManager.randomPatient().birthdate(now).save();
+        Patient child1 = testDataManager.randomPatient().birthdate(now).save();
+        Patient child2= testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship1 = new Relationship();
         motherChildRelationship1.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship1.setPersonA(mother);
-        motherChildRelationship1.setPersonB(baby1);
+        motherChildRelationship1.setPersonB(child1);
         personService.saveRelationship(motherChildRelationship1);
 
         Relationship motherChildRelationship2 = new Relationship();
         motherChildRelationship2.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship2.setPersonA(mother);
-        motherChildRelationship2.setPersonB(baby2);
+        motherChildRelationship2.setPersonB(child2);
         personService.saveRelationship(motherChildRelationship2);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit baby1Visit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby1).started(now).save();
-        Visit baby2Visit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby2).started(now).save();
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        assertThat(children.size(), equalTo(2));
+        List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
+        assertTrue(childList.contains(child1));
+        assertTrue(childList.contains(child2));
 
-        assertThat(newborns.size(), equalTo(2));
-        List<Patient> babyList = newborns.stream().map(Newborn::getNewborn).collect(Collectors.toList());
-        assertTrue(babyList.contains(baby1));
-        assertTrue(babyList.contains(baby2));
+        assertThat(children.get(0).getMother(), equalTo(mother));
+        assertThat(children.get(1).getMother(), equalTo(mother));
 
-        assertThat(newborns.get(0).getMother(), equalTo(mother));
-        assertThat(newborns.get(1).getMother(), equalTo(mother));
-
-        assertNull(newborns.get(0).getNewbornAdmission());
-        assertNull(newborns.get(1).getNewbornAdmission());
+        assertNull(children.get(0).getChildAdmission());
+        assertNull(children.get(1).getChildAdmission());
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfMotherVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfMotherVoided() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         patientService.voidPatient(mother, "test");
 
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
-
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfNewbornVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfChildVoided() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
-        patientService.voidPatient(baby, "test");
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
+        patientService.voidPatient(child, "test");
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
-
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfRelationshipVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfRelationshipVoided() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
         personService.voidRelationship(motherChildRelationship, "test");
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
-
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfMotherVisitVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfMotherVisitVoidedAndMotherHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
         visitService.voidVisit(motherVisit, "test");
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
 
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfBabyVisitVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfChildVisitVoidedAndChildHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
-        visitService.voidVisit(babyVisit, "test");
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
+        visitService.voidVisit(childVisit, "test");
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
 
-        assertThat(newborns.size(), equalTo(0));
+        assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetNewbornByMotherIfVisitLocationsDontMatch() throws Exception {
+    public void shouldGetChildsForMultipleMothers() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
-        Location otherVisitLocation = testDataManager.location().name("Other Visit Location").save();
-
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate("2000-01-01").save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
-
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(otherVisitLocation).patient(baby).started(now).save();
-
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
-
-        assertThat(newborns.size(), equalTo(0));
-    }
-
-    @Test
-    public void shouldGetNewbornsForMultipleMothers() throws Exception {
-        Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
-
-        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
-
-        Relationship motherChildRelationship = new Relationship();
-        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
-        motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
-        personService.saveRelationship(motherChildRelationship);
-
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
 
         Patient otherMother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient otherBaby = testDataManager.randomPatient().birthdate(now).save();
+        Patient otherChild = testDataManager.randomPatient().birthdate("2000-01-01").save();
 
         Relationship otherMotherChildRelationship = new Relationship();
         otherMotherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         otherMotherChildRelationship.setPersonA(otherMother);
-        otherMotherChildRelationship.setPersonB(otherBaby);
+        otherMotherChildRelationship.setPersonB(otherChild);
         personService.saveRelationship(otherMotherChildRelationship);
 
-        Visit otherMotherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherMother).started(oneHourAgo).save();
-        Visit otherBabyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherBaby).started(now).save();
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), false, false, false));
 
+        assertThat(children.size(), equalTo(2));
+        List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
+        assertTrue(childList.contains(child));
+        assertTrue(childList.contains(otherChild));
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Arrays.asList(mother, otherMother));
-
-        assertThat(newborns.size(), equalTo(2));
-        List<Patient> babyList = newborns.stream().map(Newborn::getNewborn).collect(Collectors.toList());
-        assertTrue(babyList.contains(baby));
-        assertTrue(babyList.contains(otherBaby));
-
-        List<Patient> motherList = newborns.stream().map(Newborn::getMother).collect(Collectors.toList());
+        List<Patient> motherList = children.stream().map(Child::getMother).collect(Collectors.toList());
         assertTrue(motherList.contains(mother));
         assertTrue(motherList.contains(otherMother));
     }
 
     @Test
-    public void shouldGetNewbornByMotherWithInpatientAdmission() throws Exception {
+    public void shouldGetChildsForMultipleMothersMatchingByActiveVisitsAndChildBornDuringActiveVisit() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        // admit the baby
-        Encounter admission = testDataManager.encounter().encounterType(emrApiProperties.getAdmissionEncounterType()).encounterDatetime(now).patient(baby).save();
-
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).encounter(admission).save();
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
 
-        List<Newborn> newborns = maternalService.getNewbornsByMother(Collections.singletonList(mother));
+        Patient otherMother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient otherChild = testDataManager.randomPatient().birthdate(now).save();
 
-        assertThat(newborns.size(), equalTo(1));
-        assertThat(newborns.get(0).getNewbornAdmission().getVisit(), equalTo(babyVisit));
-        assertThat(newborns.get(0).getNewbornAdmission().getFirstAdmissionOrTransferEncounter(), equalTo(admission));
+        Relationship otherMotherChildRelationship = new Relationship();
+        otherMotherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        otherMotherChildRelationship.setPersonA(otherMother);
+        otherMotherChildRelationship.setPersonB(otherChild);
+        personService.saveRelationship(otherMotherChildRelationship);
+
+        Visit otherMotherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherMother).started(oneHourAgo).save();
+        Visit otherChildVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherChild).started(now).save();
+
+
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), true, true, true));
+
+        assertThat(children.size(), equalTo(2));
+        List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
+        assertTrue(childList.contains(child));
+        assertTrue(childList.contains(otherChild));
+
+        List<Patient> motherList = children.stream().map(Child::getMother).collect(Collectors.toList());
+        assertTrue(motherList.contains(mother));
+        assertTrue(motherList.contains(otherMother));
     }
 
     @Test
-    public void shouldGetMotherByNewborn() throws Exception {
+    public void shouldGetChildByMotherWithInpatientAdmission() throws Exception {
+        Date now = new Date();
+
+        Location visitLocation = testDataManager.location().name("Visit Location").save();
+
+        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
+
+        Relationship motherChildRelationship = new Relationship();
+        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        motherChildRelationship.setPersonA(mother);
+        motherChildRelationship.setPersonB(child);
+        personService.saveRelationship(motherChildRelationship);
+
+        // admit the child
+        Encounter admission = testDataManager.encounter().encounterType(emrApiProperties.getAdmissionEncounterType()).encounterDatetime(now).patient(child).save();
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).encounter(admission).save();
+
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+
+        assertThat(children.size(), equalTo(1));
+        assertThat(children.get(0).getChildAdmission().getVisit(), equalTo(childVisit));
+        assertThat(children.get(0).getChildAdmission().getFirstAdmissionOrTransferEncounter(), equalTo(admission));
+    }
+
+    @Test
+    public void getChildByMotherDoesNotFailWhenChildHaveTwoActiveVisits() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
+        Visit anotherChildVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), true, true, true));
+
+        assertThat(children.size(), equalTo(1));
+    }
+
+
+    @Test
+    public void shouldGetMotherByChild() throws Exception {
+        Date now = new Date();
+        Date oneHourAgo = new DateTime().minusHours(1).toDate();
+
+        Location visitLocation = testDataManager.location().name("Visit Location").save();
+
+        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
+
+        Relationship motherChildRelationship = new Relationship();
+        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        motherChildRelationship.setPersonA(mother);
+        motherChildRelationship.setPersonB(child);
+        personService.saveRelationship(motherChildRelationship);
+
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
 
         assertThat(mothers.size(), equalTo(1));
-        assertThat(mothers.get(0).getNewborn(), equalTo(baby));
+        assertThat(mothers.get(0).getChild(), equalTo(child));
         assertThat(mothers.get(0).getMother(), equalTo(mother));
         assertNull(mothers.get(0).getMotherAdmission());
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfMotherDoesNotHaveActiveVisit() throws Exception {
+    public void shouldNotGetMotherByChildIfMotherDoesNotHaveActiveVisitAndMotherHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).stopped(now).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), true, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfNewbornDoesNotHaveActiveVisit() throws Exception {
+    public void shouldNotGetMotherByChildIfChildDoesNotHaveActiveVisitAndChildHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).stopped(now).save();
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).stopped(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, true));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfNewbornNotLinkedByMotherChildRelationship() throws Exception {
+    public void shouldNotGetMotherByChildIfChildNotLinkedByMotherChildRelationship() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
-
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfMotherVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfMotherVoided() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         patientService.voidPatient(mother, "test");
 
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
-
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfNewbornVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfChildVoided() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
-        patientService.voidPatient(baby, "test");
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
+        patientService.voidPatient(child, "test");
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
-
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfRelationshipVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfRelationshipVoided() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
         personService.voidRelationship(motherChildRelationship, "test");
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
-
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfMotherVisitVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfMotherVisitVoidedAndMotherHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
         visitService.voidVisit(motherVisit, "test");
 
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), true, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfBabyVisitVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfChildVisitVoidedAndChildHasActiveVisitSetTrue() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
-        visitService.voidVisit(babyVisit, "test");
+        Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
+        visitService.voidVisit(childVisit, "test");
 
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, true));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByNewbornIfVisitLocationsDontMatch() throws Exception {
+    public void shouldGetMothersForMultipleChildren() throws Exception {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
-        Location otherVisitLocation = testDataManager.location().name("Other Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
-
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(otherVisitLocation).patient(baby).started(now).save();
-
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
-
-        assertThat(mothers.size(), equalTo(0));
-    }
-
-    @Test
-    public void shouldGetMothersForMultipleNewborns() throws Exception {
-        Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
-
-        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
-
-        Relationship motherChildRelationship = new Relationship();
-        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
-        motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
-        personService.saveRelationship(motherChildRelationship);
-
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
 
         Patient otherMother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient otherBaby = testDataManager.randomPatient().birthdate(now).save();
+        Patient otherChild = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship otherMotherChildRelationship = new Relationship();
         otherMotherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         otherMotherChildRelationship.setPersonA(otherMother);
-        otherMotherChildRelationship.setPersonB(otherBaby);
+        otherMotherChildRelationship.setPersonB(otherChild);
         personService.saveRelationship(otherMotherChildRelationship);
 
-        Visit otherMotherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherMother).started(oneHourAgo).save();
-        Visit otherBabyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherBaby).started(now).save();
-
-
-        List<Mother> mothers = maternalService.getMothersByNewborn(Arrays.asList(baby, otherBaby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Arrays.asList(child.getUuid(),otherChild.getUuid()), false, false));
 
         assertThat(mothers.size(), equalTo(2));
-        List<Patient> babyList = mothers.stream().map(Mother::getNewborn).collect(Collectors.toList());
-        assertTrue(babyList.contains(baby));
-        assertTrue(babyList.contains(otherBaby));
+        List<Patient> childList = mothers.stream().map(Mother::getChild).collect(Collectors.toList());
+        assertTrue(childList.contains(child));
+        assertTrue(childList.contains(otherChild));
 
         List<Patient> motherList = mothers.stream().map(Mother::getMother).collect(Collectors.toList());
         assertTrue(motherList.contains(mother));
@@ -763,28 +688,27 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetMotherByNewbornWithInpatientAdmission() throws Exception {
+    public void shouldGetMotherByChildWithInpatientAdmission() throws Exception {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
-        Patient baby = testDataManager.randomPatient().birthdate(now).save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
 
         Relationship motherChildRelationship = new Relationship();
         motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
         motherChildRelationship.setPersonA(mother);
-        motherChildRelationship.setPersonB(baby);
+        motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
         // admit the mother
         Encounter admission = testDataManager.encounter().encounterType(emrApiProperties.getAdmissionEncounterType()).encounterDatetime(now).patient(mother).save();
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).encounter(admission).save();
-        Visit babyVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(baby).started(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByNewborn(Collections.singletonList(baby));
+        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
 
         assertThat(mothers.size(), equalTo(1));
         assertThat(mothers.get(0).getMotherAdmission().getVisit(), equalTo(motherVisit));

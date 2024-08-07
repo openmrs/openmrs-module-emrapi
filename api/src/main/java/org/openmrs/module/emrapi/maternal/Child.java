@@ -5,8 +5,8 @@ import org.openmrs.Patient;
 import org.openmrs.module.emrapi.adt.InpatientAdmission;
 
 @Data
-public class Newborn {
-    private Patient newborn;
+public class Child {
+    private Patient child;
     private Patient mother;
-    private InpatientAdmission newbornAdmission;
+    private InpatientAdmission childAdmission;
 }

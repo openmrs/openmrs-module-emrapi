@@ -8,6 +8,6 @@ import org.openmrs.module.emrapi.adt.InpatientAdmission;
 @Data
 public class Mother {
     private Patient mother;
-    private Patient newborn;
+    private Patient child;
     private InpatientAdmission motherAdmission;
 }
