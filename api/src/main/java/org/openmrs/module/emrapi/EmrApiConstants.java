@@ -215,4 +215,6 @@ public class EmrApiConstants {
     ));
 
     public static final String GP_USE_LEGACY_DIAGNOSIS_SERVICE = "emrapi.useLegacyDiagnosisService";
+
+    public static final String METADATA_MAPPING_MOTHER_CHILD_RELATIONSHIP_TYPE = "emrapi.motherChildRelationshipType";
 }

@@ -26,6 +26,7 @@ import org.openmrs.LocationTag;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Provider;
+import org.openmrs.RelationshipType;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
@@ -346,5 +347,9 @@ public class EmrApiProperties extends ModuleProperties {
 
 	public DispositionDescriptor getDispositionDescriptor() {
 		return dispositionService.getDispositionDescriptor();
+	}
+
+	public RelationshipType getMotherChildRelationshipType() {
+		return getEmrApiMetadataByCode(RelationshipType.class, EmrApiConstants.METADATA_MAPPING_MOTHER_CHILD_RELATIONSHIP_TYPE, false);
 	}
 }

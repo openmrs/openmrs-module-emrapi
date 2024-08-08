@@ -137,4 +137,11 @@
     <visit_attribute_type visit_attribute_type_id="100" name="Visit Template" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" min_occurs="0" max_occurs="1" creator="1" date_created="2005-01-01 00:00:00.0" retired="0" uuid="f7b07c80-27c3-49de-8830-cb9e3e805eeb" />
     <visit_attribute visit_attribute_id="100" visit_id="2" value_reference="pedsInitialOutpatient" attribute_type_id="100" creator="1" date_created="2008-08-15 15:46:47.0" voided="false" uuid="e37d58a0-7e59-11e5-a837-0800200c9a66"/>
 
+    <!-- mother-child relationship type for Maternal Service tests -->
+    <relationship_type relationship_type_id="1001" a_is_to_b="Mother" b_is_to_a="Child" preferred="0" weight="0" description="mother and child" creator="1" date_created="2008-08-15 15:55:18.0" retired="false" uuid="39f1bd38-2056-434c-874a-368b13c7265f"/>
+    <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "4001" metadata_source_id = "2134"
+                                           creator = "1" date_created="2008-08-18 12:38:58.0" uuid="7126c900-85dc-4756-98a2-1f0595824600"
+                                           retired = "false" code = "emrapi.motherChildRelationshipType" name = "emr.motherChildRelationshipType"
+                                           metadata_uuid = "39f1bd38-2056-434c-874a-368b13c7265f" metadata_class = "org.openmrs.RelationshipType"/>
+
 </dataset>
