@@ -79,12 +79,12 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(null, false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, null, false, false, false));
 
-        assertThat(children.size(), equalTo(1));
-        assertThat(children.get(0).getChild(), equalTo(child));
-        assertThat(children.get(0).getMother(), equalTo(mother));
-        assertNull(children.get(0).getChildAdmission());
+        assertThat(motherAndChildList.size(), equalTo(1));
+        assertThat(motherAndChildList.get(0).getChild(), equalTo(child));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertNull(motherAndChildList.get(0).getChildAdmission());
     }
     @Test
     public void shouldGetChildByMother() {
@@ -99,12 +99,12 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(1));
-        assertThat(children.get(0).getChild(), equalTo(child));
-        assertThat(children.get(0).getMother(), equalTo(mother));
-        assertNull(children.get(0).getChildAdmission());
+        assertThat(motherAndChildList.size(), equalTo(1));
+        assertThat(motherAndChildList.get(0).getChild(), equalTo(child));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertNull(motherAndChildList.get(0).getChildAdmission());
     }
 
     @Test
@@ -126,9 +126,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).stopped(now).save();
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, true, false, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -150,9 +150,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).stopped(now).save();
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, true, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -162,9 +162,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         Patient child = testDataManager.randomPatient().birthdate(now).save();
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -185,9 +185,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, true));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     // this test will fail when run *exactly* at midnight, on the second
@@ -209,12 +209,12 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(now).save();
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, true));
 
-        assertThat(children.size(),equalTo(1));
-        assertThat(children.get(0).getChild(),equalTo(child));
-        assertThat(children.get(0).getMother(), equalTo(mother));
-        assertNull(children.get(0).getChildAdmission());
+        assertThat(motherAndChildList.size(),equalTo(1));
+        assertThat(motherAndChildList.get(0).getChild(),equalTo(child));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertNull(motherAndChildList.get(0).getChildAdmission());
     }
 
     @Test
@@ -237,18 +237,18 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship2.setPersonB(child2);
         personService.saveRelationship(motherChildRelationship2);
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(2));
-        List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
+        assertThat(motherAndChildList.size(), equalTo(2));
+        List<Patient> childList = motherAndChildList.stream().map(MotherAndChild::getChild).collect(Collectors.toList());
         assertTrue(childList.contains(child1));
         assertTrue(childList.contains(child2));
 
-        assertThat(children.get(0).getMother(), equalTo(mother));
-        assertThat(children.get(1).getMother(), equalTo(mother));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertThat(motherAndChildList.get(1).getMother(), equalTo(mother));
 
-        assertNull(children.get(0).getChildAdmission());
-        assertNull(children.get(1).getChildAdmission());
+        assertNull(motherAndChildList.get(0).getChildAdmission());
+        assertNull(motherAndChildList.get(1).getChildAdmission());
     }
 
     @Test
@@ -266,9 +266,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -285,9 +285,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -304,9 +304,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         personService.saveRelationship(motherChildRelationship);
         personService.voidRelationship(motherChildRelationship, "test");
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -328,9 +328,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
         visitService.voidVisit(motherVisit, "test");
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, true, false, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -351,9 +351,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
         visitService.voidVisit(childVisit, "test");
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, true, false));
 
-        assertThat(children.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -376,14 +376,14 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         otherMotherChildRelationship.setPersonB(otherChild);
         personService.saveRelationship(otherMotherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(2));
-        List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
+        assertThat(motherAndChildList.size(), equalTo(2));
+        List<Patient> childList = motherAndChildList.stream().map(MotherAndChild::getChild).collect(Collectors.toList());
         assertTrue(childList.contains(child));
         assertTrue(childList.contains(otherChild));
 
-        List<Patient> motherList = children.stream().map(Child::getMother).collect(Collectors.toList());
+        List<Patient> motherList = motherAndChildList.stream().map(MotherAndChild::getMother).collect(Collectors.toList());
         assertTrue(motherList.contains(mother));
         assertTrue(motherList.contains(otherMother));
     }
@@ -420,14 +420,14 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit otherChildVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherChild).started(now).save();
 
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), true, true, true));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), null, true, true, true));
 
-        assertThat(children.size(), equalTo(2));
-        List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
+        assertThat(motherAndChildList.size(), equalTo(2));
+        List<Patient> childList = motherAndChildList.stream().map(MotherAndChild::getChild).collect(Collectors.toList());
         assertTrue(childList.contains(child));
         assertTrue(childList.contains(otherChild));
 
-        List<Patient> motherList = children.stream().map(Child::getMother).collect(Collectors.toList());
+        List<Patient> motherList = motherAndChildList.stream().map(MotherAndChild::getMother).collect(Collectors.toList());
         assertTrue(motherList.contains(mother));
         assertTrue(motherList.contains(otherMother));
     }
@@ -451,11 +451,11 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Encounter admission = testDataManager.encounter().encounterType(emrApiProperties.getAdmissionEncounterType()).encounterDatetime(now).patient(child).save();
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).encounter(admission).save();
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, false));
 
-        assertThat(children.size(), equalTo(1));
-        assertThat(children.get(0).getChildAdmission().getVisit(), equalTo(childVisit));
-        assertThat(children.get(0).getChildAdmission().getFirstAdmissionOrTransferEncounter(), equalTo(admission));
+        assertThat(motherAndChildList.size(), equalTo(1));
+        assertThat(motherAndChildList.get(0).getChildAdmission().getVisit(), equalTo(childVisit));
+        assertThat(motherAndChildList.get(0).getChildAdmission().getFirstAdmissionOrTransferEncounter(), equalTo(admission));
     }
 
     @Test
@@ -478,9 +478,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
         Visit anotherChildVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
 
-        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), true, true, true));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, true, true, true));
 
-        assertThat(children.size(), equalTo(1));
+        assertThat(motherAndChildList.size(), equalTo(1));
     }
 
     @Test
@@ -496,12 +496,12 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(null, false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, null, false, false, false));
 
-        assertThat(mothers.size(), equalTo(1));
-        assertThat(mothers.get(0).getChild(), equalTo(child));
-        assertThat(mothers.get(0).getMother(), equalTo(mother));
-        assertNull(mothers.get(0).getMotherAdmission());
+        assertThat(motherAndChildList.size(), equalTo(1));
+        assertThat(motherAndChildList.get(0).getChild(), equalTo(child));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertNull(motherAndChildList.get(0).getMotherAdmission());
     }
 
     @Test
@@ -517,12 +517,12 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, false, false));
 
-        assertThat(mothers.size(), equalTo(1));
-        assertThat(mothers.get(0).getChild(), equalTo(child));
-        assertThat(mothers.get(0).getMother(), equalTo(mother));
-        assertNull(mothers.get(0).getMotherAdmission());
+        assertThat(motherAndChildList.size(), equalTo(1));
+        assertThat(motherAndChildList.get(0).getChild(), equalTo(child));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertNull(motherAndChildList.get(0).getMotherAdmission());
     }
 
     @Test
@@ -543,9 +543,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).stopped(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), true, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), true, false, false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -565,9 +565,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).stopped(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, true,false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, true,false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -577,9 +577,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         Patient child = testDataManager.randomPatient().birthdate(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, false, false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -597,9 +597,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, false, false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -616,9 +616,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, false, false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -635,9 +635,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         personService.saveRelationship(motherChildRelationship);
         personService.voidRelationship(motherChildRelationship, "test");
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false,false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, false,false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -659,9 +659,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
         visitService.voidVisit(motherVisit, "test");
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), true, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), true, false, false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -682,9 +682,9 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
         visitService.voidVisit(childVisit, "test");
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, true, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, true, false));
 
-        assertThat(mothers.size(), equalTo(0));
+        assertThat(motherAndChildList.size(), equalTo(0));
     }
 
     @Test
@@ -709,14 +709,14 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         otherMotherChildRelationship.setPersonB(otherChild);
         personService.saveRelationship(otherMotherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Arrays.asList(child.getUuid(),otherChild.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Arrays.asList(child.getUuid(),otherChild.getUuid()), false, false, false));
 
-        assertThat(mothers.size(), equalTo(2));
-        List<Patient> childList = mothers.stream().map(Mother::getChild).collect(Collectors.toList());
+        assertThat(motherAndChildList.size(), equalTo(2));
+        List<Patient> childList = motherAndChildList.stream().map(MotherAndChild::getChild).collect(Collectors.toList());
         assertTrue(childList.contains(child));
         assertTrue(childList.contains(otherChild));
 
-        List<Patient> motherList = mothers.stream().map(Mother::getMother).collect(Collectors.toList());
+        List<Patient> motherList = motherAndChildList.stream().map(MotherAndChild::getMother).collect(Collectors.toList());
         assertTrue(motherList.contains(mother));
         assertTrue(motherList.contains(otherMother));
     }
@@ -742,11 +742,11 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).encounter(admission).save();
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, Collections.singletonList(child.getUuid()), false, false, false));
 
-        assertThat(mothers.size(), equalTo(1));
-        assertThat(mothers.get(0).getMotherAdmission().getVisit(), equalTo(motherVisit));
-        assertThat(mothers.get(0).getMotherAdmission().getFirstAdmissionOrTransferEncounter(), equalTo(admission));
+        assertThat(motherAndChildList.size(), equalTo(1));
+        assertThat(motherAndChildList.get(0).getMotherAdmission().getVisit(), equalTo(motherVisit));
+        assertThat(motherAndChildList.get(0).getMotherAdmission().getFirstAdmissionOrTransferEncounter(), equalTo(admission));
     }
 
     @Test
@@ -777,12 +777,12 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
         Visit otherMotherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherMother).started(oneHourAgo).save();
 
-        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(null, false, false, true));
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(null, null, false, false, true));
 
-        assertThat(mothers.size(), equalTo(1));
-        assertThat(mothers.get(0).getChild(), equalTo(child));
-        assertThat(mothers.get(0).getMother(), equalTo(mother));
-        assertNull(mothers.get(0).getMotherAdmission());
+        assertThat(motherAndChildList.size(), equalTo(1));
+        assertThat(motherAndChildList.get(0).getChild(), equalTo(child));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertNull(motherAndChildList.get(0).getMotherAdmission());
     }
 
 }

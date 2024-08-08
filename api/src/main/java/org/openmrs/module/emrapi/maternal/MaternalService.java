@@ -7,16 +7,11 @@ import org.openmrs.api.OpenmrsService;
 public interface MaternalService extends OpenmrsService {
 
     /**
-     * Fetches patients who are "children" (personB) of a Mother-Child relationship
+     * Fetches patients in a "Mother-to-Child" relationship, based on the given search criteria.
+     *
      * @param criteria search criteria (see class for details)
-     * @return a list of children, with their linked mothers (note this returns a "Child" per mother-child pair, so a child with multiple mothers will appear multiple times)
+     * @return a list of mothers and children that match the search criteria
      */
-    List<Child> getChildrenByMothers(ChildrenByMothersSearchCriteria criteria);
+    List<MotherAndChild> getMothersAndChildren(MothersAndChildrenSearchCriteria criteria);
 
-    /**
-     * Fetches patients who are "mothers" (personA) of a Mother-Child relationship
-     * @param criteria search criteria (see class for details)
-     * @return a list of mothers, with their linked children (note this returns a "Mother" per mother-child pair, so a mother with multiple children will appear multiple times)
-     */
-    List<Mother> getMothersByChildren(MothersByChildrenSearchCriteria criteria);
 }
