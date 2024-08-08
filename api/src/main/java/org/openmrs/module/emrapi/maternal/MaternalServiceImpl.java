@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.openmrs.Patient;
 import org.openmrs.RelationshipType;
-import org.openmrs.Visit;
 import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
@@ -37,7 +36,7 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
         this.adtService = adtService;
     }
 
-    public List<Child> getChildrenByMother(ChildSearchCriteria criteria) {
+    public List<Child> getChildrenByMothers(ChildrenByMothersSearchCriteria criteria) {
 
         RelationshipType motherChildRelationshipType = emrApiProperties.getMotherChildRelationshipType();
 
@@ -45,26 +44,23 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
             throw new APIException("Mother-Child relationship type has not been configured");
         }
 
-        if (criteria.getMotherUuids() == null || criteria.getMotherUuids().isEmpty()) {
-            throw new APIException("No mothers provided");
-        }
-
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("motherUuids", criteria.getMotherUuids());
+        parameters.put("childUuids", null);
         parameters.put("motherChildRelationshipType", motherChildRelationshipType);
-        parameters.put("motherHasActiveVisit", criteria.getMotherHasActiveVisit());
-        parameters.put("childHasActiveVisit", criteria.getChildHasActiveVisit());
-        parameters.put("childBornDuringMothersActiveVisit", criteria.getChildBornDuringMothersActiveVisit());
+        parameters.put("requireMotherHasActiveVisit", criteria.requireMotherHasActiveVisit());
+        parameters.put("requireChildHasActiveVisit", criteria.requireChildHasActiveVisit());
+        parameters.put("requireChildBornDuringMothersActiveVisit", criteria.requireChildBornDuringMothersActiveVisit());
 
-        List<?> l = emrApiDAO.executeHqlFromResource("hql/children_by_mother.hql", parameters, List.class);
+        List<?> l = emrApiDAO.executeHqlFromResource("hql/mother_child.hql", parameters, List.class);
 
         List<Child> ret = new ArrayList<>();
 
         for (Object req : l) {
             Object[] row = (Object[]) req;
             Child child = new Child();
-            child.setChild((Patient) row[0]);
-            child.setMother((Patient) row[1]);
+            child.setMother((Patient) row[0]);
+            child.setChild((Patient) row[1]);
             ret.add(child);
         }
 
@@ -73,10 +69,8 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
         inpatientAdmissionSearchCriteria.setPatientIds(new ArrayList<>(ret.stream().map(Child::getChild).map(Patient::getId).collect(Collectors.toSet())));
         List<InpatientAdmission> admissions = adtService.getInpatientAdmissions(inpatientAdmissionSearchCriteria);
         Map<Patient, InpatientAdmission> admissionsByPatient = new HashMap<>();
-        if (admissions != null) {
-            for (InpatientAdmission admission : admissions) {
-                admissionsByPatient.put(admission.getVisit().getPatient(), admission);
-            }
+        for (InpatientAdmission admission : admissions) {
+            admissionsByPatient.put(admission.getVisit().getPatient(), admission);
         }
         for (Child child : ret) {
             child.setChildAdmission(admissionsByPatient.get(child.getChild()));
@@ -85,24 +79,22 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
         return ret;
     }
 
-    public List<Mother> getMothersByChild(MotherSearchCriteria criteria) {
+    public List<Mother> getMothersByChildren(MothersByChildrenSearchCriteria criteria) {
         RelationshipType motherChildRelationshipType = emrApiProperties.getMotherChildRelationshipType();
 
         if (motherChildRelationshipType == null) {
             throw new APIException("Mother-Child relationship type has not been configured");
         }
 
-        if (criteria.getChildUuids() == null || criteria.getChildUuids().isEmpty()) {
-            throw new APIException("No children provided");
-        }
-
         Map<String, Object> parameters = new HashMap<>();
+        parameters.put("motherUuids", null);
         parameters.put("childUuids", criteria.getChildUuids());
         parameters.put("motherChildRelationshipType", motherChildRelationshipType);
-        parameters.put("motherHasActiveVisit", criteria.getMotherHasActiveVisit());
-        parameters.put("childHasActiveVisit", criteria.getChildHasActiveVisit());
+        parameters.put("requireMotherHasActiveVisit", criteria.requireMotherHasActiveVisit());
+        parameters.put("requireChildHasActiveVisit", criteria.requireChildHasActiveVisit());
+        parameters.put("requireChildBornDuringMothersActiveVisit", criteria.requireChildBornDuringMothersActiveVisit());
 
-        List<?> l = emrApiDAO.executeHqlFromResource("hql/mothers_by_child.hql", parameters, List.class);
+        List<?> l = emrApiDAO.executeHqlFromResource("hql/mother_child.hql", parameters, List.class);
 
         List<Mother> ret = new ArrayList<>();
 
@@ -119,10 +111,8 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
         inpatientAdmissionSearchCriteria.setPatientIds(new ArrayList<>(ret.stream().map(Mother::getMother).map(Patient::getId).collect(Collectors.toSet())));
         List<InpatientAdmission> admissions = adtService.getInpatientAdmissions(inpatientAdmissionSearchCriteria);
         Map<Patient, InpatientAdmission> admissionsByPatient = new HashMap<>();
-        if (admissions != null) {
-            for (InpatientAdmission admission : admissions) {
-                admissionsByPatient.put(admission.getVisit().getPatient(), admission);
-            }
+        for (InpatientAdmission admission : admissions) {
+            admissionsByPatient.put(admission.getVisit().getPatient(), admission);
         }
         for (Mother mother : ret) {
             mother.setMotherAdmission(admissionsByPatient.get(mother.getMother()));

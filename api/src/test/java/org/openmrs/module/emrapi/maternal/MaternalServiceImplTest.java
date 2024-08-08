@@ -59,14 +59,15 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         executeDataSet("baseTestDataset.xml");
         ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
     }
 
+
     @Test
-    public void shouldGetChildByMother() throws Exception {
+    public void shouldGetChild() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -78,7 +79,27 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(null, false, false, false));
+
+        assertThat(children.size(), equalTo(1));
+        assertThat(children.get(0).getChild(), equalTo(child));
+        assertThat(children.get(0).getMother(), equalTo(mother));
+        assertNull(children.get(0).getChildAdmission());
+    }
+    @Test
+    public void shouldGetChildByMother() {
+        Date now = new Date();
+
+        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
+
+        Relationship motherChildRelationship = new Relationship();
+        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        motherChildRelationship.setPersonA(mother);
+        motherChildRelationship.setPersonB(child);
+        personService.saveRelationship(motherChildRelationship);
+
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(1));
         assertThat(children.get(0).getChild(), equalTo(child));
@@ -87,7 +108,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfMotherDoesNotHaveActiveVisitAndMotherHasActiveVisitSetTrue() throws Exception {
+    public void shouldNotGetChildByMotherIfMotherDoesNotHaveActiveVisitAndMotherHasActiveVisitSetTrue() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -105,13 +126,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).stopped(now).save();
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfChildDoesNotHaveActiveVisitAndChildHasActiveVisitSetTrue() throws Exception {
+    public void shouldNotGetChildByMotherIfChildDoesNotHaveActiveVisitAndChildHasActiveVisitSetTrue() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -129,26 +150,25 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).stopped(now).save();
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfChildNotLinkedByMotherChildRelationship() throws Exception {
+    public void shouldNotGetChildByMotherIfChildNotLinkedByMotherChildRelationship() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         Patient child = testDataManager.randomPatient().birthdate(now).save();
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfChildBornADayOrMoreBeforeVisitAndChildBornDuringMothersActiveVisitSetTrue() throws Exception {
-        Date now = new Date();
+    public void shouldNotGetChildByMotherIfChildBornADayOrMoreBeforeVisitAndChildBornDuringMothersActiveVisitSetTrue() {
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
         Date oneDayAgo = new DateTime().minusDays(1).toDate();
 
@@ -165,14 +185,14 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
 
         assertThat(children.size(), equalTo(0));
     }
 
     // this test will fail when run *exactly* at midnight, on the second
     @Test
-    public void shouldGetChildByMotherIfChildBornBeforeVisitStartButSameDayAndChildBornDuringMothersActiveVisitSetTrue() throws Exception {
+    public void shouldGetChildByMotherIfChildBornBeforeVisitStartButSameDayAndChildBornDuringMothersActiveVisitSetTrue() {
         Date now = new Date();
         Date oneSecondAgo = new DateTime().minusSeconds(1).toDate();
 
@@ -189,7 +209,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(now).save();
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, true));
 
         assertThat(children.size(),equalTo(1));
         assertThat(children.get(0).getChild(),equalTo(child));
@@ -198,7 +218,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetMultipleChildByMother() throws Exception {
+    public void shouldGetMultipleChildByMother() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -217,7 +237,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship2.setPersonB(child2);
         personService.saveRelationship(motherChildRelationship2);
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(2));
         List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
@@ -232,7 +252,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfMotherVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfMotherVoided() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -246,13 +266,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfChildVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfChildVoided() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -265,13 +285,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfRelationshipVoided() throws Exception {
+    public void shouldNotGetChildByMotherIfRelationshipVoided() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -284,13 +304,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         personService.saveRelationship(motherChildRelationship);
         personService.voidRelationship(motherChildRelationship, "test");
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfMotherVisitVoidedAndMotherHasActiveVisitSetTrue() throws Exception {
+    public void shouldNotGetChildByMotherIfMotherVisitVoidedAndMotherHasActiveVisitSetTrue() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -308,15 +328,14 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
         visitService.voidVisit(motherVisit, "test");
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), true, false, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetChildByMotherIfChildVisitVoidedAndChildHasActiveVisitSetTrue() throws Exception {
+    public void shouldNotGetChildByMotherIfChildVisitVoidedAndChildHasActiveVisitSetTrue() {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
 
@@ -332,16 +351,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
         visitService.voidVisit(childVisit, "test");
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, true, false));
 
         assertThat(children.size(), equalTo(0));
     }
 
     @Test
-    public void shouldGetChildsForMultipleMothers() throws Exception {
-        Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
+    public void shouldGetChildrenForMultipleMothers() {
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         Patient child = testDataManager.randomPatient().birthdate("2000-01-01").save();
 
@@ -360,7 +376,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         otherMotherChildRelationship.setPersonB(otherChild);
         personService.saveRelationship(otherMotherChildRelationship);
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(2));
         List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
@@ -373,7 +389,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetChildsForMultipleMothersMatchingByActiveVisitsAndChildBornDuringActiveVisit() throws Exception {
+    public void shouldGetChildrenForMultipleMothersMatchingByActiveVisitsAndChildBornDuringActiveVisit() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -404,7 +420,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit otherChildVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherChild).started(now).save();
 
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), true, true, true));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Arrays.asList(mother.getUuid(),otherMother.getUuid()), true, true, true));
 
         assertThat(children.size(), equalTo(2));
         List<Patient> childList = children.stream().map(Child::getChild).collect(Collectors.toList());
@@ -417,7 +433,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetChildByMotherWithInpatientAdmission() throws Exception {
+    public void shouldGetChildByMotherWithInpatientAdmission() {
         Date now = new Date();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
@@ -435,7 +451,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Encounter admission = testDataManager.encounter().encounterType(emrApiProperties.getAdmissionEncounterType()).encounterDatetime(now).patient(child).save();
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).encounter(admission).save();
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), false, false, false));
 
         assertThat(children.size(), equalTo(1));
         assertThat(children.get(0).getChildAdmission().getVisit(), equalTo(childVisit));
@@ -443,7 +459,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void getChildByMotherDoesNotFailWhenChildHaveTwoActiveVisits() throws Exception {
+    public void getChildByMotherDoesNotFailWhenChildHaveTwoActiveVisits() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -462,18 +478,14 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
         Visit anotherChildVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
 
-        List<Child> children = maternalService.getChildrenByMother(new ChildSearchCriteria(Collections.singletonList(mother.getUuid()), true, true, true));
+        List<Child> children = maternalService.getChildrenByMothers(new ChildrenByMothersSearchCriteria(Collections.singletonList(mother.getUuid()), true, true, true));
 
         assertThat(children.size(), equalTo(1));
     }
 
-
     @Test
-    public void shouldGetMotherByChild() throws Exception {
+    public void shouldGetMother() {
         Date now = new Date();
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
-
-        Location visitLocation = testDataManager.location().name("Visit Location").save();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         Patient child = testDataManager.randomPatient().birthdate(now).save();
@@ -484,7 +496,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(null, false, false, false));
 
         assertThat(mothers.size(), equalTo(1));
         assertThat(mothers.get(0).getChild(), equalTo(child));
@@ -493,7 +505,28 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfMotherDoesNotHaveActiveVisitAndMotherHasActiveVisitSetTrue() throws Exception {
+    public void shouldGetMotherByChild() {
+        Date now = new Date();
+
+        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
+
+        Relationship motherChildRelationship = new Relationship();
+        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        motherChildRelationship.setPersonA(mother);
+        motherChildRelationship.setPersonB(child);
+        personService.saveRelationship(motherChildRelationship);
+
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
+
+        assertThat(mothers.size(), equalTo(1));
+        assertThat(mothers.get(0).getChild(), equalTo(child));
+        assertThat(mothers.get(0).getMother(), equalTo(mother));
+        assertNull(mothers.get(0).getMotherAdmission());
+    }
+
+    @Test
+    public void shouldNotGetMotherByChildIfMotherDoesNotHaveActiveVisitAndMotherHasActiveVisitSetTrue() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -510,13 +543,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).stopped(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), true, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), true, false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfChildDoesNotHaveActiveVisitAndChildHasActiveVisitSetTrue() throws Exception {
+    public void shouldNotGetMotherByChildIfChildDoesNotHaveActiveVisitAndChildHasActiveVisitSetTrue() {
         Date now = new Date();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
@@ -532,25 +565,25 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).stopped(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, true));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, true,false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfChildNotLinkedByMotherChildRelationship() throws Exception {
+    public void shouldNotGetMotherByChildIfChildNotLinkedByMotherChildRelationship() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
         Patient child = testDataManager.randomPatient().birthdate(now).save();
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfMotherVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfMotherVoided() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -564,13 +597,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfChildVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfChildVoided() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -583,13 +616,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfRelationshipVoided() throws Exception {
+    public void shouldNotGetMotherByChildIfRelationshipVoided() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -602,13 +635,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         personService.saveRelationship(motherChildRelationship);
         personService.voidRelationship(motherChildRelationship, "test");
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false,false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfMotherVisitVoidedAndMotherHasActiveVisitSetTrue() throws Exception {
+    public void shouldNotGetMotherByChildIfMotherVisitVoidedAndMotherHasActiveVisitSetTrue() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -626,13 +659,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
         visitService.voidVisit(motherVisit, "test");
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), true, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), true, false, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldNotGetMotherByChildIfChildVisitVoidedAndChildHasActiveVisitSetTrue() throws Exception {
+    public void shouldNotGetMotherByChildIfChildVisitVoidedAndChildHasActiveVisitSetTrue() {
         Date now = new Date();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
@@ -649,13 +682,13 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         Visit childVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(child).started(now).save();
         visitService.voidVisit(childVisit, "test");
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, true));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, true, false));
 
         assertThat(mothers.size(), equalTo(0));
     }
 
     @Test
-    public void shouldGetMothersForMultipleChildren() throws Exception {
+    public void shouldGetMothersForMultipleChildren() {
         Date now = new Date();
 
         Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
@@ -676,7 +709,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         otherMotherChildRelationship.setPersonB(otherChild);
         personService.saveRelationship(otherMotherChildRelationship);
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Arrays.asList(child.getUuid(),otherChild.getUuid()), false, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Arrays.asList(child.getUuid(),otherChild.getUuid()), false, false, false));
 
         assertThat(mothers.size(), equalTo(2));
         List<Patient> childList = mothers.stream().map(Mother::getChild).collect(Collectors.toList());
@@ -689,7 +722,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    public void shouldGetMotherByChildWithInpatientAdmission() throws Exception {
+    public void shouldGetMotherByChildWithInpatientAdmission() {
         Date now = new Date();
         Date oneHourAgo = new DateTime().minusHours(1).toDate();
 
@@ -709,11 +742,47 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
         Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).encounter(admission).save();
 
-        List<Mother> mothers = maternalService.getMothersByChild(new MotherSearchCriteria(Collections.singletonList(child.getUuid()), false, false));
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(Collections.singletonList(child.getUuid()), false, false, false));
 
         assertThat(mothers.size(), equalTo(1));
         assertThat(mothers.get(0).getMotherAdmission().getVisit(), equalTo(motherVisit));
         assertThat(mothers.get(0).getMotherAdmission().getFirstAdmissionOrTransferEncounter(), equalTo(admission));
+    }
+
+    @Test
+    public void shouldOnlyGetMothersWithChildrenBornDuringActiveVisit() {
+        Date now = new Date();
+        Date oneHourAgo = new DateTime().minusHours(1).toDate();
+
+        Location visitLocation = testDataManager.location().name("Visit Location").save();
+
+        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient child = testDataManager.randomPatient().birthdate(now).save();
+
+        Relationship motherChildRelationship = new Relationship();
+        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        motherChildRelationship.setPersonA(mother);
+        motherChildRelationship.setPersonB(child);
+        personService.saveRelationship(motherChildRelationship);
+
+        Patient otherMother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient otherChild = testDataManager.randomPatient().birthdate("2020-01-01").save();  // not during active visit
+
+        Relationship otherMotherChildRelationship = new Relationship();
+        otherMotherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        otherMotherChildRelationship.setPersonA(otherMother);
+        otherMotherChildRelationship.setPersonB(otherChild);
+        personService.saveRelationship(otherMotherChildRelationship);
+
+        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
+        Visit otherMotherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(otherMother).started(oneHourAgo).save();
+
+        List<Mother> mothers = maternalService.getMothersByChildren(new MothersByChildrenSearchCriteria(null, false, false, true));
+
+        assertThat(mothers.size(), equalTo(1));
+        assertThat(mothers.get(0).getChild(), equalTo(child));
+        assertThat(mothers.get(0).getMother(), equalTo(mother));
+        assertNull(mothers.get(0).getMotherAdmission());
     }
 
 }
