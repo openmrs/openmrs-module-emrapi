@@ -141,7 +141,7 @@
     <relationship_type relationship_type_id="1001" a_is_to_b="Mother" b_is_to_a="Child" preferred="0" weight="0" description="mother and child" creator="1" date_created="2008-08-15 15:55:18.0" retired="false" uuid="39f1bd38-2056-434c-874a-368b13c7265f"/>
     <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "4001" metadata_source_id = "2134"
                                            creator = "1" date_created="2008-08-18 12:38:58.0" uuid="7126c900-85dc-4756-98a2-1f0595824600"
-                                           retired = "false" code = "emrapi.motherChildRelationshipType" name = "emr.motherChildRelationshipType"
+                                           retired = "false" code = "emr.motherChildRelationshipType" name = "emr.motherChildRelationshipType"
                                            metadata_uuid = "39f1bd38-2056-434c-874a-368b13c7265f" metadata_class = "org.openmrs.RelationshipType"/>
 
 </dataset>

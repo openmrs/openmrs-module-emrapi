@@ -47,7 +47,9 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("motherUuids", criteria.getMotherUuids());
+        parameters.put("restrictByMothers", criteria.getMotherUuids() != null);
         parameters.put("childUuids", criteria.getChildUuids());
+        parameters.put("restrictByChildren", criteria.getChildUuids() != null);
         parameters.put("motherChildRelationshipType", motherChildRelationshipType);
         parameters.put("motherRequiredToHaveActiveVisit", criteria.isMotherRequiredToHaveActiveVisit());
         parameters.put("childRequiredToHaveActiveVisit", criteria.isChildRequiredToHaveActiveVisit());
