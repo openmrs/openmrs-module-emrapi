@@ -49,9 +49,9 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
         parameters.put("motherUuids", criteria.getMotherUuids());
         parameters.put("childUuids", criteria.getChildUuids());
         parameters.put("motherChildRelationshipType", motherChildRelationshipType);
-        parameters.put("requireMotherHasActiveVisit", criteria.isRequireMotherHasActiveVisit());
-        parameters.put("requireChildHasActiveVisit", criteria.isRequireChildHasActiveVisit());
-        parameters.put("requireChildBornDuringMothersActiveVisit", criteria.isRequireChildBornDuringMothersActiveVisit());
+        parameters.put("motherRequiredToHaveActiveVisit", criteria.isMotherRequiredToHaveActiveVisit());
+        parameters.put("childRequiredToHaveActiveVisit", criteria.isChildRequiredToHaveActiveVisit());
+        parameters.put("childRequiredToBeBornDuringMothersActiveVisit", criteria.isChildRequiredToBeBornDuringMothersActiveVisit());
 
         List<?> l = emrApiDAO.executeHqlFromResource("hql/mother_child.hql", parameters, List.class);
 
@@ -59,10 +59,10 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
 
         for (Object req : l) {
             Object[] row = (Object[]) req;
-            MotherAndChild child = new MotherAndChild();
-            child.setMother((Patient) row[0]);
-            child.setChild((Patient) row[1]);
-            ret.add(child);
+            MotherAndChild mothreAndChild = new MotherAndChild();
+            mothreAndChild.setMother((Patient) row[0]);
+            mothreAndChild.setChild((Patient) row[1]);
+            ret.add(mothreAndChild);
         }
 
         // now fetch all the admissions for children in the result set
