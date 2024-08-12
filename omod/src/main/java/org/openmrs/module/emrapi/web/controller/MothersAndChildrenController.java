@@ -3,10 +3,8 @@ package org.openmrs.module.emrapi.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.emrapi.maternal.MaternalService;
 import org.openmrs.module.emrapi.maternal.MotherAndChild;
 import org.openmrs.module.emrapi.maternal.MothersAndChildrenSearchCriteria;
@@ -34,16 +32,16 @@ public class MothersAndChildrenController {
     public SimpleObject getMothersAndChildren(
             HttpServletRequest request,
             HttpServletResponse response,
-            @RequestParam(required = false, value = "motherUuids") String motherUuids,
-            @RequestParam(required = false, value = "childUuids") String childUuids,
+            @RequestParam(required = false, value = "mother") List<String> motherUuids,
+            @RequestParam(required = false, value = "child") List<String> childUuids,
             @RequestParam(required = false, value = "requireMotherHasActiveVisit") boolean requireMotherHasActiveVisit,
             @RequestParam(required = false, value = "requireChildHasActiveVisit") boolean requireChildHasActiveVisit,
             @RequestParam(required = false, value = "requireChildBornDuringMothersActiveVisit") boolean requireChildBornDuringMothersActiveVisit
     ) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         MothersAndChildrenSearchCriteria criteria = new MothersAndChildrenSearchCriteria();
-        criteria.setMotherUuids(StringUtils.isNotBlank(motherUuids) ? Arrays.asList(motherUuids.split(",")) : null);
-        criteria.setChildUuids(StringUtils.isNotBlank(childUuids) ? Arrays.asList(childUuids.split(",")) : null);
+        criteria.setMotherUuids(motherUuids);
+        criteria.setChildUuids(childUuids);
         criteria.setMotherRequiredToHaveActiveVisit(requireMotherHasActiveVisit);
         criteria.setChildRequiredToHaveActiveVisit(requireChildHasActiveVisit);
         criteria.setChildRequiredToBeBornDuringMothersActiveVisit(requireChildBornDuringMothersActiveVisit);
