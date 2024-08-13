@@ -141,6 +141,12 @@
         </description>
     </globalProperty>
 
+    <globalProperty>
+        <property>emrapi.serializer.whitelist.types</property>
+        <defaultValue>org.openmrs.module.emrapi.metadata.MetadataPackagesConfig,org.openmrs.module.emrapi.metadata.MetadataPackageConfig</defaultValue>
+        <description></description>
+    </globalProperty>
+
     <!-- privileges for conditions, see  org.openmrs.module.emrapi.conditionslist.PrivilegeConstants -->
     <privilege>
         <name>Edit conditions</name>
