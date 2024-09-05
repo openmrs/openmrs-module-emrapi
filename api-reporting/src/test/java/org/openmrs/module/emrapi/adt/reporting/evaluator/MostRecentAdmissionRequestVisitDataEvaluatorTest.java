@@ -53,9 +53,6 @@ public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseReport
     @Autowired
     private EmrApiProperties emrApiProperties;
 
-    @Autowired
-    private EmrConceptService emrConceptService;
-
     private DispositionDescriptor dispositionDescriptor;
 
     private DiagnosisMetadata diagnosisMetadata;
@@ -69,10 +66,10 @@ public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseReport
         executeDataSet("baseTestDataset.xml");
         def = new MostRecentAdmissionRequestVisitDataDefinition();
         dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
+        ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
         diagnosisMetadata = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
         context = new VisitEvaluationContext();
         Context.getAdministrationService().setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
-        Context.flushSession();
     }
 
     @Test

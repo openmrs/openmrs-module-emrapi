@@ -330,12 +330,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseReportingTest 
                 .encounterType(emrApiProperties.getVisitNoteEncounterType())
                 .visit(visit)
                 .save();
-        testDataManager.obs()
-                .person(patient)
-                .encounter(visitNoteEncounter2)
-                .concept(dispositionDescriptor.getDispositionConcept())
-                .value(admitToHospital)
-                .save();
+        createDispositionObs(visitNoteEncounter2, admitToHospital);
 
         VisitQueryResult result = visitQueryService.evaluate(query, null);
         assertThat(result.getMemberIds().size(), is(1));

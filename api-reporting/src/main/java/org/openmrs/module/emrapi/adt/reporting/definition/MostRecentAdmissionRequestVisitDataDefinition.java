@@ -1,10 +1,16 @@
 package org.openmrs.module.emrapi.adt.reporting.definition;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.openmrs.Location;
+import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.reporting.data.BaseDataDefinition;
 import org.openmrs.module.reporting.data.visit.definition.VisitDataDefinition;
+import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationPropertyCachingStrategy;
 import org.openmrs.module.reporting.evaluation.caching.Caching;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,10 +28,20 @@ import java.util.Map;
  *                      via getPrimaryDiagnoses(Encounter) method of the DiagnosisService)
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
+@Getter
+@Setter
 public class MostRecentAdmissionRequestVisitDataDefinition extends BaseDataDefinition implements VisitDataDefinition {
 
-
     public static final long serialVersionUID = 1L;
+
+    @ConfigurationProperty
+    private Location visitLocation;
+
+    @ConfigurationProperty
+    private List<Location> dispositionLocations;
+
+    @ConfigurationProperty
+    private List<DispositionType> dispositionTypes;
 
     /**
      * Default Constructor
