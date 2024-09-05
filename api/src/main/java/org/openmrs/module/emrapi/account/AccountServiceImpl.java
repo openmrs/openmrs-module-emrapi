@@ -1,5 +1,7 @@
 package org.openmrs.module.emrapi.account;
 
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
@@ -12,10 +14,12 @@ import org.openmrs.api.UserService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +36,8 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
     private DomainWrapperFactory domainWrapperFactory;
 
     private EmrApiProperties emrApiProperties;
+
+    private EmrApiDAO emrApiDAO;
 
     /**
      * @param userService the userService to set
@@ -62,47 +68,66 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
         this.emrApiProperties = emrApiProperties;
     }
 
+    public void setEmrApiDAO(EmrApiDAO emrApiDAO) {
+        this.emrApiDAO = emrApiDAO;
+    }
+
     /**
      * @see org.openmrs.module.emrapi.account.AccountService#getAllAccounts()
      */
     @Override
     @Transactional(readOnly = true)
     public List<AccountDomainWrapper> getAllAccounts() {
+        return getAccounts(new AccountSearchCriteria());
+    }
 
-        Map<Person, AccountDomainWrapper> byPerson = new LinkedHashMap<Person, AccountDomainWrapper>();
+    @Override
+    public List<AccountDomainWrapper> getAccounts(AccountSearchCriteria criteria) {
+        Map<Person, AccountDomainWrapper> byPerson = new LinkedHashMap<>();
+        List<User> users;
+        List<Provider> providers;
+        if (StringUtils.isNotBlank(criteria.getNameOrIdentifier())) {
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("search", "%" + criteria.getNameOrIdentifier() + "%");
+            users = emrApiDAO.executeHqlFromResource("hql/user_search.hql", searchParams, User.class);
+            providers = emrApiDAO.executeHqlFromResource("hql/provider_search.hql", searchParams, Provider.class);
+        }
+        else {
+            users = userService.getAllUsers();
+            providers = providerService.getAllProviders();
+        }
 
-        for (User user : userService.getAllUsers()) {
+        for (User user : users) {
             //exclude daemon user
-            if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid()))
+            if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid())) {
                 continue;
-
-            if (!user.getPerson().isPersonVoided()) {
-                byPerson.put(user.getPerson(), domainWrapperFactory.newAccountDomainWrapper(user.getPerson()));
+            }
+            Person person = user.getPerson();
+            if (BooleanUtils.isNotTrue(person.getPersonVoided())) {
+                byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
             }
         }
 
-        for (Provider provider : providerService.getAllProviders()) {
+        for (Provider provider : providers) {
 
             // skip the baked-in unknown provider
             if (provider.equals(emrApiProperties.getUnknownProvider())) {
                 continue;
             }
 
-            if (provider.getPerson() == null)
-                throw new APIException("Providers not associated to a person are not supported");
+            Person person = provider.getPerson();
 
-            AccountDomainWrapper account = byPerson.get(provider.getPerson());
-            if (account == null && !provider.getPerson().isPersonVoided()) {
-                byPerson.put(provider.getPerson(), domainWrapperFactory.newAccountDomainWrapper(provider.getPerson()));
+            if (person == null) {
+                throw new APIException("Providers not associated to a person are not supported");
+            }
+
+            AccountDomainWrapper account = byPerson.get(person);
+            if (account == null && BooleanUtils.isNotTrue(person.getPersonVoided())) {
+                byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
             }
         }
 
-        List<AccountDomainWrapper> accounts = new ArrayList<AccountDomainWrapper>();
-        for (AccountDomainWrapper account : byPerson.values()) {
-            accounts.add(account);
-        }
-
-        return accounts;
+        return new ArrayList<>(byPerson.values());
     }
 
     /**

@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 public class AccountComponentTest extends EmrApiContextSensitiveTest {
 
     @Autowired
@@ -51,6 +54,7 @@ public class AccountComponentTest extends EmrApiContextSensitiveTest {
 
     @Before
     public void beforeAllTests() throws Exception {
+        executeDataSet("baseTestDataset.xml");
         executeDataSet("accountComponentTestDataset.xml");
     }
 
@@ -248,4 +252,36 @@ public class AccountComponentTest extends EmrApiContextSensitiveTest {
 
     }
 
+    /**
+     * @see AccountService#getAccounts(AccountSearchCriteria) ()
+     */
+    @Test
+    public void shouldGetAccountsThatMatchSearchCriteria() throws Exception {
+        // user 501:  username = bruno, systemId = 2-6, retired = true, person=501, provider 1001, identifier = 123, retired = false
+        // user 502:  username = butch, systemId = 3-4, retired = false, person=502
+        // provider 1, person=1, identifier = Test, retired = false
+        // provider 5000, person=5000, name = John Smith, set as unknown provider
+        // provider 5001, person=5001, name = Mary Smith, no user
+
+        // Should include all accounts except for the unknown provider
+        AccountSearchCriteria criteria = new AccountSearchCriteria();
+        List<AccountDomainWrapper> allAccounts = accountService.getAccounts(criteria);
+        assertThat(allAccounts.size(), equalTo(4));
+
+        criteria.setNameOrIdentifier("bruno");
+        allAccounts = accountService.getAccounts(criteria);
+        assertThat(allAccounts.size(), equalTo(1));
+
+        criteria.setNameOrIdentifier("Smith");
+        allAccounts = accountService.getAccounts(criteria);
+        assertThat(allAccounts.size(), equalTo(1));
+
+        criteria.setNameOrIdentifier("3");
+        allAccounts = accountService.getAccounts(criteria);
+        assertThat(allAccounts.size(), equalTo(2));
+
+        criteria.setNameOrIdentifier("Bob");
+        allAccounts = accountService.getAccounts(criteria);
+        assertThat(allAccounts.size(), equalTo(0));
+    }
 }

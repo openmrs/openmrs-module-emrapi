@@ -20,10 +20,19 @@
             retired = "false"
     />
 
+    <person person_id="5000" gender="M" birthdate="1948-01-01 00:00:00.0" birthdate_estimated="0" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="343a8d95-6b1d-11ef-9f7f-0242ac120002"/>
+    <person_name person_name_id="5000" preferred="true" person_id="5000" given_name="John" family_name="Smith" creator="1" date_created="2005-09-22 00:00:00.0" voided="false" void_reason="" uuid="8f70ed2a-6b1d-11ef-9f7f-0242ac120002"/>
+    <provider provider_id="5000" person_id="5000" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="a6135c13-6b1c-11ef-9f7f-0242ac120002"/>
+
+    <person person_id="5001" gender="F" birthdate="1952-01-01 00:00:00.0" birthdate_estimated="0" dead="false" creator="1" date_created="2005-01-01 00:00:00.0" voided="false" uuid="0670f680-6b1f-11ef-9f7f-0242ac120002"/>
+    <person_name person_name_id="5001" preferred="true" person_id="5001" given_name="Mary" family_name="Smith" creator="1" date_created="2005-09-22 00:00:00.0" voided="false" void_reason="" uuid="0fc40bbe-6b1f-11ef-9f7f-0242ac120002"/>
+    <provider provider_id="5001" person_id="5001" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="15864a30-6b1f-11ef-9f7f-0242ac120002"/>
+
 
     <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3245" metadata_source_id = "2134"
             creator = "1" date_created="2008-08-18 12:38:58.0" uuid="cf25712e-f193-48d5-a85a-5fd8d0244c71"
             retired = "false" code = "emr.unknownProvider" name = "Unknown Provider"
+            metadata_uuid = "a6135c13-6b1c-11ef-9f7f-0242ac120002" metadata_class = "org.openmrs.Provider"
     />
 
     <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3246" metadata_source_id = "2134"
