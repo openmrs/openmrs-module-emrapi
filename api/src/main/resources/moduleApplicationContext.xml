@@ -15,6 +15,7 @@
                 <property name="providerService" ref="providerService"/>
                 <property name="domainWrapperFactory" ref="domainWrapperFactory"/>
                 <property name="emrApiProperties" ref="emrApiProperties"/>
+                <property name="emrApiDAO" ref="emrApiDAOImpl"/>
             </bean>
         </property>
         <property name="preInterceptors">

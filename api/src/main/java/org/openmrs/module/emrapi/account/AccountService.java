@@ -15,6 +15,11 @@ public interface AccountService {
     List<AccountDomainWrapper> getAllAccounts();
 
     /**
+     * @should get all unique accounts that match the given criteria
+     */
+    List<AccountDomainWrapper> getAccounts(AccountSearchCriteria criteria);
+
+    /**
      * Save the account details to the database
      *
      * @param account
