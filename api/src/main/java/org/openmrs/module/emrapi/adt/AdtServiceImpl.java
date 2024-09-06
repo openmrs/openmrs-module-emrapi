@@ -954,15 +954,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         // Get all encounter types that might cause a request to be fulfilled
         List<EncounterType> adtEncounterTypes = new ArrayList<>();
-        if (dispositionTypes.contains(DispositionType.ADMIT)) {
-            adtEncounterTypes.add(emrApiProperties.getAdmissionEncounterType());
-        }
-        if (dispositionTypes.contains(DispositionType.TRANSFER)) {
-            adtEncounterTypes.add(emrApiProperties.getTransferWithinHospitalEncounterType());
-        }
-        if (dispositionTypes.contains(DispositionType.DISCHARGE)) {
-            adtEncounterTypes.add(emrApiProperties.getExitFromInpatientEncounterType());
-        }
+        adtEncounterTypes.add(emrApiProperties.getAdmissionEncounterType());
+        adtEncounterTypes.add(emrApiProperties.getTransferWithinHospitalEncounterType());
+        adtEncounterTypes.add(emrApiProperties.getExitFromInpatientEncounterType());
 
         // Disposition Locations are stored as Obs where the valueText is the location id.  Collect these values
         List<String> dispositionLocationIds = null;
