@@ -906,6 +906,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
     @Override
     @Transactional(readOnly = true)
+    @Deprecated
     public List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds) {
         Location visitLocation = null ;
         if (location != null ) {
