@@ -121,6 +121,14 @@ public class EmrApiProperties extends ModuleProperties {
 		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE, false);
 	}
 
+	public EncounterType getInpatientNoteEncounterType() {
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_INPATIENT_NOTE_ENCOUNTER_TYPE, false);
+	}
+
+	public EncounterType getTransferRequestEncounterType() {
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_TRANSFER_REQUEST_ENCOUNTER_TYPE, false);
+	}
+
 	public Form getAdmissionForm() {
 		return getEmrApiMetadataByCode(Form.class, EmrApiConstants.GP_ADMISSION_FORM, false);
 	}

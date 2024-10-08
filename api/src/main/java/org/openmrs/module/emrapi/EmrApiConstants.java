@@ -44,6 +44,10 @@ public class EmrApiConstants {
 
     public static final String GP_TRANSFER_WITHIN_HOSPITAL_ENCOUNTER_TYPE = "emr.transferWithinHospitalEncounterType";
 
+    public static final String GP_INPATIENT_NOTE_ENCOUNTER_TYPE = "emr.inpatientNoteEncounterType";
+
+    public static final String GP_TRANSFER_REQUEST_ENCOUNTER_TYPE = "emr.transferRequestEncounterType";
+
     public static final String GP_CHECK_IN_CLERK_ENCOUNTER_ROLE = "emr.checkInClerkEncounterRole";
 
     public static final String GP_CLINICIAN_ENCOUNTER_ROLE = "emr.clinicianEncounterRole";
