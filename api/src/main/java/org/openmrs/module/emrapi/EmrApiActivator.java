@@ -238,15 +238,6 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
             extraPatientIdTypesMapping = new MetadataTermMapping(emrapiMetadataSource, EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES, extraPatientIdTypesSet);
             extraPatientIdTypesMapping.setName(EmrApiConstants.GP_EXTRA_PATIENT_IDENTIFIER_TYPES);
             metadataMappingService.saveMetadataTermMapping(extraPatientIdTypesMapping);
-        } else {
-        	if (!EmrApiConstants.MM_EXTRA_PIT_SET_UUID.equalsIgnoreCase(extraPatientIdTypesMapping.getMetadataUuid())) {
-        		MetadataSet extraPatientIdTypesSet = metadataMappingService.getMetadataSetByUuid(extraPatientIdTypesMapping.getMetadataUuid());
-        		extraPatientIdTypesSet.setUuid(EmrApiConstants.MM_EXTRA_PIT_SET_UUID);
-        		metadataMappingService.saveMetadataSet(extraPatientIdTypesSet);	
-        		
-        		extraPatientIdTypesMapping.setMetadataUuid(EmrApiConstants.MM_EXTRA_PIT_SET_UUID);
-        		metadataMappingService.saveMetadataTermMapping(extraPatientIdTypesMapping);
-        	}
         }
     }
     
