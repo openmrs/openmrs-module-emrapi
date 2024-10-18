@@ -61,6 +61,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     @Before
     public void setUp() {
         executeDataSet("baseTestDataset.xml");
+        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
         ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
     }

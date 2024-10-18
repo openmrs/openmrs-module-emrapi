@@ -56,6 +56,7 @@ public class DispositionServiceTest {
 
         dispositionService = new DispositionServiceImpl(concertService, emrConceptService);
         dispositionService.setDispositionDescriptor(dispositionDescriptor);
+        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
     }
 
     @Test

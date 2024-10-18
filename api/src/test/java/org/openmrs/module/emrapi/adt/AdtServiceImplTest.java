@@ -72,6 +72,7 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
     @Before
     public void setup() throws Exception {
         executeDataSet("baseTestDataset.xml");
+        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
         dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
         visitLocation = testDataManager.location().name("Hospital").tag("Visit Location").save();
