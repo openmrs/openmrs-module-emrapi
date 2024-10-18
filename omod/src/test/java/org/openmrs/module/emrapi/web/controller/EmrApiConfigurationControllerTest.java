@@ -51,6 +51,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 	@Before
 	public void setUp() {
 		executeDataSet("baseTestDataset.xml");
+		dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 	}

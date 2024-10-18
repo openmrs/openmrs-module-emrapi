@@ -45,7 +45,6 @@ import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -108,6 +107,7 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
     @Before
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
+        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
     }
 
     @Test

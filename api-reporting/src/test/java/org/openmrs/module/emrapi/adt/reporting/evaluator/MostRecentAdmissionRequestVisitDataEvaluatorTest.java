@@ -67,6 +67,7 @@ public class MostRecentAdmissionRequestVisitDataEvaluatorTest extends BaseReport
     @Before
     public void setup() throws Exception {
         executeDataSet("baseTestDataset.xml");
+        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
         def = new MostRecentAdmissionRequestVisitDataDefinition();
         dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         diagnosisMetadata = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
