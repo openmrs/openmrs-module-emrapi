@@ -169,7 +169,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
 
     @Test
     public void shouldNotGetChildByMotherIfChildBornADayOrMoreBeforeVisitAndChildBornDuringMothersActiveVisitSetTrue() {
-        Date oneHourAgo = new DateTime().minusHours(1).toDate();
+        Date now = new Date();
         Date oneDayAgo = new DateTime().minusDays(1).toDate();
 
         Location visitLocation = testDataManager.location().name("Visit Location").save();
@@ -183,7 +183,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         motherChildRelationship.setPersonB(child);
         personService.saveRelationship(motherChildRelationship);
 
-        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(oneHourAgo).save();
+        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(now).save();
 
         List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, true));
 
