@@ -5,6 +5,17 @@
 
 <hibernate-configuration>
     <session-factory>
+        <property name="hibernate.show_sql">true</property>
+
+        <!-- Format SQL for better readability -->
+        <property name="hibernate.format_sql">true</property>
+
+        <!-- Include comments in the generated SQL (optional but helpful for debugging) -->
+        <property name="hibernate.use_sql_comments">true</property>
+
+        <!-- Optionally, log parameter values for the SQL queries (using Hibernate 5.2+) -->
+        <property name="hibernate.type">TRACE</property>
+
         <mapping resource="Provider.hbm.xml"/>
         <mapping resource="ProviderRole.hbm.xml"/>
         <mapping resource="ExportedPackage.hbm.xml" />
