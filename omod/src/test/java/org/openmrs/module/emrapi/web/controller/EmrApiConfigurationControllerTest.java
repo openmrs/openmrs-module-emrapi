@@ -66,7 +66,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 	@Test
 	public void shouldGetDefaultRepresentation() {
 		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
-		assertEquals(50, config.keySet().size());
+		assertEquals(51, config.keySet().size());
 		assertEquals("org.openmrs.module.emrapi", config.get("metadataSourceName"));
 		assertEquals("50", config.get("lastViewedPatientSizeLimit").toString());
 		Map<String, Object> unknownLocation = mapNode(config, "unknownLocation");

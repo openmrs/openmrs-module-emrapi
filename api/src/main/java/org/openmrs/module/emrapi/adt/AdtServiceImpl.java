@@ -14,7 +14,7 @@
 
 package org.openmrs.module.emrapi.adt;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.joda.time.DateTime;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -73,6 +73,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 
 public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
@@ -187,31 +188,41 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         VisitDomainWrapper visitDomainWrapper = domainWrapperFactory.newVisitDomainWrapper(visit);
 
-        if (visitDomainWrapper.isAdmitted() || visitDomainWrapper.isAwaitingAdmission()) {
-            return false;  // don't close the visit if patient is admitted or waiting admission
-        }
-
-        Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();
-        if (mostRecentDisposition != null && mostRecentDisposition.getKeepsVisitOpen() != null && mostRecentDisposition.getKeepsVisitOpen()) {
-            return false; // don't close the visit if the most recent disposition is one that keeps visit opens
-        }
-
         Date now = new Date();
-        Date mustHaveSomethingAfter = DateUtils.addHours(now, -emrApiProperties.getVisitExpireHours());
+        Date lastActivity = getLastActivityDate(visit);
+        long hoursInactive = TimeUnit.HOURS.convert(Math.abs(lastActivity.getTime() - now.getTime()), TimeUnit.MILLISECONDS);
 
-        if (OpenmrsUtil.compare(visit.getStartDatetime(), mustHaveSomethingAfter) >= 0) {
-            return false;
+        boolean inpatient = (visitDomainWrapper.isAdmitted() || visitDomainWrapper.isAwaitingAdmission());
+        if (!inpatient) {
+            Disposition mostRecentDisposition = visitDomainWrapper.getMostRecentDisposition();
+            inpatient = mostRecentDisposition != null && BooleanUtils.isTrue(mostRecentDisposition.getKeepsVisitOpen());
         }
 
+        if (inpatient) {
+            Integer inpatientVisitExpireHours = emrApiProperties.getInpatientVisitExpireHours();
+            return (inpatientVisitExpireHours != null && inpatientVisitExpireHours <= hoursInactive);
+        }
+        return emrApiProperties.getVisitExpireHours() <= hoursInactive;
+    }
+
+    /**
+     * Returns the last activity date for the given visit
+     * Currently this checks the Visit startDatetime, and the encounterDatetime for each Encounter in the Visit
+     * @param visit the Visit to check
+     * @return the number of minutes since the last activity
+     */
+    protected Date getLastActivityDate(Visit visit) {
+        Date lastActivityDate = visit.getStartDatetime();
         if (visit.getEncounters() != null) {
-            for (Encounter candidate : visit.getEncounters()) {
-                if (!candidate.isVoided() && OpenmrsUtil.compare(candidate.getEncounterDatetime(), mustHaveSomethingAfter) >= 0) {
-                    return false;
+            for (Encounter e : visit.getEncounters()) {
+                if (BooleanUtils.isNotTrue(e.getVoided())) {
+                    if (lastActivityDate.before(e.getEncounterDatetime())) {
+                        lastActivityDate = e.getEncounterDatetime();
+                    }
                 }
             }
         }
-
-        return true;
+        return lastActivityDate;
     }
 
     @Override
