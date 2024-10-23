@@ -32,6 +32,7 @@ import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
 import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
@@ -45,8 +46,8 @@ import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +65,11 @@ import java.util.concurrent.Future;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
@@ -105,9 +110,14 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
     @Autowired
     EmrConceptService emrConceptService;
 
+    @Autowired
+    @Qualifier("adminService")
+    AdministrationService administrationService;
+
     @Before
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
+        administrationService.setGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS, "");
     }
 
     @Test
@@ -465,6 +475,16 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
 
         activeVisit = service.getActiveVisit(patient, location);
         assertNotNull(activeVisit);
+
+        administrationService.setGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS, "15");
+        service.closeInactiveVisits();
+        activeVisit = service.getActiveVisit(patient, location);
+        assertNotNull(activeVisit);
+
+        administrationService.setGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS, "14");
+        service.closeInactiveVisits();
+        activeVisit = service.getActiveVisit(patient, location);
+        assertNull(activeVisit);
     }
 
     @Test

@@ -145,6 +145,11 @@ public class EmrApiProperties extends ModuleProperties {
         return NumberUtils.toInt(getGlobalProperty(EmrApiConstants.GP_VISIT_EXPIRE_HOURS, false), EmrApiConstants.DEFAULT_VISIT_EXPIRE_HOURS);
 	}
 
+	public Integer getInpatientVisitExpireHours() {
+		String gpVal = getGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS, false);
+		return StringUtils.hasText(gpVal) ? NumberUtils.toInt(gpVal) : null;
+	}
+
 	public VisitType getAtFacilityVisitType() {
 		return getEmrApiMetadataByCode(VisitType.class, EmrApiConstants.GP_AT_FACILITY_VISIT_TYPE);
 	}
