@@ -17,13 +17,6 @@ public class HibernateVisitDAO implements VisitDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-
-//    public void setSessionFactory(SessionFactory sessionFactory) {
-//        this.sessionFactory = sessionFactory;
-//    }
-
-
-    @Override
     public List<VisitWithDiagnoses> getVisitsByPatientId(Patient patient) {
 
         String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
@@ -62,22 +55,11 @@ public class HibernateVisitDAO implements VisitDAO {
                     .add(diagnosis);
         }
 
-        //
         List<VisitWithDiagnoses> visitWithDiagnoses = visits.stream()
                 .sorted(Comparator.comparing(Visit::getStartDatetime).reversed())
                 .map(visit -> new VisitWithDiagnoses(visit, visitToDiagnosesMap.getOrDefault(visit, new HashSet<>())))
                 .collect(Collectors.toList());
 
         return visitWithDiagnoses;
-
-
-//        String queryString = "FROM Visit v WHERE v.patient.id = :patient_id";
-//
-//        Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-//        query.setParameter("patient_id", patient.getId());
-//
-//        List list = query.list();
-//        return list;
-
     }
 }

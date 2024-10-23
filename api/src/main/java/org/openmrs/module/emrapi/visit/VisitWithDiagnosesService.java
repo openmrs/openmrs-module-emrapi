@@ -6,8 +6,8 @@ public interface VisitWithDiagnosesService {
     /**
      * Fetches visits of a patient by patient ID.
      *
-     * @param patientId the ID of the patient
+     * @param patientUuid the UUID of the patient
      * @return a list of visits
      */
-    List<VisitWithDiagnoses> getVisitsByPatientId(Integer patientId);
+    List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid);
 }

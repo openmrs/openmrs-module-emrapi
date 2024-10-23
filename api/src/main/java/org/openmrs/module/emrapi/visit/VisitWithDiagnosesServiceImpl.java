@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.visit;
 
+import org.hibernate.ObjectNotFoundException;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
@@ -11,7 +12,6 @@ import java.util.List;
 
 @Service
 public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements VisitWithDiagnosesService {
-    // Existing methods and dependencies
 
     @Autowired
     PatientService patientService;
@@ -20,11 +20,14 @@ public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements
     VisitDAO visitDAO;
 
     @Override
-    public List<VisitWithDiagnoses> getVisitsByPatientId(Integer patientId) {
+    public List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid) {
 
-        Patient patient = patientService.getPatient(patientId);
+        Patient patient = patientService.getPatientByUuid(patientUuid);
+
+        if (patient == null) {
+            throw new ObjectNotFoundException("No patient found with uuid " + patientUuid, Patient.class.getName());
+        }
 
         return visitDAO.getVisitsByPatientId(patient);
-//        return null;
     }
 }
