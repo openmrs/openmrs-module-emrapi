@@ -41,7 +41,8 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
 
-        ResponseEntity<List<VisitWithDiagnoses>> visitsResponse = (ResponseEntity<List<VisitWithDiagnoses>>) visitController.getVisitsByPatientId(patientUuid);
+        ResponseEntity<List<VisitWithDiagnoses>> visitsResponse = (ResponseEntity<List<VisitWithDiagnoses>>)
+                visitController.getVisitsByPatientId(patientUuid);
         assertNotNull(visitsResponse);
 
         List<VisitWithDiagnoses> visits = visitsResponse.getBody();

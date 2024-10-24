@@ -9,5 +9,5 @@ public interface VisitWithDiagnosesService {
      * @param patientUuid the UUID of the patient
      * @return a list of visits
      */
-    List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid);
+    List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid, int startIndex, int limit);
 }

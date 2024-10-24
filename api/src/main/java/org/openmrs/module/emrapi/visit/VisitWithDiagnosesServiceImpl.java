@@ -20,7 +20,7 @@ public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements
     VisitDAO visitDAO;
 
     @Override
-    public List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid) {
+    public List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid, int startIndex, int limit) {
 
         Patient patient = patientService.getPatientByUuid(patientUuid);
 
@@ -28,6 +28,6 @@ public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements
             throw new ObjectNotFoundException("No patient found with uuid " + patientUuid, Patient.class.getName());
         }
 
-        return visitDAO.getVisitsByPatientId(patient);
+        return visitDAO.getVisitsByPatientId(patient, startIndex, limit);
     }
 }

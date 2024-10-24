@@ -22,7 +22,7 @@ public class HibernateVisitDAO implements VisitDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-    public List<VisitWithDiagnoses> getVisitsByPatientId(Patient patient) {
+    public List<VisitWithDiagnoses> getVisitsByPatientId(Patient patient, int startIndex, int limit) {
 
         String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
 
@@ -32,7 +32,8 @@ public class HibernateVisitDAO implements VisitDAO {
                 "JOIN enc.encounterType et " +
                 "WHERE v.patient.id = :patientId " +
                 "AND et.uuid = :encounterTypeUuid " +
-                "ORDER BY v.startDatetime DESC";
+                "ORDER BY v.startDatetime DESC "+
+                "LIMIT :startIndex, :limit";
 
          List<Visit> visits = sessionFactory.getCurrentSession()
                 .createQuery(hqlVisit)
