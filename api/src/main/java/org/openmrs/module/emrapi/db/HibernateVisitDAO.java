@@ -8,7 +8,12 @@ import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
@@ -30,7 +35,7 @@ public class HibernateVisitDAO implements VisitDAO {
                 "ORDER BY v.startDatetime DESC";
 
          List<Visit> visits = sessionFactory.getCurrentSession()
-                .createQuery(hqlVisit)  // For Hibernate versions < 5.2
+                .createQuery(hqlVisit)
                 .setParameter("patientId", patient.getId())
                 .setParameter("encounterTypeUuid", visitNoteEncounterTypeUuid).list();
 
@@ -39,12 +44,12 @@ public class HibernateVisitDAO implements VisitDAO {
                 "WHERE e.visit.id IN :visitIds";
 
         List<Integer> visitIds = visits.stream()
-                .map(Visit::getId)  // Extract the IDs from Visit objects
+                .map(Visit::getId)
                 .collect(Collectors.toList());
 
         List<Diagnosis> diagnoses = sessionFactory.getCurrentSession()
                 .createQuery(hqlDiagnosis)
-                .setParameterList("visitIds", visitIds)  // Use the list of IDs
+                .setParameterList("visitIds", visitIds)
                 .list();
 
         Map<Visit, Set<Diagnosis>> visitToDiagnosesMap = new HashMap<>();
