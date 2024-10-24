@@ -30,12 +30,8 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     private PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
-    // TODO inject this in some better way than using a setter to override?
-    private String dispositionConfig;
-
-    private final String DEFAULT_DISPOSITION_CONFIG_LOCATION = "file:" + OpenmrsUtil.getApplicationDataDirectory() + "/configuration/dispositions/dispositionConfig.json";
-
-    private final String LEGACY_DEFAULT_DISPOSITION_CONFIG_LOCATION = "classpath*:/dispositionConfig.json";  // prior to 2.1.0 release
+    // can also be overwritten by Iniz
+    private String dispositionConfig = "dispositionConfig.json";
 
     public DispositionServiceImpl(ConceptService conceptService, EmrConceptService emrConceptService) {
         this.conceptService = conceptService;
@@ -66,46 +62,8 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     @Override
     public List<Disposition> getDispositions() {
-
-        if (dispositionConfig !=null) {
-            try {
-                String path;
-                if (!dispositionConfig.contains("file:")) {
-                    path = "classpath*:/" + dispositionConfig;
-                } else {
-                    path = "file:" + OpenmrsUtil.getApplicationDataDirectory() + "/" + dispositionConfig.replace("file:", "");
-                }
-                return getDispositionsFrom(path);
-            } catch (IOException ignored) {
-                // if this fails for some reason, we will try the default locations below
-            }
-        }
-
-        // if no config file specified, try the default locations
-        try {
-            return getDispositionsFrom(DEFAULT_DISPOSITION_CONFIG_LOCATION);
-        } catch (IOException ignored) {
-            // exception will be thrown below if needed
-        }
-
-        try {
-            return getDispositionsFrom(LEGACY_DEFAULT_DISPOSITION_CONFIG_LOCATION);
-        } catch (IOException ignored) {
-            // exception will be thrown below if needed
-        }
-
-        throw new RuntimeException("No disposition file found at: " + dispositionConfig + " or "  + DEFAULT_DISPOSITION_CONFIG_LOCATION + " or " + LEGACY_DEFAULT_DISPOSITION_CONFIG_LOCATION);
+        return getDispositionsFrom(dispositionConfig);
     }
-
-    private List<Disposition> getDispositionsFrom(String path) throws IOException {
-        Resource[] dispositionDefinitions = resourceResolver.getResources(path);
-        for (Resource dispositionDefinition : dispositionDefinitions) {
-            return objectMapper.readValue(dispositionDefinition.getInputStream(), new TypeReference<List<Disposition>>() {
-            });
-        }
-        throw new IOException("No disposition file found at " + path);
-    }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -212,6 +170,33 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
         this.dispositionConfig = dispositionConfig;
     }
 
+    private List<Disposition> getDispositionsFrom(String configFile)  {
+
+        try {
+
+            String path;
+
+            if (!configFile.startsWith("file:")) {  // this is a classpath resource
+                path  = "classpath*:/" + configFile;
+            }
+            else if (!configFile.startsWith("file:/")) {  // this is a non-absolute file reference, so we need to prepend the application data directory
+                path = "file:" + OpenmrsUtil.getApplicationDataDirectory() + "/" + configFile.replace("file:","");
+            }
+            else {  // this is an absolute file reference
+                path = configFile;
+            }
+
+            Resource[] dispositionDefinitions = resourceResolver.getResources(path);
+            for (Resource dispositionDefinition : dispositionDefinitions) {
+                return objectMapper.readValue(dispositionDefinition.getInputStream(), new TypeReference<List<Disposition>>() {});
+            }
+            return null;
+        }
+        catch (IOException e) {
+            throw new RuntimeException ("Unable to read disposition file " + configFile, e);
+        }
+
+    }
 
     // TODO handle this better--this property is only used to allow use to inject a mock disposition descriptor
     private DispositionDescriptor dispositionDescriptor;
