@@ -38,15 +38,17 @@ public class VisitController {
         List<VisitWithDiagnoses> visits;
         visits = visitWithDiagnosesService.getVisitsByPatientId(patientUuid, context.getStartIndex(), context.getLimit());
         
+        // Convert the visits and diagnoses to SimpleObjects
         List<SimpleObject> convertedVisits = new ArrayList<>();
-        
         for (VisitWithDiagnoses visit : visits) {
             SimpleObject visitObject = (SimpleObject) ConversionUtil.convertToRepresentation(visit, context.getRepresentation());
             List<SimpleObject> convertedDiagnoses = new ArrayList<>();
+            
             for (Diagnosis diagnosis : visit.getDiagnoses()) {
                 convertedDiagnoses.add((SimpleObject) ConversionUtil.convertToRepresentation(diagnosis, context.getRepresentation()));
             }
             visitObject.put("diagnoses", convertedDiagnoses);
+            
             convertedVisits.add(visitObject);
         }
         
