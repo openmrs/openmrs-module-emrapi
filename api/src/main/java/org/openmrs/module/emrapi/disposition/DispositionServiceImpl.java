@@ -30,7 +30,7 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
     private PathMatchingResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
-    // TODO inject this in some better way than using a setter to override?
+    // can be overridden by Initializer starting with Iniz version 2.8.0
     private String dispositionConfig = "dispositionConfig.json";
 
     public DispositionServiceImpl(ConceptService conceptService, EmrConceptService emrConceptService) {

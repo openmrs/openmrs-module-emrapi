@@ -118,6 +118,7 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
         administrationService.setGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS, "");
+        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
     }
 
     @Test

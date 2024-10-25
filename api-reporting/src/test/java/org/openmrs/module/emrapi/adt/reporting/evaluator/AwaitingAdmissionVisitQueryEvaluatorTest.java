@@ -67,6 +67,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseReportingTest 
     @Before
     public void setup() throws Exception {
         executeDataSet("baseTestDataset.xml");
+        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
         dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
         ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
         query = new AwaitingAdmissionVisitQuery();
