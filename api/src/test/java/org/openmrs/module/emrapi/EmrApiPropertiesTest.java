@@ -9,6 +9,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -47,6 +48,24 @@ public class EmrApiPropertiesTest {
         when(administrationService.getGlobalProperty(EmrApiConstants.GP_VISIT_EXPIRE_HOURS)).thenReturn("foo");
 
         assertEquals(EmrApiConstants.DEFAULT_VISIT_EXPIRE_HOURS, emrApiProperties.getVisitExpireHours());
+    }
+
+    @Test
+    public void inpatientVisitExpireHours_shouldBeConfiguredValueFromGlobalProperty(){
+        when(administrationService.getGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS)).thenReturn("72");
+        assertEquals(72, emrApiProperties.getInpatientVisitExpireHours().intValue());
+    }
+
+    @Test
+    public void inpatientVisitExpireHours_shouldBeNullWhenBlank(){
+        when(administrationService.getGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS)).thenReturn(" ");
+        assertNull(emrApiProperties.getInpatientVisitExpireHours());
+    }
+
+    @Test
+    public void inpatientVisitExpireHours_shouldBeNullWhenNull(){
+        when(administrationService.getGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS)).thenReturn(null);
+        assertNull(emrApiProperties.getInpatientVisitExpireHours());
     }
     
     @Test
