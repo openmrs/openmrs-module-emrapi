@@ -1,8 +1,11 @@
 package org.openmrs.module.emrapi.web.controller;
 
 import org.hibernate.ObjectNotFoundException;
+import org.openmrs.Diagnosis;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnosesService;
+import org.openmrs.module.webservices.rest.SimpleObject;
+import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,13 +36,20 @@ public class VisitController {
             @PathVariable String patientUuid) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         List<VisitWithDiagnoses> visits;
-        try {
-            visits = visitWithDiagnosesService.getVisitsByPatientId(patientUuid, context.getStartIndex(), context.getLimit());
-        }
-        catch (ObjectNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        visits = visitWithDiagnosesService.getVisitsByPatientId(patientUuid, context.getStartIndex(), context.getLimit());
+        
+        List<SimpleObject> convertedVisits = new ArrayList<>();
+        
+        for (VisitWithDiagnoses visit : visits) {
+            SimpleObject visitObject = (SimpleObject) ConversionUtil.convertToRepresentation(visit, context.getRepresentation());
+            List<SimpleObject> convertedDiagnoses = new ArrayList<>();
+            for (Diagnosis diagnosis : visit.getDiagnoses()) {
+                convertedDiagnoses.add((SimpleObject) ConversionUtil.convertToRepresentation(diagnosis, context.getRepresentation()));
+            }
+            visitObject.put("diagnoses", convertedDiagnoses);
+            convertedVisits.add(visitObject);
         }
         
-        return new ResponseEntity<>(new NeedsPaging<>(visits, context), HttpStatus.OK);
+        return new ResponseEntity<>(new NeedsPaging<>(convertedVisits, context), HttpStatus.OK);
     }
 }

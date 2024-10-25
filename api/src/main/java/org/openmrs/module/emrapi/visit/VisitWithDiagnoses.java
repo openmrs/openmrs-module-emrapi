@@ -22,9 +22,11 @@ public class VisitWithDiagnoses extends Visit {
         this.setStartDatetime(visit.getStartDatetime());
         this.setStopDatetime(visit.getStopDatetime());
         this.setEncounters(visit.getEncounters());
+        this.uuid = visit.getUuid();
         this.diagnoses = diagnoses;
     }
 
+    private String uuid;
     private Set<Diagnosis> diagnoses;
 
 

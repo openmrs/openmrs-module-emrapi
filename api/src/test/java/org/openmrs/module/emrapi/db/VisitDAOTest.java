@@ -22,7 +22,6 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
 
     @Before
     public void setup() {
-//        executeDataSet("baseMetaData.xml");
         executeDataSet("pastVisitSetup.xml");
     }
 
@@ -33,7 +32,7 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(109);
 
-        List<VisitWithDiagnoses> visits = visitDAO.getVisitsByPatientId(patient);
+        List<VisitWithDiagnoses> visits = visitDAO.getVisitsByPatientId(patient,0,10);
         assertNotNull(visits);
         assert visits.size() == 2;
 
@@ -62,6 +61,19 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
         for (Encounter encounter : secondVisitEncounters) {
             assert encounter.getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
         }
+    }
+    
+    @Test
+    public void shouldFetchVisitsByPatientIdWithPagination() {
+        Patient patient = new Patient();
+        patient.setPatientId(109);
+
+        List<VisitWithDiagnoses> visits = visitDAO.getVisitsByPatientId(patient,0,1);
+        assertNotNull(visits);
+        assert visits.size() == 1;
+
+        VisitWithDiagnoses mostRecentVisit = visits.get(0);
+        assert mostRecentVisit.getId() == 1015;
     }
 
 }

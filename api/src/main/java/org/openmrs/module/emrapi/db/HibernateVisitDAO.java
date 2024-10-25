@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.db;
 
+import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.openmrs.Diagnosis;
 import org.openmrs.Patient;
@@ -25,20 +26,22 @@ public class HibernateVisitDAO implements VisitDAO {
     public List<VisitWithDiagnoses> getVisitsByPatientId(Patient patient, int startIndex, int limit) {
 
         String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
-
-
+        
         String hqlVisit="SELECT DISTINCT v FROM Visit v " +
                 "JOIN FETCH v.encounters enc " +
                 "JOIN enc.encounterType et " +
                 "WHERE v.patient.id = :patientId " +
                 "AND et.uuid = :encounterTypeUuid " +
-                "ORDER BY v.startDatetime DESC "+
-                "LIMIT :startIndex, :limit";
+                "ORDER BY v.startDatetime DESC";
+        
+        Query visitQuery = sessionFactory.getCurrentSession().createQuery(hqlVisit);
+        
+        visitQuery.setParameter("patientId", patient.getId());
+        visitQuery.setParameter("encounterTypeUuid", visitNoteEncounterTypeUuid);
+        visitQuery.setFirstResult(startIndex);
+        visitQuery.setMaxResults(limit);
 
-         List<Visit> visits = sessionFactory.getCurrentSession()
-                .createQuery(hqlVisit)
-                .setParameter("patientId", patient.getId())
-                .setParameter("encounterTypeUuid", visitNoteEncounterTypeUuid).list();
+         List<Visit> visits = visitQuery.list();
 
         String hqlDiagnosis = "SELECT DISTINCT diag FROM Diagnosis diag " +
                 "JOIN diag.encounter e " +

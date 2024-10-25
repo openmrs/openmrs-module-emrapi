@@ -1,88 +1,119 @@
 package org.openmrs.module.emrapi.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-import org.openmrs.Diagnosis;
-import org.openmrs.Encounter;
-import org.openmrs.api.PatientService;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnosesService;
+import org.junit.runner.RunWith;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
 public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
-
+    
     @Autowired
-    VisitController visitController;
-
-    @Autowired
-    VisitWithDiagnosesService customVisitService;
-
-    @Autowired
-    PatientService patientService;
-
-
+    private WebApplicationContext webApplicationContext;
+    
+    private MockMvc mockMvc;
+    
     @Before
     public void setUp() throws Exception {
         executeDataSet("baseMetaData.xml");
         executeDataSet("pastVisitSetup.xml");
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        
     }
 
     @Test
-    public void shouldGetVisitsByPatientId() {
+    public void shouldGetVisitsByPatientId() throws Exception {
 
         String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
+        String firstVisitUuid = "1esd5218-6b78-11e0-93c3-18a905e044dc";
+        String secondVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
+        
+        // extract the response from the mockMvc
+        
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        String jsonResponse = response.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> result = objectMapper.readValue(jsonResponse, Map.class);
 
-        ResponseEntity<List<VisitWithDiagnoses>> visitsResponse = (ResponseEntity<List<VisitWithDiagnoses>>)
-                visitController.getVisitsByPatientId(patientUuid);
-        assertNotNull(visitsResponse);
-
-        List<VisitWithDiagnoses> visits = visitsResponse.getBody();
-
-        assertNotNull(visits);
+        assertNotNull(result);
+        assert result.get("totalCount").equals(2);
+        
+        List<Map<String, Object>> visits = (List<Map<String, Object>>) result.get("pageOfResults");
         assert visits.size() == 2;
-
-        VisitWithDiagnoses firstVisit = visits.get(1);
-        Set<Encounter> firstVisitEncounters = firstVisit.getEncounters();
-        Set<Diagnosis> firstVisitDiagnoses = firstVisit.getDiagnoses();
-
-        assert firstVisit.getId() == 1014;
-        assertEquals(firstVisit.getPatient().getUuid(), patientUuid);
+        
+        // extract the first visit and check its properties
+        Map<String, Object> firstVisit = visits.get(1);
+        List<Map<String, Object>> firstVisitEncounters = (List<Map<String, Object>>) firstVisit.get("encounters");
+        List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>) firstVisit.get("diagnoses");
+        
+        assert firstVisit.get("uuid").equals(firstVisitUuid);
         assert firstVisitEncounters.size() == 2;
         assert firstVisitDiagnoses.size() == 3;
-
-        for (Encounter encounter : firstVisitEncounters) {
-            assert encounter.getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
+        
+        for (Map<String, Object> encounter : firstVisitEncounters) {
+            assert ((String) encounter.get("display")).startsWith("Visit Note");
         }
-
-        VisitWithDiagnoses secondVisit = visits.get(0);
-        Set<Encounter> secondVisitEncounters = secondVisit.getEncounters();
-        Set<Diagnosis> secondVisitDiagnoses = secondVisit.getDiagnoses();
-
-        assert secondVisit.getId() == 1015;
-        assertEquals(secondVisit.getPatient().getUuid(), patientUuid);
+       
+        // extract the second visit and check its properties
+        Map<String, Object> secondVisit = visits.get(0);
+        List<Map<String, Object>> secondVisitEncounters = (List<Map<String, Object>>) secondVisit.get("encounters");
+        List<Map<String, Object>> secondVisitDiagnoses = (List<Map<String, Object>>) secondVisit.get("diagnoses");
+        
+        assert secondVisit.get("uuid").equals(secondVisitUuid);
         assert secondVisitEncounters.size() == 1;
         assert secondVisitDiagnoses.size() == 2;
-
-        for (Encounter encounter : secondVisitEncounters) {
-            assert encounter.getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
+        
+        for (Map<String, Object> encounter : secondVisitEncounters) {
+            assert ((String) encounter.get("display")).startsWith("Visit Note");
         }
-
     }
-
+    
     @Test
-    public void shouldThrowExceptionWhenPatientUuidIsInvalid() {
-        String invalidPatientUuid = "invalid-uuid";
-        ResponseEntity<?> visitsResponse = visitController.getVisitsByPatientId(invalidPatientUuid);
-        assertNotNull(visitsResponse);
-        assert visitsResponse.getStatusCode().is4xxClientError();
+    public void shouldGetVisitsByPatientIdWithPagination() throws Exception {
+        
+        String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
+        String mostRecentVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
+        
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
+                        .param("startIndex", "0")
+                        .param("limit", "1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        
+        String jsonResponse = response.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> result = objectMapper.readValue(jsonResponse, Map.class);
+
+        assertNotNull(result);
+        assert result.get("totalCount").equals(1);
+        
+        List<Map<String, Object>> visits = (List<Map<String, Object>>) result.get("pageOfResults");
+        assert visits.size() == 1;
+        
+        Map<String, Object> recentVisit = visits.get(0);
+        assert recentVisit.get("uuid").equals(mostRecentVisitUuid);
     }
 }
