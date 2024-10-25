@@ -176,14 +176,11 @@ public class DispositionServiceImpl extends BaseOpenmrsService implements Dispos
 
             String path;
 
-            if (!configFile.startsWith("file:")) {  // this is a classpath resource
+            if (configFile.indexOf("file:") == -1) {
                 path  = "classpath*:/" + configFile;
             }
-            else if (!configFile.startsWith("file:/")) {  // this is a non-absolute file reference, so we need to prepend the application data directory
+            else {
                 path = "file:" + OpenmrsUtil.getApplicationDataDirectory() + "/" + configFile.replace("file:","");
-            }
-            else {  // this is an absolute file reference
-                path = configFile;
             }
 
             Resource[] dispositionDefinitions = resourceResolver.getResources(path);
