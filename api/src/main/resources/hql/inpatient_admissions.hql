@@ -12,6 +12,6 @@ where encounter.voided = false
     and (:visitLocation is null or visit.location = :visitLocation)
     and visit.stopDatetime is null
     and encounter.encounterType in (:admissionEncounterType, :transferEncounterType, :dischargeEncounterType)
-    and (:limitByPatient is false or patient.patientId in (:patientIds))
-    and (:limitByVisit is false or visit.visitId in (:visitIds))
+    and (:limitByPatient is false or patient.uuid in (:patients))
+    and (:limitByVisit is false or visit.uuid in (:visits))
 order by visit.visitId, encounter.encounterDatetime, encounter.encounterId

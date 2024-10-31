@@ -34,13 +34,17 @@ public class InpatientAdmissionController {
             HttpServletResponse response,
             @RequestParam(required = false, value = "visitLocation") Location visitLocation,
             @RequestParam(required = false, value = "currentInpatientLocation") List<Location> currentInpatientLocations,
-            @RequestParam(required = false, value = "includeDischarged") boolean includeDischarged
+            @RequestParam(required = false, value = "includeDischarged") boolean includeDischarged,
+            @RequestParam(required = false, value = "patients") List<String> patients,
+            @RequestParam(required = false, value = "visits") List<String> visits
     ) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         InpatientAdmissionSearchCriteria criteria = new InpatientAdmissionSearchCriteria();
         criteria.setVisitLocation(visitLocation);
         criteria.setCurrentInpatientLocations(currentInpatientLocations);
         criteria.setIncludeDischarged(includeDischarged);
+        criteria.setPatients(patients);
+        criteria.setVisits(visits);
         List<InpatientAdmission> requests = adtService.getInpatientAdmissions(criteria);
         return new NeedsPaging<>(requests, context).toSimpleObject(new InpatientAdmissionConverter());
     }

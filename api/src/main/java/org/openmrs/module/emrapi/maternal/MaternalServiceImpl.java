@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openmrs.Patient;
 import org.openmrs.RelationshipType;
@@ -69,9 +70,8 @@ public class MaternalServiceImpl  extends BaseOpenmrsService implements Maternal
 
         // now fetch all the admissions for children in the result set
         InpatientAdmissionSearchCriteria inpatientAdmissionSearchCriteria = new InpatientAdmissionSearchCriteria();
-        Set<Integer> patientIds  = ret.stream().map(MotherAndChild::getChild).map(Patient::getId).collect(Collectors.toSet());
-        patientIds.addAll(ret.stream().map(MotherAndChild::getMother).map(Patient::getId).collect(Collectors.toSet()));
-        inpatientAdmissionSearchCriteria.setPatientIds(new ArrayList<>(patientIds));
+        Set<String> patients  = ret.stream().flatMap(mc -> Stream.of(mc.getChild(),mc.getMother())).map(Patient::getUuid).collect(Collectors.toSet());
+        inpatientAdmissionSearchCriteria.setPatients(new ArrayList<>(patients));
         List<InpatientAdmission> admissions = adtService.getInpatientAdmissions(inpatientAdmissionSearchCriteria);
         Map<Patient, InpatientAdmission> admissionsByPatient = new HashMap<>();
         for (InpatientAdmission admission : admissions) {

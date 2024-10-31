@@ -58,6 +58,6 @@ where
             and locationObs.valueText in (:dispositionLocationIds)
         ) > 0
     )
-    and (:limitByPatient is false or dispoEncounter.patient.patientId in (:patientIds))
-    and (:limitByVisit is false or visit.visitId in (:visitIds))
+    and (:limitByPatient is false or person.uuid in (:patients))
+    and (:limitByVisit is false or visit.uuid in (:visits))
 order by dispo.obsId

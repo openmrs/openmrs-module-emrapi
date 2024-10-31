@@ -272,11 +272,11 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
         assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
         assertNumRequests(requestCriteria, 1);
-        requestCriteria.addPatientId(patient.getPatientId() + 1);
+        requestCriteria.addPatientUuid("fakePatientUuid1");
         assertNumRequests(requestCriteria, 0);
-        requestCriteria.addPatientId(patient.getPatientId() + 2);
+        requestCriteria.addPatientUuid("fakePatientUuid2");
         assertNumRequests(requestCriteria, 0);
-        requestCriteria.addPatientId(patient.getPatientId());
+        requestCriteria.addPatientUuid(patient.getUuid());
         assertNumRequests(requestCriteria, 1);
     }
 
@@ -287,11 +287,11 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
         assertNumRequests(requestCriteria, 0);
         createAdmissionRequest(DateUtils.addHours(visitDate, 2));
         assertNumRequests(requestCriteria, 1);
-        requestCriteria.addVisitId(visit.getVisitId() + 1);
+        requestCriteria.addVisitUuid("fakeVisitUuid1");
         assertNumRequests(requestCriteria, 0);
-        requestCriteria.addVisitId(visit.getVisitId() + 2);
+        requestCriteria.addVisitUuid("fakeVisitUuid2");
         assertNumRequests(requestCriteria, 0);
-        requestCriteria.addVisitId(visit.getVisitId());
+        requestCriteria.addVisitUuid(visit.getUuid());
         assertNumRequests(requestCriteria, 1);
     }
 
@@ -559,27 +559,27 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
 
     @Test
     public void shouldGetAdmissionForPatient() {
-        admissionCriteria.addPatientId(patient.getPatientId());
+        admissionCriteria.addPatientUuid(patient.getUuid());
         assertNumAdmissions(admissionCriteria, 0);
         createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
         assertNumAdmissions(admissionCriteria, 1);
-        admissionCriteria.setPatientIds(Collections.singletonList(patient.getPatientId() + 1));
+        admissionCriteria.setPatients(Collections.singletonList("fakePatientUuid"));
         assertNumAdmissions(admissionCriteria, 0);
     }
 
     @Test
     public void shouldGetAdmissionForVisit() {
-        admissionCriteria.addVisitId(visit.getVisitId());
+        admissionCriteria.addVisitUuid(visit.getUuid());
         assertNumAdmissions(admissionCriteria, 0);
         createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
         assertNumAdmissions(admissionCriteria, 1);
-        admissionCriteria.setVisitIds(Collections.singletonList(visit.getVisitId() + 1));
+        admissionCriteria.setVisits(Collections.singletonList("fakeVisitUuid"));
         assertNumAdmissions(admissionCriteria, 0);
     }
 
     @Test
     public void shouldGetAdmissionThatHasBeenDischarged() {
-        admissionCriteria.addVisitId(visit.getVisitId());
+        admissionCriteria.addVisitUuid(visit.getUuid());
         assertNumAdmissions(admissionCriteria, 0);
         createAdmissionEncounter(DateUtils.addHours(visitDate, 2));
         assertNumAdmissions(admissionCriteria, 1);

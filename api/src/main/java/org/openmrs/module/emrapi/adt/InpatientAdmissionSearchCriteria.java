@@ -15,8 +15,8 @@ public class InpatientAdmissionSearchCriteria {
     private Location visitLocation;
     private List<Location> currentInpatientLocations;
     private boolean includeDischarged = false;
-    private List<Integer> patientIds;
-    private List<Integer> visitIds;
+    private List<String> patients;
+    private List<String> visits;
 
     public void addCurrentInpatientLocation(Location location) {
         if (currentInpatientLocations == null) {
@@ -25,17 +25,17 @@ public class InpatientAdmissionSearchCriteria {
         currentInpatientLocations.add(location);
     }
 
-    public void addPatientId(Integer patientId) {
-        if (patientIds == null) {
-            patientIds = new ArrayList<>();
+    public void addPatientUuid(String patientUuid) {
+        if (patients == null) {
+            patients = new ArrayList<>();
         }
-        patientIds.add(patientId);
+        patients.add(patientUuid);
     }
 
-    public void addVisitId(Integer visitId) {
-        if (visitIds == null) {
-            visitIds = new ArrayList<>();
+    public void addVisitUuid(String visitUuid) {
+        if (visits == null) {
+            visits = new ArrayList<>();
         }
-        visitIds.add(visitId);
+        visits.add(visitUuid);
     }
 }
