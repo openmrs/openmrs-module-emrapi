@@ -17,8 +17,8 @@ public class InpatientRequestSearchCriteria {
     private Location visitLocation;
     private List<Location> dispositionLocations;
     private List<DispositionType> dispositionTypes;
-    private List<String> patients;
-    private List<String> visits;
+    private List<Integer> patientIds;
+    private List<Integer> visitIds;
 
     public void addDispositionLocation(Location location) {
         if (dispositionLocations == null) {
@@ -34,17 +34,17 @@ public class InpatientRequestSearchCriteria {
         dispositionTypes.add(dispositionType);
     }
 
-    public void addPatientUuid(String patientUuid) {
-        if (patients == null) {
-            patients = new ArrayList<>();
+    public void addPatientId(Integer patientId) {
+        if (patientIds == null) {
+            patientIds = new ArrayList<>();
         }
-        patients.add(patientUuid);
+        patientIds.add(patientId);
     }
 
-    public void addVisitUuid(String visitUuid) {
-        if (visits == null) {
-            visits = new ArrayList<>();
+    public void addVisitId(Integer visitId) {
+        if (visitIds == null) {
+            visitIds = new ArrayList<>();
         }
-        visits.add(visitUuid);
+        visitIds.add(visitId);
     }
 }

@@ -989,10 +989,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         parameters.put("limitByDispositionLocation", dispositionLocationIds != null);
         parameters.put("admitLocationConcept", descriptor.getAdmissionLocationConcept());
         parameters.put("transferLocationConcept", descriptor.getInternalTransferLocationConcept());
-        parameters.put("patients", criteria.getPatients());
-        parameters.put("limitByPatient", criteria.getPatients() != null);
-        parameters.put("visits", criteria.getVisits());
-        parameters.put("limitByVisit", criteria.getVisits() != null);
+        parameters.put("patientIds", criteria.getPatientIds());
+        parameters.put("limitByPatient", criteria.getPatientIds() != null);
+        parameters.put("visitIds", criteria.getVisitIds());
+        parameters.put("limitByVisit", criteria.getVisitIds() != null);
 
         List<?> reqs = emrApiDAO.executeHqlFromResource("hql/inpatient_requests.hql", parameters, List.class);
         List<InpatientRequest> ret = new ArrayList<>();
@@ -1036,10 +1036,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         parameters.put("admissionEncounterType", emrApiProperties.getAdmissionEncounterType());
         parameters.put("transferEncounterType", emrApiProperties.getTransferWithinHospitalEncounterType());
         parameters.put("dischargeEncounterType", emrApiProperties.getExitFromInpatientEncounterType());
-        parameters.put("patients", criteria.getPatients());
-        parameters.put("limitByPatient", criteria.getPatients() != null);
-        parameters.put("visits", criteria.getVisits());
-        parameters.put("limitByVisit", criteria.getVisits() != null);
+        parameters.put("patientIds", criteria.getPatientIds());
+        parameters.put("limitByPatient", criteria.getPatientIds() != null);
+        parameters.put("visitIds", criteria.getVisitIds());
+        parameters.put("limitByVisit", criteria.getVisitIds() != null);
 
         List<?> l = emrApiDAO.executeHqlFromResource("hql/inpatient_admissions.hql", parameters, List.class);
         Map<Visit, InpatientAdmission> m = new LinkedHashMap<>();
@@ -1067,7 +1067,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         // Filter out any admissions that do not match the search criteria
-        List<String> visits = new ArrayList<>();
+        List<Integer> visitIds = new ArrayList<>();
         for (Iterator<Map.Entry<Visit, InpatientAdmission>> i = m.entrySet().iterator(); i.hasNext(); ) {
             InpatientAdmission admission = i.next().getValue();
             if (criteria.getCurrentInpatientLocations() != null && !criteria.getCurrentInpatientLocations().contains(admission.getCurrentInpatientLocation())) {
@@ -1077,13 +1077,13 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
                 i.remove();
             }
             else {
-                visits.add(admission.getVisit().getUuid());
+                visitIds.add(admission.getVisit().getVisitId());
             }
         }
 
         // Retrieve InpatientRequests associated with these admissions prior to returning them
         InpatientRequestSearchCriteria requestCriteria = new InpatientRequestSearchCriteria();
-        requestCriteria.setVisits(visits);
+        requestCriteria.setVisitIds(visitIds);
         List<InpatientRequest> requests = getInpatientRequests(requestCriteria);
         for (InpatientRequest r : requests) {
             InpatientAdmission admission = m.get(r.getVisit());
