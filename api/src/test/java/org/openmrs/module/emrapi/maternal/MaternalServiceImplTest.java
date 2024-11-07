@@ -217,6 +217,32 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
         assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
         assertNull(motherAndChildList.get(0).getChildAdmission());
     }
+    
+    @Test
+    public void shouldGetChildByMotherIfChildBornInNextCalendarYearAfterVisitStart() {
+        DateTime lastDayOfYear = new DateTime(1980, 12, 31, 0, 0);
+        Date oneDayLater = lastDayOfYear.plusDays(1).toDate();
+
+        Location visitLocation = testDataManager.location().name("Visit Location").save();
+
+        Patient mother = testDataManager.randomPatient().birthdate("1980-01-01").gender("F").save();
+        Patient child = testDataManager.randomPatient().birthdate(oneDayLater).save();
+
+        Relationship motherChildRelationship = new Relationship();
+        motherChildRelationship.setRelationshipType(emrApiProperties.getMotherChildRelationshipType());
+        motherChildRelationship.setPersonA(mother);
+        motherChildRelationship.setPersonB(child);
+        personService.saveRelationship(motherChildRelationship);
+
+        Visit motherVisit = testDataManager.visit().visitType(emrApiProperties.getAtFacilityVisitType()).location(visitLocation).patient(mother).started(lastDayOfYear.toDate()).save();
+
+        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(new MothersAndChildrenSearchCriteria(Collections.singletonList(mother.getUuid()), null, false, false, true));
+
+        assertThat(motherAndChildList.size(),equalTo(1));
+        assertThat(motherAndChildList.get(0).getChild(),equalTo(child));
+        assertThat(motherAndChildList.get(0).getMother(), equalTo(mother));
+        assertNull(motherAndChildList.get(0).getChildAdmission());
+    }
 
     @Test
     public void shouldGetMultipleChildByMother() {
