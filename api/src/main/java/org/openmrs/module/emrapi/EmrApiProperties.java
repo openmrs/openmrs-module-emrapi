@@ -129,6 +129,14 @@ public class EmrApiProperties extends ModuleProperties {
 		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_TRANSFER_REQUEST_ENCOUNTER_TYPE, false);
 	}
 
+	public EncounterType getBedAssignmentEncounterType() {
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_BED_ASSIGNMENT_ENCOUNTER_TYPE, false);
+	}
+
+	public EncounterType getCancelADTRequestEncounterType() {
+		return getEmrApiMetadataByCode(EncounterType.class, EmrApiConstants.GP_CANCEL_ADT_REQUEST_ENCOUNTER_TYPE, false);
+	}
+
 	public Form getAdmissionForm() {
 		return getEmrApiMetadataByCode(Form.class, EmrApiConstants.GP_ADMISSION_FORM, false);
 	}

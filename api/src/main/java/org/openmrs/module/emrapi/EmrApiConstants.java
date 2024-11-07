@@ -48,6 +48,10 @@ public class EmrApiConstants {
 
     public static final String GP_TRANSFER_REQUEST_ENCOUNTER_TYPE = "emr.transferRequestEncounterType";
 
+    public static final String GP_BED_ASSIGNMENT_ENCOUNTER_TYPE = "emr.bedAssignmentEncounterType";
+
+    public static final String GP_CANCEL_ADT_REQUEST_ENCOUNTER_TYPE = "emr.cancelADTRequestEncounterType";
+
     public static final String GP_CHECK_IN_CLERK_ENCOUNTER_ROLE = "emr.checkInClerkEncounterRole";
 
     public static final String GP_CLINICIAN_ENCOUNTER_ROLE = "emr.clinicianEncounterRole";
