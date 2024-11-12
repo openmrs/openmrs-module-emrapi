@@ -73,8 +73,6 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
 
     private PersonService personService;
 
-    private ConceptService conceptService;
-
     private MetadataMappingService metadataMappingService;
 
     /**
@@ -137,14 +135,12 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         administrationService = Context.getAdministrationService();
         providerService = Context.getProviderService();
         personService = Context.getPersonService();
-        conceptService = Context.getConceptService();
         metadataMappingService = Context.getService(MetadataMappingService.class);
 
         createMissingMetadataMappings();
         createUnknownProvider();
 
         administrationService.setGlobalProperty(OpenmrsConstants.GP_VISIT_ASSIGNMENT_HANDLER, EmrApiVisitAssignmentHandler.class.getName());
-        createConceptSource(conceptService);
         eventListener = new PatientViewedEventListener(daemonToken);
         Event.subscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, eventListener);
 
