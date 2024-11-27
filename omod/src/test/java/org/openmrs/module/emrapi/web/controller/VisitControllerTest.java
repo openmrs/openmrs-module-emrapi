@@ -3,16 +3,13 @@ package org.openmrs.module.emrapi.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Map;
@@ -21,12 +18,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
 public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
-    
+
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private ObjectFactory<VisitController> controllerFactory;
     
     private MockMvc mockMvc;
     
@@ -34,8 +29,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
     public void setUp() throws Exception {
         executeDataSet("baseMetaData.xml");
         executeDataSet("pastVisitSetup.xml");
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        
+        mockMvc = MockMvcBuilders.standaloneSetup(controllerFactory.getObject()).build();
     }
 
     @Test
