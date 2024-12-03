@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Represents a hospital Admission
@@ -102,5 +103,19 @@ public class InpatientAdmission {
         return Comparator.comparing(Encounter::getEncounterDatetime)
                 .thenComparing(Encounter::getDateCreated)
                 .thenComparing(Encounter::getEncounterId);
+    }
+
+    public List<Encounter> getAllEncounters() {
+        return Collections.unmodifiableList(visit.getEncounters().stream().filter(e -> !e.getVoided()).sorted(getEncounterComparator()).collect(Collectors.toList()));
+    }
+
+    public Encounter getFirstEncounter() {
+        List<Encounter> encounters = getAllEncounters();
+        return encounters.isEmpty() ? null : encounters.get(0);
+    }
+
+    public Encounter getLatestEncounter() {
+        List<Encounter> encounters = getAllEncounters();
+        return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
     }
 }
