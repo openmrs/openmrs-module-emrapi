@@ -9,7 +9,11 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents and Admission, Discharge, or Transfer request
@@ -23,4 +27,24 @@ public class InpatientRequest {
     private Obs dispositionObsGroup;
     private Concept disposition;
     private Location dispositionLocation;
+
+    public List<Encounter> getAllEncounters() {
+        return Collections.unmodifiableList(visit.getEncounters().stream().filter(e -> !e.getVoided()).sorted(getEncounterComparator()).collect(Collectors.toList()));
+    }
+
+    public Encounter getFirstEncounter() {
+        List<Encounter> encounters = getAllEncounters();
+        return encounters.isEmpty() ? null : encounters.get(0);
+    }
+
+    public Encounter getLatestEncounter() {
+        List<Encounter> encounters = getAllEncounters();
+        return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
+    }
+
+    private Comparator<Encounter> getEncounterComparator() {
+        return Comparator.comparing(Encounter::getEncounterDatetime)
+                .thenComparing(Encounter::getDateCreated)
+                .thenComparing(Encounter::getEncounterId);
+    }
 }
