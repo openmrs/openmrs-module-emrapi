@@ -28,6 +28,6 @@ public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements
             throw new ObjectNotFoundException("No patient found with uuid " + patientUuid, Patient.class.getName());
         }
 
-        return visitDAO.getVisitsByPatientId(patient, startIndex, limit);
+        return visitDAO.getVisitsWithNotesAndDiagnosesByPatient(patient, startIndex, limit);
     }
 }

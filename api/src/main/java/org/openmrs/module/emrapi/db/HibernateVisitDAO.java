@@ -23,15 +23,15 @@ public class HibernateVisitDAO implements VisitDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-    public List<VisitWithDiagnoses> getVisitsByPatientId(Patient patient, int startIndex, int limit) {
+    public List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit) {
 
         String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
         
         String hqlVisit="SELECT DISTINCT v FROM Visit v " +
-                "JOIN FETCH v.encounters enc " +
-                "JOIN enc.encounterType et " +
+                "LEFT JOIN FETCH v.encounters enc " +
+                "LEFT JOIN enc.encounterType et " +
                 "WHERE v.patient.id = :patientId " +
-                "AND et.uuid = :encounterTypeUuid " +
+                "AND (et.uuid = :encounterTypeUuid OR enc IS NULL) " +
                 "ORDER BY v.startDatetime DESC";
         
         Query visitQuery = sessionFactory.getCurrentSession().createQuery(hqlVisit);

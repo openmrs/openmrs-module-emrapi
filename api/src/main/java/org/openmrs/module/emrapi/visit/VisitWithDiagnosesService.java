@@ -1,5 +1,7 @@
 package org.openmrs.module.emrapi.visit;
 
+import org.openmrs.Patient;
+
 import java.util.List;
 
 public interface VisitWithDiagnosesService {

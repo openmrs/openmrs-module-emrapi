@@ -39,8 +39,9 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
         String firstVisitUuid = "1esd5218-6b78-11e0-93c3-18a905e044dc";
         String secondVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
+        String thirdVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid+"/visitWithNotesAndDiagnoses")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -50,13 +51,13 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         Map<String, Object> result = objectMapper.readValue(jsonResponse, Map.class);
 
         assertNotNull(result);
-        assert result.get("totalCount").equals(2);
+        assert result.get("totalCount").equals(3);
         
         List<Map<String, Object>> visits = (List<Map<String, Object>>) result.get("pageOfResults");
-        assert visits.size() == 2;
+        assert visits.size() == 3;
         
         // extract the first visit and check its properties
-        Map<String, Object> firstVisit = visits.get(1);
+        Map<String, Object> firstVisit = visits.get(2);
         List<Map<String, Object>> firstVisitEncounters = (List<Map<String, Object>>) firstVisit.get("encounters");
         List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>) firstVisit.get("diagnoses");
         
@@ -69,7 +70,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         }
        
         // extract the second visit and check its properties
-        Map<String, Object> secondVisit = visits.get(0);
+        Map<String, Object> secondVisit = visits.get(1);
         List<Map<String, Object>> secondVisitEncounters = (List<Map<String, Object>>) secondVisit.get("encounters");
         List<Map<String, Object>> secondVisitDiagnoses = (List<Map<String, Object>>) secondVisit.get("diagnoses");
         
@@ -80,6 +81,15 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         for (Map<String, Object> encounter : secondVisitEncounters) {
             assert ((String) encounter.get("display")).startsWith("Visit Note");
         }
+        
+        // extract the third visit and check its properties (no notes or diagnoses)
+        Map<String, Object> thirdVisit = visits.get(0);
+        List<Map<String, Object>> thirdVisitEncounters = (List<Map<String, Object>>) thirdVisit.get("encounters");
+        List<Map<String, Object>> thirdVisitDiagnoses = (List<Map<String, Object>>) thirdVisit.get("diagnoses");
+        
+        assert thirdVisit.get("uuid").equals(thirdVisitUuid);
+        assert thirdVisitEncounters.isEmpty();
+        assert thirdVisitDiagnoses.isEmpty();
     }
     
     @Test

@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface VisitDAO {
 
-    List<VisitWithDiagnoses> getVisitsByPatientId(Patient patient, int startIndex, int limit);
+    List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit);
 }

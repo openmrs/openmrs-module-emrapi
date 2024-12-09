@@ -22,6 +22,7 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
 
     @Before
     public void setup() {
+        executeDataSet("baseTestDataset.xml");
         executeDataSet("pastVisitSetup.xml");
     }
 
@@ -32,11 +33,11 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(109);
 
-        List<VisitWithDiagnoses> visits = visitDAO.getVisitsByPatientId(patient,0,10);
+        List<VisitWithDiagnoses> visits = visitDAO.getVisitsWithNotesAndDiagnosesByPatient(patient,0,10);
         assertNotNull(visits);
-        assert visits.size() == 2;
+        assert visits.size() == 3;
 
-        VisitWithDiagnoses firstVisit = visits.get(1);
+        VisitWithDiagnoses firstVisit = visits.get(2);
         Set<Encounter> firstVisitEncounters = firstVisit.getEncounters();
         Set<Diagnosis> firstVisitDiagnoses = firstVisit.getDiagnoses();
 
@@ -49,7 +50,7 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
             assert encounter.getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
         }
 
-        VisitWithDiagnoses secondVisit = visits.get(0);
+        VisitWithDiagnoses secondVisit = visits.get(1);
         Set<Encounter> secondVisitEncounters = secondVisit.getEncounters();
         Set<Diagnosis> secondVisitDiagnoses = secondVisit.getDiagnoses();
 
@@ -61,6 +62,16 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
         for (Encounter encounter : secondVisitEncounters) {
             assert encounter.getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
         }
+        
+        VisitWithDiagnoses thirdVisit = visits.get(0);
+        Set<Encounter> thirdVisitEncounters = thirdVisit.getEncounters();
+        Set<Diagnosis> thirdVisitDiagnoses = thirdVisit.getDiagnoses();
+        
+        assert thirdVisit.getId() == 1017;
+        assert thirdVisit.getPatient().getPatientId() == 109;
+        assert thirdVisitEncounters.isEmpty();
+        assert thirdVisitDiagnoses.isEmpty();
+        
     }
     
     @Test
@@ -68,7 +79,7 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(109);
 
-        List<VisitWithDiagnoses> visits = visitDAO.getVisitsByPatientId(patient,0,1);
+        List<VisitWithDiagnoses> visits = visitDAO.getVisitsWithNotesAndDiagnosesByPatient(patient,0,1);
         assertNotNull(visits);
         assert visits.size() == 1;
 
