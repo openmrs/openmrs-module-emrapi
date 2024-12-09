@@ -26,10 +26,4 @@
   <encounter encounter_id="2001" visit_id="1014" encounter_type="1003" patient_id="109" location_id="1901" form_id="1" encounter_datetime="2023-10-20 09:10:00.0" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="a123d653-444b-4118-9c83-a3715b82d4ac"/>
   <encounter encounter_id="2002" visit_id="1014" encounter_type="1004" patient_id="109" location_id="1901" form_id="1" encounter_datetime="2023-10-20 09:10:00.0" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="a9a41017-2593-442a-bb88-c80358692d1e"/>
 
-<!--  &lt;!&ndash; Metadata mapping for Visit Note encounter type &ndash;&gt;-->
-<!--  <metadatamapping_metadata_term_mapping metadata_term_mapping_id="3945" metadata_source_id="2134"-->
-<!--                                         creator="1" date_created="2023-10-20 12:38:58.0" uuid="111bbad0-d565-11e3-9c1a-0800200c9a665"-->
-<!--                                         retired="false" code="emr.visitNoteEncounterType" name="emr.visitNoteEncounterType"-->
-<!--                                         metadata_uuid="06087e80-d565-11e3-9c1a-0800200c9a66" metadata_class="org.openmrs.EncounterType"/>-->
-
 </dataset>

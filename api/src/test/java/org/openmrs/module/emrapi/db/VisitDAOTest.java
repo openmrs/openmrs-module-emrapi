@@ -84,7 +84,7 @@ public class VisitDAOTest extends EmrApiContextSensitiveTest {
         assert visits.size() == 1;
 
         VisitWithDiagnoses mostRecentVisit = visits.get(0);
-        assert mostRecentVisit.getId() == 1015;
+        assert mostRecentVisit.getId() == 1017;
     }
 
 }
