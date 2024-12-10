@@ -96,9 +96,9 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
     public void shouldGetVisitsByPatientIdWithPagination() throws Exception {
         
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
-        String mostRecentVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
+        String mostRecentVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid+"/visitWithNotesAndDiagnoses")
                         .param("startIndex", "0")
                         .param("limit", "1")
                         .contentType(MediaType.APPLICATION_JSON))
