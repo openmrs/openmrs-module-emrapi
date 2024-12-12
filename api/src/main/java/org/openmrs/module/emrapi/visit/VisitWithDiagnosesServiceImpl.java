@@ -20,7 +20,7 @@ public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements
     EmrApiDAO emrApiDAO;
 
     @Override
-    public List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid, int startIndex, int limit) {
+    public List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(String patientUuid, int startIndex, int limit) {
 
         Patient patient = patientService.getPatientByUuid(patientUuid);
 

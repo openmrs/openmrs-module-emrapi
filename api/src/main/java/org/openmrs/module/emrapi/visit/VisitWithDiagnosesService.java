@@ -1,7 +1,5 @@
 package org.openmrs.module.emrapi.visit;
 
-import org.openmrs.Patient;
-
 import java.util.List;
 
 public interface VisitWithDiagnosesService {
@@ -11,5 +9,5 @@ public interface VisitWithDiagnosesService {
      * @param patientUuid the UUID of the patient
      * @return a list of visits that has note encounters and diagnoses
      */
-    List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid, int startIndex, int limit);
+    List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(String patientUuid, int startIndex, int limit);
 }

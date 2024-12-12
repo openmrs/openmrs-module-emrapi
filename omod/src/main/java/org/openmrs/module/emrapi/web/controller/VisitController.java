@@ -1,8 +1,6 @@
 package org.openmrs.module.emrapi.web.controller;
 
-import org.hibernate.ObjectNotFoundException;
 import org.openmrs.Diagnosis;
-import org.openmrs.Patient;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnosesService;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -37,7 +35,7 @@ public class VisitController {
             @PathVariable("patientUuid") String patientUuid) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         List<VisitWithDiagnoses> visitsEntries;
-        visitsEntries = visitWithDiagnosesService.getVisitsByPatientId(patientUuid, context.getStartIndex(), context.getLimit());
+        visitsEntries = visitWithDiagnosesService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
         
         // Convert the visits and diagnoses to SimpleObjects
         List<SimpleObject> convertedVisits = new ArrayList<>();
