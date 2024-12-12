@@ -4,7 +4,7 @@ import org.hibernate.ObjectNotFoundException;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.emrapi.db.VisitDAO;
+import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements
     PatientService patientService;
 
     @Autowired
-    VisitDAO visitDAO;
+    EmrApiDAO emrApiDAO;
 
     @Override
     public List<VisitWithDiagnoses> getVisitsByPatientId(String patientUuid, int startIndex, int limit) {
@@ -28,6 +28,6 @@ public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements
             throw new ObjectNotFoundException("No patient found with uuid " + patientUuid, Patient.class.getName());
         }
 
-        return visitDAO.getVisitsWithNotesAndDiagnosesByPatient(patient, startIndex, limit);
+        return emrApiDAO.getVisitsWithNotesAndDiagnosesByPatient(patient, startIndex, limit);
     }
 }

@@ -36,21 +36,23 @@ public class VisitController {
             HttpServletResponse response,
             @PathVariable("patientUuid") String patientUuid) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
-        List<VisitWithDiagnoses> visits;
-        visits = visitWithDiagnosesService.getVisitsByPatientId(patientUuid, context.getStartIndex(), context.getLimit());
+        List<VisitWithDiagnoses> visitsEntries;
+        visitsEntries = visitWithDiagnosesService.getVisitsByPatientId(patientUuid, context.getStartIndex(), context.getLimit());
         
         // Convert the visits and diagnoses to SimpleObjects
         List<SimpleObject> convertedVisits = new ArrayList<>();
-        for (VisitWithDiagnoses visit : visits) {
-            SimpleObject visitObject = (SimpleObject) ConversionUtil.convertToRepresentation(visit, context.getRepresentation());
+        for (VisitWithDiagnoses visitEntry : visitsEntries) {
+            SimpleObject visitEntryObject = new SimpleObject();
+            SimpleObject visitObject = (SimpleObject) ConversionUtil.convertToRepresentation(visitEntry.getVisit(), context.getRepresentation());
             List<SimpleObject> convertedDiagnoses = new ArrayList<>();
             
-            for (Diagnosis diagnosis : visit.getDiagnoses()) {
+            for (Diagnosis diagnosis : visitEntry.getDiagnoses()) {
                 convertedDiagnoses.add((SimpleObject) ConversionUtil.convertToRepresentation(diagnosis, context.getRepresentation()));
             }
-            visitObject.put("diagnoses", convertedDiagnoses);
+            visitEntryObject.put("visit", visitObject);
+            visitEntryObject.put("diagnoses", convertedDiagnoses);
             
-            convertedVisits.add(visitObject);
+            convertedVisits.add(visitEntryObject);
         }
         
         return new ResponseEntity<>(new NeedsPaging<>(convertedVisits, context), HttpStatus.OK);

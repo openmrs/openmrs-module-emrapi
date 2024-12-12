@@ -26,22 +26,21 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
     private MockMvc mockMvc;
     
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         executeDataSet("baseMetaData.xml");
         executeDataSet("pastVisitSetup.xml");
         mockMvc = MockMvcBuilders.standaloneSetup(controllerFactory.getObject()).build();
     }
 
     @Test
-    public void shouldGetVisitsByPatientId() throws Exception {
+    public void shouldGetVisitsWithNotesAndDiagnosesByPatient() throws Exception {
 
-        String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
         String firstVisitUuid = "1esd5218-6b78-11e0-93c3-18a905e044dc";
         String secondVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
         String thirdVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid+"/visitWithNotesAndDiagnoses")
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithNotesAndDiagnoses")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -53,13 +52,14 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         assertNotNull(result);
         assert result.get("totalCount").equals(3);
         
-        List<Map<String, Object>> visits = (List<Map<String, Object>>) result.get("pageOfResults");
-        assert visits.size() == 3;
+        List<Map<String, Object>> visitEntries = (List<Map<String, Object>>) result.get("pageOfResults");
+        assert visitEntries.size() == 3;
         
         // extract the first visit and check its properties
-        Map<String, Object> firstVisit = visits.get(2);
+        Map<String, Object> firstVisitEntry = visitEntries.get(2);
+        Map<String, Object> firstVisit = (Map<String, Object>) firstVisitEntry.get("visit");
         List<Map<String, Object>> firstVisitEncounters = (List<Map<String, Object>>) firstVisit.get("encounters");
-        List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>) firstVisit.get("diagnoses");
+        List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>) firstVisitEntry.get("diagnoses");
         
         assert firstVisit.get("uuid").equals(firstVisitUuid);
         assert firstVisitEncounters.size() == 2;
@@ -70,9 +70,10 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         }
        
         // extract the second visit and check its properties
-        Map<String, Object> secondVisit = visits.get(1);
+        Map<String, Object> secondVisitEntry = visitEntries.get(1);
+        Map<String, Object> secondVisit = (Map<String, Object>) secondVisitEntry.get("visit");
         List<Map<String, Object>> secondVisitEncounters = (List<Map<String, Object>>) secondVisit.get("encounters");
-        List<Map<String, Object>> secondVisitDiagnoses = (List<Map<String, Object>>) secondVisit.get("diagnoses");
+        List<Map<String, Object>> secondVisitDiagnoses = (List<Map<String, Object>>) secondVisitEntry.get("diagnoses");
         
         assert secondVisit.get("uuid").equals(secondVisitUuid);
         assert secondVisitEncounters.size() == 1;
@@ -83,9 +84,10 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         }
         
         // extract the third visit and check its properties (no notes or diagnoses)
-        Map<String, Object> thirdVisit = visits.get(0);
+        Map<String, Object> thirdVisitEntry = visitEntries.get(0);
+        Map<String, Object> thirdVisit = (Map<String, Object>) thirdVisitEntry.get("visit");
         List<Map<String, Object>> thirdVisitEncounters = (List<Map<String, Object>>) thirdVisit.get("encounters");
-        List<Map<String, Object>> thirdVisitDiagnoses = (List<Map<String, Object>>) thirdVisit.get("diagnoses");
+        List<Map<String, Object>> thirdVisitDiagnoses = (List<Map<String, Object>>) thirdVisitEntry.get("diagnoses");
         
         assert thirdVisit.get("uuid").equals(thirdVisitUuid);
         assert thirdVisitEncounters.isEmpty();
@@ -93,7 +95,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
     }
     
     @Test
-    public void shouldGetVisitsByPatientIdWithPagination() throws Exception {
+    public void shouldGetVisitsWithNotesAndDiagnosesByPatientWithPagination() throws Exception {
         
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
         String mostRecentVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
@@ -112,10 +114,12 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         assertNotNull(result);
         assert result.get("totalCount").equals(1);
         
-        List<Map<String, Object>> visits = (List<Map<String, Object>>) result.get("pageOfResults");
-        assert visits.size() == 1;
+        List<Map<String, Object>> visitsEntries = (List<Map<String, Object>>) result.get("pageOfResults");
+        assert visitsEntries.size() == 1;
         
-        Map<String, Object> recentVisit = visits.get(0);
+        Map<String, Object> recentVisitEntry = visitsEntries.get(0);
+        Map<String, Object> recentVisit = (Map<String, Object>) recentVisitEntry.get("visit");
         assert recentVisit.get("uuid").equals(mostRecentVisitUuid);
+        assert recentVisit.get("encounters").equals(0);
     }
 }
