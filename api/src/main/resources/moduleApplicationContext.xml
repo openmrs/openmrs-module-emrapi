@@ -315,6 +315,7 @@
         <constructor-arg ref="encounterService"/>
     </bean>
 
+
     <bean id="emrApiDAOImpl" class="org.openmrs.module.emrapi.db.EmrApiDAOImpl">
         <property name="sessionFactory">
             <ref bean="dbSessionFactory"/>
@@ -322,6 +323,11 @@
         <property name="emrApiProperties">
             <ref bean="emrApiProperties"/>
         </property>
+    </bean>
+
+    <bean id="emrApiVisitService" class="org.openmrs.module.emrapi.visit.EmrApiVisitServiceImpl">
+        <property name="emrApiDAO" ref="emrApiDAOImpl"/>
+        <property name="patientService" ref="patientService"/>
     </bean>
 
     <bean id="visitResponseMapper" class="org.openmrs.module.emrapi.visit.VisitResponseMapper">

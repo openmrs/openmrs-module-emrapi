@@ -2,7 +2,7 @@ package org.openmrs.module.emrapi.visit;
 
 import java.util.List;
 
-public interface VisitWithDiagnosesService {
+public interface EmrApiVisitService {
     /**
      * Fetches visits with note encounters and diagnoses of a patient by patient ID.
      *

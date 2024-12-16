@@ -1,22 +1,20 @@
 package org.openmrs.module.emrapi.visit;
 
+import lombok.Setter;
 import org.hibernate.ObjectNotFoundException;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Setter
 @Service
-public class VisitWithDiagnosesServiceImpl extends BaseOpenmrsService implements VisitWithDiagnosesService {
+public class EmrApiVisitServiceImpl extends BaseOpenmrsService implements EmrApiVisitService {
 
-    @Autowired
     PatientService patientService;
-
-    @Autowired
     EmrApiDAO emrApiDAO;
 
     @Override

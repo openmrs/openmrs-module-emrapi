@@ -1,15 +1,15 @@
 package org.openmrs.module.emrapi.web.controller;
 
+import lombok.Setter;
 import org.openmrs.Diagnosis;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnosesService;
+import org.openmrs.module.emrapi.visit.EmrApiVisitService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,20 +22,20 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
 @Controller
 public class VisitController {
     
-    @Autowired
-    VisitWithDiagnosesService visitWithDiagnosesService;
-    
-    @RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visitWithNotesAndDiagnoses")
+    EmrApiVisitService emrApiVisitService;
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visitWithNotesAndDiagnoses")
     public ResponseEntity<?> getVisitsWithDiagnosesByPatient(
             HttpServletRequest request,
             HttpServletResponse response,
             @PathVariable("patientUuid") String patientUuid) {
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         List<VisitWithDiagnoses> visitsEntries;
-        visitsEntries = visitWithDiagnosesService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
+        visitsEntries = emrApiVisitService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
         
         // Convert the visits and diagnoses to SimpleObjects
         List<SimpleObject> convertedVisits = new ArrayList<>();
