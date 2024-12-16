@@ -39,7 +39,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         String secondVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
         String thirdVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithNotesAndDiagnoses")
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithNotesAndDiagnoses?patient="+patientUuid)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();

@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.web.controller;
 
 import lombok.Setter;
 import org.openmrs.Diagnosis;
+import org.openmrs.Patient;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
 import org.openmrs.module.emrapi.visit.EmrApiVisitService;
 import org.openmrs.module.webservices.rest.SimpleObject;
@@ -10,12 +11,14 @@ import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
+import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +27,7 @@ import java.util.List;
 
 @Setter
 @Controller
-public class VisitController {
+public class VisitController extends BaseRestController {
     
     EmrApiVisitService emrApiVisitService;
 	
@@ -32,7 +35,9 @@ public class VisitController {
     public ResponseEntity<?> getVisitsWithDiagnosesByPatient(
             HttpServletRequest request,
             HttpServletResponse response,
-            @PathVariable("patientUuid") String patientUuid) {
+            @PathVariable("patientUuid") String patientUuid,
+            @RequestParam("patient") Patient patient) {
+        
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         List<VisitWithDiagnoses> visitsEntries;
         visitsEntries = emrApiVisitService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
