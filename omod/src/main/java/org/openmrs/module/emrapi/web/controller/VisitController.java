@@ -35,8 +35,7 @@ public class VisitController extends BaseRestController {
     public ResponseEntity<?> getVisitsWithDiagnosesByPatient(
             HttpServletRequest request,
             HttpServletResponse response,
-            @PathVariable("patientUuid") String patientUuid,
-            @RequestParam("patient") Patient patient) {
+            @PathVariable("patientUuid") String patientUuid) {
         
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
         List<VisitWithDiagnoses> visitsEntries;
