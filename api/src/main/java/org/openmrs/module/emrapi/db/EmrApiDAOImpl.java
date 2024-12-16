@@ -1,13 +1,16 @@
 package org.openmrs.module.emrapi.db;
 
+import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.openmrs.Diagnosis;
+import org.openmrs.EncounterType;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
 
 import java.io.IOException;
@@ -26,13 +29,13 @@ public class EmrApiDAOImpl implements EmrApiDAO {
 
    protected final Log log = LogFactory.getLog(getClass());
 
+   @Setter
    private DbSessionFactory sessionFactory;
-
-   public void setSessionFactory(DbSessionFactory sessionFactory) {
-      this.sessionFactory = sessionFactory;
-   }
-
-   @Override
+   
+   @Setter
+   private EmrApiProperties emrApiProperties;
+	
+	@Override
    @SuppressWarnings("unchecked")
    public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz) {
       Query query = sessionFactory.getCurrentSession().createQuery(queryString);
@@ -67,7 +70,7 @@ public class EmrApiDAOImpl implements EmrApiDAO {
    
    public List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit) {
       
-      String visitNoteEncounterTypeUuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79";
+      String visitNoteEncounterTypeUuid = emrApiProperties.getVisitNoteEncounterType().getUuid();
       
       String hqlVisit="SELECT DISTINCT v FROM Visit v " +
               "LEFT JOIN FETCH v.encounters enc " +

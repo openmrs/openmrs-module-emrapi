@@ -319,6 +319,9 @@
         <property name="sessionFactory">
             <ref bean="dbSessionFactory"/>
         </property>
+        <property name="emrApiProperties">
+            <ref bean="emrApiProperties"/>
+        </property>
     </bean>
 
     <bean id="visitResponseMapper" class="org.openmrs.module.emrapi.visit.VisitResponseMapper">

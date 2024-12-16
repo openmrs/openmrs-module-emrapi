@@ -6,6 +6,12 @@
   <encounter_type encounter_type_id="1003" name="Visit Note" description="Visit note" creator="1" date_created="2023-10-15 10:00:00.0" retired="false" uuid="d7151f82-c1f3-4152-a605-2f9ea7414a79"/>
   <encounter_type encounter_type_id="1004" name="Consultation" description="Consultation encounter" creator="1" date_created="2023-10-15 10:00:00.0" retired="false" uuid="d92ca5dc-7fd0-4fa2-b726-ab16fbc53fc1"/>
 
+  <metadatamapping_metadata_term_mapping metadata_term_mapping_id = "3945" metadata_source_id = "2134"
+                                         creator = "1" date_created="2008-08-18 12:38:58.0" uuid="111bbad0-d565-11e3-9c1a-0800200c9a665"
+                                         retired = "false" code = "emr.visitNoteEncounterType" name = "emr.visitNoteEncounterType"
+                                         metadata_uuid = "d7151f82-c1f3-4152-a605-2f9ea7414a79" metadata_class = "org.openmrs.EncounterType"
+  />
+
   <!-- Patient 1: Scott Clark -->
   <person person_id="109" gender="M" dead="false" creator="1" birthdate_estimated="0" date_created="2023-10-15 10:30:00.0" voided="false" void_reason="" uuid="8604d42e-3ca8-11e3-bf2b-0d0c09861e97"/>
   <person_name person_name_id="109" person_id="109" preferred="true" prefix="" given_name="Scott" middle_name="" family_name="Clark" family_name_suffix="" creator="1" date_created="2023-10-15 10:31:00.0" voided="false" void_reason="" uuid="8f9e3a7b-6482-487d-9abe-c07b123c4f08"/>
@@ -58,5 +64,6 @@
   <encounter_diagnosis diagnosis_id="5" encounter_id="2005" patient_id="110" creator="1" date_created="2023-10-25 08:42:00.0" rank="1" certainty="CONFIRMED" voided="false" uuid="c0a9f874-2b47-4f58-93fc-d8a0d233b77f"/>
   <encounter_diagnosis diagnosis_id="6" encounter_id="2006" patient_id="110" creator="1" date_created="2023-10-25 08:47:00.0" rank="1" certainty="CONFIRMED" voided="false" uuid="0b75c6d4-45a5-477a-bf7a-f5a0476a47d8"/>
   <encounter_diagnosis diagnosis_id="7" encounter_id="2007" patient_id="110" creator="1" date_created="2023-11-05 09:05:00.0" rank="1" certainty="CONFIRMED" voided="false" uuid="33a9f72c-d911-42b9-950f-4f1a6201a20a"/>
+
 
 </dataset>

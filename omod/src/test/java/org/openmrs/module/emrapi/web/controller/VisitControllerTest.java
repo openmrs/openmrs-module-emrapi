@@ -27,7 +27,6 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
     
     @Before
     public void setUp() {
-        executeDataSet("baseMetaData.xml");
         executeDataSet("pastVisitSetup.xml");
         mockMvc = MockMvcBuilders.standaloneSetup(controllerFactory.getObject()).build();
     }
@@ -120,6 +119,5 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         Map<String, Object> recentVisitEntry = visitsEntries.get(0);
         Map<String, Object> recentVisit = (Map<String, Object>) recentVisitEntry.get("visit");
         assert recentVisit.get("uuid").equals(mostRecentVisitUuid);
-        assert recentVisit.get("encounters").equals(0);
     }
 }

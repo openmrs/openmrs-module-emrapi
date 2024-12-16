@@ -29,7 +29,7 @@ public class VisitController {
     VisitWithDiagnosesService visitWithDiagnosesService;
     
     @RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visitWithNotesAndDiagnoses")
-    public ResponseEntity<?> getVisitsByPatientId(
+    public ResponseEntity<?> getVisitsWithDiagnosesByPatient(
             HttpServletRequest request,
             HttpServletResponse response,
             @PathVariable("patientUuid") String patientUuid) {
