@@ -18,5 +18,4 @@ public class VisitWithDiagnoses {
        this.visit = visit;
        this.diagnoses = diagnoses;
     }
-    
 }
