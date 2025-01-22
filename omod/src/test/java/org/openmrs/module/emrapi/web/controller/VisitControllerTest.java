@@ -11,6 +11,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +32,17 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
     
     @Before
     public void setUp() {
-        executeDataSet("pastVisitSetup.xml");
+        URL resource = getClass().getClassLoader().getResource("pastVisitSetup.xml");
+	    String filePath;
+	    try {
+		    filePath = new File(resource.toURI()).getAbsolutePath();
+	    }
+	    catch (URISyntaxException e) {
+		    throw new RuntimeException(e);
+	    }
+	    
+	    // Execute the dataset
+        executeDataSet(filePath);
         mockMvc = MockMvcBuilders.standaloneSetup(controllerFactory.getObject()).build();
     }
 

@@ -1,7 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <dataset>
-
+  <metadatamapping_metadata_source
+          metadata_source_id = "2134"
+          creator = "1"
+          date_created="2008-08-18 12:38:58.0"
+          uuid="cf25712e-f193-48d5-a85a-5fd8d0242223"
+          name="org.openmrs.module.emrapi"
+          retired = "false"
+  />
   <!-- Encounter Types -->
   <encounter_type encounter_type_id="1003" name="Visit Note" description="Visit note" creator="1" date_created="2023-10-15 10:00:00.0" retired="false" uuid="d7151f82-c1f3-4152-a605-2f9ea7414a79"/>
   <encounter_type encounter_type_id="1004" name="Consultation" description="Consultation encounter" creator="1" date_created="2023-10-15 10:00:00.0" retired="false" uuid="d92ca5dc-7fd0-4fa2-b726-ab16fbc53fc1"/>
