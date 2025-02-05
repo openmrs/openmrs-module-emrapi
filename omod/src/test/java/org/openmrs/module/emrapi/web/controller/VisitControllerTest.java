@@ -139,9 +139,8 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         
         String patientUuid = "non-existent-uuid";
         
-        // Ideally, this should return a 404 error, but the controller is not handling this case
         mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithDiagnosesAndNotes")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
     }
 }
