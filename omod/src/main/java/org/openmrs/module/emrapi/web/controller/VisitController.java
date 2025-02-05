@@ -2,7 +2,9 @@ package org.openmrs.module.emrapi.web.controller;
 
 import lombok.Setter;
 import org.openmrs.Diagnosis;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
+import org.openmrs.Encounter;
+import org.openmrs.api.APIException;
+import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 import org.openmrs.module.emrapi.visit.EmrApiVisitService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
@@ -11,6 +13,7 @@ import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,30 +30,41 @@ import java.util.List;
 @Controller
 public class VisitController extends BaseRestController {
     
+    @Autowired
     EmrApiVisitService emrApiVisitService;
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visitWithNotesAndDiagnoses")
-    public ResponseEntity<?> getVisitsWithDiagnosesByPatient(
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visitWithDiagnosesAndNotes")
+    public ResponseEntity<?> getVisitsWithDiagnosesAndNotesByPatient(
             HttpServletRequest request,
             HttpServletResponse response,
             @PathVariable("patientUuid") String patientUuid) {
         
         RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
-        List<VisitWithDiagnoses> visitsEntries;
-        visitsEntries = emrApiVisitService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
+        List<VisitWithDiagnosesAndNotes> visitsEntries;
+        try {
+            visitsEntries = emrApiVisitService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
+        }catch (APIException e) {
+            return new ResponseEntity<>(RestUtil.wrapErrorResponse(e, e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+        
         
         // Convert the visits and diagnoses to SimpleObjects
         List<SimpleObject> convertedVisits = new ArrayList<>();
-        for (VisitWithDiagnoses visitEntry : visitsEntries) {
+        for (VisitWithDiagnosesAndNotes visitEntry : visitsEntries) {
             SimpleObject visitEntryObject = new SimpleObject();
             SimpleObject visitObject = (SimpleObject) ConversionUtil.convertToRepresentation(visitEntry.getVisit(), context.getRepresentation());
             List<SimpleObject> convertedDiagnoses = new ArrayList<>();
+            List<SimpleObject> convertedVisitNotes = new ArrayList<>();
             
             for (Diagnosis diagnosis : visitEntry.getDiagnoses()) {
                 convertedDiagnoses.add((SimpleObject) ConversionUtil.convertToRepresentation(diagnosis, context.getRepresentation()));
             }
+            for (Encounter encounter : visitEntry.getVisitNotes()) {
+                convertedVisitNotes.add((SimpleObject) ConversionUtil.convertToRepresentation(encounter, context.getRepresentation()));
+            }
             visitEntryObject.put("visit", visitObject);
             visitEntryObject.put("diagnoses", convertedDiagnoses);
+            visitEntryObject.put("visitNotes", convertedVisitNotes);
             
             convertedVisits.add(visitEntryObject);
         }

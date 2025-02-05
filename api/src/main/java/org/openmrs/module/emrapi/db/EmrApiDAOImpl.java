@@ -6,12 +6,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.openmrs.Diagnosis;
-import org.openmrs.EncounterType;
+import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
+import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ public class EmrApiDAOImpl implements EmrApiDAO {
    @Setter
    private EmrApiProperties emrApiProperties;
 	
-	@Override
+   @Override
    @SuppressWarnings("unchecked")
    public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz) {
       Query query = sessionFactory.getCurrentSession().createQuery(queryString);
@@ -68,11 +68,11 @@ public class EmrApiDAOImpl implements EmrApiDAO {
       return executeHql(hql, parameters, clazz);
    }
    
-   public List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit) {
+   public List<VisitWithDiagnosesAndNotes> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit) {
       
       String visitNoteEncounterTypeUuid = emrApiProperties.getVisitNoteEncounterType().getUuid();
       
-      String hqlVisit="SELECT DISTINCT v FROM Visit v " +
+      String hqlVisit = "SELECT DISTINCT v FROM Visit v " +
               "LEFT JOIN FETCH v.encounters enc " +
               "LEFT JOIN enc.encounterType et " +
               "WHERE v.patient.id = :patientId " +
@@ -109,12 +109,16 @@ public class EmrApiDAOImpl implements EmrApiDAO {
                  .add(diagnosis);
       }
       
-      List<VisitWithDiagnoses> visitWithDiagnoses = visits.stream()
-              .sorted(Comparator.comparing(Visit::getStartDatetime).reversed())
-              .map(visit -> new VisitWithDiagnoses(visit, visitToDiagnosesMap.getOrDefault(visit, new HashSet<>())))
+      List<VisitWithDiagnosesAndNotes> visitWithDiagnosisAndNotes = visits.stream()
+              .map(visit -> {
+                 Set<Encounter> visitNotes = visit.getEncounters();
+                 // clear out the encounters so that they don't get serialized
+                 visit.setEncounters(new HashSet<>());
+                 return new VisitWithDiagnosesAndNotes(visit, visitToDiagnosesMap.getOrDefault(visit, new HashSet<>()), visitNotes);
+              })
               .collect(Collectors.toList());
       
-      return visitWithDiagnoses;
+      return visitWithDiagnosisAndNotes;
    }
    
 }

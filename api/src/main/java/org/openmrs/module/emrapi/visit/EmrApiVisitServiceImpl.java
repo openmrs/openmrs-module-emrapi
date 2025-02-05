@@ -3,6 +3,7 @@ package org.openmrs.module.emrapi.visit;
 import lombok.Setter;
 import org.hibernate.ObjectNotFoundException;
 import org.openmrs.Patient;
+import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
@@ -14,16 +15,16 @@ import java.util.List;
 @Service
 public class EmrApiVisitServiceImpl extends BaseOpenmrsService implements EmrApiVisitService {
 
-    PatientService patientService;
-    EmrApiDAO emrApiDAO;
+    private PatientService patientService;
+    private EmrApiDAO emrApiDAO;
 
     @Override
-    public List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(String patientUuid, int startIndex, int limit) {
-
+    public List<VisitWithDiagnosesAndNotes> getVisitsWithNotesAndDiagnosesByPatient(String patientUuid, int startIndex, int limit) {
+        
         Patient patient = patientService.getPatientByUuid(patientUuid);
 
         if (patient == null) {
-            throw new ObjectNotFoundException("No patient found with uuid " + patientUuid, Patient.class.getName());
+            throw new APIException("No patient found with uuid " + patientUuid);
         }
 
         return emrApiDAO.getVisitsWithNotesAndDiagnosesByPatient(patient, startIndex, limit);

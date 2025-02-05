@@ -6,7 +6,7 @@ import org.openmrs.Diagnosis;
 import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
+import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -33,43 +33,43 @@ public class EmrApiDaoTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(109);
 
-        List<VisitWithDiagnoses> visits = emrApiDAO.getVisitsWithNotesAndDiagnosesByPatient(patient,0,10);
+        List<VisitWithDiagnosesAndNotes> visits = emrApiDAO.getVisitsWithNotesAndDiagnosesByPatient(patient,0,10);
         assertNotNull(visits);
         assert visits.size() == 3;
 
-        VisitWithDiagnoses firstVisit = visits.get(2);
-        Set<Encounter> firstVisitEncounters = firstVisit.getVisit().getEncounters();
+        VisitWithDiagnosesAndNotes firstVisit = visits.get(2);
+        Set<Encounter> firstVisitNotes = firstVisit.getVisitNotes();
         Set<Diagnosis> firstVisitDiagnoses = firstVisit.getDiagnoses();
 
         assert firstVisit.getVisit().getId() == 1014;
         assert firstVisit.getVisit().getPatient().getPatientId() == 109;
-        assert firstVisitEncounters.size() == 2;
+        assert firstVisitNotes.size() == 2;
         assert firstVisitDiagnoses.size() == 3;
 
-        for (Encounter encounter : firstVisitEncounters) {
+        for (Encounter encounter : firstVisitNotes) {
             assert encounter.getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
         }
 
-        VisitWithDiagnoses secondVisit = visits.get(1);
-        Set<Encounter> secondVisitEncounters = secondVisit.getVisit().getEncounters();
+        VisitWithDiagnosesAndNotes secondVisit = visits.get(1);
+        Set<Encounter> secondVisitNotes = secondVisit.getVisitNotes();
         Set<Diagnosis> secondVisitDiagnoses = secondVisit.getDiagnoses();
 
         assert secondVisit.getVisit().getId() == 1015;
         assert secondVisit.getVisit().getPatient().getPatientId() == 109;
-        assert secondVisitEncounters.size() == 1;
+        assert secondVisitNotes.size() == 1;
         assert secondVisitDiagnoses.size() == 2;
 
-        for (Encounter encounter : secondVisitEncounters) {
+        for (Encounter encounter : secondVisitNotes) {
             assert encounter.getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
         }
         
-        VisitWithDiagnoses thirdVisit = visits.get(0);
-        Set<Encounter> thirdVisitEncounters = thirdVisit.getVisit().getEncounters();
+        VisitWithDiagnosesAndNotes thirdVisit = visits.get(0);
+        Set<Encounter> thirdVisitNotes = thirdVisit.getVisitNotes();
         Set<Diagnosis> thirdVisitDiagnoses = thirdVisit.getDiagnoses();
         
         assert thirdVisit.getVisit().getId() == 1017;
         assert thirdVisit.getVisit().getPatient().getPatientId() == 109;
-        assert thirdVisitEncounters.isEmpty();
+        assert thirdVisitNotes.isEmpty();
         assert thirdVisitDiagnoses.isEmpty();
         
     }
@@ -79,11 +79,11 @@ public class EmrApiDaoTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(109);
 
-        List<VisitWithDiagnoses> visits = emrApiDAO.getVisitsWithNotesAndDiagnosesByPatient(patient,0,1);
+        List<VisitWithDiagnosesAndNotes> visits = emrApiDAO.getVisitsWithNotesAndDiagnosesByPatient(patient,0,1);
         assertNotNull(visits);
         assert visits.size() == 1;
 
-        VisitWithDiagnoses mostRecentVisit = visits.get(0);
+        VisitWithDiagnosesAndNotes mostRecentVisit = visits.get(0);
         assert mostRecentVisit.getVisit().getId() == 1017;
     }
 

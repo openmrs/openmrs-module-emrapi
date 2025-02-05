@@ -9,5 +9,5 @@ public interface EmrApiVisitService {
      * @param patientUuid the UUID of the patient
      * @return a list of visits that has note encounters and diagnoses
      */
-    List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(String patientUuid, int startIndex, int limit);
+    List<VisitWithDiagnosesAndNotes> getVisitsWithNotesAndDiagnosesByPatient(String patientUuid, int startIndex, int limit);
 }

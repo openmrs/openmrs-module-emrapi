@@ -1,7 +1,7 @@
 package org.openmrs.module.emrapi.db;
 
 import org.openmrs.Patient;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnoses;
+import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 
 import java.util.List;
 import java.util.Map;
@@ -21,5 +21,5 @@ public interface EmrApiDAO {
      *
      * @return a list of visits that has note encounters and diagnoses
      */
-    List<VisitWithDiagnoses> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit);
+    List<VisitWithDiagnosesAndNotes> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit);
 }

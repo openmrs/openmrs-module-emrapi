@@ -12,10 +12,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +52,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         String secondVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
         String thirdVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithNotesAndDiagnoses?patient="+patientUuid)
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithDiagnosesAndNotes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -72,39 +70,39 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         // extract the first visit and check its properties
         Map<String, Object> firstVisitEntry = visitEntries.get(2);
         Map<String, Object> firstVisit = (Map<String, Object>) firstVisitEntry.get("visit");
-        List<Map<String, Object>> firstVisitEncounters = (List<Map<String, Object>>) firstVisit.get("encounters");
+        List<Map<String, Object>> firstVisitNotes = (List<Map<String, Object>>)firstVisitEntry.get("visitNotes");
         List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>) firstVisitEntry.get("diagnoses");
         
         assert firstVisit.get("uuid").equals(firstVisitUuid);
-        assert firstVisitEncounters.size() == 2;
+        assert firstVisitNotes.size() == 2;
         assert firstVisitDiagnoses.size() == 3;
         
-        for (Map<String, Object> encounter : firstVisitEncounters) {
+        for (Map<String, Object> encounter : firstVisitNotes) {
             assert ((String) encounter.get("display")).startsWith("Visit Note");
         }
        
         // extract the second visit and check its properties
         Map<String, Object> secondVisitEntry = visitEntries.get(1);
         Map<String, Object> secondVisit = (Map<String, Object>) secondVisitEntry.get("visit");
-        List<Map<String, Object>> secondVisitEncounters = (List<Map<String, Object>>) secondVisit.get("encounters");
+        List<Map<String, Object>> secondVisitNotes = (List<Map<String, Object>>) secondVisitEntry.get("visitNotes");
         List<Map<String, Object>> secondVisitDiagnoses = (List<Map<String, Object>>) secondVisitEntry.get("diagnoses");
         
         assert secondVisit.get("uuid").equals(secondVisitUuid);
-        assert secondVisitEncounters.size() == 1;
+        assert secondVisitNotes.size() == 1;
         assert secondVisitDiagnoses.size() == 2;
         
-        for (Map<String, Object> encounter : secondVisitEncounters) {
+        for (Map<String, Object> encounter : secondVisitNotes) {
             assert ((String) encounter.get("display")).startsWith("Visit Note");
         }
         
         // extract the third visit and check its properties (no notes or diagnoses)
         Map<String, Object> thirdVisitEntry = visitEntries.get(0);
         Map<String, Object> thirdVisit = (Map<String, Object>) thirdVisitEntry.get("visit");
-        List<Map<String, Object>> thirdVisitEncounters = (List<Map<String, Object>>) thirdVisit.get("encounters");
+        List<Map<String, Object>> thirdVisitNotes = (List<Map<String, Object>>) thirdVisitEntry.get("visitNotes");
         List<Map<String, Object>> thirdVisitDiagnoses = (List<Map<String, Object>>) thirdVisitEntry.get("diagnoses");
         
         assert thirdVisit.get("uuid").equals(thirdVisitUuid);
-        assert thirdVisitEncounters.isEmpty();
+        assert thirdVisitNotes.isEmpty();
         assert thirdVisitDiagnoses.isEmpty();
     }
     
@@ -114,7 +112,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
         String mostRecentVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid+"/visitWithNotesAndDiagnoses")
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid+"/visitWithDiagnosesAndNotes")
                         .param("startIndex", "0")
                         .param("limit", "1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -134,5 +132,16 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         Map<String, Object> recentVisitEntry = visitsEntries.get(0);
         Map<String, Object> recentVisit = (Map<String, Object>) recentVisitEntry.get("visit");
         assert recentVisit.get("uuid").equals(mostRecentVisitUuid);
+    }
+    
+    @Test
+    public void shouldThrowErrorWhenPatientNotFound() throws Exception {
+        
+        String patientUuid = "non-existent-uuid";
+        
+        // Ideally, this should return a 404 error, but the controller is not handling this case
+        mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithDiagnosesAndNotes")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is5xxServerError());
     }
 }
