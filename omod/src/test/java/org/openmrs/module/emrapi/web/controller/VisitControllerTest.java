@@ -77,8 +77,9 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         assert firstVisitNotes.size() == 2;
         assert firstVisitDiagnoses.size() == 3;
         
-        for (Map<String, Object> encounter : firstVisitNotes) {
-            assert ((String) encounter.get("display")).startsWith("Visit Note");
+        for (Map<String, Object> note : firstVisitNotes) {
+            // All notes obs in test data starts with "Visit Note"
+	        assert ((String) note.get("value")).startsWith("Visit Note");
         }
        
         // extract the second visit and check its properties
@@ -91,8 +92,9 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         assert secondVisitNotes.size() == 1;
         assert secondVisitDiagnoses.size() == 2;
         
-        for (Map<String, Object> encounter : secondVisitNotes) {
-            assert ((String) encounter.get("display")).startsWith("Visit Note");
+        for (Map<String, Object> note : secondVisitNotes) {
+            // All notes obs in test data starts with "Visit Note"
+            assert ((String) note.get("value")).startsWith("Visit Note");
         }
         
         // extract the third visit and check its properties (no notes or diagnoses)

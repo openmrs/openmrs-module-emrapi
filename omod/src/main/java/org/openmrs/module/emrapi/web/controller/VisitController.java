@@ -2,7 +2,7 @@ package org.openmrs.module.emrapi.web.controller;
 
 import lombok.Setter;
 import org.openmrs.Diagnosis;
-import org.openmrs.Encounter;
+import org.openmrs.Obs;
 import org.openmrs.api.APIException;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 import org.openmrs.module.emrapi.visit.EmrApiVisitService;
@@ -10,6 +10,7 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestUtil;
+import org.openmrs.module.webservices.rest.web.representation.CustomRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
@@ -39,14 +40,16 @@ public class VisitController extends BaseRestController {
             HttpServletResponse response,
             @PathVariable("patientUuid") String patientUuid) {
         
-        RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
+        CustomRepresentation representation = new CustomRepresentation("uuid,display,startDatetime,stopDatetime,patient:REF,visitType:REF,attributes");
+        CustomRepresentation notesRepresentation = new CustomRepresentation("uuid,value,obsDatetime,concept:REF");
+        
+        RequestContext context = RestUtil.getRequestContext(request, response, representation);
         List<VisitWithDiagnosesAndNotes> visitsEntries;
         try {
             visitsEntries = emrApiVisitService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
         }catch (APIException e) {
             return new ResponseEntity<>(RestUtil.wrapErrorResponse(e, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
-        
         
         // Convert the visits and diagnoses to SimpleObjects
         List<SimpleObject> convertedVisits = new ArrayList<>();
@@ -57,10 +60,10 @@ public class VisitController extends BaseRestController {
             List<SimpleObject> convertedVisitNotes = new ArrayList<>();
             
             for (Diagnosis diagnosis : visitEntry.getDiagnoses()) {
-                convertedDiagnoses.add((SimpleObject) ConversionUtil.convertToRepresentation(diagnosis, context.getRepresentation()));
+                convertedDiagnoses.add((SimpleObject) ConversionUtil.convertToRepresentation(diagnosis, Representation.DEFAULT));
             }
-            for (Encounter encounter : visitEntry.getVisitNotes()) {
-                convertedVisitNotes.add((SimpleObject) ConversionUtil.convertToRepresentation(encounter, context.getRepresentation()));
+            for (Obs obs : visitEntry.getVisitNotes()) {
+                convertedVisitNotes.add((SimpleObject) ConversionUtil.convertToRepresentation(obs, notesRepresentation));
             }
             visitEntryObject.put("visit", visitObject);
             visitEntryObject.put("diagnoses", convertedDiagnoses);

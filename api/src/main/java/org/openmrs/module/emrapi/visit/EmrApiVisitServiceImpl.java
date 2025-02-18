@@ -21,6 +21,10 @@ public class EmrApiVisitServiceImpl extends BaseOpenmrsService implements EmrApi
     @Override
     public List<VisitWithDiagnosesAndNotes> getVisitsWithNotesAndDiagnosesByPatient(String patientUuid, int startIndex, int limit) {
         
+        if (patientUuid == null) {
+            throw new APIException("Patient uuid is required");
+        }
+        
         Patient patient = patientService.getPatientByUuid(patientUuid);
 
         if (patient == null) {

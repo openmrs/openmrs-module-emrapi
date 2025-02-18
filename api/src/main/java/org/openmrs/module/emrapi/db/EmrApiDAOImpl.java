@@ -6,7 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.openmrs.Diagnosis;
-import org.openmrs.Encounter;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
@@ -16,25 +16,23 @@ import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EmrApiDAOImpl implements EmrApiDAO {
-
+   
    protected final Log log = LogFactory.getLog(getClass());
-
+   
    @Setter
    private DbSessionFactory sessionFactory;
    
    @Setter
    private EmrApiProperties emrApiProperties;
-	
+   
    @Override
    @SuppressWarnings("unchecked")
    public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz) {
@@ -43,14 +41,13 @@ public class EmrApiDAOImpl implements EmrApiDAO {
          Object value = parameters.get(parameter);
          if (value instanceof Collection) {
             query.setParameterList(parameter, (Collection) value);
-         }
-         else {
+         } else {
             query.setParameter(parameter, value);
          }
       }
       return query.list();
    }
-
+   
    @Override
    public <T> List<T> executeHqlFromResource(String resource, Map<String, Object> parameters, Class<T> clazz) {
       String hql = null;
@@ -68,53 +65,81 @@ public class EmrApiDAOImpl implements EmrApiDAO {
       return executeHql(hql, parameters, clazz);
    }
    
-   public List<VisitWithDiagnosesAndNotes> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex, int limit) {
+   public List<VisitWithDiagnosesAndNotes> getVisitsWithNotesAndDiagnosesByPatient(Patient patient, int startIndex,
+           int limit) {
       
       String visitNoteEncounterTypeUuid = emrApiProperties.getVisitNoteEncounterType().getUuid();
       
-      String hqlVisit = "SELECT DISTINCT v FROM Visit v " +
-              "LEFT JOIN FETCH v.encounters enc " +
-              "LEFT JOIN enc.encounterType et " +
+      // get visits for the patient, paginated
+      String hqlVisits = "SELECT v FROM Visit v " +
               "WHERE v.patient.id = :patientId " +
-              "AND (et.uuid = :encounterTypeUuid OR enc IS NULL) " +
+              "AND v.voided = false " +
               "ORDER BY v.startDatetime DESC";
       
-      Query visitQuery = sessionFactory.getCurrentSession().createQuery(hqlVisit);
+      Query visitsQuery = sessionFactory.getCurrentSession().createQuery(hqlVisits);
+      visitsQuery.setParameter("patientId", patient.getId());
+      visitsQuery.setFirstResult(startIndex);
+      visitsQuery.setMaxResults(limit);
       
-      visitQuery.setParameter("patientId", patient.getId());
-      visitQuery.setParameter("encounterTypeUuid", visitNoteEncounterTypeUuid);
-      visitQuery.setFirstResult(startIndex);
-      visitQuery.setMaxResults(limit);
+      List<Visit> visits = visitsQuery.list();
       
-      List<Visit> visits = visitQuery.list();
-      
-      String hqlDiagnosis = "SELECT DISTINCT diag FROM Diagnosis diag " +
-              "JOIN diag.encounter e " +
-              "WHERE e.visit.id IN :visitIds";
-      
+      // extract visit IDs, so that we can query notes and diagnoses for these visits
       List<Integer> visitIds = visits.stream()
               .map(Visit::getId)
               .collect(Collectors.toList());
       
-      List<Diagnosis> diagnoses = sessionFactory.getCurrentSession()
-              .createQuery(hqlDiagnosis)
-              .setParameterList("visitIds", visitIds)
-              .list();
+      // get encounter type ID for visit note, so that we don't have to run join query later
+      String hqlEncounterTypeId = "SELECT et.id FROM EncounterType et WHERE et.uuid = :encounterTypeUuid";
+      Integer encounterTypeId = (Integer) sessionFactory.getCurrentSession()
+              .createQuery(hqlEncounterTypeId)
+              .setParameter("encounterTypeUuid", visitNoteEncounterTypeUuid)
+              .uniqueResult();
       
-      Map<Visit, Set<Diagnosis>> visitToDiagnosesMap = new HashMap<>();
+      String hqlNotesObs = "SELECT obs FROM Obs obs " +
+              "JOIN obs.encounter e " +
+              "WHERE e.encounterType.id = :encounterTypeId " +
+              "AND e.visit.id IN :visitIds " +
+              "AND obs.voided = false";
+      
+      Query notesQuery = sessionFactory.getCurrentSession().createQuery(hqlNotesObs);
+      notesQuery.setParameterList("visitIds", visitIds);
+      notesQuery.setParameter("encounterTypeId", encounterTypeId);
+      List<Obs> notesObs = notesQuery.list();
+      
+      // get diagnoses for the visits
+      String hqlDiagnosis = "SELECT DISTINCT diag FROM Diagnosis diag " +
+              "JOIN diag.encounter e " +
+              "WHERE e.visit.id IN :visitIds " +
+              "AND diag.voided = false " +
+              "ORDER BY diag.rank";
+      Query diagnosesQuery = sessionFactory.getCurrentSession().createQuery(hqlDiagnosis);
+      diagnosesQuery.setParameterList("visitIds", visitIds);
+      List<Diagnosis> diagnoses = diagnosesQuery.list();
+      
+      // group notes and diagnoses by visit ID
+      Map<Integer, ArrayList<Obs>> visitIdToNotesMap = new HashMap<>();
+      Map<Integer, ArrayList<Diagnosis>> visitIdToDiagnosesMap = new HashMap<>();
+      
+      for (Obs obs : notesObs) {
+         Integer visitId = obs.getEncounter().getVisit().getId();
+         visitIdToNotesMap
+                 .computeIfAbsent(visitId, v -> new ArrayList<>())
+                 .add(obs);
+      }
       for (Diagnosis diagnosis : diagnoses) {
-         Visit visit = diagnosis.getEncounter().getVisit();
-         visitToDiagnosesMap
-                 .computeIfAbsent(visit, v -> new HashSet<>())
+         Integer visitId = diagnosis.getEncounter().getVisit().getId();
+         visitIdToDiagnosesMap
+                 .computeIfAbsent(visitId, v -> new ArrayList<>())
                  .add(diagnosis);
       }
       
+      // create VisitWithDiagnosesAndNotes objects
       List<VisitWithDiagnosesAndNotes> visitWithDiagnosisAndNotes = visits.stream()
               .map(visit -> {
-                 Set<Encounter> visitNotes = visit.getEncounters();
-                 // clear out the encounters so that they don't get serialized
-                 visit.setEncounters(new HashSet<>());
-                 return new VisitWithDiagnosesAndNotes(visit, visitToDiagnosesMap.getOrDefault(visit, new HashSet<>()), visitNotes);
+                 ArrayList<Obs> notes = visitIdToNotesMap.getOrDefault(visit.getId(), new ArrayList<>());
+                 ArrayList<Diagnosis> visitDiagnoses = visitIdToDiagnosesMap.getOrDefault(visit.getId(),
+                         new ArrayList<>());
+                 return new VisitWithDiagnosesAndNotes(visit, visitDiagnoses, notes);
               })
               .collect(Collectors.toList());
       
