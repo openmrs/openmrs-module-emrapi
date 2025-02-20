@@ -47,7 +47,7 @@ public class VisitController extends BaseRestController {
         List<VisitWithDiagnosesAndNotes> visitsEntries;
         try {
             visitsEntries = emrApiVisitService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
-        }catch (APIException e) {
+        } catch (APIException e) {
             return new ResponseEntity<>(RestUtil.wrapErrorResponse(e, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
         
