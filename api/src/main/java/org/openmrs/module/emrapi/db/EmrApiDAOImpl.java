@@ -88,22 +88,17 @@ public class EmrApiDAOImpl implements EmrApiDAO {
               .map(Visit::getId)
               .collect(Collectors.toList());
       
-      // get encounter type ID for visit note, so that we don't have to run join query later
-      String hqlEncounterTypeId = "SELECT et.id FROM EncounterType et WHERE et.uuid = :encounterTypeUuid";
-      Integer encounterTypeId = (Integer) sessionFactory.getCurrentSession()
-              .createQuery(hqlEncounterTypeId)
-              .setParameter("encounterTypeUuid", visitNoteEncounterTypeUuid)
-              .uniqueResult();
       
       String hqlNotesObs = "SELECT obs FROM Obs obs " +
               "JOIN obs.encounter e " +
-              "WHERE e.encounterType.id = :encounterTypeId " +
+              "JOIN e.encounterType et " +
+              "WHERE et.uuid = :encounterTypeUuid " +
               "AND e.visit.id IN :visitIds " +
               "AND obs.voided = false";
       
       Query notesQuery = sessionFactory.getCurrentSession().createQuery(hqlNotesObs);
       notesQuery.setParameterList("visitIds", visitIds);
-      notesQuery.setParameter("encounterTypeId", encounterTypeId);
+      notesQuery.setParameter("encounterTypeUuid", visitNoteEncounterTypeUuid);
       List<Obs> notesObs = notesQuery.list();
       
       // get diagnoses for the visits
@@ -136,9 +131,8 @@ public class EmrApiDAOImpl implements EmrApiDAO {
       // create VisitWithDiagnosesAndNotes objects
       List<VisitWithDiagnosesAndNotes> visitWithDiagnosisAndNotes = visits.stream()
               .map(visit -> {
-                 ArrayList<Obs> notes = visitIdToNotesMap.getOrDefault(visit.getId(), new ArrayList<>());
-                 ArrayList<Diagnosis> visitDiagnoses = visitIdToDiagnosesMap.getOrDefault(visit.getId(),
-                         new ArrayList<>());
+                 ArrayList<Obs> notes = visitIdToNotesMap.computeIfAbsent(visit.getId(), ArrayList::new);
+                 ArrayList<Diagnosis> visitDiagnoses = visitIdToDiagnosesMap.computeIfAbsent(visit.getId(), ArrayList::new);
                  return new VisitWithDiagnosesAndNotes(visit, visitDiagnoses, notes);
               })
               .collect(Collectors.toList());
