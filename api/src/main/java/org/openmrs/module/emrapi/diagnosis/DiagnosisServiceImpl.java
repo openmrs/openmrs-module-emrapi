@@ -10,6 +10,7 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * class implementing the DiagnosisService while delegating calls to the core module
@@ -34,7 +35,7 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 		this.adminService = adminService;
 	}
 
-	protected boolean useDiagnosesAsObs() {
+	public boolean useDiagnosesAsObs() {
 		return adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true");
 	}
 
@@ -81,6 +82,15 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 		}
 		else {
 			return coreDiagnosisService.codeNonCodedDiagnosis(nonCodedObs, diagnoses);
+		}
+	}
+
+	public Map<Visit, List<Diagnosis>> getDiagnoses(List<Visit> visits) {
+		if (useDiagnosesAsObs()) {
+			return obsGroupDiagnosisService.getDiagnoses(visits);
+		}
+		else {
+			return coreDiagnosisService.getDiagnoses(visits);
 		}
 	}
 

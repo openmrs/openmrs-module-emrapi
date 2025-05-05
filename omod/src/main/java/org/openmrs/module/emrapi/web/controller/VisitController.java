@@ -1,11 +1,13 @@
 package org.openmrs.module.emrapi.web.controller;
 
 import lombok.Setter;
-import org.openmrs.Diagnosis;
 import org.openmrs.Obs;
+import org.openmrs.Patient;
 import org.openmrs.api.APIException;
+import org.openmrs.api.PatientService;
+import org.openmrs.module.emrapi.diagnosis.Diagnosis;
+import org.openmrs.module.emrapi.patient.EmrPatientService;
 import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
-import org.openmrs.module.emrapi.visit.EmrApiVisitService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
@@ -30,9 +32,12 @@ import java.util.List;
 @Setter
 @Controller
 public class VisitController extends BaseRestController {
+
+    @Autowired
+    PatientService patientService;
     
     @Autowired
-    EmrApiVisitService emrApiVisitService;
+    EmrPatientService emrPatientService;
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visitWithDiagnosesAndNotes")
     public ResponseEntity<?> getVisitsWithDiagnosesAndNotesByPatient(
@@ -46,7 +51,11 @@ public class VisitController extends BaseRestController {
         RequestContext context = RestUtil.getRequestContext(request, response, representation);
         List<VisitWithDiagnosesAndNotes> visitsEntries;
         try {
-            visitsEntries = emrApiVisitService.getVisitsWithNotesAndDiagnosesByPatient(patientUuid, context.getStartIndex(), context.getLimit());
+            Patient patient = patientService.getPatientByUuid(patientUuid);
+            if (patient == null) {
+                throw new APIException("Patient " + patientUuid + " not found");
+            }
+            visitsEntries = emrPatientService.getVisitsWithDiagnosesAndNotesByPatient(patient, context.getStartIndex(), context.getLimit());
         } catch (APIException e) {
             return new ResponseEntity<>(RestUtil.wrapErrorResponse(e, e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -58,7 +67,6 @@ public class VisitController extends BaseRestController {
             SimpleObject visitObject = (SimpleObject) ConversionUtil.convertToRepresentation(visitEntry.getVisit(), context.getRepresentation());
             List<SimpleObject> convertedDiagnoses = new ArrayList<>();
             List<SimpleObject> convertedVisitNotes = new ArrayList<>();
-            
             for (Diagnosis diagnosis : visitEntry.getDiagnoses()) {
                 convertedDiagnoses.add((SimpleObject) ConversionUtil.convertToRepresentation(diagnosis, Representation.DEFAULT));
             }

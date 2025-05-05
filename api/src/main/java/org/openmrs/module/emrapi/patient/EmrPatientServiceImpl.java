@@ -13,18 +13,28 @@
  */
 package org.openmrs.module.emrapi.patient;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.Setter;
 import org.openmrs.Location;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.Visit;
 import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
+import org.openmrs.module.emrapi.diagnosis.Diagnosis;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Setter
 public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPatientService {
 	
 	private EmrPatientDAO dao;
@@ -34,22 +44,8 @@ public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPati
 	private PatientService patientService;
 	
 	private AdtService adtService;
-	
-	public void setDao(EmrPatientDAO dao) {
-		this.dao = dao;
-	}
-	
-	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
-		this.emrApiProperties = emrApiProperties;
-	}
-	
-	public void setPatientService(PatientService patientService) {
-		this.patientService = patientService;
-	}
-	
-	public void setAdtService(AdtService adtService) {
-		this.adtService = adtService;
-	}
+
+	private DiagnosisService emrDiagnosisService;
 	
 	@Override
 	public List<Patient> findPatients(String query, Location checkedInAt, Integer start, Integer length) {
@@ -81,5 +77,36 @@ public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPati
 		}
 		
 		return patients.get(0);
+	}
+
+	@Override
+	public List<Visit> getVisitsForPatient(Patient patient, Integer startIndex, Integer limit) {
+		return dao.getVisitsForPatient(patient, startIndex, limit);
+	}
+
+	@Override
+	public Map<Visit, List<Obs>> getVisitNoteObservations(List<Visit> visits) {
+		Map<Visit, List<Obs>> ret = new HashMap<>();
+		List<Obs> observations = dao.getVisitNoteObservations(visits);
+		for (Obs obs : observations) {
+			Visit visit = obs.getEncounter().getVisit();
+			List<Obs> observationsForVisit = ret.computeIfAbsent(visit, k -> new ArrayList<>());
+			observationsForVisit.add(obs);
+		}
+		return ret;
+	}
+
+	@Override
+	public List<VisitWithDiagnosesAndNotes> getVisitsWithDiagnosesAndNotesByPatient(Patient patient, Integer startIndex, Integer limit) {
+		List<Visit> visits = getVisitsForPatient(patient, startIndex, limit);
+		Map<Visit, List<Obs>> notesObs = getVisitNoteObservations(visits);
+		Map<Visit, List<Diagnosis>> diagnoses = emrDiagnosisService.getDiagnoses(visits);
+        return visits.stream().map(visit -> {
+			VisitWithDiagnosesAndNotes note = new VisitWithDiagnosesAndNotes();
+			note.setVisit(visit);
+			note.setDiagnoses(diagnoses.computeIfAbsent(visit, k -> new ArrayList<>()));
+			note.setVisitNotes(notesObs.computeIfAbsent(visit, k -> new ArrayList<>()));
+			return note;
+		}).collect(Collectors.toList());
 	}
 }

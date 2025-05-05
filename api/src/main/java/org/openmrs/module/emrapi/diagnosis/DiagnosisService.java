@@ -9,6 +9,7 @@ import org.openmrs.api.OpenmrsService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <pre>
@@ -28,6 +29,11 @@ public interface DiagnosisService extends OpenmrsService {
      * @return
      */
     List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses);
+
+	/**
+	 * @return true if system is configured to store diagnoses as obs groups rather than diagnoses
+	 */
+	boolean useDiagnosesAsObs();
 
 	/**
 	 * Gets diagnoses since date, sorted in reverse chronological order
@@ -61,6 +67,11 @@ public interface DiagnosisService extends OpenmrsService {
 	 * @return the list of diagnoses
 	 */
 	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate);
+
+	/**
+	 * @return a Map from Visit to the List of Diagnoses in that visit, given a List of visits
+	 */
+	Map<Visit, List<Diagnosis>> getDiagnoses(List<Visit> visits);
 
 	/**
 	 * @return diagnoses as obs, for the given metadata and primary/confirmed specification

@@ -14,14 +14,6 @@
 
 package org.openmrs.module.emrapi.patient;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collections;
-
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Months;
@@ -47,6 +39,14 @@ import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A rich-domain-model class that wraps a Patient, and lets you perform common queries.
