@@ -11,6 +11,5 @@ import java.util.List;
 public class VisitWithDiagnosesAndNotes {
     private Visit visit;
     private List<Diagnosis> diagnoses;
-    private List<Obs> diagnosesAsObs;
     private List<Obs> visitNotes;
 }
