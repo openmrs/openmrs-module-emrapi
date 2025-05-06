@@ -2,16 +2,18 @@ package org.openmrs.module.emrapi.patient;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Diagnosis;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -22,6 +24,9 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
 
     @Autowired
     PatientService patientService;
+
+    @Autowired
+    DiagnosisService diagnosisService;
 
     @Autowired
     EmrPatientService emrPatientService;
@@ -39,16 +44,19 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
 
         Patient patient = patientService.getPatient(109);
 
-        List<VisitWithDiagnosesAndNotes> visits = emrPatientService.getVisitsWithDiagnosesAndNotesByPatient(patient,0,10);
+        List<Visit> visits = emrPatientService.getVisitsForPatient(patient,0,10);
+        Map<Visit, List<Obs>> notesByVisit = emrPatientService.getVisitNoteObservations(visits);
+        Map<Visit, List<Diagnosis>> diagnosesByVisit = diagnosisService.getDiagnoses(visits);
+
         assertNotNull(visits);
         assert visits.size() == 3;
 
-        VisitWithDiagnosesAndNotes firstVisit = visits.get(2);
-        List<Obs> firstVisitNotes = firstVisit.getVisitNotes();
-        List<Diagnosis> firstVisitDiagnoses = firstVisit.getDiagnoses();
+        Visit firstVisit = visits.get(2);
+        List<Obs> firstVisitNotes = notesByVisit.get(firstVisit);
+        List<Diagnosis> firstVisitDiagnoses = diagnosesByVisit.get(firstVisit);
 
-        assert firstVisit.getVisit().getId() == 1014;
-        assert firstVisit.getVisit().getPatient().getPatientId() == 109;
+        assert firstVisit.getId() == 1014;
+        assert firstVisit.getPatient().getPatientId() == 109;
         assert firstVisitNotes.size() == 2;
         assert firstVisitDiagnoses.size() == 3;
 
@@ -56,12 +64,12 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
             assert obs.getEncounter().getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
         }
 
-        VisitWithDiagnosesAndNotes secondVisit = visits.get(1);
-       List<Obs> secondVisitNotes = secondVisit.getVisitNotes();
-       List<Diagnosis> secondVisitDiagnoses = secondVisit.getDiagnoses();
+        Visit secondVisit = visits.get(1);
+        List<Obs> secondVisitNotes = notesByVisit.get(secondVisit);
+        List<Diagnosis> secondVisitDiagnoses = diagnosesByVisit.get(secondVisit);
 
-        assert secondVisit.getVisit().getId() == 1015;
-        assert secondVisit.getVisit().getPatient().getPatientId() == 109;
+        assert secondVisit.getId() == 1015;
+        assert secondVisit.getPatient().getPatientId() == 109;
         assert secondVisitNotes.size() == 1;
         assert secondVisitDiagnoses.size() == 2;
 
@@ -69,15 +77,14 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
             assert obs.getEncounter().getEncounterType().getUuid().equals(visitNoteEncounterTypeUuid);
         }
 
-        VisitWithDiagnosesAndNotes thirdVisit = visits.get(0);
-       List<Obs> thirdVisitNotes = thirdVisit.getVisitNotes();
-       List<Diagnosis> thirdVisitDiagnoses = thirdVisit.getDiagnoses();
+        Visit thirdVisit = visits.get(0);
+        List<Obs> thirdVisitNotes = notesByVisit.get(thirdVisit);
+        List<Diagnosis> thirdVisitDiagnoses = diagnosesByVisit.get(thirdVisit);
 
-        assert thirdVisit.getVisit().getId() == 1017;
-        assert thirdVisit.getVisit().getPatient().getPatientId() == 109;
+        assert thirdVisit.getId() == 1017;
+        assert thirdVisit.getPatient().getPatientId() == 109;
         assert thirdVisitNotes.isEmpty();
         assert thirdVisitDiagnoses.isEmpty();
-
     }
 
     @Test
@@ -85,12 +92,12 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(109);
 
-        List<VisitWithDiagnosesAndNotes> visits = emrPatientService.getVisitsWithDiagnosesAndNotesByPatient(patient,0,1);
+        List<Visit> visits = emrPatientService.getVisitsForPatient(patient,0,1);
         assertNotNull(visits);
         assert visits.size() == 1;
 
-        VisitWithDiagnosesAndNotes mostRecentVisit = visits.get(0);
-        assert mostRecentVisit.getVisit().getId() == 1017;
+        Visit mostRecentVisit = visits.get(0);
+        assert mostRecentVisit.getId() == 1017;
     }
 
     /**
@@ -101,12 +108,12 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(111);
 
-        List<VisitWithDiagnosesAndNotes> visits = emrPatientService.getVisitsWithDiagnosesAndNotesByPatient(patient,0,10);
+        List<Visit> visits = emrPatientService.getVisitsForPatient(patient,0,10);
         assertNotNull(visits);
         assert visits.size() == 1;
 
-        VisitWithDiagnosesAndNotes visit = visits.get(0);
-        assert visit.getVisit().getId() == 1019;
+        Visit visit = visits.get(0);
+        assert visit.getId() == 1019;
     }
 
     /**
@@ -117,12 +124,13 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
         Patient patient = new Patient();
         patient.setPatientId(111);
 
-        List<VisitWithDiagnosesAndNotes> visits = emrPatientService.getVisitsWithDiagnosesAndNotesByPatient(patient,0,10);
+        List<Visit> visits = emrPatientService.getVisitsForPatient(patient,0,10);
         assertNotNull(visits);
         assert visits.size() == 1;
 
-        VisitWithDiagnosesAndNotes visit = visits.get(0);
-        assert visit.getVisitNotes().isEmpty();
+        Map<Visit, List<Obs>> notesByVisit = emrPatientService.getVisitNoteObservations(visits);
+        List<Obs> visitNotes = notesByVisit.get(visits.get(0));
+        assert visitNotes.isEmpty();
     }
 
 }

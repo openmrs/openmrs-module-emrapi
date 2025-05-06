@@ -13,12 +13,13 @@
  */
 package org.openmrs.module.emrapi.patient;
 
-import java.util.List;
-
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface EmrPatientDAO {
 	
@@ -26,5 +27,5 @@ public interface EmrPatientDAO {
 
 	List<Visit> getVisitsForPatient(Patient patient, Integer startIndex, Integer limit);
 
-	List<Obs> getVisitNoteObservations(List<Visit> visits);
+	List<Obs> getVisitNoteObservations(Collection<Visit> visits);
 }

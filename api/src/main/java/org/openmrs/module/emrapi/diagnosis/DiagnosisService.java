@@ -6,7 +6,7 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.OpenmrsService;
 
-
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public interface DiagnosisService extends OpenmrsService {
 	/**
 	 * @return a Map from Visit to the List of Diagnoses in that visit, given a List of visits
 	 */
-	Map<Visit, List<Diagnosis>> getDiagnoses(List<Visit> visits);
+	Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits);
 
 	/**
 	 * @return diagnoses as obs, for the given metadata and primary/confirmed specification

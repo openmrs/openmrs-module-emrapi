@@ -29,6 +29,7 @@ import org.openmrs.api.db.hibernate.PatientSearchCriteria;
 import org.openmrs.module.emrapi.EmrApiProperties;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Setter
@@ -98,7 +99,7 @@ public class HibernateEmrPatientDAO implements EmrPatientDAO {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<Obs> getVisitNoteObservations(List<Visit> visits) {
+	public List<Obs> getVisitNoteObservations(Collection<Visit> visits) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 		criteria.createAlias("encounter", "encounter");
 		criteria.add(Restrictions.in("encounter.visit", visits));

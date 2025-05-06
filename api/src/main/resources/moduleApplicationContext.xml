@@ -172,7 +172,6 @@
                 <property name="emrApiProperties" ref="emrApiProperties"/>
                 <property name="patientService" ref="patientService"/>
                 <property name="adtService" ref="adtService"/>
-                <property name="emrDiagnosisService" ref="emrDiagnosisService"/>
             </bean>
         </property>
         <property name="preInterceptors">

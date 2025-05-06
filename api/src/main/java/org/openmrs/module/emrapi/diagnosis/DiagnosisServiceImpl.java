@@ -8,6 +8,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 		}
 	}
 
-	public Map<Visit, List<Diagnosis>> getDiagnoses(List<Visit> visits) {
+	public Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.getDiagnoses(visits);
 		}

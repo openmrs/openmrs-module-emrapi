@@ -17,8 +17,8 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -39,10 +39,5 @@ public interface EmrPatientService {
 	/**
 	 * @return a Map from Visit to a List of observations contained in all Visit Note encounters within the given Visit
 	 */
-	Map<Visit, List<Obs>> getVisitNoteObservations(List<Visit> visits);
-
-	/**
-	 * @return visits that have note encounters and diagnoses for the given patient
-	 */
-	List<VisitWithDiagnosesAndNotes> getVisitsWithDiagnosesAndNotesByPatient(Patient patient, Integer startIndex, Integer limit);
+	Map<Visit, List<Obs>> getVisitNoteObservations(Collection<Visit> visits);
 }

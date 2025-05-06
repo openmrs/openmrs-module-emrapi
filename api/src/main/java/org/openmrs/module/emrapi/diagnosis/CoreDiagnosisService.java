@@ -9,6 +9,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,8 +54,8 @@ public class CoreDiagnosisService {
 		return diagnosisList;
 	}
 
-	public Map<Visit, List<Diagnosis>> getDiagnoses(List<Visit> visits) {
-		Map<Visit, List<Diagnosis>> ret = new HashMap<>();
+	public Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits) {
+		Map<Visit, List<org.openmrs.Diagnosis>> ret = new HashMap<>();
         String query =
 				"select distinct diag FROM Diagnosis diag " +
                 "where diag.encounter.visit in :visits " +
@@ -63,10 +64,11 @@ public class CoreDiagnosisService {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("visits", visits);
 		List<org.openmrs.Diagnosis> diagnoses = emrApiDAO.executeHql(query, parameters, org.openmrs.Diagnosis.class);
+		for (Visit visit : visits) {
+			ret.put(visit, new ArrayList<>());
+		}
 		for (org.openmrs.Diagnosis diagnosis : diagnoses) {
-			Visit v = diagnosis.getEncounter().getVisit();
-            List<Diagnosis> l = ret.computeIfAbsent(v, k -> new ArrayList<>());
-            l.add(DiagnosisUtils.convert(diagnosis));
+			ret.get(diagnosis.getEncounter().getVisit()).add(diagnosis);
 		}
 		return ret;
 	}

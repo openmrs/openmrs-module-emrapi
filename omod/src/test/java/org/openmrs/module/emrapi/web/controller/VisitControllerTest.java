@@ -52,7 +52,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         String secondVisitUuid = "1c72e1ac-9b18-11e0-93c3-18a905e044dc";
         String thirdVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithDiagnosesAndNotes")
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -107,6 +107,47 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         assert thirdVisitNotes.isEmpty();
         assert thirdVisitDiagnoses.isEmpty();
     }
+
+    @Test
+    public void shouldGetCustomRepresentation() throws Exception {
+
+        String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
+        String firstVisitUuid = "1esd5218-6b78-11e0-93c3-18a905e044dc";
+
+        String rep = "custom:(visit:(uuid),diagnoses:(certainty))";
+
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
+                        .param("v", rep)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = response.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> result = objectMapper.readValue(jsonResponse, Map.class);
+
+        assertNotNull(result);
+        assert result.get("totalCount").equals(3);
+
+        List<Map<String, Object>> visitEntries = (List<Map<String, Object>>) result.get("pageOfResults");
+        assert visitEntries.size() == 3;
+
+        // extract the first visit and check its properties
+        Map<String, Object> firstVisitEntry = visitEntries.get(2);
+        Map<String, Object> firstVisit = (Map<String, Object>) firstVisitEntry.get("visit");
+        List<Map<String, Object>> firstVisitNotes = (List<Map<String, Object>>)firstVisitEntry.get("visitNotes");
+        List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>) firstVisitEntry.get("diagnoses");
+
+        assert firstVisit.size() == 1;
+        assert firstVisit.get("uuid").equals(firstVisitUuid);
+        assert firstVisitNotes == null;
+        assert firstVisitDiagnoses.size() == 3;
+
+        for (Map<String, Object> diagnosis : firstVisitDiagnoses) {
+            assert diagnosis.size() == 1;
+            assert diagnosis.get("certainty").equals("CONFIRMED");
+        }
+    }
     
     @Test
     public void shouldGetVisitsWithNotesAndDiagnosesByPatientWithPagination() throws Exception {
@@ -114,7 +155,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
         String mostRecentVisitUuid = "3c72f2bc-9b18-11e0-93c3-18a905e044ec";
         
-        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid+"/visitWithDiagnosesAndNotes")
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid+"/visit")
                         .param("startIndex", "0")
                         .param("limit", "1")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -141,7 +182,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         
         String patientUuid = "non-existent-uuid";
         
-        mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visitWithDiagnosesAndNotes")
+        mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }

@@ -24,15 +24,12 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
-import org.openmrs.module.emrapi.diagnosis.Diagnosis;
-import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
-import org.openmrs.module.emrapi.visit.VisitWithDiagnosesAndNotes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Setter
 public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPatientService {
@@ -44,8 +41,6 @@ public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPati
 	private PatientService patientService;
 	
 	private AdtService adtService;
-
-	private DiagnosisService emrDiagnosisService;
 	
 	@Override
 	public List<Patient> findPatients(String query, Location checkedInAt, Integer start, Integer length) {
@@ -85,28 +80,15 @@ public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPati
 	}
 
 	@Override
-	public Map<Visit, List<Obs>> getVisitNoteObservations(List<Visit> visits) {
+	public Map<Visit, List<Obs>> getVisitNoteObservations(Collection<Visit> visits) {
 		Map<Visit, List<Obs>> ret = new HashMap<>();
 		List<Obs> observations = dao.getVisitNoteObservations(visits);
+		for (Visit visit : visits) {
+			ret.put(visit, new ArrayList<>());
+		}
 		for (Obs obs : observations) {
-			Visit visit = obs.getEncounter().getVisit();
-			List<Obs> observationsForVisit = ret.computeIfAbsent(visit, k -> new ArrayList<>());
-			observationsForVisit.add(obs);
+			ret.get(obs.getEncounter().getVisit()).add(obs);
 		}
 		return ret;
-	}
-
-	@Override
-	public List<VisitWithDiagnosesAndNotes> getVisitsWithDiagnosesAndNotesByPatient(Patient patient, Integer startIndex, Integer limit) {
-		List<Visit> visits = getVisitsForPatient(patient, startIndex, limit);
-		Map<Visit, List<Obs>> notesObs = getVisitNoteObservations(visits);
-		Map<Visit, List<Diagnosis>> diagnoses = emrDiagnosisService.getDiagnoses(visits);
-        return visits.stream().map(visit -> {
-			VisitWithDiagnosesAndNotes note = new VisitWithDiagnosesAndNotes();
-			note.setVisit(visit);
-			note.setDiagnoses(diagnoses.computeIfAbsent(visit, k -> new ArrayList<>()));
-			note.setVisitNotes(notesObs.computeIfAbsent(visit, k -> new ArrayList<>()));
-			return note;
-		}).collect(Collectors.toList());
 	}
 }

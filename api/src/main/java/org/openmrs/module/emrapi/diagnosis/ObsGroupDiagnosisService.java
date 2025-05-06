@@ -227,8 +227,8 @@ public class ObsGroupDiagnosisService {
         return emrApiDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, Integer.class);
     }
 
-    public Map<Visit, List<Diagnosis>> getDiagnoses(List<Visit> visits) {
-        Map<Visit, List<Diagnosis>> ret = new HashMap<>();
+    public Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits) {
+        Map<Visit, List<org.openmrs.Diagnosis>> ret = new HashMap<>();
         String query =
                 "select o.obsGroup from Obs o " +
                 "where o.voided = false " +
@@ -242,10 +242,11 @@ public class ObsGroupDiagnosisService {
         parameters.put("diagnosisOrderConcept", emrApiProperties.getDiagnosisMetadata().getDiagnosisOrderConcept());
         List<Obs> obsGroups = emrApiDAO.executeHql(query, parameters, Obs.class);
         List<Diagnosis> diagnoses = getDiagnosesFromObsGroups(obsGroups);
+        for (Visit visit : visits) {
+            ret.put(visit, new ArrayList<>());
+        }
         for (Diagnosis diagnosis : diagnoses) {
-            Visit visit = diagnosis.getExistingObs().getEncounter().getVisit();
-            List<Diagnosis> l = ret.computeIfAbsent(visit, k -> new ArrayList<>());
-            l.add(diagnosis);
+            ret.get(diagnosis.getExistingObs().getEncounter().getVisit()).add(DiagnosisUtils.convert(diagnosis));
         }
         return ret;
     }
