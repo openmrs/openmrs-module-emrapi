@@ -23,7 +23,6 @@
   <person person_id="109" gender="M" dead="false" creator="1" birthdate_estimated="0" date_created="2023-10-15 10:30:00.0" voided="false" void_reason="" uuid="8604d42e-3ca8-11e3-bf2b-0d0c09861e97"/>
   <person_name person_name_id="109" person_id="109" preferred="true" prefix="" given_name="Scott" middle_name="" family_name="Clark" family_name_suffix="" creator="1" date_created="2023-10-15 10:31:00.0" voided="false" void_reason="" uuid="8f9e3a7b-6482-487d-9abe-c07b123c4f08"/>
   <patient patient_id="109" creator="1" date_created="2023-10-15 10:32:00.0" voided="false" />
-  <concept concept_id="200" retired="0" datatype_id="1" class_id="1" creator="1" is_set="0" date_created="2023-10-15 10:33:00.0" uuid="a8a8f882-1350-11df-a1f1-0026b9348838"/>
   <!-- Location Information -->
   <location location_id="1901" name="Location tagged to visit" creator="1" date_created="2023-10-15 10:35:00.0" retired="false" uuid="f1771d8e-bf1f-4dc5-957f-9d40a5eebf08"/>
 
@@ -36,8 +35,8 @@
   <encounter encounter_id="2008" visit_id="1014" encounter_type="1003" patient_id="109" location_id="1901" form_id="1" encounter_datetime="2023-10-20 09:25:00.0" creator="1" date_created="2023-10-20 09:27:00.0" voided="false" uuid="b2f67239-8a69-4f68-8fbe-6a248efc2b44"/>
 
   <!-- Obs for First Visit -->
-  <obs obs_id="1" encounter_id="2001" concept_id="200" person_id="109" obs_datetime="2023-10-20 09:10:00.0" location_id="1901" value_text="Visit Note: Hi" status="FINAL" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="a8e7f317-e6f7-4c34-a9bd-e4808be03c88"/>
-  <obs obs_id="2" encounter_id="2008" concept_id="200" person_id="109" obs_datetime="2023-10-20 09:10:00.0" location_id="1901" value_text="Visit Note: Custom note" status="FINAL" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="b9f8a854-dc87-44ae-8ed2-c2dc835fa12a"/>
+  <obs obs_id="1" encounter_id="2001" concept_id="19" person_id="109" obs_datetime="2023-10-20 09:10:00.0" location_id="1901" value_text="Visit Note: Hi" status="FINAL" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="a8e7f317-e6f7-4c34-a9bd-e4808be03c88"/>
+  <obs obs_id="2" encounter_id="2008" concept_id="19" person_id="109" obs_datetime="2023-10-20 09:10:00.0" location_id="1901" value_text="Visit Note: Custom note" status="FINAL" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="b9f8a854-dc87-44ae-8ed2-c2dc835fa12a"/>
 
   <!-- Diagnoses for First Visit -->
   <encounter_diagnosis diagnosis_id="1" encounter_id="2001" patient_id="109" creator="1" date_created="2023-10-20 09:15:00.0" rank="1" certainty="CONFIRMED" voided="false" uuid="47dd2d5e-5cfe-4fdd-b284-3147e60d4d25"/>
@@ -52,7 +51,7 @@
   <encounter encounter_id="2004" visit_id="1015" encounter_type="1004" patient_id="109" location_id="1901" form_id="1" encounter_datetime="2023-11-01 10:20:00.0" creator="1" date_created="2023-11-01 10:25:00.0" voided="false" uuid="d58e3e83-dbd4-4ba8-a61f-b4ff5c1bc1e8"/>
 
   <!-- Obs for Second Visit -->
-  <obs obs_id="3" encounter_id="2003" concept_id="200" person_id="109" obs_datetime="2023-10-20 09:10:00.0" location_id="1901" value_text="Visit Note: My note" status="FINAL" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="b7cce9cb-8f0e-4297-b979-bafea5e9a72a"/>
+  <obs obs_id="3" encounter_id="2003" concept_id="19" person_id="109" obs_datetime="2023-10-20 09:10:00.0" location_id="1901" value_text="Visit Note: My note" status="FINAL" creator="1" date_created="2023-10-20 09:12:00.0" voided="false" uuid="b7cce9cb-8f0e-4297-b979-bafea5e9a72a"/>
 
   <!-- Diagnoses for Second Visit -->
   <encounter_diagnosis diagnosis_id="3" encounter_id="2003" patient_id="109" creator="1" date_created="2023-11-01 10:15:00.0" rank="1" certainty="CONFIRMED" voided="false" uuid="aef38d76-ffde-47a1-8717-5c74fddc2c35"/>
@@ -75,9 +74,9 @@
   <encounter encounter_id="2007" visit_id="1016" encounter_type="1003" patient_id="110" location_id="1901" form_id="1" encounter_datetime="2023-11-05 09:00:00.0" creator="1" date_created="2023-11-05 09:05:00.0" voided="false" uuid="f6f8c39b-76f9-4879-8712-4cd178d2c2dc"/>
 
   <!-- Obs for John Doe's visit -->
-  <obs obs_id="4" encounter_id="2005" concept_id="200" person_id="110" obs_datetime="2023-10-25 08:40:00.0" location_id="1901" value_text="Visit Note: hi" status="FINAL" creator="1" date_created="2023-10-25 08:42:00.0" voided="false" uuid="d8e7f317-e6f7-4c34-a9bd-e4808be03c88"/>
-  <obs obs_id="5" encounter_id="2006" concept_id="200" person_id="110" obs_datetime="2023-10-25 08:45:00.0" location_id="1901" status="FINAL" creator="1" date_created="2023-10-25 08:47:00.0" voided="false" uuid="e9f8a854-dc87-44ae-8ed2-c2dc835fa12a"/>
-  <obs obs_id="6" encounter_id="2007" concept_id="200" person_id="110" obs_datetime="2023-11-05 09:00:00.0" location_id="1901" value_text="Visit Note: A custom note" status="FINAL" creator="1" date_created="2023-11-05 09:05:00.0" voided="false" uuid="f7cce9cb-8f0e-4297-b979-bafea5e9a72a"/>
+  <obs obs_id="4" encounter_id="2005" concept_id="19" person_id="110" obs_datetime="2023-10-25 08:40:00.0" location_id="1901" value_text="Visit Note: hi" status="FINAL" creator="1" date_created="2023-10-25 08:42:00.0" voided="false" uuid="d8e7f317-e6f7-4c34-a9bd-e4808be03c88"/>
+  <obs obs_id="5" encounter_id="2006" concept_id="19" person_id="110" obs_datetime="2023-10-25 08:45:00.0" location_id="1901" status="FINAL" creator="1" date_created="2023-10-25 08:47:00.0" voided="false" uuid="e9f8a854-dc87-44ae-8ed2-c2dc835fa12a"/>
+  <obs obs_id="6" encounter_id="2007" concept_id="19" person_id="110" obs_datetime="2023-11-05 09:00:00.0" location_id="1901" value_text="Visit Note: A custom note" status="FINAL" creator="1" date_created="2023-11-05 09:05:00.0" voided="false" uuid="f7cce9cb-8f0e-4297-b979-bafea5e9a72a"/>
 
 
   <!-- Diagnoses for John Doe's visit -->
@@ -93,12 +92,12 @@
   <!-- First Visit for Lester Lewis -->
   <visit visit_id="1018" patient_id="111" visit_type_id="1" date_started="2023-11-05 14:00:00.0" date_stopped="2023-11-05 14:30:00.0" location_id="1901" creator="1" date_created="2023-11-05 14:05:00.0" voided="1" uuid="b8fcde4e-db13-40d1-90fd-af948ec86d0e" />
   <encounter encounter_id="2009" visit_id="1018" encounter_type="1003" patient_id="111" location_id="1901" form_id="1" encounter_datetime="2023-11-05 14:10:00.0" creator="1" date_created="2023-11-05 14:12:00.0" voided="false" uuid="241022ba-7ff7-4169-8eea-9ba8090527b1"/>
-  <obs obs_id="7" encounter_id="2009" concept_id="200" person_id="111" obs_datetime="2023-11-05 14:10:00.0" location_id="1901" value_text="Visit Note: another note" status="FINAL" creator="1" date_created="2023-11-05 14:12:00.0" voided="false" uuid="c8e7f317-e6f7-4c34-a9bd-e4808be03c88"/>
+  <obs obs_id="7" encounter_id="2009" concept_id="19" person_id="111" obs_datetime="2023-11-05 14:10:00.0" location_id="1901" value_text="Visit Note: another note" status="FINAL" creator="1" date_created="2023-11-05 14:12:00.0" voided="false" uuid="c8e7f317-e6f7-4c34-a9bd-e4808be03c88"/>
 
   <!-- Second Visit for Lester Lewis voided encounters -->
   <visit visit_id="1019" patient_id="111" visit_type_id="1" date_started="2023-12-05 14:00:00.0" date_stopped="2023-12-05 14:30:00.0" location_id="1901" creator="1" date_created="2023-12-05 14:05:00.0" voided="0" uuid="9f35e300-3bc2-423c-94f3-7e6d36648dde" />
   <encounter encounter_id="2010" visit_id="1019" encounter_type="1004" patient_id="111" location_id="1901" form_id="1" encounter_datetime="2023-12-05 14:10:00.0" creator="1" date_created="2023-12-05 14:12:00.0" voided="true" void_reason="voided for testing" uuid="8b5dea6a-d956-44ed-9dbb-539c8e5c5874"/>
-  <obs obs_id="8" encounter_id="2010" concept_id="200" person_id="111" obs_datetime="2023-12-05 14:10:00.0" location_id="1901" value_text="Visit Note: hellow" status="FINAL" creator="1" date_created="2023-12-05 14:12:00.0" voided="false" uuid="75ffb4a9-68b3-4835-8a9b-e967c622c5b2"/>
+  <obs obs_id="8" encounter_id="2010" concept_id="19" person_id="111" obs_datetime="2023-12-05 14:10:00.0" location_id="1901" value_text="Visit Note: hellow" status="FINAL" creator="1" date_created="2023-12-05 14:12:00.0" voided="false" uuid="75ffb4a9-68b3-4835-8a9b-e967c622c5b2"/>
 
   <!-- Diagnoses for Lester Lewis -->
   <encounter_diagnosis diagnosis_id="9" encounter_id="2009" patient_id="111" creator="1" date_created="2023-11-05 14:15:00.0" rank="1" certainty="CONFIRMED" voided="false" uuid="54d6a678-135b-45f3-a623-0b24b515b635"/>

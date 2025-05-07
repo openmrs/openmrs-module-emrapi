@@ -3,9 +3,21 @@ package org.openmrs.module.emrapi.web.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.EncounterService;
+import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.diagnosis.Diagnosis;
+import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
+import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
+import org.openmrs.module.emrapi.test.builder.ObsBuilder;
 import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -25,6 +37,19 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
 
     @Autowired
     private ObjectFactory<VisitController> controllerFactory;
+
+    @Autowired
+    ConceptService conceptService;
+
+    @Autowired
+    EncounterService encounterService;
+
+    @Autowired
+    EmrApiProperties emrApiProperties;
+
+    @Autowired
+    @Qualifier("adminService")
+    AdministrationService administrationService;
     
     private MockMvc mockMvc;
     
@@ -176,7 +201,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         Map<String, Object> recentVisit = (Map<String, Object>) recentVisitEntry.get("visit");
         assert recentVisit.get("uuid").equals(mostRecentVisitUuid);
     }
-    
+
     @Test
     public void shouldThrowErrorWhenPatientNotFound() throws Exception {
         
@@ -185,5 +210,73 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
         mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void shouldGetVisitsWithObsGroupDiagnosesByPatient() throws Exception {
+
+        administrationService.setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
+        DiagnosisMetadata dmd = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
+
+        String patientUuid = "8604d42e-3ca8-11e3-bf2b-0d0c09861e97";
+        Concept codedDiagnosisConcept = conceptService.getConcept(11);
+
+        Encounter encounter = encounterService.getEncounter(2001);
+        encounter.addObs(new ObsBuilder()
+                .setPerson(encounter.getPatient())
+                .setEncounter(encounter)
+                .setConcept(dmd.getDiagnosisSetConcept())
+                .addMember(dmd.getNonCodedDiagnosisConcept(), "Headache")
+                .addMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.SECONDARY))
+                .addMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.CONFIRMED)).get()
+        );
+        encounter.addObs(new ObsBuilder()
+                .setPerson(encounter.getPatient())
+                .setEncounter(encounter)
+                .setConcept(dmd.getDiagnosisSetConcept())
+                .addMember(dmd.getCodedDiagnosisConcept(), codedDiagnosisConcept)
+                .addMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.PRIMARY))
+                .addMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.PRESUMED)).get()
+        );
+        encounterService.saveEncounter(encounter);
+
+        MvcResult response = mockMvc.perform(get("/rest/v1/emrapi/patient/" + patientUuid + "/visit")
+                        .param("v", "custom:(diagnoses:(diagnosis,certainty,rank))")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = response.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> result = objectMapper.readValue(jsonResponse, Map.class);
+
+        assertNotNull(result);
+        assert result.get("totalCount").equals(3);
+
+        List<Map<String, Object>> visitEntries = (List<Map<String, Object>>) result.get("pageOfResults");
+        assert visitEntries.size() == 3;
+
+        // extract the first visit and check its properties
+        List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>)visitEntries.get(2).get("diagnoses");
+        List<Map<String, Object>> secondVisitDiagnoses = (List<Map<String, Object>>)visitEntries.get(1).get("diagnoses");
+        List<Map<String, Object>> thirdVisitDiagnoses = (List<Map<String, Object>>)visitEntries.get(0).get("diagnoses");
+
+        assert firstVisitDiagnoses.size() == 2;
+        assert secondVisitDiagnoses.isEmpty();
+        assert thirdVisitDiagnoses.isEmpty();
+
+        Map<String, Object> diagnosis1 = firstVisitDiagnoses.get(0);
+        Map<String, Object> diagnosisValue1 = (Map<String, Object>) diagnosis1.get("diagnosis");
+        assert ((Map)diagnosisValue1.get("coded")).get("uuid").equals(codedDiagnosisConcept.getUuid());
+        assert diagnosisValue1.get("nonCoded") == null;
+        assert diagnosis1.get("certainty").equals("PROVISIONAL");
+        assert diagnosis1.get("rank").equals(1);
+
+        Map<String, Object> diagnosis2 = firstVisitDiagnoses.get(1);
+        Map<String, Object> diagnosisValue2 = (Map<String, Object>) diagnosis2.get("diagnosis");
+        assert diagnosisValue2.get("coded") == null;
+        assert diagnosisValue2.get("nonCoded").equals("Headache");
+        assert diagnosis2.get("certainty").equals("CONFIRMED");
+        assert diagnosis2.get("rank").equals(2);
     }
 }
