@@ -6,7 +6,6 @@ import org.openmrs.Diagnosis;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
@@ -18,9 +17,6 @@ import java.util.Map;
 import static org.junit.Assert.assertNotNull;
 
 public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
-
-    @Autowired
-    AdministrationService adminService;
 
     @Autowired
     PatientService patientService;
@@ -35,7 +31,6 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
     public void setup() {
         executeDataSet("baseTestDataset.xml");
         executeDataSet("pastVisitSetup.xml");
-        //adminService.setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
     }
 
     @Test
