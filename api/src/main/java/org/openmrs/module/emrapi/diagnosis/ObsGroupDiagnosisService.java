@@ -11,6 +11,7 @@ import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -247,6 +248,15 @@ public class ObsGroupDiagnosisService {
         }
         for (Diagnosis diagnosis : diagnoses) {
             ret.get(diagnosis.getExistingObs().getEncounter().getVisit()).add(DiagnosisUtils.convert(diagnosis));
+        }
+        for (List<org.openmrs.Diagnosis> diagnosisList : ret.values()) {
+            diagnosisList.sort((a, b) -> {
+                int ret1 = a.getEncounter().getEncounterDatetime().compareTo(b.getEncounter().getEncounterDatetime()) * -1;
+                if (ret1 == 0) {
+                    ret1 = OpenmrsUtil.compareWithNullAsGreatest(a.getRank(), b.getRank());
+                }
+                return ret1;
+            });
         }
         return ret;
     }

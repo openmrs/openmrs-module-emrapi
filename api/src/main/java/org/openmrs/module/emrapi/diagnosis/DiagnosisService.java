@@ -31,11 +31,6 @@ public interface DiagnosisService extends OpenmrsService {
     List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses);
 
 	/**
-	 * @return true if system is configured to store diagnoses as obs groups rather than diagnoses
-	 */
-	boolean useDiagnosesAsObs();
-
-	/**
 	 * Gets diagnoses since date, sorted in reverse chronological order
 	 *
 	 * @param patient

@@ -36,7 +36,7 @@ public class DiagnosisServiceImpl extends BaseOpenmrsService implements Diagnosi
 		this.adminService = adminService;
 	}
 
-	public boolean useDiagnosesAsObs() {
+	protected boolean useDiagnosesAsObs() {
 		return adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true");
 	}
 

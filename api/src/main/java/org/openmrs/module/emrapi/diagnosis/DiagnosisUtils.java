@@ -48,6 +48,7 @@ public class DiagnosisUtils {
             diagnosis.setCoded(emrApiDiagnosis.getDiagnosis().getCodedAnswer());
             diagnosis.setSpecificName(emrApiDiagnosis.getDiagnosis().getSpecificCodedAnswer());
             diagnosis.setNonCoded(emrApiDiagnosis.getDiagnosis().getNonCodedAnswer());
+            coreDiagnosis.setDiagnosis(diagnosis);
         }
         if (emrApiDiagnosis.getCertainty() != null) {
             if (emrApiDiagnosis.getCertainty() == Diagnosis.Certainty.CONFIRMED) {
