@@ -13,18 +13,25 @@
  */
 package org.openmrs.module.emrapi.patient;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.Setter;
 import org.openmrs.Location;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.Visit;
 import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Setter
 public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPatientService {
 	
 	private EmrPatientDAO dao;
@@ -34,22 +41,6 @@ public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPati
 	private PatientService patientService;
 	
 	private AdtService adtService;
-	
-	public void setDao(EmrPatientDAO dao) {
-		this.dao = dao;
-	}
-	
-	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
-		this.emrApiProperties = emrApiProperties;
-	}
-	
-	public void setPatientService(PatientService patientService) {
-		this.patientService = patientService;
-	}
-	
-	public void setAdtService(AdtService adtService) {
-		this.adtService = adtService;
-	}
 	
 	@Override
 	public List<Patient> findPatients(String query, Location checkedInAt, Integer start, Integer length) {
@@ -81,5 +72,23 @@ public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPati
 		}
 		
 		return patients.get(0);
+	}
+
+	@Override
+	public List<Visit> getVisitsForPatient(Patient patient, Integer startIndex, Integer limit) {
+		return dao.getVisitsForPatient(patient, startIndex, limit);
+	}
+
+	@Override
+	public Map<Visit, List<Obs>> getVisitNoteObservations(Collection<Visit> visits) {
+		Map<Visit, List<Obs>> ret = new HashMap<>();
+		List<Obs> observations = dao.getVisitNoteObservations(visits);
+		for (Visit visit : visits) {
+			ret.put(visit, new ArrayList<>());
+		}
+		for (Obs obs : observations) {
+			ret.get(obs.getEncounter().getVisit()).add(obs);
+		}
+		return ret;
 	}
 }

@@ -13,34 +13,31 @@
  */
 package org.openmrs.module.emrapi.patient;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.openmrs.api.db.hibernate.DbSessionFactory;  
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.Location;
+import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Visit;
+import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.api.db.hibernate.PatientSearchCriteria;
 import org.openmrs.module.emrapi.EmrApiProperties;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+@Setter
 public class HibernateEmrPatientDAO implements EmrPatientDAO {
 	
 	private DbSessionFactory sessionFactory;
 	
 	private EmrApiProperties emrApiProperties;
-	
-	public void setSessionFactory(DbSessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-	
-	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
-		this.emrApiProperties = emrApiProperties;
-	}
 	
 	@Override
 	public List<Patient> findPatients(String query, Location checkedInAt, Integer start, Integer maxResults) {
@@ -82,5 +79,32 @@ public class HibernateEmrPatientDAO implements EmrPatientDAO {
 			return new PatientSearchCriteria(sessionFactory.getHibernateSessionFactory(), criteria).prepareCriteria(query, null,
 			    new ArrayList<PatientIdentifierType>(), true, true, true);
 		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Visit> getVisitsForPatient(Patient patient, Integer startIndex, Integer limit) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Visit.class);
+		criteria.add(Restrictions.eq("patient", patient));
+		criteria.add(Restrictions.eq("voided", false));
+		criteria.addOrder(Order.desc("startDatetime"));
+		if (startIndex != null) {
+			criteria.setFirstResult(startIndex);
+		}
+		if (limit != null) {
+			criteria.setMaxResults(limit);
+		}
+		return criteria.list();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Obs> getVisitNoteObservations(Collection<Visit> visits) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
+		criteria.createAlias("encounter", "encounter");
+		criteria.add(Restrictions.in("encounter.visit", visits));
+		criteria.add(Restrictions.eq("encounter.encounterType", emrApiProperties.getVisitNoteEncounterType()));
+		criteria.add(Restrictions.eq("voided", false));
+		return criteria.list();
 	}
 }

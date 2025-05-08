@@ -6,12 +6,12 @@ import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
-import org.openmrs.Person;
 import org.openmrs.Visit;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
+import org.openmrs.util.OpenmrsUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,16 +143,20 @@ public class ObsGroupDiagnosisService {
     }
 
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
-		List<Diagnosis> diagnoses = new ArrayList<Diagnosis>();
-
 		DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
-
-		List<Obs> observations = obsService.getObservations(Arrays.asList((Person) patient), null, Arrays.asList(diagnosisMetadata.getDiagnosisSetConcept()),
+		List<Obs> observations = obsService.getObservations(Arrays.asList(patient), null, Arrays.asList(diagnosisMetadata.getDiagnosisSetConcept()),
 				null, null, null, Arrays.asList("obsDatetime"),
 				null, null, fromDate, null, false);
+        return getDiagnosesFromObsGroups(observations);
+	}
 
-		for (Obs obs : observations) {
-			Diagnosis diagnosis;
+    protected List<Diagnosis> getDiagnosesFromObsGroups(List<Obs> diagnosisObsGroups) {
+        List<Diagnosis> diagnoses = new ArrayList<>();
+        DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+        Collection<Concept> nonDiagnosisConcepts = emrApiProperties.getSuppressedDiagnosisConcepts();
+        Collection<Concept> nonDiagnosisConceptSets = emrApiProperties.getNonDiagnosisConceptSets();
+        for (Obs obs : diagnosisObsGroups) {
+            Diagnosis diagnosis;
             try {
                 diagnosis = diagnosisMetadata.toDiagnosis(obs);
             }
@@ -163,38 +167,28 @@ public class ObsGroupDiagnosisService {
                 }
                 continue;
             }
-
-			Collection<Concept> nonDiagnosisConcepts = emrApiProperties.getSuppressedDiagnosisConcepts();
-			Collection<Concept> nonDiagnosisConceptSets = emrApiProperties.getNonDiagnosisConceptSets();
-
-			Set<Concept> filter = new HashSet<Concept>();
-			filter.addAll(nonDiagnosisConcepts);
-			for (Concept conceptSet : nonDiagnosisConceptSets) {
-				filter.addAll(conceptSet.getSetMembers());
-			}
-
-			if (!filter.contains(diagnosis.getDiagnosis().getCodedAnswer())) {
-				diagnoses.add(diagnosis);
-			}
-		}
-
-		return diagnoses;
-	}
+            Set<Concept> filter = new HashSet<>();
+            filter.addAll(nonDiagnosisConcepts);
+            for (Concept conceptSet : nonDiagnosisConceptSets) {
+                filter.addAll(conceptSet.getSetMembers());
+            }
+            if (!filter.contains(diagnosis.getDiagnosis().getCodedAnswer())) {
+                diagnoses.add(diagnosis);
+            }
+        }
+        return diagnoses;
+    }
 
 	public List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate) {
 		List<Diagnosis> diagnoses = getDiagnoses(patient, fromDate);
-
-		Set<CodedOrFreeTextAnswer> answers = new HashSet<CodedOrFreeTextAnswer>();
-
+		Set<CodedOrFreeTextAnswer> answers = new HashSet<>();
 		Iterator<Diagnosis> it = diagnoses.iterator();
 		while(it.hasNext()) {
 			Diagnosis diagnosis = it.next();
-
 			if (!answers.add(diagnosis.getDiagnosis())) {
 				 it.remove();
 			}
 		}
-
 		return diagnoses;
 	}
 
@@ -234,15 +228,48 @@ public class ObsGroupDiagnosisService {
         return emrApiDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, Integer.class);
     }
 
+    public Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits) {
+        Map<Visit, List<org.openmrs.Diagnosis>> ret = new HashMap<>();
+        String query =
+                "select o.obsGroup from Obs o " +
+                "where o.voided = false " +
+                "and o.obsGroup.voided = false " +
+                "and o.encounter.visit in :visits " +
+                "and o.concept = :diagnosisOrderConcept " +
+                "group by o.encounter, o.obsGroup " +
+                "order by o.encounter.encounterDatetime desc, o.obsGroup.obsDatetime desc ";
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("visits", visits);
+        parameters.put("diagnosisOrderConcept", emrApiProperties.getDiagnosisMetadata().getDiagnosisOrderConcept());
+        List<Obs> obsGroups = emrApiDAO.executeHql(query, parameters, Obs.class);
+        List<Diagnosis> diagnoses = getDiagnosesFromObsGroups(obsGroups);
+        for (Visit visit : visits) {
+            ret.put(visit, new ArrayList<>());
+        }
+        for (Diagnosis diagnosis : diagnoses) {
+            ret.get(diagnosis.getExistingObs().getEncounter().getVisit()).add(DiagnosisUtils.convert(diagnosis));
+        }
+        for (List<org.openmrs.Diagnosis> diagnosisList : ret.values()) {
+            diagnosisList.sort((a, b) -> {
+                int ret1 = a.getEncounter().getEncounterDatetime().compareTo(b.getEncounter().getEncounterDatetime()) * -1;
+                if (ret1 == 0) {
+                    ret1 = OpenmrsUtil.compareWithNullAsGreatest(a.getRank(), b.getRank());
+                }
+                return ret1;
+            });
+        }
+        return ret;
+    }
+
     public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
-        if (primaryOnly == true) {
-            if (confirmedOnly == false) {
+        if (primaryOnly) {
+            if (!confirmedOnly) {
                 return getPrimaryDiagnoses(visit, diagnosisMetadata);
             } else {
                 return getConfirmedPrimaryDiagnoses(visit, diagnosisMetadata);
             }
         } else {
-            if (confirmedOnly == false) {
+            if (!confirmedOnly) {
                 return getDiagnoses(visit, diagnosisMetadata);
             } else {
                 return getConfirmedDiagnoses(visit, diagnosisMetadata);

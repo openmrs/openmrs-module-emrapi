@@ -6,11 +6,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openmrs.Concept;
+import org.openmrs.ConditionVerificationStatus;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
-import org.openmrs.api.ObsService;
+import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
+import org.openmrs.contrib.testdata.TestDataManager;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
@@ -19,8 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.contains;
@@ -37,7 +43,7 @@ public class ObsGroupDiagnosisServiceComponentTest extends EmrApiContextSensitiv
 	ConceptService conceptService;
 
 	@Autowired
-	ObsService obsService;
+	EncounterService encounterService;
 
 	@Autowired
 	EmrApiProperties emrApiProperties;
@@ -47,6 +53,9 @@ public class ObsGroupDiagnosisServiceComponentTest extends EmrApiContextSensitiv
 
 	@Autowired
 	ObsGroupDiagnosisService diagnosisService;
+
+	@Autowired
+	TestDataManager testDataManager;
 
 	DiagnosisMetadata dmd;
 
@@ -180,6 +189,32 @@ public class ObsGroupDiagnosisServiceComponentTest extends EmrApiContextSensitiv
         assertThat(diagnoses.get(0).getExistingObs(), is(mostRecentObs));
 	}
 
+	@Test
+	public void getDiagnoses_shouldReturnDiagnosesMappedToCoreDiagnosesByVisit() {
+		Patient patient = patientService.getPatient(2);
+		Concept malaria = conceptService.getConcept(11);
+		String date1 = "2013-08-10";
+		Visit visit = testDataManager.visit().patient(patient).started(date1).visitType(1).save();
+		Encounter encounter = testDataManager.encounter().visit(visit).patient(patient).encounterDatetime(date1).encounterType(1).save();
+		encounter.addObs(buildDiagnosis(patient, date1, Diagnosis.Order.SECONDARY, Diagnosis.Certainty.PRESUMED, malaria).save().get());
+		encounter.addObs(buildDiagnosis(patient, date1, Diagnosis.Order.PRIMARY, Diagnosis.Certainty.CONFIRMED, "Headache").save().get());
+		encounterService.saveEncounter(encounter);
+		Map<Visit, List<org.openmrs.Diagnosis>> visits = diagnosisService.getDiagnoses(Collections.singletonList(visit));
+		assertThat(visits.size(), is(1));
+		assertThat(visits.keySet().iterator().next(), is(visit));
+		List<org.openmrs.Diagnosis> diagnoses = visits.get(visit);
+		assertThat(diagnoses.size(), is(2));
+		assertThat(diagnoses.get(0).getPatient(), is(patient));
+		assertThat(diagnoses.get(0).getEncounter(), is(encounter));
+		assertThat(diagnoses.get(0).getDiagnosis().getNonCoded(), is("Headache"));
+		assertThat(diagnoses.get(0).getCertainty(), is(ConditionVerificationStatus.CONFIRMED));
+		assertThat(diagnoses.get(0).getRank(), is(1));
+		assertThat(diagnoses.get(1).getPatient(), is(patient));
+		assertThat(diagnoses.get(1).getEncounter(), is(encounter));
+		assertThat(diagnoses.get(1).getDiagnosis().getCoded(), is(malaria));
+		assertThat(diagnoses.get(1).getCertainty(), is(ConditionVerificationStatus.PROVISIONAL));
+		assertThat(diagnoses.get(1).getRank(), is(2));
+	}
 
 	public static Matcher<Diagnosis> hasObs(final Obs obs) {
 		return new FeatureMatcher<Diagnosis, Obs>(is(obs), "obs", "obs") {
