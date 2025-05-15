@@ -64,6 +64,8 @@ public class EmrApiConstants {
 
     public static final String GP_PERSON_IMAGES_DIRECTORY = "emr.personImagesDirectory";
 
+    public static final String GP_DISABLE_VISIT_ASSIGMENT_HANDLER = "emrapi.emrApiVisitAssignmentHandler.disabled";
+
     public static final String LOCATION_TAG_SUPPORTS_VISITS = "Visit Location";
 
     public static final String LOCATION_TAG_SUPPORTS_LOGIN = "Login Location";

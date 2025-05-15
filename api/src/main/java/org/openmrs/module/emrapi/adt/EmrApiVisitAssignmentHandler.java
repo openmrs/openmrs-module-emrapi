@@ -79,6 +79,11 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
     @Override
     public void beforeCreateEncounter(Encounter encounter) {
 
+        // do nothing if disabled
+        if ("true".equalsIgnoreCase(administrationService.getGlobalProperty(EmrApiConstants.GP_DISABLE_VISIT_ASSIGMENT_HANDLER))) {
+            return;
+        }
+
         //Do nothing if the encounter already belongs to a visit.
         if (encounter.getVisit() != null) {
             return;
