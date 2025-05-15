@@ -112,7 +112,7 @@
         </description>
     </globalProperty>
     <globalProperty>
-        <property>emrapi.EmrApiVisitAssignmentHandler.disabled</property>
+        <property>emrapi.emrApiVisitAssignmentHandler.disabled</property>
         <defaultValue>false</defaultValue>
         <description>
             Allows disabling of the visit assignment handler
