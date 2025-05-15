@@ -112,6 +112,13 @@
         </description>
     </globalProperty>
     <globalProperty>
+        <property>emrapi.EmrApiVisitAssignmentHandler.disabled</property>
+        <defaultValue>false</defaultValue>
+        <description>
+            Allows disabling of the visit assignment handler
+        </description>
+    </globalProperty>
+    <globalProperty>
         <property>emrapi.EmrApiVisitAssignmentHandler.encounterTypeToNewVisitTypeMap</property>
         <defaultValue></defaultValue>
         <description>
