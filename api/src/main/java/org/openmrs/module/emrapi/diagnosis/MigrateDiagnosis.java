@@ -14,9 +14,18 @@ import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * Migrates existing Diagnosis from the obs table to the new encounter_diagnosis table by getting all existing diagnosis
@@ -24,29 +33,90 @@ import java.util.List;
  */
 public class MigrateDiagnosis {
 	
+	private final Logger log = LoggerFactory.getLogger(MigrateDiagnosis.class);
+	
+	private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+	
+	private final ExecutorService executorService = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+	
+	// Flag that identifies whether at least one Diagnosis was migrated
+	private final AtomicBoolean migratedAtLeastOne = new AtomicBoolean(false);
+	
 	/**
-	 * Creates new Diagnosis using the Diagnosis model from the openmrs-core and saves it using the new DiagnosisService
+	 * Creates a new Diagnosis using the Diagnosis model from the openmrs-core and saves it using the new DiagnosisService
 	 * @return true if at least one Diagnosis was migrated
 	 */
 	public Boolean migrate(DiagnosisMetadata diagnosisMetadata) {
-		// Flag that identifies whether atleast one Diagnosis was migrated
-		Boolean migratedAtleastOneEncounterDiagosis = false;
-
-		ObsGroupDiagnosisService oldDiagnosisService = getDeprecatedDiagnosisService();
-		
-		org.openmrs.api.DiagnosisService newDiagnosisService = Context.getService(org.openmrs.api.DiagnosisService.class);
-		List<Integer> patientsIds = oldDiagnosisService.getAllPatientsWithDiagnosis(diagnosisMetadata);
-		
-		for (int id : patientsIds) {
-			Patient patient = Context.getPatientService().getPatient(id);
-			List<org.openmrs.Diagnosis> diagnoses = convert(oldDiagnosisService.getDiagnoses(patient, null));
-			
-			for (org.openmrs.Diagnosis diagnosis : diagnoses) {
-				newDiagnosisService.save(diagnosis);
-				migratedAtleastOneEncounterDiagosis = true;
+		try {
+			log.info("Starting migration of diagnoses from obs to encounter_diagnosis table");
+			processPatientsInBatch(diagnosisMetadata);
+		} finally {
+			executorService.shutdown();
+			try {
+				if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+					executorService.shutdownNow();
+				}
+			} catch (InterruptedException e) {
+				executorService.shutdownNow();
+				Thread.currentThread().interrupt();
 			}
 		}
-		return migratedAtleastOneEncounterDiagosis;
+		
+		return migratedAtLeastOne.get();
+	}
+	
+	/**
+	 * Processes patients in batches to migrate their diagnoses
+	 * @param diagnosisMetadata metadata containing information about the diagnosis migration
+	 */
+	private void processPatientsInBatch(DiagnosisMetadata diagnosisMetadata) {
+		List<Integer> patientIds = getDeprecatedDiagnosisService().getPatientsWithDiagnosis(diagnosisMetadata);
+		
+		while (patientIds != null && !patientIds.isEmpty()) {
+			List<Future<?>> tasks = patientIds.stream()
+					.map(ptId -> executorService.submit(() -> migrateDiagnosisForSinglePatient(ptId)))
+					.collect(Collectors.toList());
+			// Wait for all tasks in the current batch to complete
+			waitForPatientDiagnosisMigrationTasksToComplete(tasks);
+			patientIds = getDeprecatedDiagnosisService().getPatientsWithDiagnosis(diagnosisMetadata);
+		}
+	}
+	
+	/**
+	 * Waits for all patient diagnosis migration tasks in the current batch to complete
+	 * @param tasks the list of tasks to wait for
+	 */
+	private void waitForPatientDiagnosisMigrationTasksToComplete(List<Future<?>> tasks) {
+		tasks.forEach(task -> {
+			try {
+				task.get();
+			} catch (ExecutionException | InterruptedException e) {
+				log.error("Error during patient diagnosis migration", e.getCause());
+			}
+		});
+	}
+	
+	private void migrateDiagnosisForSinglePatient(Integer patientId) {
+		Context.openSession();
+		DiagnosisUtils.getRequiredPrivilegesForDiagnosisMigration().forEach(Context::addProxyPrivilege);
+		try {
+			Patient patient = Context.getPatientService().getPatient(patientId);
+			List<Diagnosis> emrapiDiagnoses = getDeprecatedDiagnosisService().getDiagnoses(patient, null);
+			List<org.openmrs.Diagnosis> diagnoses = convert(emrapiDiagnoses);
+			if (diagnoses.isEmpty()) {
+				log.warn("No diagnoses found for patient with ID: {}. Skipping migration.", patientId);
+				return;
+			}
+			diagnoses.forEach(getNewDiagnosisService()::save);
+			migratedAtLeastOne.set(true);
+		} catch (Exception e) {
+			log.error("Failed to migrate diagnoses for patient with ID: {}", patientId, e);
+			throw new RuntimeException(e);
+		}
+		finally {
+			DiagnosisUtils.getRequiredPrivilegesForDiagnosisMigration().forEach(Context::removeProxyPrivilege);
+			Context.closeSession();
+		}
 	}
 
 	/**
@@ -99,5 +169,15 @@ public class MigrateDiagnosis {
 	 */
 	public static ObsGroupDiagnosisService getDeprecatedDiagnosisService() {
 		return Context.getRegisteredComponent("obsGroupDiagnosisService", ObsGroupDiagnosisService.class);
+	}
+	
+	/**
+	 * Gets the new diagnosis service found in the openmrs-core module.
+	 * The one which was introduced in platform 2.2
+	 *
+	 * @return the new diagnosis service
+	 */
+	public static org.openmrs.api.DiagnosisService getNewDiagnosisService() {
+		return Context.getService(org.openmrs.api.DiagnosisService.class);
 	}
 }

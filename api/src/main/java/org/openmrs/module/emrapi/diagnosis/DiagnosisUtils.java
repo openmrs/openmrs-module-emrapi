@@ -4,8 +4,10 @@ import org.openmrs.CodedOrFreeText;
 import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DiagnosisUtils {
@@ -81,5 +83,23 @@ public class DiagnosisUtils {
         }
 
         return coreDiagnosis;
+    }
+    
+    /**
+     * Returns a list of privileges required for diagnosis migration.
+     * These privileges are used to ensure that the user has the necessary permissions
+     * to perform diagnosis migration operations.
+     *
+     * @return a list of required privileges for diagnosis migration
+     */
+    public static List<String> getRequiredPrivilegesForDiagnosisMigration() {
+        return Arrays.asList(
+                PrivilegeConstants.GET_PATIENTS, PrivilegeConstants.GET_CONCEPT_SOURCES,
+                PrivilegeConstants.GET_OBS, PrivilegeConstants.GET_CONCEPTS,
+                PrivilegeConstants.GET_DIAGNOSES, PrivilegeConstants.GET_GLOBAL_PROPERTIES,
+                PrivilegeConstants.EDIT_OBS, PrivilegeConstants.ADD_OBS,
+                PrivilegeConstants.DELETE_OBS, PrivilegeConstants.EDIT_DIAGNOSES,
+                "Add Diagnoses"
+        );
     }
 }

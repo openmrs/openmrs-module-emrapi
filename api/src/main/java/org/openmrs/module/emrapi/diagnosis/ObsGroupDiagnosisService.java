@@ -9,6 +9,7 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.util.OpenmrsUtil;
@@ -275,5 +276,25 @@ public class ObsGroupDiagnosisService {
                 return getConfirmedDiagnoses(visit, diagnosisMetadata);
             }
         }
+    }
+    
+    /**
+     * Returns a list of patient IDs that have a diagnosis matching the given DiagnosisMetadata.
+     * This method is designed to handle large datasets efficiently by processing patients in batches.
+     *
+     * @param diagnosisMetadata the metadata defining the diagnosis set to filter patients by
+     * @return a list of patient IDs with the specified diagnosis
+     */
+    public List<Integer> getPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
+        // This is to avoid loading all patients into memory at once
+        // and to allow for processing in manageable chunks.
+        // The batch size is configurable via the global property emrapi.diagnosisMigrationBatchSize
+        int batchSize = Integer.parseInt(Context.getAdministrationService().getGlobalProperty("emrapi.diagnosisMigrationBatchSize"));
+        if (batchSize <= 0) {
+            throw new IllegalArgumentException("emrapi.diagnosisMigrationBatchSize must be a positive integer");
+        }
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("diagnosisSetConcept", diagnosisMetadata.getDiagnosisSetConcept());
+        return emrApiDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, Integer.class, batchSize);
     }
 }

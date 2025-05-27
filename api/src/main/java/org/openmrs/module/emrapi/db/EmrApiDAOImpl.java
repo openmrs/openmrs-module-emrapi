@@ -52,4 +52,43 @@ public class EmrApiDAOImpl implements EmrApiDAO {
       }
       return executeHql(hql, parameters, clazz);
    }
+   
+   @Override
+    @SuppressWarnings("unchecked")
+   public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz, Integer maxResults) {
+        Query query = sessionFactory.getCurrentSession().createQuery(queryString);
+        for (String parameter : parameters.keySet()) {
+             Object value = parameters.get(parameter);
+             if (value instanceof Collection) {
+                query.setParameterList(parameter, (Collection) value);
+             } else {
+                query.setParameter(parameter, value);
+             }
+        }
+        if (maxResults != null) {
+             query.setMaxResults(maxResults);
+        }
+        return query.list();
+   }
+   
+   @Override
+   public <T> List<T> executeHqlFromResource(String resource, Map<String, Object> parameters, Class<T> clazz,
+           Integer maxResults) {
+        String hql = null;
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(resource)) {
+            if (is != null) {
+                hql = IOUtils.toString(is, StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading " + resource, e);
+        }
+        if (hql == null) {
+            throw new RuntimeException("No resource found for " + resource);
+        }
+        if (maxResults == null) {
+            return executeHql(hql, parameters, clazz);
+        } else {
+            return executeHql(hql, parameters, clazz, maxResults);
+        }
+   }
 }

@@ -149,6 +149,14 @@
     </globalProperty>
 
     <globalProperty>
+        <property>emrapi.diagnosisMigrationBatchSize</property>
+        <defaultValue>500</defaultValue>
+        <description>
+            Specifies the batch size to use when migrating diagnoses from the legacy diagnosis model to the new one.
+        </description>
+    </globalProperty>
+
+    <globalProperty>
         <property>emrapi.serializer.whitelist.types</property>
         <defaultValue>org.openmrs.module.emrapi.metadata.MetadataPackagesConfig,org.openmrs.module.emrapi.metadata.MetadataPackageConfig</defaultValue>
         <description></description>
