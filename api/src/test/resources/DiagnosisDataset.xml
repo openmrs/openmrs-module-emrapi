@@ -34,4 +34,6 @@
 	<encounter_diagnosis diagnosis_id="5" encounter_id="1" patient_id="2" creator="1" date_created="2016-01-12 00:00:00" rank="2" certainty="PROVISIONAL" voided="false" uuid="c033f9c4-a605-4613-972f-22f045db6bc7"/>
 	<encounter_diagnosis diagnosis_id="6" encounter_id="1" patient_id="2" creator="1" date_created="2016-01-12 00:00:00" rank="2" certainty="PROVISIONAL" voided="true" date_voided="2017-01-12 00:00:52" voided_by="1" void_reason="test reason" uuid="52c70212-66e9-4fb9-be92-75805971c2aa"/>
 
+	<!-- The global property below is used to set the batch size for diagnosis migration -->
+	<global_property property="emrapi.diagnosisMigrationBatchSize" property_value="500" uuid="d4f8b0c2-3c5e-4a6b-bf9d-8f0c1e2b3c4d"/>
 </dataset>

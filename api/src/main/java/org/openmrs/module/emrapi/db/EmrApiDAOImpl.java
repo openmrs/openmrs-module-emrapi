@@ -14,81 +14,62 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class EmrApiDAOImpl implements EmrApiDAO {
    
    protected final Log log = LogFactory.getLog(getClass());
    
    @Setter
    private DbSessionFactory sessionFactory;
-   
-   @Override
-   @SuppressWarnings("unchecked")
-   public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz) {
-      Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-      for (String parameter : parameters.keySet()) {
-         Object value = parameters.get(parameter);
-         if (value instanceof Collection) {
-            query.setParameterList(parameter, (Collection) value);
-         } else {
-            query.setParameter(parameter, value);
-         }
-      }
-      return query.list();
-   }
-   
-   @Override
-   public <T> List<T> executeHqlFromResource(String resource, Map<String, Object> parameters, Class<T> clazz) {
-      String hql = null;
-      try (InputStream is = getClass().getClassLoader().getResourceAsStream(resource)) {
-         if (is != null) {
-            hql = IOUtils.toString(is, StandardCharsets.UTF_8);
-         }
-      }
-      catch (IOException e) {
-         throw new RuntimeException("Error loading " + resource, e);
-      }
-      if (hql == null) {
-         throw new RuntimeException("No resource found for " + resource);
-      }
-      return executeHql(hql, parameters, clazz);
-   }
-   
-   @Override
-    @SuppressWarnings("unchecked")
-   public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz, Integer maxResults) {
-        Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-        for (String parameter : parameters.keySet()) {
-             Object value = parameters.get(parameter);
-             if (value instanceof Collection) {
-                query.setParameterList(parameter, (Collection) value);
-             } else {
-                query.setParameter(parameter, value);
-             }
-        }
-        if (maxResults != null) {
-             query.setMaxResults(maxResults);
-        }
+    
+    @Override
+    public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz) {
+        Query query = createQuery(queryString, parameters);
         return query.list();
-   }
-   
-   @Override
-   public <T> List<T> executeHqlFromResource(String resource, Map<String, Object> parameters, Class<T> clazz,
-           Integer maxResults) {
-        String hql = null;
+    }
+    
+    @Override
+    public <T> List<T> executeHqlFromResource(String resource, Map<String, Object> parameters, Class<T> clazz) {
+        String hql = loadHqlFromResource(resource);
+        return executeHql(hql, parameters, clazz);
+    }
+    
+    @Override
+    public <T> List<T> executeHql(String hql, Map<String, Object> parameters, int startIndex, int pageSize) {
+        Query query = createQuery(hql, parameters);
+        query.setFirstResult(startIndex);
+        query.setMaxResults(pageSize);
+        return query.list();
+    }
+    
+    @Override
+    public <T> List<T> executeHqlFromResource(String resource, Map<String, Object> parameters, int startIndex, int pageSize) {
+        String hql = loadHqlFromResource(resource);
+        return executeHql(hql, parameters, startIndex, pageSize);
+    }
+    
+    private Query createQuery(String hql, Map<String, Object> parameters) {
+        Query query = sessionFactory.getCurrentSession().createQuery(hql);
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Collection) {
+                query.setParameterList(entry.getKey(), (Collection<?>) value);
+            } else {
+                query.setParameter(entry.getKey(), value);
+            }
+        }
+        return query;
+    }
+    
+    private String loadHqlFromResource(String resource) {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(resource)) {
             if (is != null) {
-                hql = IOUtils.toString(is, StandardCharsets.UTF_8);
+                return IOUtils.toString(is, StandardCharsets.UTF_8);
+            } else {
+                throw new RuntimeException("No resource found for " + resource);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error loading " + resource, e);
         }
-        if (hql == null) {
-            throw new RuntimeException("No resource found for " + resource);
-        }
-        if (maxResults == null) {
-            return executeHql(hql, parameters, clazz);
-        } else {
-            return executeHql(hql, parameters, clazz, maxResults);
-        }
-   }
+    }
 }

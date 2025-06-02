@@ -9,7 +9,6 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.util.OpenmrsUtil;
@@ -17,6 +16,7 @@ import org.openmrs.util.OpenmrsUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -279,22 +279,57 @@ public class ObsGroupDiagnosisService {
     }
     
     /**
-     * Returns a list of patient IDs that have a diagnosis matching the given DiagnosisMetadata.
-     * This method is designed to handle large datasets efficiently by processing patients in batches.
+     * Returns a list of patient IDs who have a diagnosis matching the specified metadata.
      *
-     * @param diagnosisMetadata the metadata defining the diagnosis set to filter patients by
-     * @return a list of patient IDs with the specified diagnosis
+     * @param diagnosisMetadata the metadata for the diagnosis to filter by
+     * @param startIndex the index to start from for pagination
+     * @param pageSize the number of patient IDs to return
+     *
+     * @return a list of patient IDs who have the specified diagnosis
      */
-    public List<Integer> getPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata) {
-        // This is to avoid loading all patients into memory at once
-        // and to allow for processing in manageable chunks.
-        // The batch size is configurable via the global property emrapi.diagnosisMigrationBatchSize
-        int batchSize = Integer.parseInt(Context.getAdministrationService().getGlobalProperty("emrapi.diagnosisMigrationBatchSize"));
-        if (batchSize <= 0) {
-            throw new IllegalArgumentException("emrapi.diagnosisMigrationBatchSize must be a positive integer");
-        }
+    public List<Integer> getPatientsWithDiagnosis(DiagnosisMetadata diagnosisMetadata, int startIndex, int pageSize) {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("diagnosisSetConcept", diagnosisMetadata.getDiagnosisSetConcept());
-        return emrApiDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, Integer.class, batchSize);
+        return emrApiDAO.executeHqlFromResource("hql/patients_diagnoses.hql", parameters, startIndex, pageSize);
+    }
+    
+    /**
+     * Returns a list of diagnoses for a given patient from a specified date.
+     *
+     * @param patient the patient to get diagnoses for
+     * @param fromDate the date from which to retrieve diagnoses
+     * @param diagnosisMetadata the metadata for the diagnosis
+     * @return a list of diagnoses for the patient
+     */
+    public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate, DiagnosisMetadata diagnosisMetadata, EmrApiProperties emrApiProperties) {
+        List<Obs> observations = obsService.getObservations(Collections.singletonList(patient), null,
+		        Collections.singletonList(diagnosisMetadata.getDiagnosisSetConcept()),
+                null, null, null, Collections.singletonList("obsDatetime"),
+                null, null, fromDate, null, false);
+        
+        List<Diagnosis> diagnoses = new ArrayList<>();
+        Collection<Concept> nonDiagnosisConcepts = emrApiProperties.getSuppressedDiagnosisConcepts();
+        Collection<Concept> nonDiagnosisConceptSets = emrApiProperties.getNonDiagnosisConceptSets();
+        for (Obs obs : observations) {
+            Diagnosis diagnosis;
+            try {
+                diagnosis = diagnosisMetadata.toDiagnosis(obs);
+            }
+            catch (Exception ex) {
+                log.warn("Error trying to interpret " + obs + " as a diagnosis");
+                if (log.isDebugEnabled()) {
+                    log.debug("Detailed error", ex);
+                }
+                continue;
+            }
+	        Set<Concept> filter = new HashSet<>(nonDiagnosisConcepts);
+            nonDiagnosisConceptSets.forEach(c -> {
+                filter.addAll(c.getSetMembers());
+                if (!filter.contains(diagnosis.getDiagnosis().getCodedAnswer())) {
+                    diagnoses.add(diagnosis);
+                }
+            });
+        }
+        return diagnoses;
     }
 }

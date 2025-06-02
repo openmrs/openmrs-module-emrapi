@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -33,8 +34,13 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ObsGroupDiagnosisServiceComponentTest extends EmrApiContextSensitiveTest {
@@ -214,6 +220,25 @@ public class ObsGroupDiagnosisServiceComponentTest extends EmrApiContextSensitiv
 		assertThat(diagnoses.get(1).getDiagnosis().getCoded(), is(malaria));
 		assertThat(diagnoses.get(1).getCertainty(), is(ConditionVerificationStatus.PROVISIONAL));
 		assertThat(diagnoses.get(1).getRank(), is(2));
+	}
+	
+	@Test
+	public void getPatientsWithDiagnosis_shouldReturnPatientIds() {
+		Patient patient = patientService.getPatient(2);
+		buildDiagnosis(patient, "2025-05-29", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded pain").save();
+		
+		List<Integer> patientIds = diagnosisService.getPatientsWithDiagnosis(dmd, 0, 10);
+		
+		assertThat(patientIds, is(notNullValue()));
+		assertThat(patientIds.size(), is(1));
+		assertThat(patientIds, contains(patient.getId()));
+	}
+	
+	@Test
+	public void getPatientsWithDiagnosis_shouldReturnEmptyPatientIdsList() {
+		List<Integer> patientIds = diagnosisService.getPatientsWithDiagnosis(dmd, 0, 10);
+		
+		assertThat(patientIds, is(empty()));
 	}
 
 	public static Matcher<Diagnosis> hasObs(final Obs obs) {

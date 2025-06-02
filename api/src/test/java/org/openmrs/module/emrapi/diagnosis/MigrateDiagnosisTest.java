@@ -1,9 +1,9 @@
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
@@ -15,14 +15,15 @@ import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-
-@RunWith(SpringJUnit4ClassRunner.class)
 public class MigrateDiagnosisTest extends EmrApiContextSensitiveTest {
 
 	private static final String DIAGNOSIS_DATASET = "DiagnosisDataset.xml";
@@ -62,38 +63,93 @@ public class MigrateDiagnosisTest extends EmrApiContextSensitiveTest {
 	}
 
 	@Test
-	public void migrate_shouldVoidEmrapiDiagnosisAndCreateAnewCoreDiagnosis() {
+	public void migrate_shouldVoidEmrApiDiagnosisAndCreateAnewCoreDiagnosis() {
 		Patient patient = patientService.getPatient(7);
-		OldDiagnosisBuilder oldDiagnosisBuilder = new OldDiagnosisBuilder(diagnosisMetadata);
-		Obs obs = oldDiagnosisBuilder.buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).save().get();
-		oldDiagnosisBuilder.buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded disease", encounterService.getEncounter(1)).save();
-		assertFalse(obs.getVoided());
-		List<Diagnosis> emrapiDiagnoses = MigrateDiagnosis.getDeprecatedDiagnosisService().getDiagnoses(patient, null);
-		assertEquals(2, emrapiDiagnoses.size());
+		Encounter encounter = encounterService.getEncounter(1);
+		Obs obs1 = buildEmrApiDiagnosis(diagnosisMetadata,patient,encounter, Diagnosis.Order.PRIMARY,Diagnosis.Certainty.PRESUMED, "non-coded disease").save().get();
+		Obs obs2 = buildEmrApiDiagnosis(diagnosisMetadata, patient, encounter, Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED, "non-coded pain").save().get();
+		
+		assertNotNull(obs1);
+		assertFalse(obs1.getVoided());
+		assertNotNull(obs2);
+		assertFalse(obs2.getVoided());
+		
+		List<Diagnosis> emrApiDiagnoses = MigrateDiagnosis.getDeprecatedDiagnosisService().getDiagnoses(patient, null);
+		assertEquals(2, emrApiDiagnoses.size());
+		
 		// before migration
-		Assert.assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
+		// No
+		assertEquals(0, MigrateDiagnosis.getNewDiagnosisService().getDiagnoses(patient, null).size());
 		
-		new MigrateDiagnosis().migrate(diagnosisMetadata);
+		new MigrateDiagnosis().migrate(diagnosisMetadata, emrApiProperties);
+		
 		// after migration
-		Assert.assertEquals(2, diagnosisService.getDiagnoses(patient, null).size());
-		assertTrue(obs.getVoided());
+		List<Diagnosis> emrApiDiagnosesAfterMigration = MigrateDiagnosis.getDeprecatedDiagnosisService().getDiagnoses(patient, null);
+		assertEquals(0, emrApiDiagnosesAfterMigration.size());
 		
+		List<org.openmrs.Diagnosis> migratedDiagnoses = MigrateDiagnosis.getNewDiagnosisService().getDiagnoses(patient, null);
+		assertEquals(2, migratedDiagnoses.size());
+		migratedDiagnoses.forEach(md -> assertEquals(patient.getUuid(), md.getPatient().getUuid()));
 	}
 	
 	@Test
 	public void migrate_shouldVoidChildObsOfMigratedDiagnosis() {
 		Patient patient = patientService.getPatient(7);
-		OldDiagnosisBuilder oldDiagnosisBuilder = new OldDiagnosisBuilder(diagnosisMetadata);
-		ObsBuilder builder = oldDiagnosisBuilder.buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).
-				addMember(Context.getConceptService().getConcept(3), "Some Value");
-		Obs obs = builder.save().get();
+		Encounter encounter = encounterService.getEncounter(1);
+		
+		Obs obs = buildEmrApiDiagnosis(diagnosisMetadata, patient, encounter, Diagnosis.Order.SECONDARY,
+				Diagnosis.Certainty.CONFIRMED, "non-coded pain")
+				.addMember(Context.getConceptService().getConcept(3), "Some Value").save().get();
+		
 		// Before migration
 		assertEquals(4, obs.getGroupMembers().size());
-		new MigrateDiagnosis().migrate(diagnosisMetadata);
+		
+		new MigrateDiagnosis().migrate(diagnosisMetadata, emrApiProperties);
+		
 		// After migration
-		assertEquals(0, obs.getGroupMembers().size());
+		assertEquals(4, obs.getGroupMembers().size());
 		// Include voided
 		assertEquals(4, obs.getGroupMembers(true).size());
-			
+	}
+	
+	@Test
+	public void migrate_shouldMigrateEmrApiDiagnosesToCoreDiagnoses() {
+		Patient patient = patientService.getPatient(7);
+		Encounter encounter = encounterService.getEncounter(1);
+		// Create an emrapi diagnosis
+		buildEmrApiDiagnosis(diagnosisMetadata, patient, encounter, Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED, "non-coded pain").save();
+		buildEmrApiDiagnosis(diagnosisMetadata, patient, encounter, Diagnosis.Order.SECONDARY, Diagnosis.Certainty.PRESUMED, "Test diagnosis").save();
+		
+		// Before migration
+		// No diagnoses should exist in the new diagnosis table
+		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
+		// Patients with EmrApi diagnosis should be returned
+		List<Integer> patientWitDiagnosisIds = obsGroupDiagnosisService.getPatientsWithDiagnosis(diagnosisMetadata, 0, 10);
+		assertEquals(1, patientWitDiagnosisIds.size());
+		assertTrue(patientWitDiagnosisIds.contains(patient.getId()));
+		
+		// Migrate the diagnoses
+		new MigrateDiagnosis().migrate(diagnosisMetadata, emrApiProperties);
+		
+		// After migration
+		assertEquals(1, diagnosisService.getDiagnoses(patient, null).size());
+	}
+	
+	
+	private ObsBuilder buildEmrApiDiagnosis(DiagnosisMetadata diagnosisMetadata, Patient patient, Encounter encounter, Diagnosis.Order order, Diagnosis.Certainty certainty, Object diagnosis) {
+		ObsBuilder builder = new ObsBuilder()
+				.setPerson(patient)
+				.setObsDatetime(new Date())
+				.setConcept(diagnosisMetadata.getDiagnosisSetConcept())
+				.addMember(diagnosisMetadata.getDiagnosisOrderConcept(), diagnosisMetadata.getConceptFor(order))
+				.addMember(diagnosisMetadata.getDiagnosisCertaintyConcept(), diagnosisMetadata.getConceptFor(certainty));
+		if (diagnosis instanceof Concept) {
+			builder.addMember(diagnosisMetadata.getCodedDiagnosisConcept(), (Concept) diagnosis);
+		} else if (diagnosis instanceof String) {
+			builder.addMember(diagnosisMetadata.getNonCodedDiagnosisConcept(), (String) diagnosis);
+		} else {
+			throw new IllegalArgumentException("Diagnosis value must be a Concept or String");
+		}
+		return builder.setEncounter(encounter);
 	}
 }

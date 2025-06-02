@@ -31,7 +31,7 @@ public class MigrateDiagnosisController {
 	public String doEncounterDiagnosisMigration(HttpSession session, HttpServletRequest request) {
 		DiagnosisMetadata diagnosisMetadata = emrApiProps.getDiagnosisMetadata();
 		if (ModuleUtil.compareVersion(OpenmrsConstants.OPENMRS_VERSION, "2.2.0") >= 0) {
-			if (new MigrateDiagnosis().migrate(diagnosisMetadata)) {
+			if (new MigrateDiagnosis().migrate(diagnosisMetadata, emrApiProps)) {
 				session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "emrapi.migrateDiagnosis.success.name");
 			} else {
 				session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "emrapi.migrateDiagnosis.migration.error.message");

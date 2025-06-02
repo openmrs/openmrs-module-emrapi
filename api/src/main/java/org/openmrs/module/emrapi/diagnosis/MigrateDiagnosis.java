@@ -9,15 +9,16 @@
  */
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.openmrs.CodedOrFreeText;
-import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
+import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -46,17 +47,19 @@ public class MigrateDiagnosis {
 	 * Creates a new Diagnosis using the Diagnosis model from the openmrs-core and saves it using the new DiagnosisService
 	 * @return true if at least one Diagnosis was migrated
 	 */
-	public Boolean migrate(DiagnosisMetadata diagnosisMetadata) {
+	public Boolean migrate(DiagnosisMetadata diagnosisMetadata, EmrApiProperties emrApiProperties) {
 		try {
 			log.info("Starting migration of diagnoses from obs to encounter_diagnosis table");
-			processPatientsInBatch(diagnosisMetadata);
-		} finally {
+			processPatientsInBatch(diagnosisMetadata, emrApiProperties);
+		}
+		finally {
 			executorService.shutdown();
 			try {
 				if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
 					executorService.shutdownNow();
 				}
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				executorService.shutdownNow();
 				Thread.currentThread().interrupt();
 			}
@@ -69,16 +72,31 @@ public class MigrateDiagnosis {
 	 * Processes patients in batches to migrate their diagnoses
 	 * @param diagnosisMetadata metadata containing information about the diagnosis migration
 	 */
-	private void processPatientsInBatch(DiagnosisMetadata diagnosisMetadata) {
-		List<Integer> patientIds = getDeprecatedDiagnosisService().getPatientsWithDiagnosis(diagnosisMetadata);
-		
-		while (patientIds != null && !patientIds.isEmpty()) {
+	private void processPatientsInBatch(DiagnosisMetadata diagnosisMetadata, EmrApiProperties emrApiProperties) {
+		// This is to avoid loading all patients into memory at once
+		// and to allow processing them in manageable chunks.
+		// The batch size is configurable via the global property emrapi.diagnosisMigrationBatchSize, defaulting to 500.
+		int batchSize = Integer.parseInt(Context.getAdministrationService().getGlobalProperty("emrapi.diagnosisMigrationBatchSize", "500"));
+		if (batchSize <= 0) {
+			throw new IllegalArgumentException("emrapi.diagnosisMigrationBatchSize must be a positive integer");
+		}
+		int startIndex = 0;
+		// Loop until no more patients are found with the specified diagnosis
+		while (true) {
+			List<Integer> patientIds = getDeprecatedDiagnosisService().getPatientsWithDiagnosis(diagnosisMetadata, startIndex, batchSize);
+			if (patientIds == null || patientIds.isEmpty()) {
+				log.info("No more patients found with the specified diagnosis. Migration completed.");
+				break;
+			}
+			log.info("Processing batch of {} patients starting from index {}", patientIds.size(), startIndex);
+			// Submit tasks for each patient in the current batch
 			List<Future<?>> tasks = patientIds.stream()
-					.map(ptId -> executorService.submit(() -> migrateDiagnosisForSinglePatient(ptId)))
+					.map(ptId -> executorService.submit(() -> migrateDiagnosisForSinglePatient(ptId, diagnosisMetadata, emrApiProperties)))
 					.collect(Collectors.toList());
+			
 			// Wait for all tasks in the current batch to complete
 			waitForPatientDiagnosisMigrationTasksToComplete(tasks);
-			patientIds = getDeprecatedDiagnosisService().getPatientsWithDiagnosis(diagnosisMetadata);
+			startIndex += batchSize; // Move to the next batch
 		}
 	}
 	
@@ -87,78 +105,78 @@ public class MigrateDiagnosis {
 	 * @param tasks the list of tasks to wait for
 	 */
 	private void waitForPatientDiagnosisMigrationTasksToComplete(List<Future<?>> tasks) {
+		if (tasks == null || tasks.isEmpty()) {
+			log.warn("No tasks to wait for. Skipping waiting for patient diagnosis migration tasks.");
+			return;
+		}
 		tasks.forEach(task -> {
 			try {
 				task.get();
 			} catch (ExecutionException | InterruptedException e) {
-				log.error("Error during patient diagnosis migration", e.getCause());
+				throw new DiagnosisMigrationException("Error while migrating diagnoses for a patient", e);
 			}
 		});
 	}
 	
-	private void migrateDiagnosisForSinglePatient(Integer patientId) {
+	/**
+	 * Migrates diagnoses for a single patient by fetching existing diagnoses from the emrapi service
+	 * and saving them using the new DiagnosisService.
+	 *
+	 * @param patientId the ID of the patient whose diagnoses are to be migrated
+	 */
+	private void migrateDiagnosisForSinglePatient(Integer patientId, DiagnosisMetadata diagnosisMetadata, EmrApiProperties emrApiProperties) {
 		Context.openSession();
 		DiagnosisUtils.getRequiredPrivilegesForDiagnosisMigration().forEach(Context::addProxyPrivilege);
+		Patient patient = Context.getPatientService().getPatient(patientId);
 		try {
-			Patient patient = Context.getPatientService().getPatient(patientId);
-			List<Diagnosis> emrapiDiagnoses = getDeprecatedDiagnosisService().getDiagnoses(patient, null);
-			List<org.openmrs.Diagnosis> diagnoses = convert(emrapiDiagnoses);
+			List<Diagnosis> emrapiDiagnosis = getDeprecatedDiagnosisService().getDiagnoses(patient, null,
+					diagnosisMetadata, emrApiProperties);
+			log.error("emrapi diagnosis size: {}", emrapiDiagnosis.size());
+			List<org.openmrs.Diagnosis> diagnoses = emrapiDiagnosis.stream()
+					.map(DiagnosisUtils::convert)
+					.collect(Collectors.toList());
 			if (diagnoses.isEmpty()) {
 				log.warn("No diagnoses found for patient with ID: {}. Skipping migration.", patientId);
 				return;
 			}
 			diagnoses.forEach(getNewDiagnosisService()::save);
+			// Void the existing Obs for the migrated diagnoses
+			emrapiDiagnosis.forEach(this::voidObsForEmrApiDiagnosis);
 			migratedAtLeastOne.set(true);
 		} catch (Exception e) {
-			log.error("Failed to migrate diagnoses for patient with ID: {}", patientId, e);
-			throw new RuntimeException(e);
-		}
-		finally {
+			throw new DiagnosisMigrationException("Error while migrating diagnoses for patient with UUID: " + patient.getUuid(), e);
+		} finally {
 			DiagnosisUtils.getRequiredPrivilegesForDiagnosisMigration().forEach(Context::removeProxyPrivilege);
 			Context.closeSession();
 		}
 	}
 
 	/**
-	 * Converts a list of emrapi diagnosis objects to a list of core diagnosis objects
-	 * @param emrapiDiagnoses list of emrapi diagnosis
-	 * @return a list of core diagnosis objects.
+	 * Voids the existing Obs for the given emrapi Diagnosis.
+	 * If the Obs is a grouping Obs, it also voids all its children.
+	 *
+	 * @param emrapiDiagnosis the emrapi Diagnosis containing the Obs to be voided
 	 */
-	private List<org.openmrs.Diagnosis> convert(List<Diagnosis> emrapiDiagnoses) {
-		List<org.openmrs.Diagnosis> coreDiagnoses = new ArrayList<org.openmrs.Diagnosis>();
-		
-		for (Diagnosis emrapiDiagnosis : emrapiDiagnoses) {
-			org.openmrs.Diagnosis coreDiagnosis = new org.openmrs.Diagnosis();
-			Obs obs = emrapiDiagnosis.getExistingObs();
-			coreDiagnosis.setEncounter(obs.getEncounter());
-			coreDiagnosis.setPatient((Patient)obs.getPerson());
-			coreDiagnosis.setDiagnosis(new CodedOrFreeText(emrapiDiagnosis.getDiagnosis().getCodedAnswer(),
-					emrapiDiagnosis.getDiagnosis().getSpecificCodedAnswer(), emrapiDiagnosis.getDiagnosis().getNonCodedAnswer()));
-			coreDiagnosis.setCertainty(emrapiDiagnosis.getCertainty() == Diagnosis.Certainty.CONFIRMED ? ConditionVerificationStatus.CONFIRMED : ConditionVerificationStatus.PROVISIONAL);
-			coreDiagnosis.setCreator(obs.getCreator());
-			coreDiagnosis.setDateCreated(obs.getDateCreated());
-			coreDiagnosis.setVoided(obs.getVoided());
-			coreDiagnosis.setRank(1);
-			if (obs.getVoided()) {
-				coreDiagnosis.setVoidedBy(obs.getVoidedBy());
-				coreDiagnosis.setDateVoided(obs.getDateVoided());
-				coreDiagnosis.setVoidReason(obs.getVoidReason());
-			}
+	private void voidObsForEmrApiDiagnosis(Diagnosis emrapiDiagnosis) {
+		ObsService obsService = Context.getObsService();
+		Obs obs = emrapiDiagnosis.getExistingObs();
+		if (obs != null) {
 			obs.setVoided(true);
+			obs.setVoidedBy(Context.getAuthenticatedUser());
+			obs.setDateVoided(new Date());
+			// If the Obs is a grouping Obs, void all its children as well
 			if (obs.isObsGrouping()) {
-				List<Obs> affectedObsChildren = new ArrayList<Obs>(obs.getGroupMembers());
+				List<Obs> affectedObsChildren = new ArrayList<>(obs.getGroupMembers());
 				for (Obs child : affectedObsChildren) {
 					child.setVoided(true);
-					child.setVoidReason("Migrated parent to the new encounter_diagnosis table");
+					child.setVoidedBy(Context.getAuthenticatedUser());
+					child.setDateVoided(new Date());
+					obsService.voidObs(child,
+							"Voided this Obs due to parent Obs migration to new encounter_diagnosis table");
 				}
-				
 			}
-			
-			Context.getObsService().saveObs(obs, "Voided this Obs due to its migration to new encounter_diagnosis table");
-			coreDiagnoses.add(coreDiagnosis);
-
+			obsService.voidObs(obs, "Voided this Obs due to its migration to new encounter_diagnosis table");
 		}
-		return coreDiagnoses;
 	}
 
 	/**
