@@ -16,6 +16,7 @@ import org.openmrs.util.OpenmrsUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ import java.util.Set;
 
 public class ObsGroupDiagnosisService {
 
-    private static final Log log = LogFactory.getLog(DiagnosisService.class);
+    private static final Log log = LogFactory.getLog(ObsGroupDiagnosisService.class);
 
 	private EmrApiProperties emrApiProperties;
 
