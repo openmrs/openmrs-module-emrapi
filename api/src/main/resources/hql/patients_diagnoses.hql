@@ -7,4 +7,5 @@ where
     and p.patientId in(select distinct personId from Obs o
     where
         o.concept = :diagnosisSetConcept
+        and o.voided = 'false'
     )

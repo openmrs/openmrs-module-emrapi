@@ -14,6 +14,8 @@ import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,27 +26,43 @@ import java.util.List;
  */
 public class MigrateDiagnosis {
 	
+	private static final int BATCH_SIZE = 10;
+	
+	private static final Logger log = LoggerFactory.getLogger(MigrateDiagnosis.class);
+	
 	/**
 	 * Creates new Diagnosis using the Diagnosis model from the openmrs-core and saves it using the new DiagnosisService
 	 * @return true if at least one Diagnosis was migrated
 	 */
 	public Boolean migrate(DiagnosisMetadata diagnosisMetadata) {
-		// Flag that identifies whether atleast one Diagnosis was migrated
-		Boolean migratedAtleastOneEncounterDiagosis = false;
+		// Flag that identifies whether at least one Diagnosis was migrated
+		boolean migratedAtleastOneEncounterDiagosis = false;
 
 		ObsGroupDiagnosisService oldDiagnosisService = getDeprecatedDiagnosisService();
 		
 		org.openmrs.api.DiagnosisService newDiagnosisService = Context.getService(org.openmrs.api.DiagnosisService.class);
 		List<Integer> patientsIds = oldDiagnosisService.getAllPatientsWithDiagnosis(diagnosisMetadata);
 		
-		for (int id : patientsIds) {
-			Patient patient = Context.getPatientService().getPatient(id);
-			List<org.openmrs.Diagnosis> diagnoses = convert(oldDiagnosisService.getDiagnoses(patient, null));
+		// Process patients in batches
+		for (int i = 0; i < patientsIds.size(); i += BATCH_SIZE) {
+			int endIndex = Math.min(i + BATCH_SIZE, patientsIds.size());
+			List<Integer> patientBatch = patientsIds.subList(i, endIndex);
 			
-			for (org.openmrs.Diagnosis diagnosis : diagnoses) {
-				newDiagnosisService.save(diagnosis);
-				migratedAtleastOneEncounterDiagosis = true;
+			for (int id : patientBatch) {
+				Patient patient = Context.getPatientService().getPatient(id);
+				List<org.openmrs.Diagnosis> diagnoses = convert(oldDiagnosisService.getDiagnoses(patient, null));
+				
+				for (org.openmrs.Diagnosis diagnosis : diagnoses) {
+					newDiagnosisService.save(diagnosis);
+					migratedAtleastOneEncounterDiagosis = true;
+				}
 			}
+			
+			// Flush and clear session after each batch
+			Context.flushSession();
+			Context.clearSession();
+			
+			log.info("Processed {} of {} patients", endIndex, patientsIds.size());
 		}
 		return migratedAtleastOneEncounterDiagosis;
 	}
@@ -55,7 +73,7 @@ public class MigrateDiagnosis {
 	 * @return a list of core diagnosis objects.
 	 */
 	private List<org.openmrs.Diagnosis> convert(List<Diagnosis> emrapiDiagnoses) {
-		List<org.openmrs.Diagnosis> coreDiagnoses = new ArrayList<org.openmrs.Diagnosis>();
+		List<org.openmrs.Diagnosis> coreDiagnoses = new ArrayList<>();
 		
 		for (Diagnosis emrapiDiagnosis : emrapiDiagnoses) {
 			org.openmrs.Diagnosis coreDiagnosis = new org.openmrs.Diagnosis();
@@ -76,7 +94,7 @@ public class MigrateDiagnosis {
 			}
 			obs.setVoided(true);
 			if (obs.isObsGrouping()) {
-				List<Obs> affectedObsChildren = new ArrayList<Obs>(obs.getGroupMembers());
+				List<Obs> affectedObsChildren = new ArrayList<>(obs.getGroupMembers());
 				for (Obs child : affectedObsChildren) {
 					child.setVoided(true);
 					child.setVoidReason("Migrated parent to the new encounter_diagnosis table");

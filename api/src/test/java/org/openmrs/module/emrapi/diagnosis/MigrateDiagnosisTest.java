@@ -1,6 +1,5 @@
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +18,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -71,11 +72,11 @@ public class MigrateDiagnosisTest extends EmrApiContextSensitiveTest {
 		List<Diagnosis> emrapiDiagnoses = MigrateDiagnosis.getDeprecatedDiagnosisService().getDiagnoses(patient, null);
 		assertEquals(2, emrapiDiagnoses.size());
 		// before migration
-		Assert.assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
+		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
 		
 		new MigrateDiagnosis().migrate(diagnosisMetadata);
 		// after migration
-		Assert.assertEquals(2, diagnosisService.getDiagnoses(patient, null).size());
+		assertEquals(2, diagnosisService.getDiagnoses(patient, null).size());
 		assertTrue(obs.getVoided());
 		
 	}
@@ -94,6 +95,32 @@ public class MigrateDiagnosisTest extends EmrApiContextSensitiveTest {
 		assertEquals(0, obs.getGroupMembers().size());
 		// Include voided
 		assertEquals(4, obs.getGroupMembers(true).size());
-			
+		for (Obs child : obs.getGroupMembers(true)) {
+			assertTrue(child.getVoided());
+			assertEquals("Migrated parent to the new encounter_diagnosis table", child.getVoidReason());
+		}
+	}
+	
+	@Test
+	public void migrate_shouldReturnTrueIfAtLeastOneDiagnosisWasMigrated() {
+		Patient patient = patientService.getPatient(7);
+		new OldDiagnosisBuilder(diagnosisMetadata).buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY,
+				Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).save();
+		
+		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
+		
+		assertTrue(new MigrateDiagnosis().migrate(diagnosisMetadata));
+		
+		assertEquals(1, diagnosisService.getDiagnoses(patient, null).size());
+	}
+	
+	@Test
+	public void migrate_shouldReturnFalseIfNoDiagnosisWasMigrated() {
+		Patient patient = patientService.getPatient(7);
+		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
+		
+		assertFalse(new MigrateDiagnosis().migrate(diagnosisMetadata));
+		
+		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
 	}
 }
