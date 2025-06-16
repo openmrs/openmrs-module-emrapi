@@ -53,7 +53,7 @@ public class ProviderManagementProviderService implements ProviderServiceFacade 
     public void setProviderRole(Provider provider, Object providerRole) {
         if (provider instanceof org.openmrs.module.providermanagement.Provider) {
             org.openmrs.module.providermanagement.Provider p = (org.openmrs.module.providermanagement.Provider) provider;
-            if (providerRole == null) {
+            if (isProviderRoleNull(providerRole)) {
                 p.setProviderRole(null);
             }
             else {
@@ -93,5 +93,18 @@ public class ProviderManagementProviderService implements ProviderServiceFacade 
             }
         }
         return role;
+    }
+
+    private boolean isProviderRoleNull(Object ref) {
+        if (ref == null) {
+            return true;
+        }
+        if (ref instanceof String && ((String) ref).isEmpty()) {
+            return true;
+        }
+        if (ref instanceof String[] && (((String[]) ref).length == 0 || ((String[])ref)[0].isEmpty())) {
+            return true;
+        }
+        return false;
     }
 }
