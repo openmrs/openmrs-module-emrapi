@@ -18,6 +18,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
@@ -219,16 +220,13 @@ public class AdtServiceTest {
 
         service.ensureActiveVisit(patient, outpatientDepartment);
 
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                assertThat(actual.getVisitType(), is(atFacilityVisitType));
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), TestUtils.isJustNow());
-                return true;
-            }
+        verify(mockVisitService).saveVisit(argThat(o -> {
+            Visit actual = (Visit) o;
+            assertThat(actual.getVisitType(), is(atFacilityVisitType));
+            assertThat(actual.getPatient(), is(patient));
+            assertThat(actual.getLocation(), is(mirebalaisHospital));
+            assertThat(actual.getStartDatetime(), TestUtils.isJustNow());
+            return true;
         }));
     }
 
@@ -263,20 +261,17 @@ public class AdtServiceTest {
         assertNotSame(oldVisit, created);
 
         // should be called once to create a new visit
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                if (actual != oldVisit) {
-                    assertSame(created, actual);
-                    assertThat(actual.getVisitType(), is(atFacilityVisitType));
-                    assertThat(actual.getPatient(), is(patient));
-                    assertThat(actual.getLocation(), is(mirebalaisHospital));
-                    assertThat(actual.getStartDatetime(), TestUtils.isJustNow());
-                    return true;
-                } else {
-                    return false;
-                }
+        verify(mockVisitService).saveVisit(argThat(o -> {
+            Visit actual = (Visit) o;
+            if (actual != oldVisit) {
+                assertSame(created, actual);
+                assertThat(actual.getVisitType(), is(atFacilityVisitType));
+                assertThat(actual.getPatient(), is(patient));
+                assertThat(actual.getLocation(), is(mirebalaisHospital));
+                assertThat(actual.getStartDatetime(), TestUtils.isJustNow());
+                return true;
+            } else {
+                return false;
             }
         }));
     }
@@ -455,37 +450,29 @@ public class AdtServiceTest {
     }
 
     @Test
-    public void test_checkInPatient_forNewVisit() throws Exception {
+    public void test_checkInPatient_forNewVisit() {
         final Patient patient = new Patient();
 
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(new ArrayList<Visit>());
 
         service.checkInPatient(patient, outpatientDepartment, null, null, null, false);
 
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                assertThat(actual.getVisitType(), is(atFacilityVisitType));
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), TestUtils.isJustNow());
-                return true;
-            }
+        verify(mockVisitService).saveVisit(argThat(visit -> {
+            assertThat(visit.getVisitType(), is(atFacilityVisitType));
+            assertThat(visit.getPatient(), is(patient));
+            assertThat(visit.getLocation(), is(mirebalaisHospital));
+            assertThat(visit.getStartDatetime(), TestUtils.isJustNow());
+            return true;
         }));
 
-        verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
-            @Override
-            public boolean matches(Object o) {
-                Encounter actual = (Encounter) o;
-                assertThat(actual.getEncounterType(), is(checkInEncounterType));
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(outpatientDepartment));
-                assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
-                assertThat(actual.getProvidersByRoles().size(), is(1));
-                assertThat(actual.getProvidersByRole(checkInClerkEncounterRole).iterator().next(), is(providerForCurrentUser));
-                return true;
-            }
+        verify(mockEncounterService).saveEncounter(argThat(visit -> {
+            assertThat(visit.getEncounterType(), is(checkInEncounterType));
+            assertThat(visit.getPatient(), is(patient));
+            assertThat(visit.getLocation(), is(outpatientDepartment));
+            assertThat(visit.getEncounterDatetime(), TestUtils.isJustNow());
+            assertThat(visit.getProvidersByRoles().size(), is(1));
+            assertThat(visit.getProvidersByRole(checkInClerkEncounterRole).iterator().next(), is(providerForCurrentUser));
+            return true;
         }));
     }
 
@@ -512,7 +499,7 @@ public class AdtServiceTest {
 
         List<VisitDomainWrapper> activeVisitSummaries = service.getActiveVisits(mirebalaisHospital);
 
-        assertThat(activeVisitSummaries, TestUtils.isCollectionOfExactlyElementsWithProperties("visit", visit1, visit2));
+        Assertions.assertEquals(activeVisitSummaries, TestUtils.isCollectionOfExactlyElementsWithProperties("visit", visit1, visit2));
     }
 
     @Test
@@ -910,19 +897,15 @@ public class AdtServiceTest {
 
         service.createAdtEncounterFor(admission);
 
-        verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
-            @Override
-            public boolean matches(Object o) {
-                Encounter actual = (Encounter) o;
-                assertThat(actual.getEncounterType(), is(admissionEncounterType));
-                assertNotNull(actual.getVisit());
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(inpatientDepartment));
-                assertThat(actual.getForm(), is(admissionForm));
-                assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
-                assertThat(actual, hasProviders(admission.getProviders()));
-                return true;
-            }
+        verify(mockEncounterService).saveEncounter(argThat(encounter -> {
+            assertThat(encounter.getEncounterType(), is(admissionEncounterType));
+            assertNotNull(encounter.getVisit());
+            assertThat(encounter.getPatient(), is(patient));
+            assertThat(encounter.getLocation(), is(inpatientDepartment));
+            assertThat(encounter.getForm(), is(admissionForm));
+            assertThat(encounter.getEncounterDatetime(), TestUtils.isJustNow());
+            assertThat(encounter, hasProviders(admission.getProviders()));
+            return true;
         }));
     }
 
@@ -955,15 +938,14 @@ public class AdtServiceTest {
 
         verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
             @Override
-            public boolean matches(Object o) {
-                Encounter actual = (Encounter) o;
-                assertThat(actual.getEncounterType(), is(dischargeEncounterType));
-                assertNotNull(actual.getVisit());
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(inpatientDepartment));
-                assertNull(actual.getForm()); // because in our sample data we didn't set a discharge form
-                assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
-                assertThat(actual, hasProviders(discharge.getProviders()));
+            public boolean matches(Encounter encounter) {
+                assertThat(encounter.getEncounterType(), is(dischargeEncounterType));
+                assertNotNull(encounter.getVisit());
+                assertThat(encounter.getPatient(), is(patient));
+                assertThat(encounter.getLocation(), is(inpatientDepartment));
+                assertNull(encounter.getForm()); // because in our sample data we didn't set a discharge form
+                assertThat(encounter.getEncounterDatetime(), TestUtils.isJustNow());
+                assertThat(encounter, hasProviders(discharge.getProviders()));
                 return true;
             }
         }));
@@ -979,19 +961,15 @@ public class AdtServiceTest {
         final AdtAction transfer = new AdtAction(visit, radiologyDepartment, buildProviderMap(), TRANSFER);
         service.createAdtEncounterFor(transfer);
 
-        verify(mockEncounterService).saveEncounter(argThat(new ArgumentMatcher<Encounter>() {
-            @Override
-            public boolean matches(Object o) {
-                Encounter actual = (Encounter) o;
-                assertThat(actual.getEncounterType(), is(transferWithinHospitalEncounterType));
-                assertThat(actual.getVisit(), is(visit));
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(radiologyDepartment));
-                assertThat(actual.getForm(), is(transferForm));
-                assertThat(actual.getEncounterDatetime(), TestUtils.isJustNow());
-                assertThat(actual, hasProviders(transfer.getProviders()));
-                return true;
-            }
+        verify(mockEncounterService).saveEncounter(argThat(encounter -> {
+            assertThat(encounter.getEncounterType(), is(transferWithinHospitalEncounterType));
+            assertThat(encounter.getVisit(), is(visit));
+            assertThat(encounter.getPatient(), is(patient));
+            assertThat(encounter.getLocation(), is(radiologyDepartment));
+            assertThat(encounter.getForm(), is(transferForm));
+            assertThat(encounter.getEncounterDatetime(), TestUtils.isJustNow());
+            assertThat(encounter, hasProviders(transfer.getProviders()));
+            return true;
         }));
     }
 
@@ -1004,17 +982,13 @@ public class AdtServiceTest {
 
         service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 
-        verify(mockVisitService).saveVisit(argThat(new ArgumentMatcher<Visit>() {
-            @Override
-            public boolean matches(Object o) {
-                Visit actual = (Visit) o;
-                assertThat(actual.getVisitType(), is(atFacilityVisitType));
-                assertThat(actual.getPatient(), is(patient));
-                assertThat(actual.getLocation(), is(mirebalaisHospital));
-                assertThat(actual.getStartDatetime(), is (startDate));
-                assertThat(actual.getStopDatetime(), is(stopDate));
-                return true;
-            }
+        verify(mockVisitService).saveVisit(argThat(visit -> {
+            assertThat(visit.getVisitType(), is(atFacilityVisitType));
+            assertThat(visit.getPatient(), is(patient));
+            assertThat(visit.getLocation(), is(mirebalaisHospital));
+            assertThat(visit.getStartDatetime(), is (startDate));
+            assertThat(visit.getStopDatetime(), is(stopDate));
+            return true;
         }));
     }
 

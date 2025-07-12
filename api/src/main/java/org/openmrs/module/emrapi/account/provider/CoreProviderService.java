@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.account.provider;
 
 import org.openmrs.Person;
 import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.api.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class CoreProviderService implements ProviderServiceFacade {
     }
 
     @Override
-    public void setProviderRole(Provider provider, Object providerRole) {
-        throw new IllegalStateException("Unable to set the provider role, the provider management module is not installed");
+    public void setProviderRole(Provider provider, ProviderRole providerRole) {
+        provider.setProviderRole(providerRole);
     }
 }

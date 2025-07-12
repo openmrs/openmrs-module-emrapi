@@ -1158,7 +1158,7 @@ public class VisitDomainWrapperTest {
     }
 
 
-    private class ExpectedDiagnosis extends ArgumentMatcher<Diagnosis> {
+    private class ExpectedDiagnosis implements ArgumentMatcher<Diagnosis> {
 
         private Diagnosis expectedDiagnosis;
 
@@ -1167,7 +1167,7 @@ public class VisitDomainWrapperTest {
         }
 
         @Override
-        public boolean matches(Object o) {
+        public boolean matches(Diagnosis o) {
 
             Diagnosis actualDiagnosis = (Diagnosis) o;
 

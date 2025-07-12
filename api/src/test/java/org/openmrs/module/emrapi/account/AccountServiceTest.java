@@ -3,7 +3,9 @@ package org.openmrs.module.emrapi.account;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
+import org.mockito.hamcrest.MockitoHamcrest;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
@@ -16,10 +18,9 @@ import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
-import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
+import org.openmrs.module.emrapi.account.provider.CoreProviderService;
 import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
@@ -30,7 +31,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +44,7 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
     private ProviderService providerService;
 
-    private ProviderManagementService providerManagementService;
+    private ProviderService providerManagementService;
 
     private ProviderServiceFacade providerServiceFacade;
 
@@ -57,8 +57,8 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
-        providerManagementService = mock(ProviderManagementService.class);
-        providerServiceFacade = new ProviderManagementProviderService(providerService, providerManagementService);
+        providerManagementService = mock(ProviderService.class);
+        providerServiceFacade = new CoreProviderService(providerService);
         emrApiProperties = mock(EmrApiProperties.class);
 
         domainWrapperFactory = new MockDomainWrapperFactory();
@@ -99,7 +99,7 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
         List<AccountDomainWrapper> accounts = accountService.getAllAccounts();
         Assert.assertEquals(3, accounts.size());
-        assertThat(accounts,
+        Assertions.assertEquals(accounts,
                 TestUtils.isCollectionOfExactlyElementsWithProperties("person", person1, person2, person3));
     }
 
@@ -137,8 +137,8 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
         PersonService personService = Mockito.mock(PersonService.class);
         accountService.setPersonService(personService);
-        when(personService.getPerson(argThat(TestUtils.equalsMatcher(personId)))).thenReturn(person);
-        when(userService.getUsersByPerson(argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
+        when(personService.getPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(personId)))).thenReturn(person);
+        when(userService.getUsersByPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
                 Arrays.asList(user));
 
         AccountDomainWrapper account = accountService.getAccount(personId);
@@ -159,7 +159,7 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         Person person = new Person();
         person.setPersonId(1);
         user.setPerson(person);
-        when(userService.getUsersByPerson(argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
+        when(userService.getUsersByPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
                 Arrays.asList(user));
         AccountDomainWrapper account = accountService.getAccountByPerson(person);
         Assert.assertNotNull(account);
@@ -177,7 +177,7 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         person.setPersonId(1);
         Provider provider = new Provider();
         provider.setPerson(person);
-        when(providerService.getProvidersByPerson(argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
+        when(providerService.getProvidersByPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
                 Arrays.asList(provider));
         AccountDomainWrapper account = accountService.getAccountByPerson(person);
         Assert.assertNotNull(account);
@@ -197,7 +197,7 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         when(userService.getAllRoles()).thenReturn(Arrays.asList(role1, role2, role3));
         List<Role> capabilities = accountService.getAllCapabilities();
         Assert.assertEquals(2, capabilities.size());
-        assertThat(capabilities, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
+        Assertions.assertEquals(capabilities, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
                 EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role1", EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role3"));
     }
 
@@ -214,7 +214,7 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         when(userService.getAllRoles()).thenReturn(Arrays.asList(role1, role2, role3));
         List<Role> privilegeLevels = accountService.getAllPrivilegeLevels();
         Assert.assertEquals(2, privilegeLevels.size());
-        assertThat(privilegeLevels, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
+        Assertions.assertEquals(privilegeLevels, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
                 EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role1", EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role3"));
     }
 

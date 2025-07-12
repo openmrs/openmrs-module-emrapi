@@ -12,13 +12,12 @@ import java.util.List;
 /**
  *
  */
-public class ObsGroupMatcher extends ArgumentMatcher<Obs> {
+public class ObsGroupMatcher implements ArgumentMatcher<Obs> {
 
     private boolean expectVoided = false;
     private Concept expectedGroupingConcept;
     private List<Obs> expected = new ArrayList<Obs>();
 
-    @Override
     public void describeTo(Description description) {
         String s = expectVoided ? "Voided group" : "Group";
         if (expectedGroupingConcept != null) {
@@ -44,7 +43,7 @@ public class ObsGroupMatcher extends ArgumentMatcher<Obs> {
     }
 
     @Override
-    public boolean matches(Object argument) {
+    public boolean matches(Obs argument) {
         Obs actual = (Obs) argument;
 
         if (expectedGroupingConcept != null && !expectedGroupingConcept.equals(actual.getConcept())) {

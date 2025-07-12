@@ -3,6 +3,7 @@ package org.openmrs.module.emrapi.account;
 import org.openmrs.OpenmrsMetadata;
 import org.openmrs.Person;
 import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class MockProviderServiceFacade implements ProviderServiceFacade {
     }
 
     @Override
-    public void setProviderRole(Provider provider, Object providerRole) {
+    public void setProviderRole(Provider provider, ProviderRole providerRole) {
         providerServiceFacade.setProviderRole(provider, providerRole);
     }
 }

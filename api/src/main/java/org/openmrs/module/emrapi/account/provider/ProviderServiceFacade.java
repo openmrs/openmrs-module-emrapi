@@ -2,6 +2,7 @@ package org.openmrs.module.emrapi.account.provider;
 
 import org.openmrs.Person;
 import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 
 import java.util.Collection;
 
@@ -18,5 +19,5 @@ public interface ProviderServiceFacade {
 
     Object getProviderRole(Provider provider);
 
-    void setProviderRole(Provider provider, Object providerRole);
+    void setProviderRole(Provider provider, ProviderRole providerRole);
 }

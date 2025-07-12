@@ -84,13 +84,12 @@ public class TransferToSpecificLocationDispositionActionTest extends Authenticat
         action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
         verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
-            public boolean matches(Object argument) {
-                AdtAction actual = (AdtAction) argument;
-                return actual.getVisit().equals(visit) &&
-                        actual.getLocation().equals(toLocation) &&
-                        TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles()) &&
-                        actual.getActionDatetime().equals(encounterDate) &&
-                        actual.getType().equals(AdtAction.Type.TRANSFER);
+            public boolean matches(AdtAction adtAction) {
+                return adtAction.getVisit().equals(visit) &&
+                        adtAction.getLocation().equals(toLocation) &&
+                        TestUtils.sameProviders(adtAction.getProviders(), encounter.getProvidersByRoles()) &&
+                        adtAction.getActionDatetime().equals(encounterDate) &&
+                        adtAction.getType().equals(AdtAction.Type.TRANSFER);
             }
         }));
     }
@@ -140,13 +139,12 @@ public class TransferToSpecificLocationDispositionActionTest extends Authenticat
 
         verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
             @Override
-            public boolean matches(Object argument) {
-                AdtAction actual = (AdtAction) argument;
-                return actual.getVisit().equals(visit) &&
-                        actual.getLocation().equals(toLocation) &&
-                        TestUtils.sameProviders(actual.getProviders(), encounter.getProvidersByRoles()) &&
-                        actual.getActionDatetime().equals(encounterDate) &&
-                        actual.getType().equals(AdtAction.Type.TRANSFER);
+            public boolean matches(AdtAction adtAction) {
+                return adtAction.getVisit().equals(visit) &&
+                        adtAction.getLocation().equals(toLocation) &&
+                        TestUtils.sameProviders(adtAction.getProviders(), encounter.getProvidersByRoles()) &&
+                        adtAction.getActionDatetime().equals(encounterDate) &&
+                        adtAction.getType().equals(AdtAction.Type.TRANSFER);
             }
         }));
 

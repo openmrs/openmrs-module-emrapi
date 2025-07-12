@@ -15,7 +15,9 @@
 package org.openmrs.module.emrapi.diagnosis;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -143,20 +145,18 @@ public class DiagnosisMetadataTest {
     }
 
     private Matcher<? super Obs> hasGroupMember(final Concept question, final Object answer, final boolean isVoided) {
-        return new ArgumentMatcher<Obs>() {
+        return new TypeSafeMatcher<Obs>() {
             @Override
-            public boolean matches(Object argument) {
-                Obs actualGroup = (Obs) argument;
-                return CoreMatchers.hasItem(new ArgumentMatcher<Obs>() {
-                    @Override
-                    public boolean matches(Object argument) {
-                        Obs actual = (Obs) argument;
-                        return actual.getConcept().equals(question) &&
-                                actual.isVoided() == isVoided &&
-                                (answer instanceof Concept && actual.getValueCoded().equals(answer)
-                                        || answer instanceof String && actual.getValueText().equals(answer));
-                    }
-                }).matches(actualGroup.getGroupMembers(true));
+            public void describeTo(Description description) {
+
+            }
+            @Override
+            protected boolean matchesSafely(Obs obs) {
+                Obs actualGroup = (Obs) obs;
+                return CoreMatchers.hasItem((ArgumentMatcher<Obs>) actual -> actual.getConcept().equals(question) &&
+                        actual.isVoided() == isVoided &&
+                        (answer instanceof Concept && actual.getValueCoded().equals(answer)
+                                || answer instanceof String && actual.getValueText().equals(answer))).matches(actualGroup.getGroupMembers(true));
             }
         };
     }

@@ -37,7 +37,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <openMRSVersion>2.2.1</openMRSVersion>
+        <openMRSVersion>4.0.0-SNAPSHOT</openMRSVersion>
         <legacyuiVersion>1.16.0</legacyuiVersion>
         <lombokVersion>1.18.26</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
@@ -57,12 +57,6 @@
             <artifactId>openmrs-api</artifactId>
             <version>${openMRSVersion}</version>
             <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>providermanagement-api</artifactId>
-            <version>${providermanagementVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

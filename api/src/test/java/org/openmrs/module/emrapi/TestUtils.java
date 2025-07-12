@@ -15,7 +15,9 @@ package org.openmrs.module.emrapi;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Encounter;
@@ -79,19 +81,15 @@ public class TestUtils {
 	
 	public static <T> ArgumentMatcher<T> isCollectionOfExactlyElementsWithProperties(final String property,
 	                                                                                 final Object... expectedPropertyValues) {
-		return new ArgumentMatcher<T>() {
-			
-			@Override
-			public boolean matches(Object o) {
-				assertTrue(o instanceof Collection);
-				Collection actual = (Collection) o;
-				assertThat(actual.size(), is(expectedPropertyValues.length));
-				for (Object expectedPropertyValue : expectedPropertyValues) {
-					assertContainsElementWithProperty(actual, property, expectedPropertyValue);
-				}
-				return true;
-			}
-		};
+		return o -> {
+            assertTrue(o instanceof Collection);
+            Collection actual = (Collection) o;
+            assertThat(actual.size(), is(expectedPropertyValues.length));
+            for (Object expectedPropertyValue : expectedPropertyValues) {
+                assertContainsElementWithProperty(actual, property, expectedPropertyValue);
+            }
+            return true;
+        };
 	}
 	
 	/**
@@ -170,13 +168,18 @@ public class TestUtils {
     //use DateMatchers.within(2, SECONDS, date)
     @Deprecated
 	public static Matcher<Date> isJustNow() {
-		return new ArgumentMatcher<Date>() {
+		return new TypeSafeMatcher<Date>() {
 
 			@Override
-			public boolean matches(Object o) {
-				// within the last two seconds should be safe enough... (needs to be more than a second to account for rounding issues)
-				return Math.abs(System.currentTimeMillis() - ((Date) o).getTime()) < 2000;
+			public void describeTo(Description description) {
+
 			}
+
+			@Override
+			protected boolean matchesSafely(Date date) {
+				return Math.abs(System.currentTimeMillis() - ((Date) date).getTime()) < 2000;
+			}
+
 		};
 	}
 	
@@ -191,15 +194,18 @@ public class TestUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Matcher<T> equalsMatcher(final T object) {
-		return new ArgumentMatcher<T>() {
-			
-			/**
-			 * @see org.mockito.ArgumentMatcher#matches(Object)
-			 */
+		return new TypeSafeMatcher<T>() {
+
 			@Override
-			public boolean matches(Object arg) {
-				return OpenmrsUtil.nullSafeEquals(object, (T) arg);
+			public void describeTo(Description description) {
+
 			}
+
+			@Override
+			protected boolean matchesSafely(T t) {
+				return OpenmrsUtil.nullSafeEquals(object,t);
+			}
+
 		};
 	}
 	
@@ -250,13 +256,18 @@ public class TestUtils {
 	}
 	
 	public static Matcher<Encounter> hasProviders(final Map<EncounterRole, Set<Provider>> providers) {
-		return new ArgumentMatcher<Encounter>() {
-			
+		return new TypeSafeMatcher<Encounter>() {
+
 			@Override
-			public boolean matches(Object argument) {
-				Encounter actual = (Encounter) argument;
-				return sameProviders(actual.getProvidersByRoles(), providers);
+			public void describeTo(Description description) {
+
 			}
+
+			@Override
+			protected boolean matchesSafely(Encounter encounter) {
+				return sameProviders(encounter.getProvidersByRoles(), providers);
+			}
+
 		};
 	}
 }

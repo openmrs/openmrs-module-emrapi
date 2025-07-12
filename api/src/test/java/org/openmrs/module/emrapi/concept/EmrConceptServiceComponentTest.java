@@ -14,6 +14,8 @@
 
 package org.openmrs.module.emrapi.concept;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Before;
 import org.junit.Test;
@@ -213,13 +215,7 @@ public class EmrConceptServiceComponentTest extends EmrApiContextSensitiveTest {
     }
 
     private ArgumentMatcher<ConceptSearchResult> searchResultMatcher(final Concept concept, final String nameMatched) {
-        return new ArgumentMatcher<ConceptSearchResult>() {
-            @Override
-            public boolean matches(Object o) {
-                ConceptSearchResult actual = (ConceptSearchResult) o;
-                return actual.getConcept().equals(concept) && actual.getConceptName().getName().equals(nameMatched);
-            }
-        };
+        return conceptSearchResult -> conceptSearchResult.getConcept().equals(concept) && conceptSearchResult.getConceptName().getName().equals(nameMatched);
     }
 
 }

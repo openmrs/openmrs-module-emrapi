@@ -12,7 +12,7 @@ public abstract class EmrApiContextSensitiveTest extends BaseModuleContextSensit
 
     @BeforeClass
     public static void beforeClass() {
-        Module mod = new Module("", "providermanagement", "", "", "", "2.5.0");
+        Module mod = new Module("", "providermanagement", "", "", "", "2.5.0", "");
         mod.setFile(new File(""));
         ModuleFactory.getStartedModulesMap().put(mod.getModuleId(), mod);
     }

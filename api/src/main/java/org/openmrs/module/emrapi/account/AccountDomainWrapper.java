@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
 import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
@@ -122,7 +123,7 @@ public class AccountDomainWrapper implements DomainWrapper {
         return provider;
     }
 
-    public void setProviderRole(Object providerRole) {
+    public void setProviderRole(ProviderRole providerRole) {
         if (providerRole != null) {
             initializeProviderIfNecessary();
             providerServiceFacade.setProviderRole(this.provider, providerRole);

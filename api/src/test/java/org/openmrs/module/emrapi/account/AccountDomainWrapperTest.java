@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
+import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.PersonService;
@@ -14,11 +16,8 @@ import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
+import org.openmrs.module.emrapi.account.provider.CoreProviderService;
 import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
-import org.openmrs.module.providermanagement.Provider;
-import org.openmrs.module.providermanagement.ProviderRole;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
@@ -55,7 +54,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
 
     private ProviderService providerService;
 
-    private ProviderManagementService providerManagementService;
+    private ProviderService providerManagementService;
 
     private ProviderServiceFacade providerServiceFacade;
 
@@ -77,8 +76,8 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
-        providerManagementService = mock(ProviderManagementService.class);
-        providerServiceFacade = new MockProviderServiceFacade(new ProviderManagementProviderService(providerService, providerManagementService));
+        providerManagementService = mock(ProviderService.class);
+        providerServiceFacade = new MockProviderServiceFacade(new CoreProviderService(providerService));
 
         fullPrivileges = new Role();
         fullPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Full");
@@ -605,7 +604,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
                 providerService, providerServiceFacade, personService, providerIdentifierGenerator);
     }
 
-    private class IsExpectedProvider extends ArgumentMatcher<Provider> {
+    private class IsExpectedProvider implements ArgumentMatcher<Provider> {
 
         private Provider expectedProvider;
 
@@ -614,10 +613,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         }
 
         @Override
-        public boolean matches(Object o) {
-
-            Provider provider = (Provider) o;
-
+        public boolean matches(Provider provider) {
             try {
                 assertThat(provider.getId(), is(expectedProvider.getId()));
                 assertThat(provider.getProviderRole(), is(expectedProvider.getProviderRole()));

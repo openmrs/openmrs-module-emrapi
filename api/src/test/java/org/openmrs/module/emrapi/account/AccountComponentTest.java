@@ -18,15 +18,15 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Person;
+import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.PersonService;
+import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
-import org.openmrs.module.providermanagement.Provider;
-import org.openmrs.module.providermanagement.ProviderRole;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -50,7 +50,7 @@ public class AccountComponentTest extends EmrApiContextSensitiveTest {
     private PersonService personService;
 
     @Autowired
-    private ProviderManagementService providerManagementService;
+    private ProviderService providerManagementService;
 
     @Before
     public void beforeAllTests() throws Exception {
@@ -147,7 +147,7 @@ public class AccountComponentTest extends EmrApiContextSensitiveTest {
 
         // note that we don't expose the provider object outside of the account domain wrapper; saves confusion between the
         // two Provider object types
-        List<Provider> providers = providerManagementService.getProvidersByPerson(expectedPerson, false);
+        List<Provider> providers = (List<Provider>) providerManagementService.getProvidersByPerson(expectedPerson, false);
         Assert.assertEquals(1, providers.size());
         Assert.assertEquals(nurse, providers.get(0).getProviderRole());
     }
@@ -231,7 +231,7 @@ public class AccountComponentTest extends EmrApiContextSensitiveTest {
         Context.flushSession();
         Context.clearSession();
 
-        List<Provider> providers = providerManagementService.getProvidersByPerson(person, false);
+        List<Provider> providers = (List<Provider>) providerManagementService.getProvidersByPerson(person, false);
         Assert.assertEquals(1, providers.size());
         Assert.assertNull(providers.get(0).getProviderRole());
     }
