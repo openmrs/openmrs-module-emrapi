@@ -37,17 +37,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <openMRSVersion>4.0.0-SNAPSHOT</openMRSVersion>
+        <openMRSVersion>2.8.0-SNAPSHOT</openMRSVersion>
         <legacyuiVersion>1.16.0</legacyuiVersion>
         <lombokVersion>1.18.26</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
-        <providermanagementVersion>2.5.0</providermanagementVersion>
         <metadatamappingVersion>1.6.0</metadatamappingVersion>
         <metadatasharingVersion>1.9.0</metadatasharingVersion>
         <eventVersion>2.8.0</eventVersion>
         <allergyapiVersion>1.4</allergyapiVersion>
         <webservices.restVersion>2.42.0</webservices.restVersion>
-        <jacksonVersion>1.5.0</jacksonVersion>
         <javaxVersion>4.0.1</javaxVersion>
     </properties>
 
@@ -97,9 +95,9 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.7.6</version>
-            <type>jar</type>
+            <version>2.4.21</version>
             <scope>provided</scope>
+            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -144,16 +142,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>${jacksonVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jacksonVersion}</version>
-            <scope>provided</scope>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>4.8.0</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

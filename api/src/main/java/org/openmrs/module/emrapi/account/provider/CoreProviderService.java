@@ -39,7 +39,7 @@ public class CoreProviderService implements ProviderServiceFacade {
 
     @Override
     public Object getProviderRole(Provider provider) {
-        return null;
+        return provider.getProviderRole();
     }
 
     @Override

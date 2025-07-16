@@ -2,8 +2,8 @@ package org.openmrs.module.emrapi.account;
 
 import junit.framework.Assert;
 import org.apache.commons.lang.time.DateUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
@@ -14,10 +14,10 @@ import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.account.provider.CoreProviderService;
 import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
@@ -36,6 +36,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -44,7 +45,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS;
 
-public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
+public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
 
     private AccountService accountService;
 
@@ -70,7 +71,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
 
     private Role adminApp;
 
-    @Before
+    @BeforeEach
     public void setup() {
         accountService = mock(AccountService.class);
         userService = mock(UserService.class);
@@ -83,7 +84,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         fullPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Full");
         limitedPrivileges = new Role();
         limitedPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Limited");
-        when(accountService.getAllPrivilegeLevels()).thenReturn(Arrays.asList(fullPrivileges, limitedPrivileges));
+        lenient().when(accountService.getAllPrivilegeLevels()).thenReturn(Arrays.asList(fullPrivileges, limitedPrivileges));
 
         receptionApp = new Role();
         receptionApp.setRole(EmrApiConstants.ROLE_PREFIX_CAPABILITY + "Reception");
@@ -91,7 +92,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         archiveApp.setRole(EmrApiConstants.ROLE_PREFIX_CAPABILITY + "Archives");
         adminApp = new Role();
         adminApp.setRole(EmrApiConstants.ROLE_PREFIX_CAPABILITY + "Admin");
-        when(accountService.getAllCapabilities()).thenReturn(Arrays.asList(receptionApp, archiveApp, adminApp));
+        lenient().when(accountService.getAllCapabilities()).thenReturn(Arrays.asList(receptionApp, archiveApp, adminApp));
 
     }
 
@@ -565,7 +566,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         ProviderRole providerRole = new ProviderRole();
 
         providerIdentifierGenerator = mock(ProviderIdentifierGenerator.class);
-        when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("456");
+        lenient().when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("456");
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(providerRole);
@@ -584,7 +585,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
     public void testShouldNotFailIfProviderIdentifierGeneratorDefinedButNoProvider() throws Exception {
 
         providerIdentifierGenerator = mock(ProviderIdentifierGenerator.class);
-        when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("123");
+        lenient().when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("123");
 
         Person person = new Person();
 

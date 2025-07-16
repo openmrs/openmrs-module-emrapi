@@ -15,9 +15,11 @@ package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.openmrs.CareSetting;
 import org.openmrs.Concept;
 import org.openmrs.ConceptDatatype;
@@ -38,8 +40,6 @@ import org.openmrs.SimpleDosingInstructions;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.util.LocaleUtility;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -51,10 +51,8 @@ import java.util.Locale;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.mockito.Mockito.mockStatic;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({LocaleUtility.class, Context.class})
 public class DefaultOrderMapperTest {
 
     private static final CareSetting.CareSettingType OUT_PATIENT_CARE_SETTING = CareSetting.CareSettingType.OUTPATIENT;
@@ -72,11 +70,21 @@ public class DefaultOrderMapperTest {
 
     private DefaultOrderMapper orderMapper;
 
+    private MockedStatic<Context> context;
+
+    private MockedStatic<LocaleUtility> localeUtility;
+
     @Before
     public void setup() {
-        mockStatic(LocaleUtility.class);
-        mockStatic(Context.class);
+        localeUtility = mockStatic(LocaleUtility.class);
+        context = mockStatic(Context.class);
         orderMapper = new DefaultOrderMapper();
+    }
+
+    @After
+    public void teardown() {
+        localeUtility.close();
+        context.close();
     }
 
     @Test

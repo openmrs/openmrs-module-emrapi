@@ -16,13 +16,12 @@ package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
-import org.mockito.Matchers;
+import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openmrs.Encounter;
@@ -57,8 +56,6 @@ import org.openmrs.module.emrapi.merge.VisitMergeAction;
 import org.openmrs.module.emrapi.patient.PatientDomainWrapper;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.serialization.SerializationException;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +68,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -81,6 +80,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyCollection;
@@ -89,19 +89,17 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.TRANSFER;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
 public class AdtServiceTest {
 
     private AdtServiceImpl service;
@@ -134,6 +132,8 @@ public class AdtServiceTest {
     private Location radiologyDepartment;
     private PersonAttributeType unknownPatientPersonAttributeType;
 
+    private MockedStatic<Context> mockedContext;
+
     @Before
     public void setup() {
         personForCurrentUser = new Person();
@@ -141,8 +141,8 @@ public class AdtServiceTest {
 
         User authenticatedUser = new User();
         authenticatedUser.setPerson(personForCurrentUser);
-        mockStatic(Context.class);
-        when(Context.getAuthenticatedUser()).thenReturn(authenticatedUser);
+        mockedContext = mockStatic(Context.class);
+        mockedContext.when(Context::getAuthenticatedUser).thenReturn(authenticatedUser);
 
         providerForCurrentUser = new Provider();
         providerForCurrentUser.setPerson(personForCurrentUser);
@@ -210,6 +210,11 @@ public class AdtServiceTest {
         service.setEmrApiProperties(emrApiProperties);
         service.setDomainWrapperFactory(mockDomainWrapperFactory);
         this.service = service;
+    }
+
+    @After
+    public void tearDown() {
+        mockedContext.close();
     }
 
     @Test
@@ -492,14 +497,15 @@ public class AdtServiceTest {
         expectedLocations.add(outpatientDepartment);
         expectedLocations.add(inpatientDepartment);
 
-        when(
-                mockVisitService.getVisits(any(Collection.class), any(Collection.class), eq(expectedLocations),
-                        any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
-                        eq(false), eq(false))).thenReturn(Arrays.asList(visit1, visit2));
+        when(mockVisitService.getVisits(
+                isNull(), isNull(), anyCollection(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(false), eq(false)
+        )).thenReturn(Arrays.asList(visit1, visit2));
 
-        List<VisitDomainWrapper> activeVisitSummaries = service.getActiveVisits(mirebalaisHospital);
-
-        Assertions.assertEquals(activeVisitSummaries, TestUtils.isCollectionOfExactlyElementsWithProperties("visit", visit1, visit2));
+        List<Visit> activeVisitSummaries = service.getActiveVisits(mirebalaisHospital).stream()
+                .map(VisitDomainWrapper::getVisit).collect(Collectors.toList());
+        assertThat(activeVisitSummaries, containsInAnyOrder(visit1, visit2));
     }
 
     @Test
@@ -525,9 +531,11 @@ public class AdtServiceTest {
         encounter2.setEncounterDatetime(expectedStopDatetime);
         visit.addEncounter(encounter2);
 
-        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
-                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class)))
-                .thenReturn(Arrays.asList(visit));
+        when(mockVisitService.getVisits(
+                isNull(), isNull(), anyCollection(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(false), eq(false)
+        )).thenReturn(Collections.singletonList(visit));
 
         service.closeInactiveVisits();
 
@@ -546,9 +554,11 @@ public class AdtServiceTest {
         encounterVoided.setDateVoided(new Date());
         visit.addEncounter(encounterVoided);
 
-        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
-                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class)))
-                .thenReturn(Arrays.asList(visit));
+        when(mockVisitService.getVisits(
+                isNull(), isNull(), anyCollection(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(false), eq(false)
+        )).thenReturn(Collections.singletonList(visit));
 
         service.closeInactiveVisits();
 
@@ -591,8 +601,11 @@ public class AdtServiceTest {
         visit.addEncounter(encounter2);
         visit.addEncounter(encounter1);
 
-        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
-                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class))).thenReturn(Arrays.asList(visit));
+        when(mockVisitService.getVisits(
+                isNull(), isNull(), anyCollection(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(false), eq(false)
+        )).thenReturn(Collections.singletonList(visit));
 
         service.closeInactiveVisits();
 
@@ -611,19 +624,24 @@ public class AdtServiceTest {
                 thenReturn(locations.get(0).getTags().iterator().next());
 
         when(mockLocationService.getLocationsByTag(locations.get(0).getTags().iterator().next())).
-                thenReturn(Arrays.asList(locations.get(0)));
+                thenReturn(Collections.singletonList(locations.get(0)));
 
-        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(),
-                Matchers.anyCollection(), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class),
-                Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class),
-                Matchers.any(Boolean.class))).thenReturn(Arrays.asList(visit));
+        when(mockVisitService.getVisits(
+                anyCollection(), anyCollection(), anyCollection(), anyCollection(),
+                any(Date.class), any(Date.class), any(Date.class), any(Date.class),
+                anyMap(), anyBoolean(), anyBoolean()
+        )).thenReturn(Collections.singletonList(visit));
 
         service.closeInactiveVisits();
 
-        ArgumentCaptor<Collection<Location>> argumentCaptor = ArgumentCaptor.forClass((Class<Collection<Location>>)(Class)Collection.class);
-        verify(mockVisitService).getVisits(anyCollection(), anyCollection(), argumentCaptor.capture(), anyCollection(),
-                any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class), any(Boolean.class),
-                any(Boolean.class));
+        ArgumentCaptor<Collection> argumentCaptor = ArgumentCaptor.forClass(Collection.class);
+
+        verify(mockVisitService).getVisits(isNull(), isNull(), argumentCaptor.capture(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(false), eq(false)
+        );
+
+
         assertEquals(argumentCaptor.getValue().size(), 1);
         assertEquals(((Location)argumentCaptor.getValue().toArray()[0]).getName(),"Hospital");
     }
@@ -656,10 +674,11 @@ public class AdtServiceTest {
         Visit visit = new Visit(1);
         Date startDatetime = DateUtils.addHours(new Date(), -14);
         visit.setStartDatetime(startDatetime);
-
-        when(mockVisitService.getVisits(Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.anyCollection(), Matchers.any(Date.class),
-                Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Date.class), Matchers.any(Map.class), Matchers.any(Boolean.class), Matchers.any(Boolean.class))).thenReturn(Arrays.asList(visit));
-
+        when(mockVisitService.getVisits(
+                isNull(), isNull(), anyCollection(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(false), eq(false)
+        )).thenReturn(Collections.singletonList(visit));
         service.closeInactiveVisits();
 
         assertThat(visit.getStopDatetime(), is(startDatetime));
@@ -681,7 +700,12 @@ public class AdtServiceTest {
         Visit new1 = new Visit(3);
         new1.setStartDatetime(DateUtils.addHours(new Date(), -2));
 
-        when(mockVisitService.getVisits(anyCollection(), anyCollection(), anyCollection(), anyCollection(), any(Date.class), any(Date.class), any(Date.class), any(Date.class), anyMap(), anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(old1, old2, new1));
+        when(mockVisitService.getVisits(
+                isNull(), isNull(), anyCollection(), isNull(),
+                isNull(), isNull(), isNull(), isNull(),
+                isNull(), eq(false), eq(false)
+        )).thenReturn(Arrays.asList(old1, old2, new1));
+
 
         service.closeInactiveVisits();
 

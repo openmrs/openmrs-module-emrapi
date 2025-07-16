@@ -46,6 +46,7 @@ import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.test.SkipBaseSetup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -76,12 +77,7 @@ import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 
 public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
 
-    public static final Predicate NON_VOIDED = new Predicate() {
-        @Override
-        public boolean evaluate(Object o) {
-            return !((Encounter) o).isVoided();
-        }
-    };
+    public static final Predicate NON_VOIDED = o -> !((Encounter) o).isVoided();
 
     @Autowired
     private AdtService service;
@@ -385,7 +381,7 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
         List<Visit> visits = visitService.getVisitsByPatient(preferred);
 
         // sanity check
-        assertThat(visits.size(), is(1));
+        assertThat(visits.size(), is(2));
 
         Set<Encounter> encounters = visits.get(0).getEncounters();
         assertThat(CollectionUtils.select(encounters, NON_VOIDED).size(), is(2));

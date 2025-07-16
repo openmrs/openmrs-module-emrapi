@@ -13,31 +13,30 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openmrs.Encounter;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.postprocessor.EncounterTransactionHandler;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+
 
 import java.util.Arrays;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
+
 public class EncounterTransactionMapperTest {
     @Mock
     private EncounterObservationsMapper encounterObservationsMapper;
@@ -48,13 +47,20 @@ public class EncounterTransactionMapperTest {
     @Mock
     private OrderMapper orderMapper;
 
+    private MockedStatic<Context> mockedContext;
+
     private EncounterTransactionMapper encounterTransactionMapper;
 
     @Before
     public void setUp() {
         initMocks(this);
-        PowerMockito.mockStatic(Context.class);
         encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper, orderMapper);
+        mockedContext = mockStatic(Context.class);
+    }
+
+    @After
+    public void tearDown() {
+        mockedContext.close();
     }
 
     @Test
@@ -62,7 +68,7 @@ public class EncounterTransactionMapperTest {
         Encounter encounter = new EncounterBuilder().build();
         boolean includeAll = false;
 
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(null);
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(null);
         EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
 
         Assert.assertEquals(encounter.getUuid(), encounterTransaction.getEncounterUuid());
@@ -78,7 +84,7 @@ public class EncounterTransactionMapperTest {
     @Test
     public void shouldMapEncounterWithoutEncounterType() throws Exception {
         Encounter encounter = new EncounterBuilder().withEncounterType(null).build();
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(null);
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(null);
 
         EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, false);
 
@@ -91,7 +97,7 @@ public class EncounterTransactionMapperTest {
         boolean includeAll = false;
 
         EncounterTransactionHandler encounterTransactionHandler = mock(EncounterTransactionHandler.class);
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
 
         encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper, orderMapper);

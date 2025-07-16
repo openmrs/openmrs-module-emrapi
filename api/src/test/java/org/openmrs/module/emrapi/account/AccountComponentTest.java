@@ -29,6 +29,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.util.OpenmrsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +50,7 @@ public class AccountComponentTest extends EmrApiContextSensitiveTest {
     @Autowired
     private PersonService personService;
 
+    @Qualifier("providerService")
     @Autowired
     private ProviderService providerManagementService;
 

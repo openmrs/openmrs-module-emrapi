@@ -6,8 +6,8 @@ import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
+import org.mockito.MockedStatic;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -24,9 +24,6 @@ import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Calendar;
 import java.util.Collections;
@@ -47,12 +44,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.it.modular.hamcrest.date.DateMatchers.within;
 
-@PrepareForTest(Calendar.class)
-@RunWith(PowerMockRunner.class)
 public class VisitDomainWrapperTest {
 
     private VisitDomainWrapper visitDomainWrapper;
@@ -132,8 +128,9 @@ public class VisitDomainWrapperTest {
         startDate.add(DAY_OF_MONTH, -5);
         startDate.set(HOUR, 9);
 
-        PowerMockito.mockStatic(Calendar.class);
-        when(Calendar.getInstance()).thenReturn(today);
+        try (MockedStatic<Calendar> calender = mockStatic(Calendar.class)) {
+            calender.when(Calendar::getInstance).thenReturn(today);
+        }
 
         when(visit.getStartDatetime()).thenReturn(startDate.getTime());
 

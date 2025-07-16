@@ -26,10 +26,11 @@ import org.openmrs.util.OpenmrsConstants;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -99,8 +100,9 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
         List<AccountDomainWrapper> accounts = accountService.getAllAccounts();
         Assert.assertEquals(3, accounts.size());
-        Assertions.assertEquals(accounts,
-                TestUtils.isCollectionOfExactlyElementsWithProperties("person", person1, person2, person3));
+
+        List<Person> persons = accounts.stream().map(AccountDomainWrapper::getPerson).collect(Collectors.toList());
+        assertThat(persons, containsInAnyOrder(person1, person2, person3));
     }
 
     @Test
@@ -197,8 +199,12 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         when(userService.getAllRoles()).thenReturn(Arrays.asList(role1, role2, role3));
         List<Role> capabilities = accountService.getAllCapabilities();
         Assert.assertEquals(2, capabilities.size());
-        Assertions.assertEquals(capabilities, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
-                EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role1", EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role3"));
+
+        List<String> capabilitiesStr = capabilities.stream().map(Role::getName).collect(Collectors.toList());
+
+        assertThat(capabilitiesStr, containsInAnyOrder(
+                EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role1",
+                EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role3"));
     }
 
     /**
@@ -214,10 +220,16 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         when(userService.getAllRoles()).thenReturn(Arrays.asList(role1, role2, role3));
         List<Role> privilegeLevels = accountService.getAllPrivilegeLevels();
         Assert.assertEquals(2, privilegeLevels.size());
-        Assertions.assertEquals(privilegeLevels, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
-                EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role1", EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role3"));
-    }
 
+        List<String> roleNames = privilegeLevels.stream()
+                .map(Role::getRole)
+                .collect(Collectors.toList());
+
+        assertThat(roleNames, containsInAnyOrder(
+                EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role1",
+                EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role3"
+        ));
+    }
     @Test
     public void getApiPrivileges_shouldExcludeApplicationPrivileges() throws Exception {
         Privilege getPatients = new Privilege("Get Patients");

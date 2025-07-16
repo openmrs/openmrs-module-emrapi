@@ -81,15 +81,19 @@ public class TestUtils {
 	
 	public static <T> ArgumentMatcher<T> isCollectionOfExactlyElementsWithProperties(final String property,
 	                                                                                 final Object... expectedPropertyValues) {
-		return o -> {
-            assertTrue(o instanceof Collection);
-            Collection actual = (Collection) o;
-            assertThat(actual.size(), is(expectedPropertyValues.length));
-            for (Object expectedPropertyValue : expectedPropertyValues) {
-                assertContainsElementWithProperty(actual, property, expectedPropertyValue);
-            }
-            return true;
-        };
+		return new ArgumentMatcher<T>() {
+
+			@Override
+			public boolean matches(Object o) {
+				assertTrue(o instanceof Collection);
+				Collection actual = (Collection) o;
+				assertThat(actual.size(), is(expectedPropertyValues.length));
+				for (Object expectedPropertyValue : expectedPropertyValues) {
+					assertContainsElementWithProperty(actual, property, expectedPropertyValue);
+				}
+				return true;
+			}
+		};
 	}
 	
 	/**

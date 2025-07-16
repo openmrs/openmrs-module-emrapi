@@ -46,13 +46,13 @@ import java.util.List;
 @Setter
 public class HibernateEmrPatientDAO implements EmrPatientDAO {
 	
-	private SessionFactory sessionFactory;
+	private DbSessionFactory sessionFactory;
 	
 	private EmrApiProperties emrApiProperties;
 	
 	@Override
 	public List<Patient> findPatients(String query, Location checkedInAt, Integer start, Integer maxResults) {
-		EntityManager em = sessionFactory.unwrap(EntityManager.class);
+		EntityManager em = sessionFactory.getHibernateSessionFactory().unwrap(EntityManager.class);
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Patient> cq = cb.createQuery(Patient.class);
 		Root<Patient> patient = cq.from(Patient.class);

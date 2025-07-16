@@ -26,9 +26,9 @@ import org.openmrs.module.emrapi.encounter.OrderMetadataService;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.openmrs.module.emrapi.encounter.domain.EncounterTransaction.DosingInstructions;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 public class DosingInstructionsMapperTest {
 

@@ -15,11 +15,9 @@
 package org.openmrs.module.emrapi.diagnosis;
 
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Concept;
 import org.openmrs.ConceptAnswer;
@@ -38,6 +36,7 @@ import java.util.Locale;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -107,9 +106,9 @@ public class DiagnosisMetadataTest {
 
         assertThat(obs.getConcept(), is(dmd.getDiagnosisSetConcept()));
         assertThat(obs.getGroupMembers().size(), is(3));
-        assertThat(obs, hasGroupMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.PRIMARY), false));
-        assertThat(obs, hasGroupMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.PRESUMED), false));
-        assertThat(obs, hasGroupMember(dmd.getNonCodedDiagnosisConcept(), nonCodedAnswer, false));
+        assertTrue(hasGroupMember(obs, dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.PRIMARY), false));
+        assertTrue(hasGroupMember(obs, dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.PRESUMED), false));
+        assertTrue(hasGroupMember(obs, dmd.getNonCodedDiagnosisConcept(), nonCodedAnswer, false));
     }
 
     @Test
@@ -137,28 +136,22 @@ public class DiagnosisMetadataTest {
         assertThat(obs.getConcept(), is(dmd.getDiagnosisSetConcept()));
         assertThat(obs.getGroupMembers(false).size(), is(3));
         assertThat(obs.getGroupMembers(true).size(), is(5));
-        assertThat(obs, hasGroupMember(dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.PRIMARY), false));
-        assertThat(obs, hasGroupMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.CONFIRMED), false));
-        assertThat(obs, hasGroupMember(dmd.getNonCodedDiagnosisConcept(), newNonCodedAnswer, false));
-        assertThat(obs, hasGroupMember(dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.PRESUMED), true));
-        assertThat(obs, hasGroupMember(dmd.getNonCodedDiagnosisConcept(), oldNonCodedAnswer, true));
+        assertTrue(hasGroupMember(obs, dmd.getDiagnosisOrderConcept(), dmd.getConceptFor(Diagnosis.Order.PRIMARY), false));
+        assertTrue(hasGroupMember(obs, dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.CONFIRMED), false));
+        assertTrue(hasGroupMember(obs, dmd.getNonCodedDiagnosisConcept(), newNonCodedAnswer, false));
+        assertTrue(hasGroupMember(obs, dmd.getDiagnosisCertaintyConcept(), dmd.getConceptFor(Diagnosis.Certainty.PRESUMED), true));
+        assertTrue(hasGroupMember(obs, dmd.getNonCodedDiagnosisConcept(), oldNonCodedAnswer, true));
+
     }
 
-    private Matcher<? super Obs> hasGroupMember(final Concept question, final Object answer, final boolean isVoided) {
-        return new TypeSafeMatcher<Obs>() {
-            @Override
-            public void describeTo(Description description) {
-
-            }
-            @Override
-            protected boolean matchesSafely(Obs obs) {
-                Obs actualGroup = (Obs) obs;
-                return CoreMatchers.hasItem((ArgumentMatcher<Obs>) actual -> actual.getConcept().equals(question) &&
-                        actual.isVoided() == isVoided &&
-                        (answer instanceof Concept && actual.getValueCoded().equals(answer)
-                                || answer instanceof String && actual.getValueText().equals(answer))).matches(actualGroup.getGroupMembers(true));
-            }
-        };
+    private boolean hasGroupMember(Obs obsGroup, Concept question, Object answer, boolean isVoided) {
+        return obsGroup.getGroupMembers(true).stream().anyMatch(obs ->
+                obs.getConcept().equals(question) &&
+                        obs.isVoided() == isVoided &&
+                        ((answer instanceof Concept && obs.getValueCoded() != null && obs.getValueCoded().equals(answer)) ||
+                                (answer instanceof String && obs.getValueText() != null && obs.getValueText().equals(answer)))
+        );
     }
+
 
 }
