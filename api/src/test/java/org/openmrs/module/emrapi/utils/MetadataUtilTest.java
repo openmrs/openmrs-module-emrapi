@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.emrapi.utils;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
