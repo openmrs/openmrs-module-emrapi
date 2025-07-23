@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 public class MetadataUtilTest extends BaseModuleContextSensitiveTest {
 	
 	@Test
-    @Disabled
 	public void testSetupStandardMetadata() throws Exception {
         assertThat(Context.getVisitService().getVisitTypeByUuid("86b3d7bc-d91f-4ce2-991c-f71bba0b31e4"), nullValue());
 
