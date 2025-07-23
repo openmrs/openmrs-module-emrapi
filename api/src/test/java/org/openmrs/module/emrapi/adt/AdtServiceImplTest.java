@@ -1,8 +1,8 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -13,13 +13,13 @@ import org.openmrs.Visit;
 import org.openmrs.api.ConceptService;
 import org.openmrs.contrib.testdata.TestDataManager;
 import org.openmrs.contrib.testdata.builder.ObsBuilder;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
@@ -27,12 +27,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
+public class AdtServiceImplTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private ConceptService conceptService;
@@ -69,7 +69,7 @@ public class AdtServiceImplTest extends EmrApiContextSensitiveTest {
     List<InpatientRequest> requests;
     InpatientAdmissionSearchCriteria admissionCriteria;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         executeDataSet("baseTestDataset.xml");
         dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources

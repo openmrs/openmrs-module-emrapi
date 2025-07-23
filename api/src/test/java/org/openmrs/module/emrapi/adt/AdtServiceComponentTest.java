@@ -21,9 +21,9 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.Location;
@@ -40,13 +40,12 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.openmrs.test.SkipBaseSetup;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -63,19 +62,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 
-public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
+public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     public static final Predicate NON_VOIDED = o -> !((Encounter) o).isVoided();
 
@@ -110,7 +109,7 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
     @Qualifier("adminService")
     AdministrationService administrationService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
         administrationService.setGlobalProperty(EmrApiConstants.GP_INPATIENT_VISIT_EXPIRE_HOURS, "");
@@ -192,7 +191,7 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    @Ignore // This does not pass, TODO determine how to make this work with multi-threading and test data
+    @Disabled // This does not pass, TODO determine how to make this work with multi-threading and test data
 	public void integrationTest_ADT_workflow_duplicate_visits() throws Exception {
 		final Integer numberOfThreads = 5;
 		final CyclicBarrier threadsBarrier = new CyclicBarrier(numberOfThreads);
@@ -283,7 +282,7 @@ public class AdtServiceComponentTest extends EmrApiContextSensitiveTest {
     }
 
     @Test
-    @Ignore("Unignore after fixing EA-141")
+    @Disabled("Unignore after fixing EA-141")
     public void test_getVisitsAndHasVisitDuring() throws Exception {
 
         ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);

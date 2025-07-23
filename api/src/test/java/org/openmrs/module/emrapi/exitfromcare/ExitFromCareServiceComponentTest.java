@@ -2,8 +2,8 @@ package org.openmrs.module.emrapi.exitfromcare;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.ConceptName;
 import org.openmrs.Patient;
@@ -14,7 +14,7 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.ProgramWorkflowService;
 import org.openmrs.api.VisitService;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -24,12 +24,12 @@ import java.util.Locale;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class ExitFromCareServiceComponentTest extends EmrApiContextSensitiveTest {
+public class ExitFromCareServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private ExitFromCareService exitFromCareService;
@@ -50,7 +50,7 @@ public class ExitFromCareServiceComponentTest extends EmrApiContextSensitiveTest
 
     Date now = DateUtils.setMilliseconds(new Date(), 0);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         executeDataSet("baseTestDataset.xml");
 

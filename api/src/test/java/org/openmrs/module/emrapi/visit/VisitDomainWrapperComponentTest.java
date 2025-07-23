@@ -1,9 +1,8 @@
 package org.openmrs.module.emrapi.visit;
 
 import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -17,7 +16,6 @@ import org.openmrs.api.context.Context;
 import org.openmrs.contrib.testdata.TestDataManager;
 import org.openmrs.contrib.testdata.builder.ObsBuilder;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;
@@ -27,6 +25,7 @@ import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.ParseException;
@@ -41,9 +40,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.springframework.test.util.AssertionErrors.fail;
 
-public class VisitDomainWrapperComponentTest extends EmrApiContextSensitiveTest {
+public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private ConceptService conceptService;
@@ -68,7 +68,7 @@ public class VisitDomainWrapperComponentTest extends EmrApiContextSensitiveTest 
 
     private DispositionDescriptor dispositionDescriptor;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         executeDataSet("baseTestDataset.xml");
         dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
@@ -321,7 +321,7 @@ public class VisitDomainWrapperComponentTest extends EmrApiContextSensitiveTest 
           whichOne = impl.name();
           break;
        default:
-          Assert.fail("Invalid implementation specified.");
+          fail("Invalid implementation specified.");
        }
        long time1 = System.currentTimeMillis();
        System.out.println(whichOne + " getUniqueDiagnoses(..) | primaryOnly=" + primaryOnly.toString() + ", confirmedOnly=" + confirmedOnly.toString());

@@ -13,26 +13,26 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.openmrs.Concept;
 import org.openmrs.ConceptName;
 import org.openmrs.OrderFrequency;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
-public class OrderMetadataServiceTest extends EmrApiContextSensitiveTest {
+public class OrderMetadataServiceTest extends BaseModuleContextSensitiveTest {
 
     public static final String DAYS_CONCEPT_NAME = "Days";
     public static final String WEEKS_CONCEPT_NAME = "Weeks";
@@ -47,7 +47,7 @@ public class OrderMetadataServiceTest extends EmrApiContextSensitiveTest {
 
     private OrderMetadataService orderMetadataService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         OrderService orderService = Context.getOrderService();
         orderMetadataService = new OrderMetadataService(orderService);

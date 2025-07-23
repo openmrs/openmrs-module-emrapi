@@ -1,27 +1,26 @@
 package org.openmrs.module.emrapi.adt;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.EncounterType;
 import org.openmrs.VisitType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTest {
+public class EncounterTypeToVisitTypeMapperTest  {
 	
 	private EncounterTypetoVisitTypeMapper encounterTypetoVisitTypeMapper;
 	private EncounterService encounterService;
 	private VisitService visitService;
 	private AdministrationService adminService;
 	
-	@Before
+	@BeforeEach
 	public void before(){
 		encounterTypetoVisitTypeMapper = new EncounterTypetoVisitTypeMapper();
 		encounterService = mock(EncounterService.class);
@@ -70,7 +69,7 @@ public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTe
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNull(visitType);
+		Assertions.assertNull(visitType);
 	}
 	
 	@Test
@@ -80,15 +79,15 @@ public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTe
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals("Expected visit_type_id 2", visitType.getId().longValue(), 2);
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals(2, visitType.getId().longValue());
 		
 		// test with the Uuid for the visitType
 		encounterTypetoVisitTypeMapper.setMappingString("1:759799ab-c9a5-435e-b671-77773ada74e4");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals("Expected visit_type_uuid 759799ab-c9a5-435e-b671-77773ada74e4", visitType.getUuid(), "759799ab-c9a5-435e-b671-77773ada74e4");
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals("759799ab-c9a5-435e-b671-77773ada74e4", visitType.getUuid());
 	}
 	
 	@Test
@@ -97,15 +96,15 @@ public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTe
 		EncounterType e = encounterService.getEncounterType(2);
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals(1,visitType.getId().longValue());
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals(1,visitType.getId().longValue());
 		
 		// test with the Uuid for the visitType
 		encounterTypetoVisitTypeMapper.setMappingString("07000be2-26b6-4cce-8b40-866d8435b613:c0c579b0-8e59-401d-8a4a-976a0b183519");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals("c0c579b0-8e59-401d-8a4a-976a0b183519",visitType.getUuid());
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals("c0c579b0-8e59-401d-8a4a-976a0b183519",visitType.getUuid());
 	}
 	
 	@Test
@@ -115,15 +114,15 @@ public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTe
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals(visitType.getId().longValue(), 1);
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals(visitType.getId().longValue(), 1);
 		
 		// test with the Uuid for the visitType
 		encounterTypetoVisitTypeMapper.setMappingString("default:c0c579b0-8e59-401d-8a4a-976a0b183519");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals(visitType.getUuid(), "c0c579b0-8e59-401d-8a4a-976a0b183519");
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals(visitType.getUuid(), "c0c579b0-8e59-401d-8a4a-976a0b183519");
 	}
 	@Test
 	public void testMappingWithDefaultEncounterTypeMappingOverride(){
@@ -133,15 +132,15 @@ public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTe
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals(visitType.getId().longValue(), 2);
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals(visitType.getId().longValue(), 2);
 		
 		// test with the Uuid for the visitType
 		encounterTypetoVisitTypeMapper.setMappingString("default:c0c579b0-8e59-401d-8a4a-976a0b183519,07000be2-26b6-4cce-8b40-866d8435b613:759799ab-c9a5-435e-b671-77773ada74e4");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals(visitType.getUuid(), "759799ab-c9a5-435e-b671-77773ada74e4");
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals(visitType.getUuid(), "759799ab-c9a5-435e-b671-77773ada74e4");
 	}
 	
 	@Test
@@ -152,15 +151,15 @@ public class EncounterTypeToVisitTypeMapperTest extends EmrApiContextSensitiveTe
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals(2, visitType.getId().longValue());
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals(2, visitType.getId().longValue());
 		
 		// test with the Uuid for the visitType
 		encounterTypetoVisitTypeMapper.setMappingString("07000be2-26b6-4cce-8b40-866d8435b613:759799ab-c9a5-435e-b671-77773ada74e4,default:c0c579b0-8e59-401d-8a4a-976a0b183519");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
-		Assert.assertNotNull(visitType);
-		Assert.assertEquals("759799ab-c9a5-435e-b671-77773ada74e4",visitType.getUuid());
+		Assertions.assertNotNull(visitType);
+		Assertions.assertEquals("759799ab-c9a5-435e-b671-77773ada74e4",visitType.getUuid());
 	}
 	
 }

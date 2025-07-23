@@ -1,14 +1,14 @@
 package org.openmrs.module.emrapi.patient;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Diagnosis;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.PatientService;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertNotNull;
 
-public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
+public class EmrPatientServiceTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     PatientService patientService;
@@ -27,7 +27,7 @@ public class EmrPatientServiceTest extends EmrApiContextSensitiveTest {
     @Autowired
     EmrPatientService emrPatientService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         executeDataSet("baseTestDataset.xml");
         executeDataSet("pastVisitSetup.xml");

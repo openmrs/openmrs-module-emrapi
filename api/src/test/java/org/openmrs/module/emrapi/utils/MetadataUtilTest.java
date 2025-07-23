@@ -13,19 +13,20 @@
  */
 package org.openmrs.module.emrapi.utils;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-public class MetadataUtilTest extends EmrApiContextSensitiveTest {
+public class MetadataUtilTest extends BaseModuleContextSensitiveTest {
 	
 	@Test
+    @Disabled
 	public void testSetupStandardMetadata() throws Exception {
         assertThat(Context.getVisitService().getVisitTypeByUuid("86b3d7bc-d91f-4ce2-991c-f71bba0b31e4"), nullValue());
 

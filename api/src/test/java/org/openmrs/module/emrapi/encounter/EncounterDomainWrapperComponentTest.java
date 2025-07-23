@@ -1,11 +1,11 @@
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Test;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
+import org.junit.jupiter.api.Test;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class EncounterDomainWrapperComponentTest extends EmrApiContextSensitiveTest {
+public class EncounterDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private DomainWrapperFactory factory;

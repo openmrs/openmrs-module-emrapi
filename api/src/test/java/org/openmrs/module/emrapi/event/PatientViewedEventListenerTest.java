@@ -15,8 +15,8 @@ package org.openmrs.module.emrapi.event;
 
 import org.apache.activemq.command.ActiveMQMapMessage;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.User;
@@ -24,8 +24,8 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.jms.MapMessage;
@@ -33,9 +33,10 @@ import javax.jms.Message;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PatientViewedEventListenerTest extends EmrApiContextSensitiveTest {
+
+public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTest {
 	
 	@Autowired
 	private PatientService patientService;
@@ -50,7 +51,7 @@ public class PatientViewedEventListenerTest extends EmrApiContextSensitiveTest {
 	
 	private PatientViewedEventListener listener = new PatientViewedEventListener(null);
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		if (user == null)
 			user = userService.getUser(502);

@@ -1,20 +1,18 @@
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
@@ -23,8 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class MigrateDiagnosisTest extends EmrApiContextSensitiveTest {
+public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 
 	private static final String DIAGNOSIS_DATASET = "DiagnosisDataset.xml";
 
@@ -48,7 +45,7 @@ public class MigrateDiagnosisTest extends EmrApiContextSensitiveTest {
 
 	private DiagnosisMetadata diagnosisMetadata;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		executeDataSet(DIAGNOSIS_DATASET);
 		diagnosisMetadata = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
