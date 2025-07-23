@@ -20,7 +20,6 @@ public class AccountDomainWrapperComponentTest extends EmrApiContextSensitiveTes
         AccountDomainWrapper accountDomainWrapper = factory.newAccountDomainWrapper();
         assertThat(accountDomainWrapper.accountService, notNullValue());
         assertThat(accountDomainWrapper.personService, notNullValue());
-        assertThat(accountDomainWrapper.providerServiceFacade, notNullValue());
         assertThat(accountDomainWrapper.providerService, notNullValue());
         assertThat(accountDomainWrapper.userService, notNullValue());
     }

@@ -18,8 +18,6 @@ import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
-import org.openmrs.module.emrapi.account.provider.CoreProviderService;
-import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.util.OpenmrsConstants;
 
@@ -45,9 +43,6 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
     private ProviderService providerService;
 
-    private ProviderService providerManagementService;
-
-    private ProviderServiceFacade providerServiceFacade;
 
     private EmrApiProperties emrApiProperties;
 
@@ -58,8 +53,6 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
-        providerManagementService = mock(ProviderService.class);
-        providerServiceFacade = new CoreProviderService(providerService);
         emrApiProperties = mock(EmrApiProperties.class);
 
         domainWrapperFactory = new MockDomainWrapperFactory();
@@ -266,7 +259,6 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
             accountDomainWrapper.setAccountService(accountService);
             accountDomainWrapper.setUserService(userService);
             accountDomainWrapper.setPersonService(personService);
-            accountDomainWrapper.setProviderServiceFacade(providerServiceFacade);
             accountDomainWrapper.setProviderService(providerService);
             return accountDomainWrapper;
         }

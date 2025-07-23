@@ -15,8 +15,6 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.account.provider.CoreProviderService;
-import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsConstants;
 
@@ -55,9 +53,6 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
 
     private ProviderService providerService;
 
-    private ProviderService providerManagementService;
-
-    private ProviderServiceFacade providerServiceFacade;
 
     private ProviderIdentifierGenerator providerIdentifierGenerator = null;
 
@@ -77,8 +72,6 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
-        providerManagementService = mock(ProviderService.class);
-        providerServiceFacade = new MockProviderServiceFacade(new CoreProviderService(providerService));
 
         fullPrivileges = new Role();
         fullPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Full");
@@ -334,7 +327,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
         Provider provider = new Provider();
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-        providerServiceFacade.saveProvider(provider);
+        providerService.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         ProviderRole newProviderRole = new ProviderRole();
@@ -508,7 +501,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
         provider.setId(1);  // to mimic persistence
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-        providerServiceFacade.saveProvider(provider);
+        providerService.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
@@ -525,7 +518,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
         Provider provider = new Provider();
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-        providerServiceFacade.saveProvider(provider);
+        providerService.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
@@ -602,7 +595,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
 
     private AccountDomainWrapper initializeNewAccountDomainWrapper(Person person) {
         return new AccountDomainWrapper(person, accountService, userService,
-                providerService, providerServiceFacade, personService, providerIdentifierGenerator);
+                providerService, personService, providerIdentifierGenerator);
     }
 
     private class IsExpectedProvider implements ArgumentMatcher<Provider> {

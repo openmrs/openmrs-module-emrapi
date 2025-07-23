@@ -7,14 +7,11 @@ import org.openmrs.Person;
 import org.openmrs.PersonName;
 import org.openmrs.ProviderRole;
 import org.openmrs.Role;
-import org.openmrs.api.PasswordException;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.account.provider.CoreProviderService;
-import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
@@ -44,9 +41,6 @@ public class AccountValidatorTest {
 
     private ProviderService providerService;
 
-    private ProviderService providerManagementService;
-
-    private ProviderServiceFacade providerServiceFacade;
 
     private PersonService personService;
 
@@ -66,8 +60,6 @@ public class AccountValidatorTest {
         accountService = Mockito.mock(AccountService.class);
         userService = Mockito.mock(UserService.class);
         providerService = Mockito.mock(ProviderService.class);
-        providerManagementService = Mockito.mock(ProviderService.class);
-        providerServiceFacade = new CoreProviderService(providerService);
         personService = Mockito.mock(PersonService.class);
 
         validator = new AccountValidator();
@@ -88,7 +80,7 @@ public class AccountValidatorTest {
         someProviderRole = new ProviderRole();
 
         account = new AccountDomainWrapper(person, accountService, userService, providerService,
-                providerServiceFacade, personService, providerIdentifierGenerator);
+                 personService, providerIdentifierGenerator);
     }
 
     /**
