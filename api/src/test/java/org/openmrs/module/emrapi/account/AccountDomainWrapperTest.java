@@ -15,7 +15,6 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
@@ -34,7 +33,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -43,7 +41,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS;
 
-public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
+public class AccountDomainWrapperTest {
 
     private AccountService accountService;
 
@@ -77,7 +75,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
         fullPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Full");
         limitedPrivileges = new Role();
         limitedPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Limited");
-        lenient().when(accountService.getAllPrivilegeLevels()).thenReturn(Arrays.asList(fullPrivileges, limitedPrivileges));
+        when(accountService.getAllPrivilegeLevels()).thenReturn(Arrays.asList(fullPrivileges, limitedPrivileges));
 
         receptionApp = new Role();
         receptionApp.setRole(EmrApiConstants.ROLE_PREFIX_CAPABILITY + "Reception");
@@ -85,7 +83,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
         archiveApp.setRole(EmrApiConstants.ROLE_PREFIX_CAPABILITY + "Archives");
         adminApp = new Role();
         adminApp.setRole(EmrApiConstants.ROLE_PREFIX_CAPABILITY + "Admin");
-        lenient().when(accountService.getAllCapabilities()).thenReturn(Arrays.asList(receptionApp, archiveApp, adminApp));
+        when(accountService.getAllCapabilities()).thenReturn(Arrays.asList(receptionApp, archiveApp, adminApp));
 
     }
 
@@ -559,7 +557,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
         ProviderRole providerRole = new ProviderRole();
 
         providerIdentifierGenerator = mock(ProviderIdentifierGenerator.class);
-        lenient().when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("456");
+        when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("456");
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(providerRole);
@@ -578,7 +576,7 @@ public class AccountDomainWrapperTest extends BaseModuleContextSensitiveTest {
     public void testShouldNotFailIfProviderIdentifierGeneratorDefinedButNoProvider() throws Exception {
 
         providerIdentifierGenerator = mock(ProviderIdentifierGenerator.class);
-        lenient().when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("123");
+        when(providerIdentifierGenerator.generateIdentifier(any(Provider.class))).thenReturn("123");
 
         Person person = new Person();
 
