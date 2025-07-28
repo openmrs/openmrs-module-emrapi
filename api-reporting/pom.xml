@@ -13,9 +13,9 @@
     <name>EMR API Reporting API</name>
 
     <properties>
-        <reportingVersion>1.25.0</reportingVersion>
+        <reportingVersion>2.0.0-SNAPSHOT</reportingVersion>
         <serialization.xstreamVersion>0.2.16</serialization.xstreamVersion>
-        <calculationVersion>1.3.0</calculationVersion>
+        <calculationVersion>2.0.0-SNAPSHOT</calculationVersion>
     </properties>
 
     <dependencies>
@@ -35,24 +35,6 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>reporting-api</artifactId>
-            <version>${reportingVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>reporting-api-1.10</artifactId>
-            <version>${reportingVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>reporting-api-2.0</artifactId>
-            <version>${reportingVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>reporting-api-2.2</artifactId>
             <version>${reportingVersion}</version>
             <scope>provided</scope>
         </dependency>
