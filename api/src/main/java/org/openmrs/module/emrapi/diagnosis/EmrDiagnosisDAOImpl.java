@@ -34,20 +34,20 @@ public class EmrDiagnosisDAOImpl implements EmrDiagnosisDAO {
     */
    public List<org.openmrs.Diagnosis> getDiagnoses(Visit visit, boolean primaryOnly, boolean confirmedOnly) {
       String queryString = "from Diagnosis d where d.encounter.visit.visitId = :visitId and d.voided = false";
-      if (primaryOnly == true) {
+      if (primaryOnly) {
          queryString += " and d.rank = :rankId";
       }
-      if (confirmedOnly == true) {
+      if (confirmedOnly) {
          queryString += " and d.certainty = :certainty";
       }
       queryString += " order by d.dateCreated desc";
 
       Query query = sessionFactory.getCurrentSession().createQuery(queryString);
       query.setInteger("visitId", visit.getId());
-      if (primaryOnly == true) {
+      if (primaryOnly) {
          query.setInteger("rankId", PRIMARY_RANK);
       }
-      if (confirmedOnly == true) {
+      if (confirmedOnly) {
          query.setString("certainty", CONFIRMED_CERTAINTY);
       }
 

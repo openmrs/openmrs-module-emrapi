@@ -211,14 +211,14 @@ public class AccountDomainWrapper implements DomainWrapper {
 
             if (!user.hasRole(privilegeLevel.getRole(), true)) {
                 if (user.getRoles() != null) {
-                    user.getRoles().removeAll(accountService.getAllPrivilegeLevels());
+                    accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
                 }
                 user.addRole(privilegeLevel);
             }
         } else if (user != null) {
             // privilege level is mandatory, so technically we shouldn't ever get here
             if (user.getRoles() != null) {
-                user.getRoles().removeAll(accountService.getAllPrivilegeLevels());
+                accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
             }
         }
     }
@@ -238,8 +238,8 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     public void setCapabilities(Set<Role> capabilities) {
 
-        if (capabilities != null && capabilities.size() > 0) {
-            if (!accountService.getAllCapabilities().containsAll(capabilities)) {
+        if (capabilities != null && !capabilities.isEmpty()) {
+            if (!new HashSet<>(accountService.getAllCapabilities()).containsAll(capabilities)) {
                 throw new APIException("Attempt to set invalid capability");
             }
 
@@ -310,7 +310,7 @@ public class AccountDomainWrapper implements DomainWrapper {
         String lockoutTimeProperty = user.getUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
         if (lockoutTimeProperty != null) {
             try {
-                Long lockedOutUntil = Long.valueOf(lockoutTimeProperty) + 300000;
+                long lockedOutUntil = Long.parseLong(lockoutTimeProperty) + 300000;
                 return System.currentTimeMillis() < lockedOutUntil;
             } catch (NumberFormatException ex) {
                 return false;

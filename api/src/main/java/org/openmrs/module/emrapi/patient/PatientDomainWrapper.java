@@ -280,9 +280,7 @@ public class PatientDomainWrapper implements DomainWrapper {
 	public List<Visit> getVisitsByType(VisitType visitType) {
    		List<VisitType> visitTypes = null;
    		if (visitType != null) {
-			if (visitType != null) {
-				visitTypes = Collections.singletonList(visitType);
-			}
+			   visitTypes = Collections.singletonList(visitType);
 		}
 		return visitService.getVisits(visitTypes, Collections.singletonList(patient), null, null, null, null, null, null, null, true, false);
 	}
