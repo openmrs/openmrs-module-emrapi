@@ -19,7 +19,7 @@ import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import java.util.Date;
 import java.util.HashMap;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;

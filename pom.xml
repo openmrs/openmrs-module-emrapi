@@ -39,7 +39,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <openMRSVersion>2.8.0-SNAPSHOT</openMRSVersion>
         <legacyuiVersion>1.16.0</legacyuiVersion>
-        <lombokVersion>1.18.26</lombokVersion>
+        <lombokVersion>1.18.38</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
         <metadatamappingVersion>1.6.0</metadatamappingVersion>
         <metadatasharingVersion>1.9.0</metadatasharingVersion>
@@ -47,6 +47,8 @@
         <allergyapiVersion>1.4</allergyapiVersion>
         <webservices.restVersion>2.42.0</webservices.restVersion>
         <javaxVersion>4.0.1</javaxVersion>
+        <mockitoInlineVersion>4.8.0</mockitoInlineVersion>
+        <byteBuddyVersion>1.17.6</byteBuddyVersion>
     </properties>
 
     <dependencies>
@@ -144,7 +146,14 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>4.8.0</version>
+            <version>${mockitoInlineVersion}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${byteBuddyVersion}</version>
             <scope>test</scope>
         </dependency>
 
@@ -191,9 +200,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>3.5.3</version>
                     <configuration>
-                        <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+                        <argLine>-Xmx512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
