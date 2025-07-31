@@ -79,8 +79,12 @@ public class HibernateEmrPatientDAO implements EmrPatientDAO {
 				.distinct(true);
 
 		TypedQuery<Patient> typed = em.createQuery(cq);
-		if (start != null)     typed.setFirstResult(start);
-		if (maxResults != null) typed.setMaxResults(maxResults);
+		if (start != null)    {
+			typed.setFirstResult(start);
+		}
+		if (maxResults != null) {
+			typed.setMaxResults(maxResults);
+		}
 
 		return typed.getResultList();
 
