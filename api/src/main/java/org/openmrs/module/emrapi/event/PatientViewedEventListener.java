@@ -88,7 +88,7 @@ public class PatientViewedEventListener implements EventListener {
 		
 		UserService userService = Context.getUserService();
 		User user = userService.getUserByUuid(userUuid);
-		if (user != null && patientToAdd != null) {
+		if (user != null) {
 			EmrApiProperties emrProperties = Context.getRegisteredComponents(EmrApiProperties.class).iterator().next();
 			Integer limit = emrProperties.getLastViewedPatientSizeLimit();
 			List<Integer> patientIds = new ArrayList<Integer>();

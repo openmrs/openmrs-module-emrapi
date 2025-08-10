@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
 import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.APIException;
@@ -11,7 +12,6 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
@@ -54,9 +54,6 @@ public class AccountDomainWrapper implements DomainWrapper {
     @Autowired
     protected ProviderService providerService;
 
-    @Autowired
-    protected ProviderServiceFacade providerServiceFacade;
-
     @Autowired(required = false)
     protected ProviderIdentifierGenerator providerIdentifierGenerator;
 
@@ -65,11 +62,10 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     @Deprecated  // use DomainWrapperFactory instead
     public AccountDomainWrapper(Person person, AccountService accountService, UserService userService, ProviderService providerService,
-                                ProviderServiceFacade providerServiceFacade, PersonService personService, ProviderIdentifierGenerator providerIdentifierGenerator) {
+                                PersonService personService, ProviderIdentifierGenerator providerIdentifierGenerator) {
         this.accountService = accountService;
         this.userService = userService;
         this.providerService = providerService;
-        this.providerServiceFacade = providerServiceFacade;
         this.personService = personService;
         this.providerIdentifierGenerator = providerIdentifierGenerator;
 
@@ -90,10 +86,6 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     public void setPersonService(PersonService personService) {
         this.personService = personService;
-    }
-
-    public void setProviderServiceFacade(ProviderServiceFacade providerServiceFacade) {
-        this.providerServiceFacade = providerServiceFacade;
     }
 
     public void setProviderIdentifierGenerator(ProviderIdentifierGenerator providerIdentifierGenerator) {
@@ -122,14 +114,14 @@ public class AccountDomainWrapper implements DomainWrapper {
         return provider;
     }
 
-    public void setProviderRole(Object providerRole) {
+    public void setProviderRole(ProviderRole providerRole) {
         if (providerRole != null) {
             initializeProviderIfNecessary();
-            providerServiceFacade.setProviderRole(this.provider, providerRole);
+            provider.setProviderRole(providerRole);
         } else {
             // this prevents us from creating a new provider if we are only setting the provider role to null
             if (this.provider != null) {
-                providerServiceFacade.setProviderRole(this.provider, null);
+                provider.setProviderRole(null);
             }
         }
     }
@@ -138,7 +130,7 @@ public class AccountDomainWrapper implements DomainWrapper {
         if (this.provider == null) {
             return null;
         }
-        return providerServiceFacade.getProviderRole(this.provider);
+        return this.provider.getProviderRole();
     }
 
     public void setGivenName(String givenName) {
@@ -219,14 +211,14 @@ public class AccountDomainWrapper implements DomainWrapper {
 
             if (!user.hasRole(privilegeLevel.getRole(), true)) {
                 if (user.getRoles() != null) {
-                    user.getRoles().removeAll(accountService.getAllPrivilegeLevels());
+                    accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
                 }
                 user.addRole(privilegeLevel);
             }
         } else if (user != null) {
             // privilege level is mandatory, so technically we shouldn't ever get here
             if (user.getRoles() != null) {
-                user.getRoles().removeAll(accountService.getAllPrivilegeLevels());
+                accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
             }
         }
     }
@@ -246,8 +238,8 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     public void setCapabilities(Set<Role> capabilities) {
 
-        if (capabilities != null && capabilities.size() > 0) {
-            if (!accountService.getAllCapabilities().containsAll(capabilities)) {
+        if (capabilities != null && !capabilities.isEmpty()) {
+            if (!new HashSet<>(accountService.getAllCapabilities()).containsAll(capabilities)) {
                 throw new APIException("Attempt to set invalid capability");
             }
 
@@ -318,7 +310,7 @@ public class AccountDomainWrapper implements DomainWrapper {
         String lockoutTimeProperty = user.getUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
         if (lockoutTimeProperty != null) {
             try {
-                Long lockedOutUntil = Long.valueOf(lockoutTimeProperty) + 300000;
+                long lockedOutUntil = Long.parseLong(lockoutTimeProperty) + 300000;
                 return System.currentTimeMillis() < lockedOutUntil;
             } catch (NumberFormatException ex) {
                 return false;
@@ -387,7 +379,7 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     private void initializeProviderIfNecessary() {
         if (provider == null) {
-            provider = providerServiceFacade.newProvider();
+            provider = new Provider();
             provider.setPerson(person);
         }
     }
@@ -416,7 +408,7 @@ public class AccountDomainWrapper implements DomainWrapper {
     }
 
     private Provider getProviderByPerson(Person person) {
-        Collection<? extends Provider> providers = providerServiceFacade.getProvidersByPerson(person);
+        Collection<? extends Provider> providers = providerService.getProvidersByPerson(person);
         if (providers != null && !providers.isEmpty()) {
             if (providers.size() == 1) {
                 return providers.iterator().next();

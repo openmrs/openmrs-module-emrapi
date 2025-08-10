@@ -7,10 +7,10 @@
     <role role="Application Role: Registration" description="App: Registration"
           uuid="3480c888-c291-46c8-8d3a-96dc33d199fb"/>
 
-    <providermanagement_provider_role provider_role_id="1001" name="Nurse" creator="1"
+    <provider_role provider_role_id="1001" name="Nurse" creator="1"
                                       date_created="2005-09-22 00:00:00.0" retired="false"
                                       uuid="da7f523f-27ce-4bb2-86d6-6d1d05312bd5"/>
-    <providermanagement_provider_role provider_role_id="1002" name="Doctor" creator="1"
+    <provider_role provider_role_id="1002" name="Doctor" creator="1"
                                       date_created="2005-09-22 00:00:00.0" retired="false"
                                       uuid="deef523f-27ce-4bb2-86d6-6d1d05312bd5"/>
 

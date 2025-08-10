@@ -127,10 +127,10 @@ public class Diagnosis {
 			s.append(diagnosis.getValue().toString());
 		}
 		if (certainty != null) {
-			s.append(", " + certainty);
+			s.append(", ").append(certainty);
 		}
 		if (order != null) {
-			s.append(", " + order);
+			s.append(", ").append(order);
 		}
 		return s.toString();
 	}

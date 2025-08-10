@@ -1,10 +1,10 @@
 package org.openmrs.module.emrapi.maternal;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Patient;
@@ -25,13 +25,13 @@ import org.openmrs.api.PatientService;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.VisitService;
 import org.openmrs.contrib.testdata.TestDataManager;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
+public class MaternalServiceImplTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private MaternalService maternalService;
@@ -58,7 +58,7 @@ public class MaternalServiceImplTest extends EmrApiContextSensitiveTest {
     private TestDataManager testDataManager;
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
         executeDataSet("baseTestDataset.xml");
         dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.openmrs.module</groupId>
     <artifactId>emrapi</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>EMR API Module</name>
     <description>Higher-level APIs to support building EMR functionality in OpenMRS, to supplement the data-level APIs
@@ -37,18 +37,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <openMRSVersion>2.2.1</openMRSVersion>
+        <openMRSVersion>2.8.0-SNAPSHOT</openMRSVersion>
         <legacyuiVersion>1.16.0</legacyuiVersion>
-        <lombokVersion>1.18.26</lombokVersion>
+        <lombokVersion>1.18.38</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
-        <providermanagementVersion>2.5.0</providermanagementVersion>
         <metadatamappingVersion>1.6.0</metadatamappingVersion>
         <metadatasharingVersion>1.9.0</metadatasharingVersion>
         <eventVersion>2.8.0</eventVersion>
         <allergyapiVersion>1.4</allergyapiVersion>
         <webservices.restVersion>2.42.0</webservices.restVersion>
-        <jacksonVersion>1.5.0</jacksonVersion>
         <javaxVersion>4.0.1</javaxVersion>
+        <mockitoInlineVersion>4.8.0</mockitoInlineVersion>
+        <byteBuddyVersion>1.17.6</byteBuddyVersion>
     </properties>
 
     <dependencies>
@@ -57,12 +57,6 @@
             <artifactId>openmrs-api</artifactId>
             <version>${openMRSVersion}</version>
             <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>providermanagement-api</artifactId>
-            <version>${providermanagementVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -103,9 +97,9 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>1.7.6</version>
-            <type>jar</type>
+            <version>2.4.21</version>
             <scope>provided</scope>
+            <type>jar</type>
         </dependency>
 
         <dependency>
@@ -150,16 +144,17 @@
         </dependency>
 
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>${jacksonVersion}</version>
-            <scope>provided</scope>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockitoInlineVersion}</version>
+            <scope>test</scope>
         </dependency>
+
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jacksonVersion}</version>
-            <scope>provided</scope>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>${byteBuddyVersion}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -205,9 +200,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>3.5.3</version>
                     <configuration>
-                        <argLine>-Xmx512m -XX:MaxPermSize=512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+                        <argLine>-Xmx512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>

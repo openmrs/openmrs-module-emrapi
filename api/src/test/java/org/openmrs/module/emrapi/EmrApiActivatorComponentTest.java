@@ -14,8 +14,8 @@
 
 package org.openmrs.module.emrapi;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.EncounterType;
 import org.openmrs.GlobalProperty;
 import org.openmrs.PatientIdentifierType;
@@ -26,7 +26,7 @@ import org.openmrs.api.UserService;
 import org.openmrs.module.metadatamapping.MetadataSource;
 import org.openmrs.module.metadatamapping.MetadataTermMapping;
 import org.openmrs.module.metadatamapping.api.MetadataMappingService;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -42,7 +42,7 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class EmrApiActivatorComponentTest extends EmrApiContextSensitiveTest {
+public class EmrApiActivatorComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     @Qualifier("adminService")
@@ -57,7 +57,7 @@ public class EmrApiActivatorComponentTest extends EmrApiContextSensitiveTest {
     @Autowired
     private EmrApiProperties emrApiProperties;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         executeDataSet("activatorTestDataset.xml");
     }

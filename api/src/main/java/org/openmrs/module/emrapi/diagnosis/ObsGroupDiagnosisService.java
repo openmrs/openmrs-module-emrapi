@@ -168,8 +168,7 @@ public class ObsGroupDiagnosisService {
                 }
                 continue;
             }
-            Set<Concept> filter = new HashSet<>();
-            filter.addAll(nonDiagnosisConcepts);
+            Set<Concept> filter = new HashSet<>(nonDiagnosisConcepts);
             for (Concept conceptSet : nonDiagnosisConceptSets) {
                 filter.addAll(conceptSet.getSetMembers());
             }

@@ -308,10 +308,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
                 }
             }
         }
-        if(visit == null){
-            visit = buildVisit(patient, department, visitTime);
-            visitService.saveVisit(visit);
-        }
+        visit = buildVisit(patient, department, visitTime);
+        visitService.saveVisit(visit);
         return visit;
     }
 
@@ -906,7 +904,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional(readOnly = true)
     public boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime) {
         List<VisitDomainWrapper> visits = getVisits(patient, location, startDatetime, stopDatetime);
-        return visits == null || visits.isEmpty() ? false : true;
+        return visits != null && !visits.isEmpty();
     }
 
     @Override

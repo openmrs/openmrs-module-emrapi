@@ -2,23 +2,19 @@ package org.openmrs.module.emrapi.account;
 
 import junit.framework.Assert;
 import org.apache.commons.lang.time.DateUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
+import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
-import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
-import org.openmrs.module.providermanagement.Provider;
-import org.openmrs.module.providermanagement.ProviderRole;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
@@ -32,10 +28,10 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -45,7 +41,7 @@ import static org.mockito.Mockito.when;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP;
 import static org.openmrs.util.OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS;
 
-public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
+public class AccountDomainWrapperTest {
 
     private AccountService accountService;
 
@@ -55,9 +51,6 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
 
     private ProviderService providerService;
 
-    private ProviderManagementService providerManagementService;
-
-    private ProviderServiceFacade providerServiceFacade;
 
     private ProviderIdentifierGenerator providerIdentifierGenerator = null;
 
@@ -71,14 +64,12 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
 
     private Role adminApp;
 
-    @Before
+    @BeforeEach
     public void setup() {
         accountService = mock(AccountService.class);
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
-        providerManagementService = mock(ProviderManagementService.class);
-        providerServiceFacade = new MockProviderServiceFacade(new ProviderManagementProviderService(providerService, providerManagementService));
 
         fullPrivileges = new Role();
         fullPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Full");
@@ -334,7 +325,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         Provider provider = new Provider();
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-        providerServiceFacade.saveProvider(provider);
+        providerService.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         ProviderRole newProviderRole = new ProviderRole();
@@ -508,7 +499,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         provider.setId(1);  // to mimic persistence
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-        providerServiceFacade.saveProvider(provider);
+        providerService.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
@@ -525,7 +516,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         Provider provider = new Provider();
         ProviderRole originalProviderRole = new ProviderRole();
         provider.setProviderRole(originalProviderRole);
-        providerServiceFacade.saveProvider(provider);
+        providerService.saveProvider(provider);
 
         AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
         account.setProviderRole(null);
@@ -602,10 +593,10 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
 
     private AccountDomainWrapper initializeNewAccountDomainWrapper(Person person) {
         return new AccountDomainWrapper(person, accountService, userService,
-                providerService, providerServiceFacade, personService, providerIdentifierGenerator);
+                providerService, personService, providerIdentifierGenerator);
     }
 
-    private class IsExpectedProvider extends ArgumentMatcher<Provider> {
+    private class IsExpectedProvider implements ArgumentMatcher<Provider> {
 
         private Provider expectedProvider;
 
@@ -614,10 +605,7 @@ public class AccountDomainWrapperTest extends EmrApiContextSensitiveTest {
         }
 
         @Override
-        public boolean matches(Object o) {
-
-            Provider provider = (Provider) o;
-
+        public boolean matches(Provider provider) {
             try {
                 assertThat(provider.getId(), is(expectedProvider.getId()));
                 assertThat(provider.getProviderRole(), is(expectedProvider.getProviderRole()));

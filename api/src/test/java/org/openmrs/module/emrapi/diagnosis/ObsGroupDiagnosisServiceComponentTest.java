@@ -2,9 +2,8 @@ package org.openmrs.module.emrapi.diagnosis;
 
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Encounter;
@@ -15,12 +14,11 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.PatientService;
 import org.openmrs.contrib.testdata.TestDataManager;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -29,15 +27,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ObsGroupDiagnosisServiceComponentTest extends EmrApiContextSensitiveTest {
+public class ObsGroupDiagnosisServiceComponentTest extends BaseModuleContextSensitiveTest {
 
 	@Autowired
 	ConceptService conceptService;
@@ -60,7 +57,7 @@ public class ObsGroupDiagnosisServiceComponentTest extends EmrApiContextSensitiv
 	DiagnosisMetadata dmd;
 
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		dmd = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
 

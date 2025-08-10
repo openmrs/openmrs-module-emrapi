@@ -40,7 +40,7 @@ public class ExitFromCareServiceImpl  extends BaseOpenmrsService implements Exit
         }
 
         for (PatientProgram patientProgram : programWorkflowService.getPatientPrograms(patient, null, null, null, null, null, false)) {
-            if (patientProgram.getActive() == true && programWorkflowService.getPossibleOutcomes(patientProgram.getProgram().getProgramId()).contains(outcome)) {
+            if (patientProgram.getActive() && programWorkflowService.getPossibleOutcomes(patientProgram.getProgram().getProgramId()).contains(outcome)) {
                 patientProgram.setOutcome(outcome);
                 patientProgram.setDateCompleted(completionDate.after(patientProgram.getDateEnrolled()) ? completionDate : patientProgram.getDateEnrolled()); // if completion date is before date enrolled, just use completion date
                 // we specifically aren't handling state transitions here

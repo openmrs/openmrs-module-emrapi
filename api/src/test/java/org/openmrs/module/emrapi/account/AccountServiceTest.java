@@ -1,9 +1,10 @@
 package org.openmrs.module.emrapi.account;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.hamcrest.MockitoHamcrest;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
@@ -12,29 +13,25 @@ import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
-import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
-import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AccountServiceTest extends EmrApiContextSensitiveTest {
+public class AccountServiceTest  {
 
     private AccountServiceImpl accountService;
 
@@ -44,21 +41,16 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
     private ProviderService providerService;
 
-    private ProviderManagementService providerManagementService;
-
-    private ProviderServiceFacade providerServiceFacade;
 
     private EmrApiProperties emrApiProperties;
 
     private DomainWrapperFactory domainWrapperFactory;
 
-    @Before
+    @BeforeEach
     public void setup() {
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
-        providerManagementService = mock(ProviderManagementService.class);
-        providerServiceFacade = new ProviderManagementProviderService(providerService, providerManagementService);
         emrApiProperties = mock(EmrApiProperties.class);
 
         domainWrapperFactory = new MockDomainWrapperFactory();
@@ -98,9 +90,10 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         when(providerService.getAllProviders()).thenReturn(Arrays.asList(provider1, provider2));
 
         List<AccountDomainWrapper> accounts = accountService.getAllAccounts();
-        Assert.assertEquals(3, accounts.size());
-        assertThat(accounts,
-                TestUtils.isCollectionOfExactlyElementsWithProperties("person", person1, person2, person3));
+        Assertions.assertEquals(3, accounts.size());
+
+        List<Person> persons = accounts.stream().map(AccountDomainWrapper::getPerson).collect(Collectors.toList());
+        assertThat(persons, containsInAnyOrder(person1, person2, person3));
     }
 
     @Test
@@ -112,7 +105,7 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         when(providerService.getAllProviders()).thenReturn(Collections.singletonList(unknownProvider));
 
         List<AccountDomainWrapper> accounts = accountService.getAllAccounts();
-        Assert.assertEquals(0, accounts.size());
+        Assertions.assertEquals(0, accounts.size());
     }
 
     /**
@@ -137,16 +130,16 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
         PersonService personService = Mockito.mock(PersonService.class);
         accountService.setPersonService(personService);
-        when(personService.getPerson(argThat(TestUtils.equalsMatcher(personId)))).thenReturn(person);
-        when(userService.getUsersByPerson(argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
+        when(personService.getPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(personId)))).thenReturn(person);
+        when(userService.getUsersByPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
                 Arrays.asList(user));
 
         AccountDomainWrapper account = accountService.getAccount(personId);
-        Assert.assertNotNull(account);
-        Assert.assertEquals(person, account.getPerson());
-        Assert.assertEquals(username, account.getUsername());
-        Assert.assertEquals("ht", account.getDefaultLocale().toString());
-        Assert.assertEquals(fullPrivilegeLevel, account.getPrivilegeLevel());
+        Assertions.assertNotNull(account);
+        Assertions.assertEquals(person, account.getPerson());
+        Assertions.assertEquals(username, account.getUsername());
+        Assertions.assertEquals("ht", account.getDefaultLocale().toString());
+        Assertions.assertEquals(fullPrivilegeLevel, account.getPrivilegeLevel());
     }
 
     /**
@@ -159,11 +152,11 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         Person person = new Person();
         person.setPersonId(1);
         user.setPerson(person);
-        when(userService.getUsersByPerson(argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
+        when(userService.getUsersByPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
                 Arrays.asList(user));
         AccountDomainWrapper account = accountService.getAccountByPerson(person);
-        Assert.assertNotNull(account);
-        Assert.assertEquals(person, account.getPerson());
+        Assertions.assertNotNull(account);
+        Assertions.assertEquals(person, account.getPerson());
     }
 
     /**
@@ -177,11 +170,11 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
         person.setPersonId(1);
         Provider provider = new Provider();
         provider.setPerson(person);
-        when(providerService.getProvidersByPerson(argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
+        when(providerService.getProvidersByPerson(MockitoHamcrest.argThat(TestUtils.equalsMatcher(person)), any(Boolean.class))).thenReturn(
                 Arrays.asList(provider));
         AccountDomainWrapper account = accountService.getAccountByPerson(person);
-        Assert.assertNotNull(account);
-        Assert.assertEquals(person, account.getPerson());
+        Assertions.assertNotNull(account);
+        Assertions.assertEquals(person, account.getPerson());
     }
 
     /**
@@ -196,9 +189,13 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
         when(userService.getAllRoles()).thenReturn(Arrays.asList(role1, role2, role3));
         List<Role> capabilities = accountService.getAllCapabilities();
-        Assert.assertEquals(2, capabilities.size());
-        assertThat(capabilities, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
-                EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role1", EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role3"));
+        Assertions.assertEquals(2, capabilities.size());
+
+        List<String> capabilitiesStr = capabilities.stream().map(Role::getName).collect(Collectors.toList());
+
+        assertThat(capabilitiesStr, containsInAnyOrder(
+                EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role1",
+                EmrApiConstants.ROLE_PREFIX_CAPABILITY + "role3"));
     }
 
     /**
@@ -213,11 +210,17 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
 
         when(userService.getAllRoles()).thenReturn(Arrays.asList(role1, role2, role3));
         List<Role> privilegeLevels = accountService.getAllPrivilegeLevels();
-        Assert.assertEquals(2, privilegeLevels.size());
-        assertThat(privilegeLevels, TestUtils.isCollectionOfExactlyElementsWithProperties("role",
-                EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role1", EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role3"));
-    }
+        Assertions.assertEquals(2, privilegeLevels.size());
 
+        List<String> roleNames = privilegeLevels.stream()
+                .map(Role::getRole)
+                .collect(Collectors.toList());
+
+        assertThat(roleNames, containsInAnyOrder(
+                EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role1",
+                EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "role3"
+        ));
+    }
     @Test
     public void getApiPrivileges_shouldExcludeApplicationPrivileges() throws Exception {
         Privilege getPatients = new Privilege("Get Patients");
@@ -254,7 +257,6 @@ public class AccountServiceTest extends EmrApiContextSensitiveTest {
             accountDomainWrapper.setAccountService(accountService);
             accountDomainWrapper.setUserService(userService);
             accountDomainWrapper.setPersonService(personService);
-            accountDomainWrapper.setProviderServiceFacade(providerServiceFacade);
             accountDomainWrapper.setProviderService(providerService);
             return accountDomainWrapper;
         }

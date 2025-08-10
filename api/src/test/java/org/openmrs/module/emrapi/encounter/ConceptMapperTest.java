@@ -1,10 +1,11 @@
 package org.openmrs.module.emrapi.encounter;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.openmrs.ConceptClass;
 import org.openmrs.ConceptDatatype;
 import org.openmrs.ConceptMapType;
@@ -19,8 +20,6 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.util.LocaleUtility;
 import org.openmrs.util.OpenmrsConstants;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -29,12 +28,10 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({LocaleUtility.class, Context.class})
 public class ConceptMapperTest {
 
     @Mock
@@ -43,14 +40,24 @@ public class ConceptMapperTest {
     @Mock
     private AdministrationService administrationService;
 
+    private MockedStatic<LocaleUtility> localeUtility;
+
+    private MockedStatic<Context> context;
+
     @Before
     public void setup() throws Exception {
         initMocks(this);
-        mockStatic(LocaleUtility.class);
-        mockStatic(Context.class);
-        when(LocaleUtility.getLocalesInOrder()).thenReturn(new HashSet<Locale>());
-        when(Context.getAuthenticatedUser()).thenReturn(authenticatedUser);
-        when(Context.getAdministrationService()).thenReturn(administrationService);
+        localeUtility = mockStatic(LocaleUtility.class);
+        context = mockStatic(Context.class);
+        localeUtility.when(LocaleUtility::getLocalesInOrder).thenReturn(new HashSet<Locale>());
+        context.when(Context::getAuthenticatedUser).thenReturn(authenticatedUser);
+        context.when(Context::getAdministrationService).thenReturn(administrationService);
+    }
+
+    @After
+    public void tearDown() {
+        localeUtility.close();
+        context.close();
     }
 
     @Test
@@ -76,7 +83,7 @@ public class ConceptMapperTest {
     @Test
     public void should_use_locale_specific_short_name_if_available() throws Exception {
         when(authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE)).thenReturn("fr");
-        when(LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
+        localeUtility.when(() ->LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
 
         ConceptMapper conceptMapper = new ConceptMapper();
 
@@ -99,8 +106,8 @@ public class ConceptMapperTest {
     public void should_use_fully_specified_name_if_short_name_is_not_available_in_a_locale() throws Exception {
         when(authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE)).thenReturn("fr");
         when(administrationService.getGlobalProperty("default_locale")).thenReturn("en");
-        when(LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
-        when(LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
+        localeUtility.when(() -> LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
+        localeUtility.when(() -> LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
 
         ConceptMapper conceptMapper = new ConceptMapper();
 
@@ -128,8 +135,8 @@ public class ConceptMapperTest {
     public void should_use_short_name_of_default_locale_if_both_fully_specified_name_and_short_name_are_not_available_in_a_locale() throws Exception {
         when(authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE)).thenReturn("fr");
         when(administrationService.getGlobalProperty("default_locale")).thenReturn("en");
-        when(LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
-        when(LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
+        localeUtility.when(() -> LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
+        localeUtility.when(() ->  LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
 
         ConceptMapper conceptMapper = new ConceptMapper();
 
@@ -153,8 +160,8 @@ public class ConceptMapperTest {
     public void should_use_fully_specified_name_of_default_locale_if_both_fully_specified_name_and_short_name_are_not_available_in_a_locale_and_short_name_of_the_default_locale_is_also_not_available() throws Exception {
         when(authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE)).thenReturn("fr");
         when(administrationService.getGlobalProperty("default_locale")).thenReturn("en");
-        when(LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
-        when(LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
+        localeUtility.when(() -> LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
+        localeUtility.when(() -> LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
 
         ConceptMapper conceptMapper = new ConceptMapper();
 
@@ -174,8 +181,8 @@ public class ConceptMapperTest {
     public void should_use_any_available_name_when_no_name_in_either_default_locale_or_users_locale_is_available() throws Exception {
         when(authenticatedUser.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE)).thenReturn("fr");
         when(administrationService.getGlobalProperty("default_locale")).thenReturn("en");
-        when(LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
-        when(LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
+        localeUtility.when(() -> LocaleUtility.fromSpecification("fr")).thenReturn(Locale.FRENCH);
+        localeUtility.when(() -> LocaleUtility.fromSpecification("en")).thenReturn(Locale.ENGLISH);
 
         ConceptMapper conceptMapper = new ConceptMapper();
 

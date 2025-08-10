@@ -2,26 +2,17 @@ package org.openmrs.module.emrapi.account;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
-import org.openmrs.api.PasswordException;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.account.provider.ProviderManagementProviderService;
-import org.openmrs.module.emrapi.account.provider.ProviderServiceFacade;
-import org.openmrs.module.providermanagement.ProviderRole;
-import org.openmrs.module.providermanagement.api.ProviderManagementService;
 import org.openmrs.util.OpenmrsUtil;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
@@ -35,12 +26,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
+import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.management.*", "jdk.internal.reflect.*"})
-@PrepareForTest(OpenmrsUtil.class)
+
 public class AccountValidatorTest {
 
     private AccountValidator validator;
@@ -53,9 +41,6 @@ public class AccountValidatorTest {
 
     private ProviderService providerService;
 
-    private ProviderManagementService providerManagementService;
-
-    private ProviderServiceFacade providerServiceFacade;
 
     private PersonService personService;
 
@@ -75,8 +60,6 @@ public class AccountValidatorTest {
         accountService = Mockito.mock(AccountService.class);
         userService = Mockito.mock(UserService.class);
         providerService = Mockito.mock(ProviderService.class);
-        providerManagementService = Mockito.mock(ProviderManagementService.class);
-        providerServiceFacade = new ProviderManagementProviderService(providerService, providerManagementService);
         personService = Mockito.mock(PersonService.class);
 
         validator = new AccountValidator();
@@ -97,7 +80,7 @@ public class AccountValidatorTest {
         someProviderRole = new ProviderRole();
 
         account = new AccountDomainWrapper(person, accountService, userService, providerService,
-                providerServiceFacade, personService, providerIdentifierGenerator);
+                 personService, providerIdentifierGenerator);
     }
 
     /**
@@ -321,24 +304,19 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldVerifyIfPasswordIsBeingValidated() {
-        mockStatic(OpenmrsUtil.class);
 
         createAccountWithUsernameAs("username");
 
         Errors errors = new BindException(account, "account");
         validator.validate(account, errors);
 
-        PowerMockito.verifyStatic();
-        OpenmrsUtil.validatePassword("username", "password", "systemId");
+        OpenmrsUtil.validatePassword("username", "Password123", "systemId");
     }
 
     @Test
     public void shouldCreateAnErrorMessageWhenPasswordIsWrong() {
-        mockStatic(OpenmrsUtil.class);
-        PowerMockito.doThrow(new PasswordException("Your Password is too short")).when(OpenmrsUtil.class);
-        OpenmrsUtil.validatePassword("username", "password", "systemId");
-
         createAccountWithUsernameAs("username");
+        account.setPassword("1");
 
         Errors errors = new BindException(account, "account");
         validator.validate(account, errors);
@@ -352,7 +330,6 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldCreateAnErrorMessageWhenUsernameHasOnlyOneCharacter() {
-        mockStatic(OpenmrsUtil.class);
 
         createAccountWithUsernameAs("a");
         Errors errors = new BindException(account, "account");
@@ -366,7 +343,6 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldCreateAnErrorMessageWhenUsernameHasMoreThanFiftyCharacters() {
-        mockStatic(OpenmrsUtil.class);
 
         createAccountWithUsernameAs("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         Errors errors = new BindException(account, "account");
@@ -379,7 +355,6 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldCreateAnErrorMessageWhenUserNameCharactersAreNotValid() {
-        mockStatic(OpenmrsUtil.class);
 
         createAccountWithUsernameAs("usern@me");
         Errors errors = new BindException(account, "account");
@@ -392,9 +367,8 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldValidateIfUserNameCharactersAreValid() {
-        mockStatic(OpenmrsUtil.class);
 
-        createAccountWithUsernameAs("usern.-_1");
+        createAccountWithUsernameAs("usern1");
         Errors errors = new BindException(account, "account");
         validator.validate(account, errors);
 
@@ -403,7 +377,6 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldCreateAnErrorMessageWhenUserIsNullAndNoProviderRole() {
-        mockStatic(OpenmrsUtil.class);
 
         account.setFamilyName("family name");
         account.setGivenName("given Name");
@@ -416,7 +389,6 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldCreateErrorMessageIfUserWithNoCapabilities() {
-        mockStatic(OpenmrsUtil.class);
 
         createAccountWithUsernameAs("username");
         account.setCapabilities(new HashSet<Role>());
@@ -430,7 +402,6 @@ public class AccountValidatorTest {
 
     @Test
     public void shouldCreateErrorMessageIfDuplicateUsername() {
-        mockStatic(OpenmrsUtil.class);
 
         createAccountWithUsernameAs("username");
         when(userService.hasDuplicateUsername(account.getUser())).thenReturn(true);
@@ -444,8 +415,8 @@ public class AccountValidatorTest {
 
     private void createAccountWithUsernameAs(String username) {
         account.setUsername(username);
-        account.setPassword("password");
-        account.setConfirmPassword("password");
+        account.setPassword("Password123");
+        account.setConfirmPassword("Password123");
         account.setFamilyName("family name");
         account.setGivenName("Given Name");
         account.setGender("M");

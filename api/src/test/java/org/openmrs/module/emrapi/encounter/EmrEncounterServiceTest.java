@@ -1,14 +1,14 @@
 package org.openmrs.module.emrapi.encounter;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
-import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Provider;
@@ -27,9 +27,6 @@ import org.openmrs.module.emrapi.encounter.builder.EncounterBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher;
 import org.openmrs.module.emrapi.encounter.postprocessor.EncounterTransactionHandler;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,17 +45,15 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
 public class EmrEncounterServiceTest {
     @Mock
     private PatientService patientService;
@@ -88,6 +83,8 @@ public class EmrEncounterServiceTest {
     @Mock
     private EmrOrderService orderService;
 
+    private MockedStatic<Context> mockedContext;
+
     private EmrEncounterServiceImpl emrEncounterService;
 
     private EncounterTransactionHandler encounterTransactionHandler;
@@ -113,7 +110,12 @@ public class EmrEncounterServiceTest {
         encounterType.setUuid("encType-invsgtn-uuid");
         when(encounterService.getEncounterTypeByUuid("encType-invsgtn-uuid")).thenReturn(encounterType);
         DbSessionUtil.setDAO(dbSessionDAO);
-        PowerMockito.mockStatic(Context.class);
+        mockedContext = Mockito.mockStatic(Context.class);
+    }
+
+    @After
+    public void tearDown() {
+        mockedContext.close();
     }
 
     private EncounterTransaction.Concept getConcept(String conceptUuid) {
@@ -234,7 +236,7 @@ public class EmrEncounterServiceTest {
 
 
         verify(encounterService).getEncounters(patientArgument.capture(), locationArgument.capture(), startDateArgument.capture(),
-                endDateArgument.capture(), Matchers.<Collection<Form>>any(), encounterTypesArgument.capture(), providersArgument.capture(), visitTypesArgument.capture(),
+                endDateArgument.capture(),any(), encounterTypesArgument.capture(), providersArgument.capture(), visitTypesArgument.capture(),
                 visitsArgument.capture(), includeAllArgument.capture());
 
         assertThat(patientArgument.getValue(), is(equalTo(patient)));
@@ -255,7 +257,7 @@ public class EmrEncounterServiceTest {
         Encounter encounter = mock(Encounter.class);
 
         encounterTransactionHandler = mock(EncounterTransactionHandler.class);
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
         when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
 
@@ -273,10 +275,10 @@ public class EmrEncounterServiceTest {
 
         BaseEncounterMatcher mockEncounterMatcher = mock(BaseEncounterMatcher.class);
         when(administrationService.getGlobalProperty("emr.encounterMatcher")).thenReturn(mockEncounterMatcher.getClass().getCanonicalName());
-        when(Context.getRegisteredComponents(BaseEncounterMatcher.class)).thenReturn(Arrays.asList(mockEncounterMatcher));
+        mockedContext.when(() -> Context.getRegisteredComponents(BaseEncounterMatcher.class)).thenReturn(Arrays.asList(mockEncounterMatcher));
 
         encounterTransactionHandler = mock(EncounterTransactionHandler.class);
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
 
         emrEncounterService.onStartup();
@@ -318,8 +320,8 @@ public class EmrEncounterServiceTest {
 
         Encounter encounter = new EncounterBuilder().build();
         when(encounterService.getEncounters(any(Patient.class), any(Location.class), any(Date.class),
-                any(Date.class), Matchers.<Collection<Form>>any(), Matchers.<Collection<EncounterType>>any(), Matchers.<Collection<Provider>>any(), Matchers.<Collection<VisitType>>any(),
-                Matchers.<Collection<Visit>>any(), any(Boolean.class))).thenReturn(Arrays.asList(encounter));
+                any(Date.class), any(),any(), any(),any(),
+                any(), any(Boolean.class))).thenReturn(Arrays.asList(encounter));
 
         emrEncounterService.onStartup();
         emrEncounterService.find(parameters);
@@ -346,7 +348,7 @@ public class EmrEncounterServiceTest {
 
 
         encounterTransactionHandler = mock(EncounterTransactionHandler.class);
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
         when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
         when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(location);
@@ -386,7 +388,7 @@ public class EmrEncounterServiceTest {
         visits.add(visit);
 
         encounterTransactionHandler = mock(EncounterTransactionHandler.class);
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
         when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
         when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(location);
@@ -431,7 +433,7 @@ public class EmrEncounterServiceTest {
 
 
         encounterTransactionHandler = mock(EncounterTransactionHandler.class);
-        when(Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
+        mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(
                 Arrays.asList(encounterTransactionHandler));
         when(encounterService.getEncounterByUuid("encounterUuid")).thenReturn(encounter);
         when(locationService.getLocationByUuid("visit-location-uuid")).thenReturn(visitLocation);

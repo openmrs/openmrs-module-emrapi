@@ -88,7 +88,7 @@ public class GeneralUtils {
         for (int i = 0; i < len; i++) {
             char c = localeString.charAt(i);
             // allow only ASCII letters and "_" character
-            if ((c <= 0x20 || c >= 0x7f) || ((c >= 0x20 || c <= 0x7f) && (!Character.isLetter(c) && c != 0x5f))) {
+            if (c <= 0x20 || c >= 0x7f || !Character.isLetter(c) && c != 0x5f) {
                 if (c == 0x09)
                     continue; // allow horizontal tabs
                 localeString = localeString.replaceFirst(((Character) c).toString(), "");
@@ -264,9 +264,9 @@ public class GeneralUtils {
                 lastViewedPatientIdsString = lastViewedPatientIdsString.replaceAll("\\s", "");
                 String[] patientIds = lastViewedPatientIdsString.split(",");
 
-                Integer limit = patientIds.length;
+                int limit;
                 try{
-                    limit = Integer.valueOf(Context.getAdministrationService().getGlobalProperty(EmrApiConstants.GP_LAST_VIEWED_PATIENT_SIZE_LIMIT));
+                    limit = Integer.parseInt(Context.getAdministrationService().getGlobalProperty(EmrApiConstants.GP_LAST_VIEWED_PATIENT_SIZE_LIMIT));
                 }
                 catch (Exception e) {
                     limit = EmrApiConstants.DEFAULT_LAST_VIEWED_PATIENT_SIZE_LIMIT;

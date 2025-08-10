@@ -1,7 +1,7 @@
 package org.openmrs.module.emrapi.db;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -10,15 +10,15 @@ import org.openmrs.api.ConceptService;
 import org.openmrs.api.EncounterService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.PatientService;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-public class EmrEncounterDAOComponentTest extends EmrApiContextSensitiveTest {
+public class EmrEncounterDAOComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private EmrEncounterDAO emrEncounterDAO;
@@ -35,7 +35,7 @@ public class EmrEncounterDAOComponentTest extends EmrApiContextSensitiveTest {
     @Autowired
     private EncounterService encounterService;
 
-    @Before
+    @BeforeEach
     public void beforeAllTests() throws Exception {
         executeDataSet("emrEncounterDAOComponentTestDataset.xml");
     }

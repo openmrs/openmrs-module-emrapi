@@ -31,6 +31,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.test.BaseModuleContextSensitiveTest;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -42,12 +43,15 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EmrApiVisitAssignmentHandlerTest {
+public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitiveTest {
 
     EmrApiVisitAssignmentHandler handler;
 
@@ -129,10 +133,9 @@ public class EmrApiVisitAssignmentHandlerTest {
         suitable.setStartDatetime(DateUtils.addDays(new Date(), -1));
         suitable.setLocation(location);
 
-        when(
-                visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
-                        any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
-                        anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(notSuitable, suitable));
+        when(visitService.getVisits( isNull(), anyCollection(), isNull(), isNull(),
+                isNull(), any(Date.class), isNull(), isNull(),
+                isNull(), eq(true), eq(false))).thenReturn(Arrays.asList(suitable, notSuitable));
 
         Date encounterDatetime = new Date();
         Encounter encounter = new Encounter();
@@ -248,10 +251,9 @@ public class EmrApiVisitAssignmentHandlerTest {
         suitable.setLocation(location);
 
         // TODO this doesn't test that the query works correctly!
-        when(
-                visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
-                        any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
-                        anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(suitable));
+        when(visitService.getVisits( isNull(), anyCollection(), isNull(), isNull(),
+                        isNull(), any(Date.class), isNull(), isNull(),
+                        isNull(), eq(true), eq(false))).thenReturn(Collections.singletonList(suitable));
 
         Encounter encounter = new Encounter();
         encounter.setPatient(patient);
@@ -279,10 +281,9 @@ public class EmrApiVisitAssignmentHandlerTest {
         suitable.setLocation(location);
 
         // TODO this doesn't test that the query works correctly!
-        when(
-                visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
-                        any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
-                        anyBoolean(), anyBoolean())).thenReturn(Arrays.asList(suitable));
+        when(visitService.getVisits( isNull(), anyCollection(), isNull(), isNull(),
+                isNull(), any(Date.class), isNull(), isNull(),
+                isNull(), eq(true), eq(false))).thenReturn(Collections.singletonList(suitable));
 
         Encounter encounter = new Encounter();
         encounter.setPatient(patient);

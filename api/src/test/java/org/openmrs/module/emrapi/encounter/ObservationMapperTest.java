@@ -13,8 +13,8 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.Concept;
@@ -26,19 +26,19 @@ import org.openmrs.Obs;
 import org.openmrs.Drug;
 import org.openmrs.User;
 import org.openmrs.PersonName;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import org.openmrs.module.emrapi.encounter.mapper.UserMapper;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ObservationMapperTest extends EmrApiContextSensitiveTest {
+public class ObservationMapperTest extends BaseModuleContextSensitiveTest {
 
     @Mock
     private Concept concept;
@@ -51,7 +51,7 @@ public class ObservationMapperTest extends EmrApiContextSensitiveTest {
     private ObservationMapper observationMapper;
     private ObsBuilder obsBuilder;
 
-    @Before
+    @BeforeEach
     public void setUp(){
         User creator = mock(User.class);
         when(creator.getUuid()).thenReturn("uuid");

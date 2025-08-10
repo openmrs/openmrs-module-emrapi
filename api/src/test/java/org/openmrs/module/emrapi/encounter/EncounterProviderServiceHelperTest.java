@@ -1,9 +1,12 @@
 package org.openmrs.module.emrapi.encounter;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterRole;
@@ -12,10 +15,6 @@ import org.openmrs.api.EncounterService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,9 +26,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Context.class)
-@PowerMockIgnore("jdk.internal.reflect.*")
 public class EncounterProviderServiceHelperTest {
 
     private EncounterProviderServiceHelper encounterProviderServiceHelper;
@@ -39,6 +35,8 @@ public class EncounterProviderServiceHelperTest {
 
     @Mock
     private EncounterService encounterService;
+
+    private MockedStatic<Context> context;
 
     @Before
     public void setUp() {
@@ -68,9 +66,14 @@ public class EncounterProviderServiceHelperTest {
         anotherRole.setUuid("another-role-uuid");
         when(encounterService.getEncounterRoleByUuid("another-role-uuid")).thenReturn(anotherRole);
 
-        PowerMockito.mockStatic(Context.class);
+        context = Mockito.mockStatic(Context.class);
 
         encounterProviderServiceHelper = new EncounterProviderServiceHelper(providerService, encounterService);
+    }
+
+    @After
+    public void tearDown() {
+        context.close();
     }
 
     @Test

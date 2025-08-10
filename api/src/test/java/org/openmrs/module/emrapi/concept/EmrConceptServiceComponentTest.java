@@ -15,8 +15,8 @@
 package org.openmrs.module.emrapi.concept;
 
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Concept;
 import org.openmrs.ConceptClass;
@@ -29,8 +29,8 @@ import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.emrapi.EmrApiContextSensitiveTest;
 import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
@@ -39,14 +39,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  *
  */
-public class EmrConceptServiceComponentTest extends EmrApiContextSensitiveTest {
+public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTest {
 
     @Autowired
     private ConceptService conceptService;
@@ -54,7 +54,7 @@ public class EmrConceptServiceComponentTest extends EmrApiContextSensitiveTest {
     @Autowired
     private EmrConceptService emrConceptService;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         executeDataSet("conceptMapTypes.xml");
     }
@@ -213,13 +213,7 @@ public class EmrConceptServiceComponentTest extends EmrApiContextSensitiveTest {
     }
 
     private ArgumentMatcher<ConceptSearchResult> searchResultMatcher(final Concept concept, final String nameMatched) {
-        return new ArgumentMatcher<ConceptSearchResult>() {
-            @Override
-            public boolean matches(Object o) {
-                ConceptSearchResult actual = (ConceptSearchResult) o;
-                return actual.getConcept().equals(concept) && actual.getConceptName().getName().equals(nameMatched);
-            }
-        };
+        return conceptSearchResult -> conceptSearchResult.getConcept().equals(concept) && conceptSearchResult.getConceptName().getName().equals(nameMatched);
     }
 
 }
