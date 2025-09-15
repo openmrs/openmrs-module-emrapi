@@ -24,6 +24,7 @@ import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
+import org.openmrs.Order;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
@@ -42,6 +43,7 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -260,12 +262,27 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
         encounter.setLocation(location);
         encounter.setEncounterDatetime(new DateTime().withTimeAtStartOfDay().minusDays(1).plusHours(10).toDate()); // 10:00 yesterday
 
+        Order firstOrder = new Order();
+        firstOrder.setPatient(patient);
+        firstOrder.setDateActivated(encounter.getEncounterDatetime());
+        encounter.addOrder(firstOrder);
+        Date firstOrderOriginalDate = firstOrder.getDateActivated();
+
+        Order secondOrder = new Order();
+        secondOrder.setPatient(patient);
+        secondOrder.setDateActivated(DateUtils.addMinutes(encounter.getEncounterDatetime(), 1));
+        encounter.addOrder(secondOrder);
+        Date secondOrderOriginalDate = secondOrder.getDateActivated();
 
         handler.beforeCreateEncounter(encounter);
 
         Assert.assertThat(encounter.getVisit(), is(suitable));
         Assert.assertThat(suitable.getEncounters(), contains(encounter));
         Assert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStartDatetime()));
+        Assert.assertThat(firstOrder.getDateActivated(), not(firstOrderOriginalDate));
+        Assert.assertThat(firstOrder.getDateActivated(), is(encounter.getEncounterDatetime()));
+        Assert.assertThat(secondOrder.getDateActivated(), is(secondOrderOriginalDate));
+        Assert.assertThat(secondOrder.getDateActivated(), not(encounter.getEncounterDatetime()));
     }
 
     @Test

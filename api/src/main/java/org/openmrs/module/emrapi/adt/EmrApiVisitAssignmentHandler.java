@@ -18,6 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.openmrs.Encounter;
+import org.openmrs.Order;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.VisitType;
@@ -34,6 +35,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Ensures that encounters are assigned to visits based on the EMR module's business logic.
@@ -115,6 +117,7 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
                 if (emrApiProperties.getVisitAssignmentHandlerAdjustEncounterTimeOfDayIfNecessary()) {
                     if (adtService.isSuitableVisitIgnoringTime(candidate, encounter.getLocation(), when)) {
                         if (when.before(candidate.getStartDatetime())) {
+                            updateDateActivatedOfOrdersIfNecessary(encounter.getOrders(), when, candidate.getStartDatetime());
                             encounter.setEncounterDatetime(candidate.getStartDatetime());
                         }
                         else if (candidate.getStopDatetime() != null && when.after(candidate.getStopDatetime())) {
@@ -153,6 +156,23 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
 
         // TEMP HACK: allow visit-free encounters while we continue to discuss this
         // throw new IllegalStateException("Cannot create an encounter outside of a visit");
+    }
+
+    /**
+     * If an encounter contains orders, and those orders have `dateActivated` that equals the encounter's datetime,
+     * then if the encounter's datetime is changed, the order dateActivated values should be changed accordingly
+     * @param orders - the orders to check
+     * @param existingDatetime the existing dateActivated to adjust from
+     * @param newDatetime - the new dateActivated to adjust to
+     */
+    protected void updateDateActivatedOfOrdersIfNecessary(Set<Order> orders, Date existingDatetime, Date newDatetime) {
+        if (orders != null) {
+            for (Order order : orders) {
+                if (order.getDateActivated() != null & order.getDateActivated().equals(existingDatetime)) {
+                    order.setDateActivated(newDatetime);
+                }
+            }
+        }
     }
 
     public void setVisitService(VisitService visitService) {
