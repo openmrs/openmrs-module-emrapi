@@ -65,8 +65,6 @@ public class EmrApiProperties extends ModuleProperties {
 	}
 
 	public Provider getUnknownProvider() {
-		//have to use ProviderService because it returns objects of class org.openmrs.module.providermanagement.Provider
-		//casted to org.openmrs.Provider, which MetadataMappingService can't handle
 		return providerService.getProviderByUuid(getEmrApiMetadataUuidByCode(EmrApiConstants.GP_UNKNOWN_PROVIDER));
 	}
 

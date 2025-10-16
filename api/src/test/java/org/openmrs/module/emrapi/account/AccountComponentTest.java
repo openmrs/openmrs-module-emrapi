@@ -56,7 +56,7 @@ public class AccountComponentTest extends BaseModuleContextSensitiveTest {
 
     @Qualifier("providerService")
     @Autowired
-    private ProviderService providerManagementService;
+    private ProviderService providerService;
 
     @BeforeEach
     public void beforeAllTests() throws Exception {
@@ -100,7 +100,7 @@ public class AccountComponentTest extends BaseModuleContextSensitiveTest {
         Role archives = userService.getRole("Application Role: Archives");
         Role registration = userService.getRole("Application Role: Registration");
 
-        ProviderRole nurse = providerManagementService.getProviderRole(1001);
+        ProviderRole nurse = providerService.getProviderRole(1001);
 
         Person person = new Person();
 
@@ -153,7 +153,7 @@ public class AccountComponentTest extends BaseModuleContextSensitiveTest {
 
         // note that we don't expose the provider object outside of the account domain wrapper; saves confusion between the
         // two Provider object types
-        List<Provider> providers = (List<Provider>) providerManagementService.getProvidersByPerson(expectedPerson, false);
+        List<Provider> providers = (List<Provider>) providerService.getProvidersByPerson(expectedPerson, false);
         assertEquals(1, providers.size());
         assertEquals(nurse, providers.get(0).getProviderRole());
     }
@@ -165,7 +165,7 @@ public class AccountComponentTest extends BaseModuleContextSensitiveTest {
         Role archives = userService.getRole("Application Role: Archives");
         Role registration = userService.getRole("Application Role: Registration");
 
-        ProviderRole nurse = providerManagementService.getProviderRole(1001);
+        ProviderRole nurse = providerService.getProviderRole(1001);
 
         Person person = personService.getPerson(501);  // existing person with user account in test dataset
 
@@ -237,7 +237,7 @@ public class AccountComponentTest extends BaseModuleContextSensitiveTest {
         Context.flushSession();
         Context.clearSession();
 
-        List<Provider> providers = (List<Provider>) providerManagementService.getProvidersByPerson(person, false);
+        List<Provider> providers = (List<Provider>) providerService.getProvidersByPerson(person, false);
         assertEquals(1, providers.size());
         assertNull(providers.get(0).getProviderRole());
     }

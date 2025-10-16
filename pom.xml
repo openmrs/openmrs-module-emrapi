@@ -37,7 +37,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <openMRSVersion>2.8.0-SNAPSHOT</openMRSVersion>
+        <openMRSVersion>2.8.0</openMRSVersion>
         <legacyuiVersion>1.16.0</legacyuiVersion>
         <lombokVersion>1.18.38</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>

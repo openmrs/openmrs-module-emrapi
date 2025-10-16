@@ -21,7 +21,6 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 
 * fhir2
 * metadatasharing
-* providermanagement
 * reporting
 
 # Configuration
