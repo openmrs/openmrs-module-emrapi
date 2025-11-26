@@ -14,6 +14,7 @@
 
 package org.openmrs.module.emrapi;
 
+import lombok.Setter;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMapType;
@@ -23,25 +24,34 @@ import org.openmrs.EncounterType;
 import org.openmrs.Form;
 import org.openmrs.Location;
 import org.openmrs.LocationTag;
+import org.openmrs.OpenmrsMetadata;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.PersonAttributeType;
 import org.openmrs.Provider;
 import org.openmrs.RelationshipType;
 import org.openmrs.Role;
 import org.openmrs.VisitType;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.PersonService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
-import org.openmrs.module.metadatamapping.util.ModuleProperties;
+import org.openmrs.module.metadatamapping.MetadataSet;
+import org.openmrs.module.metadatamapping.MetadataSource;
+import org.openmrs.module.metadatamapping.MetadataTermMapping;
+import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 import org.openmrs.util.OpenmrsUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.openmrs.module.emrapi.EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ADJUST_ENCOUNTER_TIME_OF_DAY_IF_NECESSARY;
@@ -49,13 +59,32 @@ import static org.openmrs.module.emrapi.EmrApiConstants.GP_VISIT_ASSIGNMENT_HAND
 /**
  * Properties (some constant, some configured via GPs) for this module.
  */
-@Component("emrApiProperties")
-public class EmrApiProperties extends ModuleProperties {
+public class EmrApiProperties {
 
-	@Autowired
-	protected DispositionService dispositionService;
+	@Setter
+	private MetadataMappingService metadataMappingService;
 
-	@Override
+	@Setter
+	private ConceptService conceptService;
+
+	@Setter
+	private AdministrationService administrationService;
+
+	@Setter
+	private LocationService locationService;
+
+	@Setter
+	private UserService userService;
+
+	@Setter
+	private PersonService personService;
+
+	@Setter
+	private ProviderService providerService;
+
+	@Setter
+	private DispositionService dispositionService;
+
 	public String getMetadataSourceName() {
 		return EmrApiConstants.EMR_METADATA_SOURCE_NAME;
 	}
@@ -370,5 +399,114 @@ public class EmrApiProperties extends ModuleProperties {
 
 	public RelationshipType getMotherChildRelationshipType() {
 		return getEmrApiMetadataByCode(RelationshipType.class, EmrApiConstants.METADATA_MAPPING_MOTHER_CHILD_RELATIONSHIP_TYPE, false);
+	}
+
+	// Copied over from metadatamapping moduleproperties
+
+	protected ConceptSource getConceptSourceByCode(String mappingCode) {
+		ConceptSource conceptSource = getEmrApiMetadataByCode(ConceptSource.class, mappingCode);
+		if (conceptSource == null) {
+			throw new IllegalStateException("Configuration required: " + mappingCode);
+		}
+		return conceptSource;
+	}
+
+	protected List<PatientIdentifierType> getPatientIdentifierTypesByCode(String code) {
+		MetadataSet metadataSet = getEmrApiMetadataByCode(MetadataSet.class, code);
+		return metadataMappingService.getMetadataSetItems(PatientIdentifierType.class, metadataSet);
+	}
+
+	protected String getEmrApiMetadataUuidByCode(String mappingCode) {
+		return getEmrApiMetadataUuidByCode(mappingCode, true);
+	}
+
+	protected String getEmrApiMetadataUuidByCode(String mappingCode, boolean required) {
+		MetadataTermMapping mapping = metadataMappingService.getMetadataTermMapping(getEmrApiMetadataSource(), mappingCode);
+		if (mapping != null && mapping.getMetadataUuid() != null) {
+			return mapping.getMetadataUuid();
+		} else if (required) {
+			throw new IllegalStateException("Configuration required: " + mappingCode);
+		} else {
+			return null;
+		}
+	}
+
+	protected MetadataSource getEmrApiMetadataSource() {
+		return metadataMappingService.getMetadataSourceByName(getMetadataSourceName());
+	}
+
+	protected <T extends OpenmrsMetadata> T getEmrApiMetadataByCode(Class<T> type, String code, boolean required) {
+		T metadataItem = metadataMappingService.getMetadataItem(type, getMetadataSourceName(), code);
+		if (required && metadataItem == null) {
+			throw new IllegalStateException("Configuration required: " + code);
+		} else {
+			return metadataItem;
+		}
+	}
+
+	protected <T extends OpenmrsMetadata> T getEmrApiMetadataByCode(Class<T> type, String code) {
+		return getEmrApiMetadataByCode(type, code, true);
+	}
+
+	protected Concept getSingleConceptByMapping(ConceptSource conceptSource, String code) {
+		List<Concept> candidates = conceptService.getConceptsByMapping(code, conceptSource.getName(), false);
+		if (candidates.size() == 0) {
+			throw new IllegalStateException("Configuration required: can't find a concept by mapping "
+					+ conceptSource.getName() + ":" + code);
+		} else if (candidates.size() == 1) {
+			return candidates.get(0);
+		} else {
+			throw new IllegalStateException("Configuration required: found more than one concept mapped as "
+					+ conceptSource.getName() + ":" + code);
+		}
+	}
+
+	protected Integer getIntegerByGlobalProperty(String globalPropertyName) {
+		String globalProperty = getGlobalProperty(globalPropertyName, true);
+		try {
+			return Integer.valueOf(globalProperty);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException("Global property " + globalPropertyName + " value of " + globalProperty
+					+ " is not parsable as an Integer");
+		}
+	}
+
+	protected String getGlobalProperty(String globalPropertyName, boolean required) {
+		String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
+		if (required && org.apache.commons.lang.StringUtils.isEmpty(globalProperty)) {
+			throw new IllegalStateException("Configuration required: " + globalPropertyName);
+		}
+		return globalProperty;
+	}
+
+	protected Collection<Concept> getConceptsByGlobalProperty(String gpName) {
+		String gpValue = getGlobalProperty(gpName, false);
+
+		if (!org.springframework.util.StringUtils.hasText(gpValue)) {
+			return Collections.emptyList();
+		}
+
+		List<Concept> result = new ArrayList<Concept>();
+
+		String[] concepts = gpValue.split("\\,");
+		for (String concept : concepts) {
+			Concept foundConcept = conceptService.getConceptByUuid(concept);
+			if (foundConcept == null) {
+				String[] mapping = concept.split("\\:");
+				if (mapping.length == 2) {
+					foundConcept = conceptService.getConceptByMapping(mapping[0], mapping[1]);
+				}
+			}
+
+			if (foundConcept != null) {
+				result.add(foundConcept);
+			} else {
+				throw new IllegalStateException("Invalid configuration: concept '" + concept + "' defined in " + gpName
+						+ " does not exist");
+			}
+		}
+
+		return result;
 	}
 }

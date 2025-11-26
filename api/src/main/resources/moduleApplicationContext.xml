@@ -4,6 +4,17 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
   		    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <bean id="emrApiProperties" class="org.openmrs.module.emrapi.EmrApiProperties">
+        <property name="metadataMappingService" ref="metadatamapping.MetadataMappingService"/>
+        <property name="conceptService" ref="conceptService"/>
+        <property name="administrationService" ref="adminService"/>
+        <property name="locationService" ref="locationService"/>
+        <property name="userService" ref="userService"/>
+        <property name="personService" ref="personService"/>
+        <property name="providerService" ref="providerService"/>
+        <property name="dispositionService" ref="dispositionService"/>
+    </bean>
+
     <bean id="accountService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
