@@ -19,6 +19,7 @@ import org.openmrs.ConceptClass;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSource;
+import org.openmrs.annotation.Authorized;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,7 @@ public interface EmrConceptService {
      * @param term
      * @return all concepts with SAME-AS or NARROWER-THAN mappings to term
      */
+    @Authorized()
     List<Concept> getConceptsSameOrNarrowerThan(ConceptReferenceTerm term);
 
     /**
@@ -42,6 +44,7 @@ public interface EmrConceptService {
      * @param mappingOrUuid
      * @return
      */
+    @Authorized()
     Concept getConcept(String mappingOrUuid);
 
     /**
@@ -54,6 +57,7 @@ public interface EmrConceptService {
      * @param limit return up to this many results (defaults to 100)
      * @return
      */
+    @Authorized()
     List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit);
 
 }

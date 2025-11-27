@@ -15,6 +15,8 @@ package org.openmrs.module.emrapi.event;
 
 import org.openmrs.Patient;
 import org.openmrs.User;
+import org.openmrs.annotation.Authorized;
+import org.openmrs.util.PrivilegeConstants;
 
 /**
  * Public API for Application level events
@@ -29,5 +31,6 @@ public interface ApplicationEventService {
 	 * 
 	 * @should publish the patient viewed event
 	 */
+	@Authorized(PrivilegeConstants.VIEW_PATIENTS)
 	public void patientViewed(Patient patient, User user);
 }

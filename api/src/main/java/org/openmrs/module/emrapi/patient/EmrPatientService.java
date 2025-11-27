@@ -17,6 +17,8 @@ import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
+import org.openmrs.annotation.Authorized;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,17 +29,21 @@ import java.util.Map;
  */
 public interface EmrPatientService {
 	
+	@Authorized(PrivilegeConstants.VIEW_PATIENTS)
 	List<Patient> findPatients(String query, Location checkedInAt, Integer start, Integer length);
 	
+	@Authorized(PrivilegeConstants.VIEW_PATIENTS)
 	Patient findPatientByPrimaryId(String primaryId);
 
 	/**
 	 * @return a List of Visits for the given patient, ordered by startDatetime descending, optionally paged
 	 */
+	@Authorized(PrivilegeConstants.VIEW_PATIENTS)
 	List<Visit> getVisitsForPatient(Patient patient, Integer startIndex, Integer limit);
 
 	/**
 	 * @return a Map from Visit to a List of observations contained in all Visit Note encounters within the given Visit
 	 */
+	@Authorized(PrivilegeConstants.VIEW_PATIENTS)
 	Map<Visit, List<Obs>> getVisitNoteObservations(Collection<Visit> visits);
 }

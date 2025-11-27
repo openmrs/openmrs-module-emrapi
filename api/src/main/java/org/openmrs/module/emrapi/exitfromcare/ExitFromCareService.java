@@ -2,7 +2,9 @@ package org.openmrs.module.emrapi.exitfromcare;
 
 import org.openmrs.Concept;
 import org.openmrs.Patient;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.util.Date;
 
@@ -18,6 +20,7 @@ public interface ExitFromCareService extends OpenmrsService {
      * @param outcome
      * @param date
      */
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     void closePatientPrograms(Patient patient, Concept outcome, Date date);
 
     /**
@@ -27,6 +30,7 @@ public interface ExitFromCareService extends OpenmrsService {
      * @param patient
      * @param outcome
      */
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     void reopenPatientPrograms(Patient patient, Concept outcome);
 
 
@@ -37,6 +41,7 @@ public interface ExitFromCareService extends OpenmrsService {
      * @param outcome
      * @param completionDate
      */
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     void updatePatientProgramCompletionDate(Patient patient, Concept outcome, Date completionDate);
 
 
@@ -46,6 +51,7 @@ public interface ExitFromCareService extends OpenmrsService {
      *
      * @param patient
      */
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     void closeActiveVisits(Patient patient);
 
     /**
@@ -64,6 +70,7 @@ public interface ExitFromCareService extends OpenmrsService {
      * @param causeOfDeath
      * @param deathDate
      */
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     void markPatientDead(Patient patient, Concept causeOfDeath, Date deathDate);
 
 
@@ -80,6 +87,7 @@ public interface ExitFromCareService extends OpenmrsService {
      *
      * @param patient
      */
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     void markPatientNotDead(Patient patient);
 
 }

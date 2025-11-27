@@ -14,7 +14,9 @@
 package org.openmrs.module.emrapi.person.image;
 
 import org.openmrs.Person;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.util.PrivilegeConstants;
 
 /**
  * Public API for person image functionality.
@@ -27,8 +29,10 @@ public interface EmrPersonImageService extends OpenmrsService {
      * @throws org.openmrs.api.APIException
      *          if save fails
      */
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     public PersonImage savePersonImage(PersonImage personImage);
 
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     public PersonImage getCurrentPersonImage(Person person);
 
 }

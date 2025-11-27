@@ -13,8 +13,10 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.util.List;
 
@@ -29,11 +31,15 @@ import java.util.List;
  */
 public interface EmrEncounterService extends OpenmrsService {
 
+    @Authorized(PrivilegeConstants.EDIT_ENCOUNTERS)
     EncounterTransaction save(EncounterTransaction encounterTransaction);
 
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters);
 
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     EncounterTransaction getActiveEncounter(ActiveEncounterParameters activeEncounterParameters);
 
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     EncounterTransaction getEncounterTransaction(String uuid, Boolean includeAll);
 }

@@ -2,7 +2,9 @@ package org.openmrs.module.emrapi.maternal;
 
 import java.util.List;
 
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.util.PrivilegeConstants;
 
 public interface MaternalService extends OpenmrsService {
 
@@ -12,6 +14,7 @@ public interface MaternalService extends OpenmrsService {
      * @param criteria search criteria (see class for details)
      * @return a list of mothers and children that match the search criteria
      */
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     List<MotherAndChild> getMothersAndChildren(MothersAndChildrenSearchCriteria criteria);
 
 }

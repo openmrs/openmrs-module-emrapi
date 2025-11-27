@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
 import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.emrapi.EmrApiProperties;
 
 import javax.imageio.ImageIO;
@@ -27,6 +28,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Base64;
 
+@Transactional(readOnly = true)
 public class EmrPersonImageServiceImpl extends BaseOpenmrsService implements EmrPersonImageService {
 
     protected final Log log = LogFactory.getLog(getClass());

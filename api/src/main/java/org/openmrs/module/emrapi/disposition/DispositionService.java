@@ -2,7 +2,9 @@ package org.openmrs.module.emrapi.disposition;
 
 import org.openmrs.EncounterType;
 import org.openmrs.Obs;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,6 +17,7 @@ public interface DispositionService {
      *
      * @param dispositionConfig
      */
+    @Authorized()
     void setDispositionConfig(String dispositionConfig);
 
     /**
@@ -22,6 +25,7 @@ public interface DispositionService {
      *
      * @return
      */
+    @Authorized()
     boolean dispositionsSupported();
 
     /**
@@ -30,6 +34,7 @@ public interface DispositionService {
      *
      * @return dispositionDescriptor
      */
+    @Authorized()
     DispositionDescriptor getDispositionDescriptor();
 
     /**
@@ -38,6 +43,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
+    @Authorized()
     List<Disposition> getDispositions();
 
     /**
@@ -48,6 +54,7 @@ public interface DispositionService {
      * 2) if visit.isAdmitted() = true, then return only those whore careSettingTypes contains INPATIENT (or any where careSettingType = null)
      * 3) if visit.isAdmitted() = false, then return only those whore careSettingTypes contains OUTPATIENT (or any where careSettingType = null)
      */
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper);
 
     /**
@@ -56,6 +63,7 @@ public interface DispositionService {
      * Currently, this follows the logic of {@link #getValidDispositions(VisitDomainWrapper)}, but also filters dispositions
      * which define an encounterType to only those encounterTypes.
      */
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper, EncounterType encounterType);
 
     /**
@@ -65,6 +73,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
+    @Authorized()
     Disposition getDispositionByUniqueId(String uniqueId);
 
     /**
@@ -73,6 +82,7 @@ public interface DispositionService {
      * @param dispositionType
      * @return
      */
+    @Authorized()
     List<Disposition> getDispositionsByType(DispositionType dispositionType);
 
     /**
@@ -82,6 +92,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     Disposition getDispositionFromObs(Obs obs);
 
 
@@ -92,6 +103,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
+    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
     Disposition getDispositionFromObsGroup(Obs obsGroup);
 
 

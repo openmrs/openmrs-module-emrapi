@@ -3,6 +3,8 @@ package org.openmrs.module.emrapi.account;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
+import org.openmrs.annotation.Authorized;
+import org.openmrs.util.PrivilegeConstants;
 
 import java.util.List;
 
@@ -12,11 +14,13 @@ public interface AccountService {
      * @return
      * @should get all unique accounts
      */
+    @Authorized(PrivilegeConstants.VIEW_USERS)
     List<AccountDomainWrapper> getAllAccounts();
 
     /**
      * @should get all unique accounts that match the given criteria
      */
+    @Authorized(PrivilegeConstants.VIEW_USERS)
     List<AccountDomainWrapper> getAccounts(AccountSearchCriteria criteria);
 
     /**
@@ -25,6 +29,7 @@ public interface AccountService {
      * @param account
      * @return
      */
+    @Authorized(PrivilegeConstants.MANAGE_USERS)
     void saveAccount(AccountDomainWrapper account);
 
     /**
@@ -33,6 +38,7 @@ public interface AccountService {
      * @return
      * @should return the account for the person with the specified personId
      */
+    @Authorized(PrivilegeConstants.VIEW_USERS)
     AccountDomainWrapper getAccount(Integer personId);
 
     /**
@@ -42,6 +48,7 @@ public interface AccountService {
      * @should return the account for the specified person if they are associated to a user
      * @should return the account for the specified person if they are associated to a provider
      */
+    @Authorized(PrivilegeConstants.VIEW_USERS)
     AccountDomainWrapper getAccountByPerson(Person person);
 
     /**
@@ -50,6 +57,7 @@ public interface AccountService {
      * @return a list of Roles
      * @should return all roles with the capability prefix
      */
+    @Authorized(PrivilegeConstants.VIEW_USERS)
     List<Role> getAllCapabilities();
 
     /**
@@ -59,6 +67,7 @@ public interface AccountService {
      * @return a list of Roles
      * @should return all roles with the privilege level prefix
      */
+    @Authorized(PrivilegeConstants.VIEW_USERS)
     List<Role> getAllPrivilegeLevels();
 
     /**
@@ -66,6 +75,7 @@ public interface AccountService {
      *
      * @return all privileges that represent API-level actions
      */
+    @Authorized()
     List<Privilege> getApiPrivileges();
 
     /**
@@ -73,6 +83,7 @@ public interface AccountService {
      *
      * @return all privileges that represent Application-level actions
      */
+    @Authorized()
     List<Privilege> getApplicationPrivileges();
 
 }
