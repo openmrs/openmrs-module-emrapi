@@ -5,10 +5,12 @@ import org.openmrs.Obs;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.util.PrivilegeConstants;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
 
+@Transactional(readOnly = true)
 public interface DispositionService {
 
 
@@ -17,6 +19,7 @@ public interface DispositionService {
      *
      * @param dispositionConfig
      */
+    @Transactional
     @Authorized()
     void setDispositionConfig(String dispositionConfig);
 
@@ -54,7 +57,7 @@ public interface DispositionService {
      * 2) if visit.isAdmitted() = true, then return only those whore careSettingTypes contains INPATIENT (or any where careSettingType = null)
      * 3) if visit.isAdmitted() = false, then return only those whore careSettingTypes contains OUTPATIENT (or any where careSettingType = null)
      */
-    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper);
 
     /**
@@ -63,7 +66,7 @@ public interface DispositionService {
      * Currently, this follows the logic of {@link #getValidDispositions(VisitDomainWrapper)}, but also filters dispositions
      * which define an encounterType to only those encounterTypes.
      */
-    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     List<Disposition> getValidDispositions(VisitDomainWrapper visitDomainWrapper, EncounterType encounterType);
 
     /**
@@ -92,7 +95,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
-    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     Disposition getDispositionFromObs(Obs obs);
 
 
@@ -103,7 +106,7 @@ public interface DispositionService {
      * @return
      * @throws IOException
      */
-    @Authorized(PrivilegeConstants.VIEW_PATIENTS)
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     Disposition getDispositionFromObsGroup(Obs obsGroup);
 
 

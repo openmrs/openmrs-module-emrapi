@@ -20,6 +20,7 @@ import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSource;
 import org.openmrs.annotation.Authorized;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.Locale;
 /**
  * Additional useful methods not (yet) available via the core OpenMRS API
  */
+@Transactional(readOnly = true)
 public interface EmrConceptService {
 
     /**

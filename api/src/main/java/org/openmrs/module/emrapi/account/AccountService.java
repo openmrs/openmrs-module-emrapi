@@ -5,22 +5,24 @@ import org.openmrs.Privilege;
 import org.openmrs.Role;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.util.PrivilegeConstants;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional(readOnly = true)
 public interface AccountService {
 
     /**
      * @return
      * @should get all unique accounts
      */
-    @Authorized(PrivilegeConstants.VIEW_USERS)
+    @Authorized(PrivilegeConstants.GET_USERS)
     List<AccountDomainWrapper> getAllAccounts();
 
     /**
      * @should get all unique accounts that match the given criteria
      */
-    @Authorized(PrivilegeConstants.VIEW_USERS)
+    @Authorized(PrivilegeConstants.GET_USERS)
     List<AccountDomainWrapper> getAccounts(AccountSearchCriteria criteria);
 
     /**
@@ -29,7 +31,8 @@ public interface AccountService {
      * @param account
      * @return
      */
-    @Authorized(PrivilegeConstants.MANAGE_USERS)
+    @Transactional
+    @Authorized(PrivilegeConstants.EDIT_USERS)
     void saveAccount(AccountDomainWrapper account);
 
     /**
@@ -38,7 +41,7 @@ public interface AccountService {
      * @return
      * @should return the account for the person with the specified personId
      */
-    @Authorized(PrivilegeConstants.VIEW_USERS)
+    @Authorized(PrivilegeConstants.GET_USERS)
     AccountDomainWrapper getAccount(Integer personId);
 
     /**
@@ -48,7 +51,7 @@ public interface AccountService {
      * @should return the account for the specified person if they are associated to a user
      * @should return the account for the specified person if they are associated to a provider
      */
-    @Authorized(PrivilegeConstants.VIEW_USERS)
+    @Authorized(PrivilegeConstants.GET_USERS)
     AccountDomainWrapper getAccountByPerson(Person person);
 
     /**
@@ -57,7 +60,7 @@ public interface AccountService {
      * @return a list of Roles
      * @should return all roles with the capability prefix
      */
-    @Authorized(PrivilegeConstants.VIEW_USERS)
+    @Authorized(PrivilegeConstants.GET_ROLES)
     List<Role> getAllCapabilities();
 
     /**
@@ -67,7 +70,7 @@ public interface AccountService {
      * @return a list of Roles
      * @should return all roles with the privilege level prefix
      */
-    @Authorized(PrivilegeConstants.VIEW_USERS)
+    @Authorized(PrivilegeConstants.GET_ROLES)
     List<Role> getAllPrivilegeLevels();
 
     /**
@@ -75,7 +78,7 @@ public interface AccountService {
      *
      * @return all privileges that represent API-level actions
      */
-    @Authorized()
+    @Authorized(PrivilegeConstants.GET_PRIVILEGES)
     List<Privilege> getApiPrivileges();
 
     /**
@@ -83,7 +86,7 @@ public interface AccountService {
      *
      * @return all privileges that represent Application-level actions
      */
-    @Authorized()
+    @Authorized(PrivilegeConstants.GET_PRIVILEGES)
     List<Privilege> getApplicationPrivileges();
 
 }

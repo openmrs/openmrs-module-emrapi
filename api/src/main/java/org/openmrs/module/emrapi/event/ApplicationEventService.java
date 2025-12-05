@@ -17,12 +17,14 @@ import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.util.PrivilegeConstants;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Public API for Application level events
  * 
  * @since 1.0
  */
+@Transactional
 public interface ApplicationEventService {
 	
 	/**
@@ -31,6 +33,6 @@ public interface ApplicationEventService {
 	 * 
 	 * @should publish the patient viewed event
 	 */
-	@Authorized(PrivilegeConstants.VIEW_PATIENTS)
+	@Authorized(PrivilegeConstants.GET_PATIENTS)
 	public void patientViewed(Patient patient, User user);
 }
