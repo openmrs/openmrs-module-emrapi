@@ -40,12 +40,23 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
     private Concept dateOfDeathConcept;
 
     public DispositionDescriptor(ConceptService conceptService) {
-        setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME,
-                ConceptSetDescriptorField.required("dispositionSetConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET),
-                ConceptSetDescriptorField.required("dispositionConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION),
-                ConceptSetDescriptorField.optional("admissionLocationConcept", EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION),
-                ConceptSetDescriptorField.optional("internalTransferLocationConcept", EmrApiConstants.CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION),
-                ConceptSetDescriptorField.optional("dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH));
+        try {
+            setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME,
+                    ConceptSetDescriptorField.required("dispositionSetConcept",
+                            EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET),
+                    ConceptSetDescriptorField.required("dispositionConcept", EmrApiConstants.CONCEPT_CODE_DISPOSITION),
+                    ConceptSetDescriptorField.optional("admissionLocationConcept",
+                            EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION),
+                    ConceptSetDescriptorField.optional("internalTransferLocationConcept",
+                            EmrApiConstants.CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION),
+                    ConceptSetDescriptorField.optional("dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH));
+        }
+        catch (IllegalStateException e) {
+            throw new IllegalStateException("Configuration Error: Unable to setup Dispositions. " +
+                    "Please verify that the concept source '" + EmrApiConstants.EMR_CONCEPT_SOURCE_NAME + "' is configured " +
+                    "and that the concept '" + EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET + "' exists. " +
+                    "Root Cause: " + e.getMessage(), e);
+        }
     }
 
     /**
