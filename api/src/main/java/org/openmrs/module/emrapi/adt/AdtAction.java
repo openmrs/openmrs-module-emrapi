@@ -8,6 +8,7 @@ import org.openmrs.Provider;
 import org.openmrs.Visit;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.adt.exception.InvalidAdtEncounterException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 
 import java.util.Date;
@@ -90,9 +91,9 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit) {
-                if (visit.isAdmitted()) {
-                    throw new IllegalStateException("Patient is already admitted");
+            public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
+                if (visit.isAdmitted(onDate)) {
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_ALREADY_ADMITTED_CODE, "Patient is already admitted");
                 }
             }
         }, DISCHARGE {
@@ -112,9 +113,9 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit) {
-                if (!visit.isAdmitted()) {
-                    throw new IllegalStateException("Patient is not currently admitted");
+            public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
+                if (!visit.isAdmitted(onDate)) {
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_NOT_ADMITTED_CODE, "Patient is not currently admitted");
                 }
             }
         }, TRANSFER {
@@ -134,13 +135,27 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit) {
+            public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
+                if (!visit.isAdmitted(onDate)) {
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_NOT_ADMITTED_CODE, "Patient is not currently admitted");
+                }
+                Location currentLocation = visit.getInpatientLocation(onDate);
+                if(currentLocation != null && toLocation.getUuid().equals(currentLocation.getUuid())) {
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_ALREADY_AT_LOCATION_CODE, "Patient is already in location");
+                }
             }
         };
 
         public abstract EncounterType getEncounterType(EmrApiProperties properties);
         public abstract Form getForm(EmrApiProperties form);
-        public abstract void checkVisitValid(VisitDomainWrapper visit);
+
+        /**
+         * Verify that for the given visit, the AdtAction is valid in the given location at the given date
+         * @param visit
+         * @param toLocation
+         * @param onDate
+         */
+        public abstract void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate);
     }
 
 }

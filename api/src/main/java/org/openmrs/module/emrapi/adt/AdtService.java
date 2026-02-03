@@ -15,6 +15,7 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Order;
@@ -361,4 +362,14 @@ public interface AdtService extends OpenmrsService {
      * @return List<InpatientAdmission> of the matching InpatientAdmissions that match the criteria
      */
     List<InpatientAdmission> getInpatientAdmissions(InpatientAdmissionSearchCriteria criteria);
+
+    /**
+     * Verify that, for the given visit, creating the given encounter is valid with respect to ADT logic.
+     * Specifically:
+     * 1. permit an admission encounter only when the patient is not already admitted,
+     * 2. permit a transfer encounter only when the patient is already admitted, and not already in the transfer location
+     * 3. permit a discharge encounter only when the patient is already admitted.
+     * @param encounter
+     */
+    void verifyEncounterForAdtAction(Encounter encounter);
 }
