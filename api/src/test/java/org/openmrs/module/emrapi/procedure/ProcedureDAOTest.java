@@ -143,6 +143,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
         newProcedure.setPatient(patient7);
         newProcedure.setBodySite(conceptService.getConcept(4));
         newProcedure.setProcedureNonCoded("New Test Procedure");
+        newProcedure.setStatus(conceptService.getConcept(5)); // Completed
         newProcedure.setStartDateTime("2018");
 
         Procedure saved = procedureDAO.saveOrUpdate(newProcedure);

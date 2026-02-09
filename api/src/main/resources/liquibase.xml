@@ -33,7 +33,7 @@
             </column>
 
             <!-- Body site (required, coded only) -->
-            <column name="body_site_id" type="int">
+            <column name="body_site_coded" type="int">
                 <constraints nullable="false"/>
             </column>
 
@@ -132,7 +132,7 @@
         <addForeignKeyConstraint
                 constraintName="fk_procedure_body_site"
                 baseTableName="emrapi_procedure"
-                baseColumnNames="body_site_id"
+                baseColumnNames="body_site_coded"
                 referencedTableName="concept"
                 referencedColumnNames="concept_id"/>
 

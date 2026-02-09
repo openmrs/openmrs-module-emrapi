@@ -83,7 +83,7 @@ public class Procedure extends BaseChangeableOpenmrsData implements FormRecordab
     @Getter
     @Setter
     @ManyToOne
-    @JoinColumn(name = "body_site_id", nullable = false)
+    @JoinColumn(name = "body_site_coded", nullable = false)
     private Concept bodySite;
 
     // Timing
@@ -108,7 +108,8 @@ public class Procedure extends BaseChangeableOpenmrsData implements FormRecordab
     // Status
     @Getter
     @Setter
-    @Column(name = "status_coded", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "status_coded", nullable = false)
     private Concept status;
 
     // Outcome - coded or free text

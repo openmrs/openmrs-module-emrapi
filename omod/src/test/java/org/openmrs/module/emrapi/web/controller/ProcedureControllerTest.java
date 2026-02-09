@@ -40,7 +40,7 @@ public class ProcedureControllerTest extends BaseModuleWebContextSensitiveTest {
     private static final String PATIENT_UUID = "procedure-test-patient-uuid";
     private static final String PROCEDURE_CONCEPT_UUID = "procedure-concept-uuid";
    private static final String BODY_SITE_CONCEPT_UUID = "body-site-concept-uuid";
-   private static final String STATUS_CONCEPT_UUID = "status-concept-uuid";
+   private static final String STATUS_CONCEPT_UUID = "status-completed-concept-uuid";
 
     @Autowired
     private ObjectFactory<ProcedureController> controllerFactory;
