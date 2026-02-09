@@ -19,7 +19,6 @@ import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.procedure.Procedure;
 import org.openmrs.module.emrapi.procedure.ProcedureService;
 import org.openmrs.module.emrapi.web.dto.ProcedureDTO;
-import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,7 +39,7 @@ import java.util.List;
  * Provides endpoints for creating, retrieving, updating, and voiding procedures.
  */
 @Controller
-@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/procedure")
+@RequestMapping(value = "/rest/**/emrapi/procedure")
 public class ProcedureController extends BaseRestController {
    
    @Autowired
