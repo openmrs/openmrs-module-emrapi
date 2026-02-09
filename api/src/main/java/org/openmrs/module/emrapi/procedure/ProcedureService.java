@@ -41,14 +41,6 @@ public interface ProcedureService extends OpenmrsService {
    Procedure getProcedureByUuid(String uuid);
    
    /**
-    * Gets a procedure by its internal ID.
-    *
-    * @param id the procedure ID
-    * @return the procedure, or null if not found
-    */
-   Procedure getProcedure(Integer id);
-   
-   /**
     * Gets all non-voided procedures for a patient, sorted by startDateTime descending.
     *
     * @param patient the patient
@@ -56,30 +48,4 @@ public interface ProcedureService extends OpenmrsService {
     */
    List<Procedure> getProceduresByPatient(Patient patient);
    
-   /**
-    * Gets all procedures for a patient.
-    *
-    * @param patient the patient
-    * @param includeVoided whether to include voided procedures
-    * @return list of procedures sorted by startDateTime descending
-    */
-   List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided);
-   
-   /**
-    * Gets all non-voided procedures associated with an encounter.
-    *
-    * @param encounter the encounter
-    * @return list of procedures
-    */
-   List<Procedure> getProceduresByEncounter(Encounter encounter);
-   
-   /**
-    * Voids (soft-deletes) a procedure.
-    *
-    * @param procedure the procedure to void
-    * @param voidReason the reason for voiding
-    * @return the voided procedure
-    * @throws APIException if the void reason is null or empty
-    */
-   Procedure voidProcedure(Procedure procedure, String voidReason) throws APIException;
 }

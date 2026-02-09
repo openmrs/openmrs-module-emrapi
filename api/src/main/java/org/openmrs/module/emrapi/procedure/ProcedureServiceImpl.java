@@ -10,7 +10,6 @@
 package org.openmrs.module.emrapi.procedure;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
@@ -134,37 +133,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    
    @Override
    @Transactional(readOnly = true)
-   public Procedure getProcedure(Integer id) {
-      return procedureDAO.getById(id);
-   }
-   
-   @Override
-   @Transactional(readOnly = true)
    public List<Procedure> getProceduresByPatient(Patient patient) {
       return procedureDAO.getProceduresByPatient(patient, false);
-   }
-   
-   @Override
-   @Transactional(readOnly = true)
-   public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided) {
-      return procedureDAO.getProceduresByPatient(patient, includeVoided);
-   }
-   
-   @Override
-   @Transactional(readOnly = true)
-   public List<Procedure> getProceduresByEncounter(Encounter encounter) {
-      return procedureDAO.getProceduresByEncounter(encounter);
-   }
-   
-   @Override
-   @Transactional
-   public Procedure voidProcedure(Procedure procedure, String voidReason) throws APIException {
-      if (StringUtils.isBlank(voidReason)) {
-         throw new APIException("Procedure.error.voidReasonRequired", (Object[]) null);
-      }
-      procedure.setVoided(true);
-      procedure.setVoidReason(voidReason);
-      procedure.setDateVoided(new Date());
-      return procedureDAO.saveOrUpdate(procedure);
    }
 }

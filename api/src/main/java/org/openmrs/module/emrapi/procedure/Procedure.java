@@ -31,7 +31,7 @@ import java.util.Date;
 
 /**
  * Entity class representing a surgical or medical procedure performed on a patient.
- * Supports partial date/time for historical procedures (e.g., "2019", "2019-10", "2018-10-12T14:30:45.123+05:30").
+ * Supports partial estimatedDate for historical procedures (e.g., "2019", "2019-10",).
  */
 @Getter
 @Setter

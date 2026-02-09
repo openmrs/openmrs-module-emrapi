@@ -56,19 +56,4 @@ public class HibernateProcedureDAO implements ProcedureDAO {
       criteria.addOrder(Order.desc("startDateTime"));
       return criteria.list();
    }
-   
-   @Override
-   @SuppressWarnings("unchecked")
-   public List<Procedure> getProceduresByEncounter(Encounter encounter) {
-      Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Procedure.class);
-      criteria.add(Restrictions.eq("encounter", encounter));
-      criteria.add(Restrictions.eq("voided", false));
-      criteria.addOrder(Order.desc("startDateTime"));
-      return criteria.list();
-   }
-   
-   @Override
-   public void delete(Procedure procedure) {
-      sessionFactory.getCurrentSession().delete(procedure);
-   }
 }

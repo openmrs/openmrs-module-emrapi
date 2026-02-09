@@ -59,7 +59,6 @@ public class ProcedureController extends BaseRestController {
     * Gets all procedures for a patient.
     *
     * GET /rest/v1/emrapi/procedure?patient={uuid}
-    * GET /rest/v1/emrapi/procedure?patient={uuid}&historical=true
     *
     * @param patientUuid the patient UUID
     * @return list of procedure DTOs
@@ -133,55 +132,6 @@ public class ProcedureController extends BaseRestController {
       Procedure procedure = fromDTO(dto);
       procedure = procedureService.saveProcedure(procedure);
       return new ResponseEntity<>(toDTO(procedure), HttpStatus.CREATED);
-   }
-   
-   /**
-    * Updates an existing procedure.
-    *
-    * PUT /rest/v1/emrapi/procedure/{uuid}
-    *
-    * @param uuid the procedure UUID
-    * @param dto the updated procedure data
-    * @return the updated procedure DTO
-    */
-   @RequestMapping(value = "/{uuid}", method = RequestMethod.PUT)
-   @ResponseBody
-   public ResponseEntity<ProcedureDTO> updateProcedure(
-           @PathVariable("uuid") String uuid,
-           @RequestBody ProcedureDTO dto) {
-      
-      Procedure existing = procedureService.getProcedureByUuid(uuid);
-      if (existing == null) {
-         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
-      
-      updateFromDTO(existing, dto);
-      existing = procedureService.saveProcedure(existing);
-      return new ResponseEntity<>(toDTO(existing), HttpStatus.OK);
-   }
-   
-   /**
-    * Voids (soft-deletes) a procedure.
-    *
-    * DELETE /rest/v1/emrapi/procedure/{uuid}?reason={reason}
-    *
-    * @param uuid the procedure UUID
-    * @param reason the reason for voiding
-    * @return no content on success
-    */
-   @RequestMapping(value = "/{uuid}", method = RequestMethod.DELETE)
-   @ResponseBody
-   public ResponseEntity<Void> voidProcedure(
-           @PathVariable("uuid") String uuid,
-           @RequestParam("reason") String reason) {
-      
-      Procedure procedure = procedureService.getProcedureByUuid(uuid);
-      if (procedure == null) {
-         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-      }
-      
-      procedureService.voidProcedure(procedure, reason);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
    }
    
    /**
