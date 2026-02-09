@@ -80,21 +80,4 @@ public interface ProcedureService extends OpenmrsService {
     * @throws APIException if the void reason is null or empty
     */
    Procedure voidProcedure(Procedure procedure, String voidReason) throws APIException;
-   
-   /**
-    * Unvoids a previously voided procedure.
-    *
-    * @param procedure the procedure to unvoid
-    * @return the unvoided procedure
-    */
-   Procedure unvoidProcedure(Procedure procedure);
-   
-   /**
-    * Permanently deletes a procedure from the database.
-    * Use with caution - prefer voiding for audit purposes.
-    *
-    * @param procedure the procedure to delete
-    * @throws APIException if the procedure cannot be deleted
-    */
-   void purgeProcedure(Procedure procedure) throws APIException;
 }

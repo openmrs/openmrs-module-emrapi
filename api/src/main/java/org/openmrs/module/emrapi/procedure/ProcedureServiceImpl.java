@@ -165,20 +165,4 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
       procedure.setDateVoided(new Date());
       return procedureDAO.saveOrUpdate(procedure);
    }
-   
-   @Override
-   @Transactional
-   public Procedure unvoidProcedure(Procedure procedure) {
-      procedure.setVoided(false);
-      procedure.setVoidReason(null);
-      procedure.setDateVoided(null);
-      procedure.setVoidedBy(null);
-      return procedureDAO.saveOrUpdate(procedure);
-   }
-   
-   @Override
-   @Transactional
-   public void purgeProcedure(Procedure procedure) throws APIException {
-      procedureDAO.delete(procedure);
-   }
 }
