@@ -64,6 +64,9 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
         if (procedure.getDuration() != null && procedure.getDurationUnit() == null) {
             throw new APIException("Procedure.error.durationUnitRequired", (Object[]) null);
         }
+        if (procedure.getStatus() == null) {
+            throw new APIException("Procedure.error.statusRequired", (Object[]) null);
+        }
         // Validate that end date is not before start date
 //        if (procedure.getEndDateTime() != null && procedure.getStartDateTime() != null) {
 //            if (procedure.getEndDateTime().before(procedure.getStartDateTime())) {

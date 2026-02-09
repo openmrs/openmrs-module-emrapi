@@ -216,7 +216,9 @@ public class ProcedureController extends BaseRestController {
         if (procedure.getDurationUnit() != null) {
             dto.setDurationUnit(procedure.getDurationUnit().name());
         }
-
+         if(procedure.getStatus() != null){
+               dto.setStatusUuid(procedure.getStatus().getUuid());
+         }
         if (procedure.getOutcomeCoded() != null) {
             dto.setCodedOutcomeUuid(procedure.getOutcomeCoded().getUuid());
         }
@@ -290,6 +292,14 @@ public class ProcedureController extends BaseRestController {
             }
         } else {
             procedure.setDurationUnit(null);
+        }
+        
+        if(StringUtils.isNotBlank(dto.getStatusUuid())){
+            Concept statusConcept = conceptService.getConceptByUuid(dto.getStatusUuid());
+            if(statusConcept == null){
+                throw new IllegalArgumentException("Status concept not found with UUID: " + dto.getStatusUuid());
+            }
+            procedure.setStatus(statusConcept);
         }
 
         if (StringUtils.isNotBlank(dto.getCodedOutcomeUuid())) {

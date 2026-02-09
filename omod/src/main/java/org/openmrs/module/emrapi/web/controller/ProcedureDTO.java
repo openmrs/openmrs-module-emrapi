@@ -13,12 +13,17 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 
 /**
  * Data Transfer Object for Procedure entity.
  * Used for REST API communication.
  */
+@Setter
+@Getter
 public class ProcedureDTO {
 
     private String uuid;
@@ -38,6 +43,9 @@ public class ProcedureDTO {
     private Integer duration;
     private String durationUnit;  // SECONDS, MINUTES, HOURS, DAYS
 
+   // Status
+   private String statusUuid;
+   
     // Outcome - coded or free text
     private String codedOutcomeUuid;
     private String freeTextOutcome;
@@ -55,144 +63,6 @@ public class ProcedureDTO {
 
     // Default constructor
     public ProcedureDTO() {
-    }
-
-    // Getters and setters
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public String getPatientUuid() {
-        return patientUuid;
-    }
-
-    public void setPatientUuid(String patientUuid) {
-        this.patientUuid = patientUuid;
-    }
-
-    public String getEncounterUuid() {
-        return encounterUuid;
-    }
-
-    public void setEncounterUuid(String encounterUuid) {
-        this.encounterUuid = encounterUuid;
-    }
-
-    public String getCodedProcedureUuid() {
-        return codedProcedureUuid;
-    }
-
-    public void setCodedProcedureUuid(String codedProcedureUuid) {
-        this.codedProcedureUuid = codedProcedureUuid;
-    }
-
-    public String getFreeTextProcedure() {
-        return freeTextProcedure;
-    }
-
-    public void setFreeTextProcedure(String freeTextProcedure) {
-        this.freeTextProcedure = freeTextProcedure;
-    }
-
-    public String getBodySiteUuid() {
-        return bodySiteUuid;
-    }
-
-    public void setBodySiteUuid(String bodySiteUuid) {
-        this.bodySiteUuid = bodySiteUuid;
-    }
-
-    public String getStartDateTime() {
-        return startDateTime;
-    }
-
-    public void setStartDateTime(String startDateTime) {
-        this.startDateTime = startDateTime;
-    }
-
-    public Date getEndDateTime() {
-        return endDateTime;
-    }
-
-    public void setEndDateTime(Date endDateTime) {
-        this.endDateTime = endDateTime;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-    public String getDurationUnit() {
-        return durationUnit;
-    }
-
-    public void setDurationUnit(String durationUnit) {
-        this.durationUnit = durationUnit;
-    }
-
-    public String getCodedOutcomeUuid() {
-        return codedOutcomeUuid;
-    }
-
-    public void setCodedOutcomeUuid(String codedOutcomeUuid) {
-        this.codedOutcomeUuid = codedOutcomeUuid;
-    }
-
-    public String getFreeTextOutcome() {
-        return freeTextOutcome;
-    }
-
-    public void setFreeTextOutcome(String freeTextOutcome) {
-        this.freeTextOutcome = freeTextOutcome;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public String getFormNamespace() {
-        return formNamespace;
-    }
-
-    public void setFormNamespace(String formNamespace) {
-        this.formNamespace = formNamespace;
-    }
-
-    public String getFormFieldPath() {
-        return formFieldPath;
-    }
-
-    public void setFormFieldPath(String formFieldPath) {
-        this.formFieldPath = formFieldPath;
-    }
-
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(Date dateCreated) {
-        this.dateCreated = dateCreated;
-    }
-
-    public boolean isVoided() {
-        return voided;
-    }
-
-    public void setVoided(boolean voided) {
-        this.voided = voided;
     }
 
 }

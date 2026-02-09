@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- Patient for testing -->
+    <person person_id="201" gender="M" dead="false" creator="1" birthdate_estimated="0"
+            date_created="2023-10-15 10:30:00.0" voided="false" uuid="procedure-test-patient-uuid"/>
+    <person_name person_name_id="201" person_id="201" preferred="true" given_name="Test" family_name="Patient"
+                 creator="1" date_created="2023-10-15 10:31:00.0" voided="false"
+                 uuid="procedure-test-patient-name-uuid"/>
+    <patient patient_id="201" creator="1" date_created="2023-10-15 10:32:00.0" voided="false"/>
+
+    <!-- Concepts for procedure and body site -->
+    <concept concept_id="5001" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="procedure-concept-uuid"/>
+    <concept_name concept_name_id="5001" concept_id="5001" name="Test Procedure" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="procedure-concept-name-uuid"/>
+
+    <concept concept_id="5002" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="body-site-concept-uuid"/>
+    <concept_name concept_name_id="5002" concept_id="5002" name="Test Body Site" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="body-site-concept-name-uuid"/>
+
+    <concept concept_id="5003" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="outcome-concept-uuid"/>
+    <concept_name concept_name_id="5003" concept_id="5003" name="Test Outcome" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="outcome-concept-name-uuid"/>
+<!--    Concepts for status preparation | in-progress | completed -->
+    <concept concept_id="5004" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="status-preparation-concept-uuid"/>
+    <concept_name concept_name_id="5004" concept_id="5004" name="Preparation" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="status-preparation-concept-name-uuid"/>
+    <concept concept_id="5005" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="status-in-progress-concept-uuid"/>
+    <concept_name concept_name_id="5005" concept_id="5005" name="In-Progress" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                    uuid="status-in-progress-concept-name-uuid"/>
+    <concept concept_id="5006" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="status-completed-concept-uuid"/>
+    <concept_name concept_name_id="5006" concept_id="5006" name="Completed" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="status-completed-concept-name-uuid"/>
+
+</dataset>

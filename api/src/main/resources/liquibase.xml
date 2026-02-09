@@ -51,6 +51,11 @@
                 <constraints nullable="true"/>
             </column>
 
+            <!-- Status -->
+            <column name="status_coded" type="int">
+                    <constraints nullable="false"/>
+            </column>
+
             <!-- Outcome (coded or free text) -->
             <column name="outcome_coded" type="int">
                 <constraints nullable="true"/>
