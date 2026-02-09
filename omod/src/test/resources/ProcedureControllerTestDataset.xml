@@ -43,4 +43,20 @@
                   creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
                   uuid="status-completed-concept-name-uuid"/>
 
+    <!-- Pre-existing procedure for GET tests -->
+    <emrapi_procedure
+            procedure_id="101"
+            patient_id="201"
+            procedure_coded="5001"
+            body_site_coded="5002"
+            start_date_time="2023-06-15 14:30:00"
+            duration="45"
+            duration_unit="MINUTES"
+            status_coded="5006"
+            notes="Existing procedure for GET test"
+            uuid="existing-procedure-uuid"
+            creator="1"
+            date_created="2023-06-15 14:30:00"
+            voided="false"
+    />
 </dataset>
