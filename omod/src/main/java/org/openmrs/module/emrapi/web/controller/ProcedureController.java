@@ -112,13 +112,14 @@ public class ProcedureController extends BaseRestController {
    @RequestMapping(value = "/historical", method = RequestMethod.POST)
    @ResponseBody
    public ResponseEntity<ProcedureDTO> createHistoricalProcedure(@RequestBody ProcedureDTO dto) {
+      // TODO: Validate required fields for historical procedure
       Procedure procedure = fromDTO(dto);
       procedure = procedureService.saveProcedure(procedure);
       return new ResponseEntity<>(toDTO(procedure), HttpStatus.CREATED);
    }
    
    /**
-    * Creates a current (real-time) procedure.
+    * Creates a current (non -historical) procedure.
     * Any originalDateText value is ignored.
     *
     * POST /rest/v1/emrapi/procedure/current
@@ -129,6 +130,7 @@ public class ProcedureController extends BaseRestController {
    @RequestMapping(value = "/current", method = RequestMethod.POST)
    @ResponseBody
    public ResponseEntity<ProcedureDTO> createCurrentProcedure(@RequestBody ProcedureDTO dto) {
+      // TODO: Validate required fields for current procedure
       Procedure procedure = fromDTO(dto);
       procedure = procedureService.saveProcedure(procedure);
       return new ResponseEntity<>(toDTO(procedure), HttpStatus.CREATED);
