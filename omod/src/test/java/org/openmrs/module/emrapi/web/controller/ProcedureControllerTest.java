@@ -61,7 +61,7 @@ public class ProcedureControllerTest extends BaseModuleWebContextSensitiveTest {
                 + "\"patientUuid\": \"" + PATIENT_UUID + "\","
                 + "\"codedProcedureUuid\": \"" + PROCEDURE_CONCEPT_UUID + "\","
                 + "\"bodySiteUuid\": \"" + BODY_SITE_CONCEPT_UUID + "\","
-                + "\"startDateTime\": \"2023-06-15\","
+                + "\"startDateTime\": \"2025-06-15T14:30:00\","
                 + "\"duration\": 45,"
                 + "\"durationUnit\": \"MINUTES\","
                 + "\"statusUuid\": \"" + STATUS_CONCEPT_UUID + "\","
