@@ -210,6 +210,7 @@ public class ProcedureController extends BaseRestController {
         }
 
         dto.setStartDateTime(procedure.getStartDateTime());
+        dto.setEstimatedStartDate(procedure.getEstimatedStartDate());
         dto.setEndDateTime(procedure.getEndDateTime());
         dto.setDuration(procedure.getDuration());
 
@@ -280,6 +281,7 @@ public class ProcedureController extends BaseRestController {
         }
 
         procedure.setStartDateTime(dto.getStartDateTime());
+        procedure.setEstimatedStartDate(dto.getEstimatedStartDate());
         procedure.setEndDateTime(dto.getEndDateTime());
         procedure.setDuration(dto.getDuration());
 

@@ -38,7 +38,8 @@ public class ProcedureDTO {
     private String bodySiteUuid;
 
     // Timing
-    private String startDateTime;
+    private Date startDateTime;
+    private String estimatedStartDate;
     private Date endDateTime;
     private Integer duration;
     private String durationUnit;  // SECONDS, MINUTES, HOURS, DAYS

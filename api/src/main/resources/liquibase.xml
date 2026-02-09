@@ -38,8 +38,11 @@
             </column>
 
             <!-- Timing -->
-            <column name="start_date_time" type="varchar(35)">
+            <column name="start_date_time" type="datetime">
                 <constraints nullable="false"/>
+            </column>
+            <column name="estimated_start_date" type="varchar(35)">
+                <constraints nullable="true"/>
             </column>
             <column name="end_date_time" type="datetime">
                 <constraints nullable="true"/>

@@ -20,6 +20,12 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -39,8 +45,54 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
     @Transactional
     public Procedure saveProcedure(Procedure procedure) throws APIException {
         validateProcedure(procedure);
+        if (procedure.getEstimatedStartDate() != null){
+           Date calculatedStartDateTime = getDateTimeFromEstimatedDate(procedure.getEstimatedStartDate());
+           procedure.setStartDateTime(calculatedStartDateTime);
+        }
         return procedureDAO.saveOrUpdate(procedure);
     }
+   
+   Date getDateTimeFromEstimatedDate(String estimatedDate) {
+      try {
+         // Full datetime
+         if (estimatedDate.length() > 10) {
+            LocalDateTime dateTime = LocalDateTime.parse(estimatedDate);
+            return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
+         }
+         
+         // yyyy-MM-dd
+         if (estimatedDate.length() == 10) {
+            LocalDate date = LocalDate.parse(estimatedDate);
+            return Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+         }
+         
+         // yyyy-MM
+         if (estimatedDate.length() == 7) {
+            YearMonth ym = YearMonth.parse(estimatedDate);
+            return Date.from(
+                    ym.atDay(1)
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()
+            );
+         }
+         
+         // yyyy
+         if (estimatedDate.length() == 4) {
+            Year year = Year.parse(estimatedDate);
+            return Date.from(
+                    year.atMonth(1)
+                            .atDay(1)
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()
+            );
+         }
+         
+         throw new APIException("Procedure.error.invalidEstimateDate", new Object[]{estimatedDate});
+         
+      } catch (DateTimeParseException e) {
+         throw new APIException("Procedure.error.invalidEstimateDate", new Object[]{estimatedDate});
+      }
+   }
 
     /**
      * Validates a procedure before saving.
@@ -55,11 +107,18 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
         if (procedure.getProcedureCoded() == null && StringUtils.isBlank(procedure.getProcedureNonCoded())) {
             throw new APIException("Procedure.error.procedureRequired", (Object[]) null);
         }
+        if (procedure.getProcedureCoded() != null && StringUtils.isNotBlank(procedure.getProcedureNonCoded())) {
+            throw new APIException("Procedure.error.procedureCodedAndNonCodedMutuallyExclusive",
+                    (new Object[]{procedure.getProcedureCoded(), procedure.getProcedureNonCoded()}));
+        }
         if (procedure.getBodySite() == null) {
             throw new APIException("Procedure.error.bodySiteRequired", (Object[]) null);
         }
-        if (procedure.getStartDateTime() == null) {
+        if (procedure.getEstimatedStartDate() == null && procedure.getStartDateTime() == null) {
             throw new APIException("Procedure.error.startDateTimeRequired", (Object[]) null);
+        }
+        if (procedure.getEstimatedStartDate() != null && procedure.getStartDateTime() != null) {
+            throw new APIException("Procedure.error.startDateTimeAndEstimatedDateMutuallyExclusive", (new Object[]{procedure.getEstimatedStartDate(), procedure.getStartDateTime()}));
         }
         if (procedure.getDuration() != null && procedure.getDurationUnit() == null) {
             throw new APIException("Procedure.error.durationUnitRequired", (Object[]) null);
@@ -67,12 +126,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
         if (procedure.getStatus() == null) {
             throw new APIException("Procedure.error.statusRequired", (Object[]) null);
         }
-        // Validate that end date is not before start date
-//        if (procedure.getEndDateTime() != null && procedure.getStartDateTime() != null) {
-//            if (procedure.getEndDateTime().before(procedure.getStartDateTime())) {
-//                throw new APIException("Procedure.error.endDateBeforeStartDate", (Object[]) null);
-//            }
-//        }
     }
 
     @Override

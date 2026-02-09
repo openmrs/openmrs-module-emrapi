@@ -69,8 +69,6 @@ public class Procedure extends BaseChangeableOpenmrsData implements FormRecordab
     private Encounter encounter;
 
     // Procedure name - coded or free text
-    @Getter
-    @Setter
     @ManyToOne
     @JoinColumn(name = "procedure_coded")
     private Concept procedureCoded;
@@ -80,20 +78,18 @@ public class Procedure extends BaseChangeableOpenmrsData implements FormRecordab
     private String procedureNonCoded;
 
     // Body site (required, coded only)
-    @Getter
-    @Setter
     @ManyToOne
     @JoinColumn(name = "body_site_coded", nullable = false)
     private Concept bodySite;
 
     // Timing
-    @Getter
-    @Setter
     @Column(name = "start_date_time", nullable = false)
-    private String startDateTime;
+    private Date startDateTime;
+    
+   @Column(name = "estimated_start_date")
+   private String estimatedStartDate;
    
-
-    @Column(name = "end_date_time")
+   @Column(name = "end_date_time")
     private Date endDateTime;
    
 
@@ -106,8 +102,6 @@ public class Procedure extends BaseChangeableOpenmrsData implements FormRecordab
     private DurationUnit durationUnit;
     
     // Status
-    @Getter
-    @Setter
     @ManyToOne
     @JoinColumn(name = "status_coded", nullable = false)
     private Concept status;
