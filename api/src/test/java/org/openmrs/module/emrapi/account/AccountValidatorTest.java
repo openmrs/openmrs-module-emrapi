@@ -7,11 +7,13 @@ import org.openmrs.Person;
 import org.openmrs.PersonName;
 import org.openmrs.ProviderRole;
 import org.openmrs.Role;
+import org.openmrs.User;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.messagesource.MessageSourceService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
@@ -41,6 +43,7 @@ public class AccountValidatorTest {
 
     private ProviderService providerService;
 
+    private EmrApiProperties emrApiProperties;
 
     private PersonService personService;
 
@@ -61,6 +64,7 @@ public class AccountValidatorTest {
         userService = Mockito.mock(UserService.class);
         providerService = Mockito.mock(ProviderService.class);
         personService = Mockito.mock(PersonService.class);
+        emrApiProperties = Mockito.mock(EmrApiProperties.class);
 
         validator = new AccountValidator();
         validator.setMessageSourceService(Mockito.mock(MessageSourceService.class));
@@ -80,7 +84,7 @@ public class AccountValidatorTest {
         someProviderRole = new ProviderRole();
 
         account = new AccountDomainWrapper(person, accountService, userService, providerService,
-                 personService, providerIdentifierGenerator);
+                 personService, providerIdentifierGenerator, emrApiProperties);
     }
 
     /**
@@ -411,6 +415,35 @@ public class AccountValidatorTest {
         assertTrue(errors.hasErrors());
         List<FieldError> errorList = errors.getFieldErrors("username");
         assertThat(errorList.size(), is(1));
+    }
+
+    @Test
+    public void shouldCreateErrorMessageIfEmailAlreadyInUse() {
+        User existingUser = new User();
+        existingUser.setEmail("test@openmrs.org");
+        createAccountWithUsernameAs("username");
+        account.setEmail("test@openmrs.org");
+        when(userService.getUserByUsernameOrEmail("test@openmrs.org")).thenReturn(existingUser);
+        Errors errors = new BindException(account, "account");
+        validator.validate(account, errors);
+
+        assertTrue(errors.hasErrors());
+        List<FieldError> errorList = errors.getFieldErrors("email");
+        assertThat(errorList.size(), is(1));
+        assertThat(errorList.get(0).getCode(), is("emr.account.error.emailAlreadyInUse"));
+    }
+
+    @Test
+    public void shouldCreateErrorMessageIfEmailHasIncorrectFormat() {
+        createAccountWithUsernameAs("username");
+        account.setEmail("test@openmrs");
+        Errors errors = new BindException(account, "account");
+        validator.validate(account, errors);
+
+        assertTrue(errors.hasErrors());
+        List<FieldError> errorList = errors.getFieldErrors("email");
+        assertThat(errorList.size(), is(1));
+        assertThat(errorList.get(0).getCode(), is("error.email.invalid"));
     }
 
     private void createAccountWithUsernameAs(String username) {

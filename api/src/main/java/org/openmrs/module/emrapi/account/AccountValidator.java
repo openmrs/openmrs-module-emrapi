@@ -1,6 +1,7 @@
 package org.openmrs.module.emrapi.account;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.openmrs.User;
 import org.openmrs.annotation.Handler;
 import org.openmrs.api.PasswordException;
@@ -80,6 +81,7 @@ public class AccountValidator implements Validator {
             checkIfDuplicateUsername(errors, account.getUser());
             checkIfPrivilegeLevelIsCorrect(errors, account);
             checkIfNoCapabilities(errors, account);
+            validateEmail(errors, account);
         }
 
         if (checkIfUserWasCreated(user) || StringUtils.isNotBlank(account.getPassword()) || StringUtils.isNotBlank(account.getConfirmPassword())) {
@@ -192,6 +194,23 @@ public class AccountValidator implements Validator {
         if (accountDomainWrapper.getProviderRole() == null) {
             errors.rejectValue("providerRole", "error.required",
                     new Object[]{messageSourceService.getMessage("emr.account.providerRole.label")}, null);
+        }
+    }
+
+    private void validateEmail(Errors errors, AccountDomainWrapper accountDomainWrapper) {
+        String email = accountDomainWrapper.getEmail();
+        if (StringUtils.isNotBlank(email)) {
+            if (!EmailValidator.getInstance().isValid(email)) {
+                errors.rejectValue("email", "error.email.invalid");
+            }
+            else {
+                User existingUser = userService.getUserByUsernameOrEmail(email);
+                if (existingUser != null && !existingUser.equals(accountDomainWrapper.getUser())) {
+                    if (email.equalsIgnoreCase(existingUser.getEmail())) {
+                        errors.rejectValue("email", "emr.account.error.emailAlreadyInUse");
+                    }
+                }
+            }
         }
     }
 }
