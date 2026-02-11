@@ -93,7 +93,7 @@ public class AdtAction {
             @Override
             public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
                 if (visit.isAdmitted(onDate)) {
-                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_ALREADY_ADMITTED_CODE, "Patient is already admitted");
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_ALREADY_ADMITTED, toLocation, onDate);
                 }
             }
         }, DISCHARGE {
@@ -115,7 +115,7 @@ public class AdtAction {
             @Override
             public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
                 if (!visit.isAdmitted(onDate)) {
-                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_NOT_ADMITTED_CODE, "Patient is not currently admitted");
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
             }
         }, TRANSFER {
@@ -137,17 +137,21 @@ public class AdtAction {
             @Override
             public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
                 if (!visit.isAdmitted(onDate)) {
-                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_NOT_ADMITTED_CODE, "Patient is not currently admitted");
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
                 Location currentLocation = visit.getInpatientLocation(onDate);
-                if(currentLocation != null && toLocation.getUuid().equals(currentLocation.getUuid())) {
-                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.PATIENT_ALREADY_AT_LOCATION_CODE, "Patient is already in location");
+                if(toLocation != null && toLocation.equals(currentLocation)) {
+                    throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_ALREADY_AT_LOCATION, toLocation, onDate);
                 }
             }
         };
 
         public abstract EncounterType getEncounterType(EmrApiProperties properties);
         public abstract Form getForm(EmrApiProperties form);
+
+        public void checkVisitValid(VisitDomainWrapper visit) {
+                checkVisitValid(visit, null, new Date());
+        }
 
         /**
          * Verify that for the given visit, the AdtAction is valid in the given location at the given date

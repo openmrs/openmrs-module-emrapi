@@ -1,18 +1,50 @@
 package org.openmrs.module.emrapi.adt.exception;
 
+import java.util.Date;
+
+import org.openmrs.Location;
+
 public class InvalidAdtEncounterException extends IllegalArgumentException {
-  public static final String PATIENT_NOT_ADMITTED_CODE = "emrapi.encounter.adt.error.patientNotAdmitted";
-  public static final String PATIENT_ALREADY_ADMITTED_CODE = "emrapi.encounter.adt.error.patientAlreadyAdmitted";
-  public static final String PATIENT_ALREADY_AT_LOCATION_CODE = "emrapi.encounter.adt.error.patientAlreadyAtLocation";
 
-  private String code;
+    public enum Type {
+        PATIENT_NOT_ADMITTED("emrapi.encounter.adt.error.patientNotAdmitted"),
+        PATIENT_ALREADY_ADMITTED("emrapi.encounter.adt.error.patientAlreadyAdmitted"),
+        PATIENT_ALREADY_AT_LOCATION("emrapi.encounter.adt.error.patientAlreadyAtLocation");
 
-  public InvalidAdtEncounterException(String code, String message) {
-    super(message);
-    this.code = code;
-  }
+        private final String code;
 
-  public String getCode() {
-    return code;
-  }
+        Type(String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+    }
+
+    private Type type;
+    private Location location; // nullable
+    private Date date;
+
+    public InvalidAdtEncounterException(Type type, Location location, Date date) {
+        this.type = type;
+        this.location = location;
+        this.date = date;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public String getCode() {
+        return type.code;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Date getDate() {
+        return date;
+    }
 }

@@ -847,8 +847,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         Encounter encounter = buildEncounter(adtEncounterType, visit.getVisit().getPatient(), action.getLocation(), adtForm, adtDatetime, null, null);
         addProviders(encounter, action.getProviders());
 
-        visit.addEncounter(encounter);
+        encounter.setVisit(visit.getVisit());
         encounterService.saveEncounter(encounter);
+        // Add encounter to visit after saving to maintain data consistency in memory
+        visit.addEncounter(encounter);
         return encounter;
     }
 

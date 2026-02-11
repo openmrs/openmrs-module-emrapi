@@ -38,7 +38,8 @@ public class EmrApiEncounterValidator implements Validator {
         try {
             adtService.verifyEncounterForAdtAction(encounter);
         } catch (InvalidAdtEncounterException e) {
-            errors.reject(e.getCode(), e.getMessage());
+            String locationStr = e.getLocation() != null ? e.getLocation().getDisplayString() : "";
+            errors.reject(e.getCode(), new Object[]{locationStr, e.getDate()}, null);
         }
     }
 }

@@ -6,7 +6,6 @@ import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
-import org.openmrs.api.EncounterService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.VisitService;
@@ -124,7 +123,7 @@ public class EncounterValidatorTest extends BaseModuleContextSensitiveTest {
         validator.validate(encounter, errors);
 
         assertTrue(errors.hasErrors(), "Should reject admission when patient already admitted");
-        assertEquals(InvalidAdtEncounterException.PATIENT_ALREADY_ADMITTED_CODE,
+        assertEquals(InvalidAdtEncounterException.Type.PATIENT_ALREADY_ADMITTED.getCode(),
                      errors.getAllErrors().get(0).getCode());
     }
 
@@ -174,7 +173,7 @@ public class EncounterValidatorTest extends BaseModuleContextSensitiveTest {
         validator.validate(encounter, errors);
 
         assertTrue(errors.hasErrors(), "Should reject discharge when patient not admitted");
-        assertEquals(InvalidAdtEncounterException.PATIENT_NOT_ADMITTED_CODE,
+        assertEquals(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED.getCode(),
                      errors.getAllErrors().get(0).getCode());
     }
 
@@ -200,7 +199,7 @@ public class EncounterValidatorTest extends BaseModuleContextSensitiveTest {
         validator.validate(encounter, errors);
 
         assertTrue(errors.hasErrors(), "Should reject discharge when patient already discharged");
-        assertEquals(InvalidAdtEncounterException.PATIENT_NOT_ADMITTED_CODE,
+        assertEquals(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED.getCode(),
                      errors.getAllErrors().get(0).getCode());
     }
 
@@ -250,7 +249,7 @@ public class EncounterValidatorTest extends BaseModuleContextSensitiveTest {
         validator.validate(encounter, errors);
 
         assertTrue(errors.hasErrors(), "Should reject transfer when patient not admitted");
-        assertEquals(InvalidAdtEncounterException.PATIENT_NOT_ADMITTED_CODE,
+        assertEquals(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED.getCode(),
                      errors.getAllErrors().get(0).getCode());
     }
 
@@ -276,7 +275,7 @@ public class EncounterValidatorTest extends BaseModuleContextSensitiveTest {
         validator.validate(encounter, errors);
 
         assertTrue(errors.hasErrors(), "Should reject transfer when patient already at location");
-        assertEquals(InvalidAdtEncounterException.PATIENT_ALREADY_AT_LOCATION_CODE,
+        assertEquals(InvalidAdtEncounterException.Type.PATIENT_ALREADY_AT_LOCATION.getCode(),
                      errors.getAllErrors().get(0).getCode());
     }
 

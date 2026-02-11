@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
+import org.mockito.InOrder;
 import org.mockito.MockedStatic;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -49,6 +50,7 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.TestUtils;
 import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodException;
+import org.openmrs.module.emrapi.adt.exception.InvalidAdtEncounterException;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
@@ -89,6 +91,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -894,7 +897,7 @@ public class AdtServiceTest {
         return map;
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = InvalidAdtEncounterException.class)
     public void test_admitPatient_failsIfPatientIsAlreadyAdmitted() throws Exception {
         Patient patient = new Patient();
 
@@ -933,7 +936,7 @@ public class AdtServiceTest {
         }));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = InvalidAdtEncounterException.class)
     public void test_dischargePatient_failsIfPatientIsNotAdmitted() throws Exception {
         Patient patient = new Patient();
 
@@ -982,10 +985,26 @@ public class AdtServiceTest {
         final Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
         when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(visit));
 
+        InOrder inOrder = inOrder(mockEncounterService);
+
+        final AdtAction admit = new AdtAction(visit, inpatientDepartment, buildProviderMap(), ADMISSION);
+        service.createAdtEncounterFor(admit);
+
+        inOrder.verify(mockEncounterService).saveEncounter(argThat(encounter -> {
+            assertThat(encounter.getEncounterType(), is(admissionEncounterType));
+            assertThat(encounter.getVisit(), is(visit));
+            assertThat(encounter.getPatient(), is(patient));
+            assertThat(encounter.getLocation(), is(inpatientDepartment));
+            assertThat(encounter.getForm(), is(admissionForm));
+            assertThat(encounter.getEncounterDatetime(), TestUtils.isJustNow());
+            assertThat(encounter, hasProviders(admit.getProviders()));
+            return true;
+        }));
+
         final AdtAction transfer = new AdtAction(visit, radiologyDepartment, buildProviderMap(), TRANSFER);
         service.createAdtEncounterFor(transfer);
 
-        verify(mockEncounterService).saveEncounter(argThat(encounter -> {
+        inOrder.verify(mockEncounterService).saveEncounter(argThat(encounter -> {
             assertThat(encounter.getEncounterType(), is(transferWithinHospitalEncounterType));
             assertThat(encounter.getVisit(), is(visit));
             assertThat(encounter.getPatient(), is(patient));
