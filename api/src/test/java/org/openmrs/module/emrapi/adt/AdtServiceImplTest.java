@@ -496,10 +496,11 @@ public class AdtServiceImplTest extends BaseModuleContextSensitiveTest {
     @Test
     public void shouldGetAdmissionIfTransferEncounters() {
         assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 1));
         Encounter e = createTransferEncounter(DateUtils.addHours(visitDate, 2));
         List<InpatientAdmission> admissions = assertNumAdmissions(admissionCriteria, 1);
         InpatientAdmission admission = admissions.get(0);
-        assertThat(admission.getAdmissionEncounters().size(), equalTo(0));
+        assertThat(admission.getAdmissionEncounters().size(), equalTo(1));
         assertThat(admission.getTransferEncounters().size(), equalTo(1));
         assertThat(admission.getDischargeEncounters().size(), equalTo(0));
         assertThat(admission.getTransferEncounters().iterator().next(), equalTo(e));
@@ -509,10 +510,11 @@ public class AdtServiceImplTest extends BaseModuleContextSensitiveTest {
     public void shouldGetAdmissionIfDischargeEncounters() {
         admissionCriteria.setIncludeDischarged(true);
         assertNumAdmissions(admissionCriteria, 0);
+        createAdmissionEncounter(DateUtils.addHours(visitDate, 1));
         Encounter e = createDischarge(DateUtils.addHours(visitDate, 2), visitLocation);
         List<InpatientAdmission> admissions = assertNumAdmissions(admissionCriteria, 1);
         InpatientAdmission admission = admissions.get(0);
-        assertThat(admission.getAdmissionEncounters().size(), equalTo(0));
+        assertThat(admission.getAdmissionEncounters().size(), equalTo(1));
         assertThat(admission.getTransferEncounters().size(), equalTo(0));
         assertThat(admission.getDischargeEncounters().size(), equalTo(1));
         assertThat(admission.getDischargeEncounters().iterator().next(), equalTo(e));

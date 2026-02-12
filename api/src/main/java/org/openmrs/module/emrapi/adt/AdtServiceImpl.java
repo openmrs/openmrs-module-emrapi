@@ -832,12 +832,12 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         VisitDomainWrapper visit = wrap(action.getVisit()) ;
 
-        action.getType().checkVisitValid(visit);
-
         Date adtDatetime = action.getActionDatetime();
         if (adtDatetime == null) {
             adtDatetime = new Date();
         }
+
+        action.getType().checkVisitValid(visit, action.getLocation(), adtDatetime);
 
         visit.errorIfOutsideVisit(adtDatetime, "ADT Datetime outside of visit bounds");
 
@@ -847,8 +847,10 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         Encounter encounter = buildEncounter(adtEncounterType, visit.getVisit().getPatient(), action.getLocation(), adtForm, adtDatetime, null, null);
         addProviders(encounter, action.getProviders());
 
-        visit.addEncounter(encounter);
+        encounter.setVisit(visit.getVisit());
         encounterService.saveEncounter(encounter);
+        // Add encounter to visit after saving to maintain data consistency in memory
+        visit.addEncounter(encounter);
         return encounter;
     }
 
@@ -1091,5 +1093,27 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         return new ArrayList<>(m.values());
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public void verifyEncounterForAdtAction(Encounter encounter) {
+        Visit visit = encounter.getVisit();
+        EncounterType encounterType = encounter.getEncounterType();
+        Date onDate = encounter.getEncounterDatetime();
+        VisitDomainWrapper wrappedVisit = wrap(visit);
+        AdtAction.Type actionType = null;
+
+        if (encounterType.equals(emrApiProperties.getAdmissionEncounterType())) {
+            actionType = AdtAction.Type.ADMISSION;
+        } else if (encounterType.equals(emrApiProperties.getExitFromInpatientEncounterType())) {
+            actionType = AdtAction.Type.DISCHARGE;
+        } else if (encounterType.equals(emrApiProperties.getTransferWithinHospitalEncounterType())) {
+            actionType = AdtAction.Type.TRANSFER;
+        }
+        
+        if(actionType != null) {
+            actionType.checkVisitValid(wrappedVisit, encounter.getLocation(), onDate);
+        }
     }
 }

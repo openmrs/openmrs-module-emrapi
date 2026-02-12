@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- Using existing patients from standard test dataset: patients 2, 6, 7 -->
+
+    <!-- Locations for ADT testing -->
+    <location location_id="4001" name="Ward A" creator="1" date_created="2008-08-18 12:25:57.0" retired="false" uuid="a1135c13-6b1c-11ef-9f7f-0242ac120003"/>
+    <location location_id="4002" name="Ward B" creator="1" date_created="2008-08-18 12:25:57.0" retired="false" uuid="a2135c13-6b1c-11ef-9f7f-0242ac120003"/>
+
+    <!-- Visit for patient 2 - currently active with admission -->
+    <visit visit_id="3001" patient_id="2" visit_type_id="1" date_started="2024-01-01 08:00:00.0" location_id="1" creator="1" date_created="2024-01-01 08:00:00.0" voided="0" uuid="v1135c13-6b1c-11ef-9f7f-0242ac120003" />
+
+    <!-- Admission encounter for patient 2 -->
+    <encounter encounter_id="5001" visit_id="3001" encounter_type="1004" patient_id="2" location_id="4001" encounter_datetime="2024-01-01 09:00:00.0" creator="1" date_created="2024-01-01 09:00:00.0" voided="false" uuid="e1135c13-6b1c-11ef-9f7f-0242ac120003"/>
+
+    <!-- Provider link for admission encounter -->
+    <encounter_provider encounter_provider_id="5001" encounter_id="5001" provider_id="5000" encounter_role_id="6" creator="1" date_created="2024-01-01 09:00:00.0" voided="false" uuid="ep135c13-6b1c-11ef-9f7f-0242ac120003"/>
+
+    <!-- Visit for patient 6 - no admission encounter -->
+    <visit visit_id="3002" patient_id="6" visit_type_id="1" date_started="2024-01-02 08:00:00.0" location_id="1" creator="1" date_created="2024-01-02 08:00:00.0" voided="0" uuid="v2135c13-6b1c-11ef-9f7f-0242ac120003" />
+
+    <!-- Check-in encounter for patient 6 (non-ADT encounter) -->
+    <encounter encounter_id="5002" visit_id="3002" encounter_type="1000" patient_id="6" location_id="1" encounter_datetime="2024-01-02 08:30:00.0" creator="1" date_created="2024-01-02 08:30:00.0" voided="false" uuid="e2135c13-6b1c-11ef-9f7f-0242ac120003"/>
+
+    <!-- Visit for patient 7 - admitted then discharged -->
+    <visit visit_id="3003" patient_id="7" visit_type_id="1" date_started="2024-01-03 08:00:00.0" location_id="1" creator="1" date_created="2024-01-03 08:00:00.0" voided="0" uuid="v3135c13-6b1c-11ef-9f7f-0242ac120003" />
+
+    <!-- Admission encounter for patient 7 -->
+    <encounter encounter_id="5003" visit_id="3003" encounter_type="1004" patient_id="7" location_id="4001" encounter_datetime="2024-01-03 09:00:00.0" creator="1" date_created="2024-01-03 09:00:00.0" voided="false" uuid="e3135c13-6b1c-11ef-9f7f-0242ac120003"/>
+
+    <!-- Discharge encounter for patient 7 -->
+    <encounter encounter_id="5004" visit_id="3003" encounter_type="1002" patient_id="7" location_id="4001" encounter_datetime="2024-01-03 15:00:00.0" creator="1" date_created="2024-01-03 15:00:00.0" voided="false" uuid="e4135c13-6b1c-11ef-9f7f-0242ac120003"/>
+
+</dataset>
