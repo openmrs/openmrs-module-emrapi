@@ -68,7 +68,7 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
     }
 
     /**
-     * @see org.openmrs.module.emrapi.concept.EmrConceptDAO#conceptSearch(String,Locale,Collection<org.openmrs.ConceptClass>,Collection<org.openmrs.Concept>,Collection<org.openmrs.ConceptSource>,Integer)
+     * @see org.openmrs.module.emrapi.concept.EmrConceptDAO#conceptSearch(String,Locale,Collection,Collection,Collection,Integer)
      */
     @Override
     @Transactional(readOnly=true)
