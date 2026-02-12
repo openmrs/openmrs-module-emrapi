@@ -140,7 +140,7 @@ public class AdtAction {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
                 Location currentLocation = visit.getInpatientLocation(onDate);
-                if(toLocation != null && toLocation.equals(currentLocation)) {
+                if (toLocation != null && toLocation.equals(currentLocation)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_ALREADY_AT_LOCATION, toLocation, onDate);
                 }
             }
