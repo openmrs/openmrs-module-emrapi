@@ -54,6 +54,14 @@
         <lang>de</lang>
         <file>messages_de.properties</file>
     </messages>
+    <messages>
+        <lang>es</lang>
+        <file>messages_es.properties</file>
+    </messages>
+    <messages>
+        <lang>ht</lang>
+        <file>messages_ht.properties</file>
+    </messages>
     <!-- /Internationalization -->
 
 	<!-- Extensions -->

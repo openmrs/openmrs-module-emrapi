@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Person;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.Provider;
 import org.openmrs.ProviderRole;
@@ -15,6 +16,7 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.util.OpenmrsConstants;
 
 import java.util.Arrays;
@@ -51,6 +53,7 @@ public class AccountDomainWrapperTest {
 
     private ProviderService providerService;
 
+    private EmrApiProperties emrApiProperties;
 
     private ProviderIdentifierGenerator providerIdentifierGenerator = null;
 
@@ -70,6 +73,9 @@ public class AccountDomainWrapperTest {
         userService = mock(UserService.class);
         personService = mock(PersonService.class);
         providerService = mock(ProviderService.class);
+        emrApiProperties = mock(EmrApiProperties.class);
+
+        when(emrApiProperties.getTelephoneAttributeType()).thenReturn(new PersonAttributeType());
 
         fullPrivileges = new Role();
         fullPrivileges.setRole(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL + "Full");
@@ -593,7 +599,7 @@ public class AccountDomainWrapperTest {
 
     private AccountDomainWrapper initializeNewAccountDomainWrapper(Person person) {
         return new AccountDomainWrapper(person, accountService, userService,
-                providerService, personService, providerIdentifierGenerator);
+                providerService, personService, providerIdentifierGenerator, emrApiProperties);
     }
 
     private class IsExpectedProvider implements ArgumentMatcher<Provider> {
