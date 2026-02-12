@@ -5,9 +5,9 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
 import org.openmrs.User;
-import org.openmrs.api.APIException;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
@@ -16,16 +16,22 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Transactional
 public class AccountServiceImpl extends BaseOpenmrsService implements AccountService {
+
+    private Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     private UserService userService;
 
@@ -97,6 +103,9 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
             providers = providerService.getAllProviders();
         }
 
+        Set<Person> userPersons = new HashSet<>();
+        Set<Person> providerPersons = new HashSet<>();
+
         for (User user : users) {
             //exclude daemon user
             if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid())) {
@@ -105,6 +114,7 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
             Person person = user.getPerson();
             if (BooleanUtils.isNotTrue(person.getPersonVoided())) {
                 byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
+                userPersons.add(person);
             }
         }
 
@@ -117,14 +127,37 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
 
             Person person = provider.getPerson();
 
-            if (person == null) {
-                throw new APIException("Providers not associated to a person are not supported");
+            if (person == null || BooleanUtils.isTrue(person.getPersonVoided())) {
+                log.warn("Providers not associated to a person are not supported");
+                continue;
             }
 
-            AccountDomainWrapper account = byPerson.get(person);
-            if (account == null && BooleanUtils.isNotTrue(person.getPersonVoided())) {
+            // filter based on role if provided
+            ProviderRole providerRole = provider.getProviderRole();
+            if (criteria.getProviderRoles() != null && !criteria.getProviderRoles().isEmpty()) {
+                if (providerRole == null || !criteria.getProviderRoles().contains(providerRole)) {
+                    continue;
+                }
+            }
+
+            if (!byPerson.containsKey(person)) {
                 byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
             }
+            providerPersons.add(person);
+        }
+
+        if (criteria.getHasUser() == Boolean.TRUE) {
+            byPerson.keySet().retainAll(userPersons);
+        }
+        else if (criteria.getHasUser() == Boolean.FALSE) {
+            byPerson.keySet().removeAll(userPersons);
+        }
+
+        if (criteria.getHasProvider() == Boolean.TRUE) {
+            byPerson.keySet().retainAll(providerPersons);
+        }
+        else if (criteria.getHasProvider() == Boolean.FALSE) {
+            byPerson.keySet().removeAll(providerPersons);
         }
 
         return new ArrayList<>(byPerson.values());

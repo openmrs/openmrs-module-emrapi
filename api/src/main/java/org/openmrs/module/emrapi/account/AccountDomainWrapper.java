@@ -107,6 +107,18 @@ public class AccountDomainWrapper implements DomainWrapper {
         }
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Provider getProvider() {
+        return provider;
+    }
+
     public void setProviderRole(ProviderRole providerRole) {
         if (providerRole != null) {
             initializeProviderIfNecessary();
