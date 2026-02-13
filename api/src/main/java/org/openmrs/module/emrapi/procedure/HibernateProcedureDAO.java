@@ -10,50 +10,53 @@
 package org.openmrs.module.emrapi.procedure;
 
 import lombok.Setter;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
-/**
- * Hibernate implementation of the ProcedureDAO interface.
- */
 @Setter
 public class HibernateProcedureDAO implements ProcedureDAO {
-   
+
    private DbSessionFactory sessionFactory;
-   
+
+   private EntityManager getEntityManager() {
+      return sessionFactory.getHibernateSessionFactory().getCurrentSession();
+   }
+
    @Override
    public Procedure getById(Integer id) {
-      return (Procedure) sessionFactory.getCurrentSession().get(Procedure.class, id);
+      return getEntityManager().find(Procedure.class, id);
    }
-   
+
    @Override
    public Procedure getByUuid(String uuid) {
-      Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Procedure.class);
-      criteria.add(Restrictions.eq("uuid", uuid));
-      return (Procedure) criteria.uniqueResult();
+      String jpql = "SELECT p FROM Procedure p WHERE p.uuid = :uuid";
+      
+      TypedQuery<Procedure> query = getEntityManager().createQuery(jpql, Procedure.class);
+      query.setParameter("uuid", uuid);
+      
+      List<Procedure> results = query.getResultList();
+      return results.isEmpty() ? null : results.get(0);
    }
-   
+
    @Override
    public Procedure saveOrUpdate(Procedure procedure) {
-      sessionFactory.getCurrentSession().saveOrUpdate(procedure);
-      return procedure;
+      return getEntityManager().merge(procedure);
    }
    
    @Override
-   @SuppressWarnings("unchecked")
    public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided) {
-      Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Procedure.class);
-      criteria.add(Restrictions.eq("patient", patient));
-      if (!includeVoided) {
-         criteria.add(Restrictions.eq("voided", false));
-      }
-      criteria.addOrder(Order.desc("startDateTime"));
-      return criteria.list();
+      String jpql = "SELECT p FROM Procedure p" +
+              " WHERE p.patient = :patient" +
+              (includeVoided ? "" : " AND p.voided = false") +
+              " ORDER BY p.startDateTime DESC";
+      
+      TypedQuery<Procedure> query = getEntityManager().createQuery(jpql, Procedure.class);
+      query.setParameter("patient", patient);
+      
+      return query.getResultList();
    }
 }
