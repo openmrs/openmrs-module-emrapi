@@ -75,6 +75,7 @@ public class AccountResource extends DelegatingCrudResource<AccountDomainWrapper
             searchCriteria.setProviderRoles(providerRoles);
         }
         List<AccountDomainWrapper> accounts = getAccountService().getAccounts(searchCriteria);
+        accounts.sort((o1, o2) -> getDisplay(o1).compareTo(getDisplay(o2)));
         return new NeedsPaging<>(accounts, context);
     }
 
@@ -112,6 +113,7 @@ public class AccountResource extends DelegatingCrudResource<AccountDomainWrapper
         description.addProperty("userEnabled");
         description.addProperty("locked");
         description.addProperty("providerRole", Representation.REF);
+        description.addProperty("providerIdentifier");
         return description;
     }
 

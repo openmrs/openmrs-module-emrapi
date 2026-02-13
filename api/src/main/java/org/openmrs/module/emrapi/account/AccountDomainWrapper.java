@@ -138,6 +138,25 @@ public class AccountDomainWrapper implements DomainWrapper {
         return this.provider.getProviderRole();
     }
 
+    public void setProviderIdentifier(String providerIdentifier) {
+        if (StringUtils.isNotBlank(providerIdentifier)) {
+            initializeProviderIfNecessary();
+            provider.setIdentifier(providerIdentifier);
+        }
+        else {
+            if (this.provider != null) {
+                provider.setIdentifier(providerIdentifier);
+            }
+        }
+    }
+
+    public String getProviderIdentifier() {
+        if (this.provider == null) {
+            return null;
+        }
+        return this.provider.getIdentifier();
+    }
+
     public void setGivenName(String givenName) {
         initializePersonNameIfNecessary();
         person.getPersonName().setGivenName(givenName);
