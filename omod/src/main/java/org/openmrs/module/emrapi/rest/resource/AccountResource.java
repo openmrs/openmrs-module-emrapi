@@ -57,6 +57,14 @@ public class AccountResource extends DelegatingCrudResource<AccountDomainWrapper
         if (StringUtils.isNotBlank(hasProviderParam)) {
             searchCriteria.setHasProvider(Boolean.parseBoolean(hasProviderParam));
         }
+        String hasProviderRoleParam = context.getParameter("hasProviderRole");
+        if (StringUtils.isNotBlank(hasProviderRoleParam)) {
+            searchCriteria.setHasProviderRole(Boolean.parseBoolean(hasProviderRoleParam));
+        }
+        String userEnabledParam = context.getParameter("userEnabled");
+        if (StringUtils.isNotBlank(userEnabledParam)) {
+            searchCriteria.setUserEnabled(Boolean.parseBoolean(userEnabledParam));
+        }
         String providerRolesParam = context.getParameter("providerRoles");
         if (StringUtils.isNotBlank(providerRolesParam)) {
             List<ProviderRole> providerRoles = new ArrayList<>();

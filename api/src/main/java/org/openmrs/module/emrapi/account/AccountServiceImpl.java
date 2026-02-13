@@ -1,6 +1,5 @@
 package org.openmrs.module.emrapi.account;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
@@ -22,11 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Transactional
 public class AccountServiceImpl extends BaseOpenmrsService implements AccountService {
@@ -103,61 +100,57 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
             providers = providerService.getAllProviders();
         }
 
-        Set<Person> userPersons = new HashSet<>();
-        Set<Person> providerPersons = new HashSet<>();
-
+        // Get the base set of persons
         for (User user : users) {
-            //exclude daemon user
-            if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid())) {
-                continue;
+            if (user.getPerson() == null) {
+                log.warn("Users not associated to a person are not supported.  Excluding {}", user.getUuid());
             }
-            Person person = user.getPerson();
-            if (BooleanUtils.isNotTrue(person.getPersonVoided())) {
-                byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
-                userPersons.add(person);
+            else {
+                byPerson.put(user.getPerson(), domainWrapperFactory.newAccountDomainWrapper(user.getPerson()));
             }
         }
 
         for (Provider provider : providers) {
+            if (provider.getPerson() == null) {
+                log.warn("Providers not associated to a person are not supported.  Excluding {}", provider.getUuid());
+            }
+            else {
+                byPerson.put(provider.getPerson(), domainWrapperFactory.newAccountDomainWrapper(provider.getPerson()));
+            }
+        }
 
+        // Exclude persons based on user search criteria
+        for (User user : users) {
+            //exclude daemon user
+            if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid())) {
+                byPerson.remove(user.getPerson());
+            }
+            else if (criteria.getUserEnabled() == Boolean.TRUE && user.isRetired()) {
+                byPerson.remove(user.getPerson());
+            }
+            else if (criteria.getUserEnabled() == Boolean.FALSE && !user.isRetired()) {
+                byPerson.remove(user.getPerson());
+            }
+        }
+
+        // Exclude persons based on provider search criteria
+        for (Provider provider : providers) {
             // skip the baked-in unknown provider
             if (provider.equals(emrApiProperties.getUnknownProvider())) {
-                continue;
+                byPerson.remove(provider.getPerson());
             }
-
-            Person person = provider.getPerson();
-
-            if (person == null || BooleanUtils.isTrue(person.getPersonVoided())) {
-                log.warn("Providers not associated to a person are not supported");
-                continue;
-            }
-
-            // filter based on role if provided
             ProviderRole providerRole = provider.getProviderRole();
+            if (criteria.getHasProviderRole() == Boolean.TRUE && providerRole == null) {
+                byPerson.remove(provider.getPerson());
+            }
+            if (criteria.getHasProviderRole() == Boolean.FALSE && providerRole != null) {
+                byPerson.remove(provider.getPerson());
+            }
             if (criteria.getProviderRoles() != null && !criteria.getProviderRoles().isEmpty()) {
                 if (providerRole == null || !criteria.getProviderRoles().contains(providerRole)) {
-                    continue;
+                    byPerson.remove(provider.getPerson());
                 }
             }
-
-            if (!byPerson.containsKey(person)) {
-                byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
-            }
-            providerPersons.add(person);
-        }
-
-        if (criteria.getHasUser() == Boolean.TRUE) {
-            byPerson.keySet().retainAll(userPersons);
-        }
-        else if (criteria.getHasUser() == Boolean.FALSE) {
-            byPerson.keySet().removeAll(userPersons);
-        }
-
-        if (criteria.getHasProvider() == Boolean.TRUE) {
-            byPerson.keySet().retainAll(providerPersons);
-        }
-        else if (criteria.getHasProvider() == Boolean.FALSE) {
-            byPerson.keySet().removeAll(providerPersons);
         }
 
         return new ArrayList<>(byPerson.values());

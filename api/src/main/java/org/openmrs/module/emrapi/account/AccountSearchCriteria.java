@@ -14,6 +14,8 @@ public class AccountSearchCriteria {
     private String nameOrIdentifier;
     private Boolean hasUser;
     private Boolean hasProvider;
+    private Boolean hasProviderRole;
     private List<ProviderRole> providerRoles;
+    private Boolean userEnabled;
 
 }
