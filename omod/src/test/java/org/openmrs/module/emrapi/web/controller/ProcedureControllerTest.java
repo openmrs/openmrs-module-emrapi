@@ -41,6 +41,7 @@ class ProcedureControllerTest extends BaseModuleWebContextSensitiveTest {
     private static final String PROCEDURE_CONCEPT_UUID = "procedure-concept-uuid";
     private static final String BODY_SITE_UUID = "body-site-concept-uuid";
     private static final String STATUS_UUID = "status-completed-concept-uuid";
+    private static final String DURATION_UNIT_MINUTES_UUID = "duration-unit-minutes-concept-uuid";
     private static final String EXISTING_PROCEDURE_UUID = "existing-procedure-uuid";
 
     private static final String BASE_URL = "/rest/v1/emrapi/procedure";
@@ -105,7 +106,7 @@ class ProcedureControllerTest extends BaseModuleWebContextSensitiveTest {
             assertEquals(BODY_SITE_UUID, response.get("bodySiteUuid"));
             assertEquals(STATUS_UUID, response.get("statusUuid"));
             assertEquals(45, response.get("duration"));
-            assertEquals("MINUTES", response.get("durationUnit"));
+            assertEquals(DURATION_UNIT_MINUTES_UUID, response.get("durationUnitUuid"));
             assertEquals("Existing procedure for GET test", response.get("notes"));
         }
     }
@@ -123,7 +124,7 @@ class ProcedureControllerTest extends BaseModuleWebContextSensitiveTest {
                     + "\"statusUuid\": \"" + STATUS_UUID + "\","
                     + "\"startDateTime\": \"2025-06-15T14:30:00\","
                     + "\"duration\": 45,"
-                    + "\"durationUnit\": \"MINUTES\","
+                    + "\"durationUnitUuid\": \"" + DURATION_UNIT_MINUTES_UUID + "\","
                     + "\"notes\": \"Current procedure notes\""
                     + "}";
 
@@ -139,7 +140,7 @@ class ProcedureControllerTest extends BaseModuleWebContextSensitiveTest {
             assertEquals(PROCEDURE_CONCEPT_UUID, response.get("codedProcedureUuid"));
             assertEquals(BODY_SITE_UUID, response.get("bodySiteUuid"));
             assertEquals(45, response.get("duration"));
-            assertEquals("MINUTES", response.get("durationUnit"));
+           assertEquals(DURATION_UNIT_MINUTES_UUID, response.get("durationUnitUuid"));
             assertEquals("Current procedure notes", response.get("notes"));
 
             // Verify persisted to DB

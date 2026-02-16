@@ -11,30 +11,33 @@ package org.openmrs.module.emrapi.web.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.openmrs.Concept;
+import org.openmrs.Encounter;
+import org.openmrs.Patient;
 
 import java.util.Date;
 
 /**
- * Data Transfer Object for Creating and Updating Procedure entity.
+ * Data Transfer Object for Procedure entity.
  * Used for REST API communication.
  */
 @Setter
 @Getter
-public class ProcedureDTO {
+public class ProcedureResponseDTO {
    
    private String uuid;
    
-   private String patientUuid;
+   private Patient patient;
    
-   private String encounterUuid;
+   private Encounter encounter;
    
    // Procedure - coded or free text
-   private String codedProcedureUuid;
+   private Concept codedProcedure;
    
    private String freeTextProcedure;
    
    // Body site (required, coded only)
-   private String bodySiteUuid;
+   private Concept bodySite;
    
    // Timing
    private Date startDateTime;
@@ -45,14 +48,13 @@ public class ProcedureDTO {
    
    private Integer duration;
    
-   // Duration unit (coded only)
-   private String durationUnitUuid;
+   private Concept durationUnitUuid;
    
    // Status
-   private String statusUuid;
+   private Concept status;
    
    // Outcome - coded or free text
-   private String codedOutcomeUuid;
+   private Concept codedOutcome;
    
    private String freeTextOutcome;
    
@@ -70,7 +72,7 @@ public class ProcedureDTO {
    private boolean voided;
    
    // Default constructor
-   public ProcedureDTO() {
+   public ProcedureResponseDTO() {
    }
    
 }

@@ -86,7 +86,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
          
       }
       catch (DateTimeParseException e) {
-         throw new APIException("Procedure.error.invalidEstimateDate", new Object[] { estimatedDate });
+         throw new APIException("Procedure.error.invalidEstimateDate", new Object[] { estimatedDate }, e);
       }
    }
    

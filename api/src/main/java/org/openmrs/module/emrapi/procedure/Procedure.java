@@ -12,15 +12,15 @@ package org.openmrs.module.emrapi.procedure;
 import lombok.Getter;
 import lombok.Setter;
 import org.openmrs.BaseChangeableOpenmrsData;
+import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Concept;
+import org.openmrs.Duration;
 import org.openmrs.Encounter;
 import org.openmrs.FormRecordable;
 import org.openmrs.Patient;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,7 +37,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "emrapi_procedure")
-public class Procedure extends BaseChangeableOpenmrsData implements FormRecordable {
+public class Procedure extends BaseOpenmrsData implements FormRecordable {
    
    private static final long serialVersionUID = 1L;
    
@@ -90,9 +90,9 @@ public class Procedure extends BaseChangeableOpenmrsData implements FormRecordab
    @Column(name = "duration")
    private Integer duration;
    
-   @Enumerated(EnumType.STRING)
-   @Column(name = "duration_unit", length = 20)
-   private DurationUnit durationUnit;
+   @ManyToOne
+   @JoinColumn(name = "duration_unit_coded", nullable = true)
+   private Concept durationUnit;
    
    // Status
    @ManyToOne
@@ -150,4 +150,13 @@ public class Procedure extends BaseChangeableOpenmrsData implements FormRecordab
       this.procedureId = id;
    }
    
+   public Duration toDuration() {
+      if (duration != null && durationUnit != null) {
+         String code = Duration.getCode(durationUnit);
+         if (code != null) {
+            return new Duration(duration, code);
+         }
+      }
+      return null;
+   }
 }

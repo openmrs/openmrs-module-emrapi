@@ -169,14 +169,6 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 //    }
 
     @Test
-    public void procedure_shouldHaveCorrectDurationUnit() {
-        Procedure procedure = procedureDAO.getById(1);
-
-        assertEquals(Procedure.DurationUnit.MINUTES, procedure.getDurationUnit());
-        assertEquals(Integer.valueOf(90), procedure.getDuration());
-    }
-
-    @Test
     public void procedure_shouldHaveCodedProcedure() {
         Procedure procedure = procedureDAO.getById(1);
 

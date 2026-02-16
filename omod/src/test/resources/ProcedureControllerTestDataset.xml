@@ -43,6 +43,23 @@
                   creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
                   uuid="status-completed-concept-name-uuid"/>
 
+    <!-- Concept for duration unit -->
+    <concept concept_id="5007" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="duration-unit-seconds-concept-uuid"/>
+    <concept_name concept_name_id="5007" concept_id="5007" name="Seconds" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="seconds-concept-name-uuid"/>
+    <concept concept_id="5008" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="duration-unit-minutes-concept-uuid"/>
+    <concept_name concept_name_id="5008" concept_id="5008" name="Minutes" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="minutes-concept-name-uuid"/>
+    <concept concept_id="5009" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="duration-unit-hours-concept-uuid"/>
+    <concept_name concept_name_id="5009" concept_id="5009" name="Hours" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="hours-concept-name-uuid"/>
+
     <!-- Pre-existing procedure for GET tests -->
     <emrapi_procedure
             procedure_id="101"
@@ -51,7 +68,7 @@
             body_site_coded="5002"
             start_date_time="2023-06-15 14:30:00"
             duration="45"
-            duration_unit="MINUTES"
+            duration_unit_coded="5008"
             status_coded="5006"
             notes="Existing procedure for GET test"
             uuid="existing-procedure-uuid"

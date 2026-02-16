@@ -163,7 +163,7 @@ public class ProcedureController extends BaseRestController {
       dto.setDuration(procedure.getDuration());
       
       if (procedure.getDurationUnit() != null) {
-         dto.setDurationUnit(procedure.getDurationUnit().name());
+         dto.setDurationUnitUuid(procedure.getDurationUnit().getUuid());
       }
       if (procedure.getStatus() != null) {
          dto.setStatusUuid(procedure.getStatus().getUuid());
@@ -233,14 +233,12 @@ public class ProcedureController extends BaseRestController {
       procedure.setEndDateTime(dto.getEndDateTime());
       procedure.setDuration(dto.getDuration());
       
-      if (StringUtils.isNotBlank(dto.getDurationUnit())) {
-         try {
-            procedure.setDurationUnit(Procedure.DurationUnit.valueOf(dto.getDurationUnit()));
+      if (StringUtils.isNotBlank(dto.getDurationUnitUuid())) {
+         Concept durationUnitConcept = conceptService.getConceptByUuid(dto.getDurationUnitUuid());
+         if (durationUnitConcept == null) {
+            throw new IllegalArgumentException("Status concept not found with UUID: " + dto.getDurationUnitUuid());
          }
-         catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid duration unit: " + dto.getDurationUnit() +
-                    ". Valid values are: SECONDS, MINUTES, HOURS, DAYS");
-         }
+         procedure.setDurationUnit(durationUnitConcept);
       } else {
          procedure.setDurationUnit(null);
       }

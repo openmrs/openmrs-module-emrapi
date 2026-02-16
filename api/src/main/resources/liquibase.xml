@@ -50,7 +50,7 @@
             <column name="duration" type="int">
                 <constraints nullable="true"/>
             </column>
-            <column name="duration_unit" type="varchar(20)">
+            <column name="duration_unit_coded" type="int">
                 <constraints nullable="true"/>
             </column>
 
