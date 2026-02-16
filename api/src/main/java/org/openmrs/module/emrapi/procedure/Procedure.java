@@ -11,7 +11,6 @@ package org.openmrs.module.emrapi.procedure;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.openmrs.BaseChangeableOpenmrsData;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Concept;
 import org.openmrs.Duration;
@@ -41,17 +40,7 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
    
    private static final long serialVersionUID = 1L;
    
-   /**
-    * Enum representing duration units for procedure duration.
-    */
-   public enum DurationUnit {
-      SECONDS,
-      MINUTES,
-      HOURS,
-      DAYS
-   }
-   
-   @Id
+  @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @Column(name = "procedure_id")
    private Integer procedureId;
@@ -59,6 +48,10 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
    @ManyToOne
    @JoinColumn(name = "patient_id", nullable = false)
    private Patient patient;
+   
+   @ManyToOne
+   @JoinColumn(name = "procedure_type_id", nullable = false)
+   private ProcedureType procedureType;
    
    @ManyToOne
    @JoinColumn(name = "encounter_id")
