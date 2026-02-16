@@ -59,4 +59,9 @@ public class HibernateProcedureDAO implements ProcedureDAO {
       
       return query.getResultList();
    }
+   
+   @Override
+   public void delete(Procedure procedure) {
+      sessionFactory.getCurrentSession().delete(procedure);
+   }
 }

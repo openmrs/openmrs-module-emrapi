@@ -43,6 +43,9 @@ public class ProcedureValidator implements Validator {
          if (procedure.getStatus() == null) {
             errors.reject("Procedure.error.statusRequired");
          }
+         if (procedure.getVoided() && StringUtils.isBlank(procedure.getVoidReason())) {
+            errors.reject("Procedure.error.voidReasonRequiredWhenVoided");
+         }
       }
    }
 }

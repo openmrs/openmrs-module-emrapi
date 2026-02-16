@@ -115,11 +115,11 @@ public class ProcedureResource extends DelegatingCrudResource<Procedure> {
 
 	@Override
 	protected void delete(Procedure procedure, String reason, RequestContext context) throws ResponseException {
-		throw new ResourceDoesNotSupportOperationException();
+		Context.getService(ProcedureService.class).voidProcedure(procedure, reason);
 	}
 
 	@Override
 	public void purge(Procedure procedure, RequestContext context) throws ResponseException {
-		throw new ResourceDoesNotSupportOperationException();
+		Context.getService(ProcedureService.class).purgeProcedure(procedure);
 	}
 }

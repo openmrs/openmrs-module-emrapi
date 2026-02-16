@@ -48,4 +48,31 @@ public interface ProcedureService extends OpenmrsService {
     */
    List<Procedure> getProceduresByPatient(Patient patient);
    
+   /**
+    * Voids a procedure with a reason.
+    *
+    * @param procedure the procedure to void
+    * @param reason the reason for voiding
+    * @return the voided procedure
+    * @throws APIException if the procedure cannot be voided
+    */
+   Procedure voidProcedure(Procedure procedure, String reason);
+   
+   /**
+    * Unvoids a previously voided procedure.
+    *
+    * @param procedure the procedure to unvoid
+    * @return the unvoided procedure
+    */
+   Procedure unvoidProcedure(Procedure procedure);
+   
+   /**
+    * Permanently deletes a procedure from the database.
+    * Use with caution - prefer voiding for audit purposes.
+    *
+    * @param procedure the procedure to delete
+    * @throws APIException if the procedure cannot be deleted
+    */
+   void purgeProcedure(Procedure procedure);
+   
 }

@@ -51,4 +51,12 @@ public interface ProcedureDAO {
     * @return list of procedures sorted by startDateTime descending
     */
    List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided);
+   
+   /**
+    * Deletes a procedure from the database.
+    * This is a hard delete - use voiding for soft delete.
+    *
+    * @param procedure the procedure to delete
+    */
+   void delete(Procedure procedure);
 }
