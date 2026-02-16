@@ -9,178 +9,182 @@
  */
 package org.openmrs.module.emrapi.rest.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.procedure.Procedure;
 import org.openmrs.module.emrapi.procedure.ProcedureService;
-import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
-import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.openmrs.module.webservices.rest.SimpleObject;
+import org.openmrs.module.webservices.rest.web.RequestContext;
+import org.openmrs.module.webservices.rest.web.api.RestService;
+import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
+import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
+import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
-   
-   private static final String TEST_DATASET = "ProcedureControllerTestDataset.xml";
-   
-   private static final String PATIENT_UUID = "procedure-test-patient-uuid";
-   private static final String PROCEDURE_CONCEPT_UUID = "procedure-concept-uuid";
-   private static final String BODY_SITE_UUID = "body-site-concept-uuid";
-   private static final String STATUS_UUID = "status-completed-concept-uuid";
-   private static final String EXISTING_PROCEDURE_UUID = "existing-procedure-uuid";
-   
-   private static final String BASE_URL = "/rest/v1/emrapi/procedure";
-   
-   @Autowired
-   private ObjectFactory<ProcedureResource> controllerFactory;
-   
-   @Autowired
-   private ProcedureService procedureService;
-   
-   private MockMvc mockMvc;
-   
-   private ObjectMapper objectMapper;
-   
-   @BeforeEach
-   void setUp() {
-      executeDataSet(TEST_DATASET);
-      mockMvc = MockMvcBuilders.standaloneSetup(controllerFactory.getObject()).build();
-      objectMapper = new ObjectMapper();
-   }
-   
-   private Map<String, Object> parseResponse(MvcResult result) throws Exception {
-      return objectMapper.readValue(result.getResponse().getContentAsString(), Map.class);
-   }
-   
-   private List<Map<String, Object>> parseListResponse(MvcResult result) throws Exception {
-      return objectMapper.readValue(result.getResponse().getContentAsString(), List.class);
-   }
-   
-   @Nested
-   @DisplayName("GET /rest/v1/emrapi/procedure?patient={uuid}")
-   class GetProceduresByPatient {
-      
-      @Test
-      void shouldReturnProceduresForPatient() throws Exception {
-         MvcResult result = mockMvc.perform(get(BASE_URL).param("patient", PATIENT_UUID))
-                 .andExpect(status().isOk())
-                 .andReturn();
-         
-         List<Map<String, Object>> response = parseListResponse(result);
-         assertEquals(1, response.size());
-         assertEquals(EXISTING_PROCEDURE_UUID, response.get(0).get("uuid"));
-         assertEquals(PATIENT_UUID, response.get(0).get("patientUuid"));
-         assertEquals("Existing procedure for GET test", response.get(0).get("notes"));
-      }
-   }
-   
-   @Nested
-   @DisplayName("GET /rest/v1/emrapi/procedure/{uuid}")
-   class GetProcedureByUuid {
-      
-      @Test
-      void shouldReturnProcedureByUuid() throws Exception {
-         MvcResult result = mockMvc.perform(get(BASE_URL + "/" + EXISTING_PROCEDURE_UUID))
-                 .andExpect(status().isOk())
-                 .andReturn();
-         
-         Map<String, Object> response = parseResponse(result);
-         assertEquals(EXISTING_PROCEDURE_UUID, response.get("uuid"));
-         assertEquals(PATIENT_UUID, response.get("patientUuid"));
-         assertEquals(PROCEDURE_CONCEPT_UUID, response.get("codedProcedureUuid"));
-         assertEquals(BODY_SITE_UUID, response.get("bodySiteUuid"));
-         assertEquals(STATUS_UUID, response.get("statusUuid"));
-         assertEquals(45, response.get("duration"));
-         assertEquals("MINUTES", response.get("durationUnit"));
-         assertEquals("Existing procedure for GET test", response.get("notes"));
-      }
-   }
-   
-   @Nested
-   @DisplayName("POST /rest/v1/emrapi/procedure/current")
-   class CreateCurrentProcedure {
-      
-      @Test
-      void shouldCreateCurrentProcedure() throws Exception {
-         String requestBody = "{"
-                 + "\"patientUuid\": \"" + PATIENT_UUID + "\","
-                 + "\"codedProcedureUuid\": \"" + PROCEDURE_CONCEPT_UUID + "\","
-                 + "\"bodySiteUuid\": \"" + BODY_SITE_UUID + "\","
-                 + "\"statusUuid\": \"" + STATUS_UUID + "\","
-                 + "\"startDateTime\": \"2025-06-15T14:30:00\","
-                 + "\"duration\": 45,"
-                 + "\"durationUnit\": \"MINUTES\","
-                 + "\"notes\": \"Current procedure notes\""
-                 + "}";
-         
-         MvcResult result = mockMvc.perform(post(BASE_URL + "/current")
-                         .contentType(MediaType.APPLICATION_JSON)
-                         .content(requestBody))
-                 .andExpect(status().isCreated())
-                 .andReturn();
-         
-         Map<String, Object> response = parseResponse(result);
-         assertNotNull(response.get("uuid"));
-         assertEquals(PATIENT_UUID, response.get("patientUuid"));
-         assertEquals(PROCEDURE_CONCEPT_UUID, response.get("codedProcedureUuid"));
-         assertEquals(BODY_SITE_UUID, response.get("bodySiteUuid"));
-         assertEquals(45, response.get("duration"));
-         assertEquals("MINUTES", response.get("durationUnit"));
-         assertEquals("Current procedure notes", response.get("notes"));
-         
-         // Verify persisted to DB
-         String uuid = (String) response.get("uuid");
-         Procedure saved = procedureService.getProcedureByUuid(uuid);
-         assertNotNull(saved);
-         assertEquals("Current procedure notes", saved.getNotes());
-      }
-   }
-   
-   @Nested
-   @DisplayName("POST /rest/v1/emrapi/procedure/historical")
-   class CreateHistoricalProcedure {
-      
-      @Test
-      void shouldCreateHistoricalProcedure() throws Exception {
-         String requestBody = "{"
-                 + "\"patientUuid\": \"" + PATIENT_UUID + "\","
-                 + "\"codedProcedureUuid\": \"" + PROCEDURE_CONCEPT_UUID + "\","
-                 + "\"bodySiteUuid\": \"" + BODY_SITE_UUID + "\","
-                 + "\"statusUuid\": \"" + STATUS_UUID + "\","
-                 + "\"estimatedStartDate\": \"2020-06\","
-                 + "\"notes\": \"Historical procedure notes\""
-                 + "}";
-         
-         MvcResult result = mockMvc.perform(post(BASE_URL + "/historical")
-                         .contentType(MediaType.APPLICATION_JSON)
-                         .content(requestBody))
-                 .andExpect(status().isCreated())
-                 .andReturn();
-         
-         Map<String, Object> response = parseResponse(result);
-         assertNotNull(response.get("uuid"));
-         assertEquals("2020-06", response.get("estimatedStartDate"));
-         assertEquals("Historical procedure notes", response.get("notes"));
-         
-         // Verify persisted to DB
-         String uuid = (String) response.get("uuid");
-         Procedure saved = procedureService.getProcedureByUuid(uuid);
-         assertNotNull(saved);
-         assertEquals("2020-06", saved.getEstimatedStartDate());
-      }
-   }
+public class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
+
+	private static final String TEST_DATASET = "ProcedureControllerTestDataset.xml";
+
+	private static final String PATIENT_UUID = "procedure-test-patient-uuid";
+	private static final String PROCEDURE_CONCEPT_UUID = "procedure-concept-uuid";
+	private static final String BODY_SITE_UUID = "body-site-concept-uuid";
+	private static final String STATUS_UUID = "status-completed-concept-uuid";
+	private static final String DURATION_UNIT_MINUTES_UUID = "duration-unit-minutes-concept-uuid";
+	private static final String EXISTING_PROCEDURE_UUID = "existing-procedure-uuid";
+
+	private ProcedureResource resource;
+
+	@Before
+	public void setUp() throws Exception {
+		executeDataSet(TEST_DATASET);
+		resource = (ProcedureResource) Context.getService(RestService.class)
+				.getResourceBySupportedClass(Procedure.class);
+	}
+
+	@Test
+	public void getByUniqueId_shouldReturnProcedureByUuid() {
+		Procedure procedure = resource.getByUniqueId(EXISTING_PROCEDURE_UUID);
+
+		assertNotNull(procedure);
+		assertEquals(EXISTING_PROCEDURE_UUID, procedure.getUuid());
+		assertEquals(PROCEDURE_CONCEPT_UUID, procedure.getProcedureCoded().getUuid());
+		assertEquals(BODY_SITE_UUID, procedure.getBodySite().getUuid());
+		assertEquals(STATUS_UUID, procedure.getStatus().getUuid());
+		assertEquals(Integer.valueOf(45), procedure.getDuration());
+		assertEquals(DURATION_UNIT_MINUTES_UUID, procedure.getDurationUnit().getUuid());
+		assertEquals("Existing procedure for GET test", procedure.getNotes());
+	}
+
+	@Test
+	public void getByUniqueId_shouldReturnNullForUnknownUuid() {
+		assertNull(resource.getByUniqueId("non-existent-uuid"));
+	}
+
+	@Test
+	public void retrieve_shouldReturnRepresentationWithExpectedProperties() throws Exception {
+		SimpleObject result = (SimpleObject) resource.retrieve(EXISTING_PROCEDURE_UUID, new RequestContext());
+
+		assertNotNull(result);
+		assertEquals(EXISTING_PROCEDURE_UUID, result.get("uuid"));
+		assertEquals("Existing procedure for GET test", result.get("notes"));
+		assertEquals(Integer.valueOf(45), result.get("duration"));
+		assertEquals(Boolean.FALSE, result.get("voided"));
+
+		// Concept fields are REF representations (nested objects with uuid + display)
+		Map<String, Object> procedureCoded = result.get("procedureCoded");
+		assertNotNull(procedureCoded);
+		assertEquals(PROCEDURE_CONCEPT_UUID, procedureCoded.get("uuid"));
+
+		Map<String, Object> bodySite = result.get("bodySite");
+		assertNotNull(bodySite);
+		assertEquals(BODY_SITE_UUID, bodySite.get("uuid"));
+
+		Map<String, Object> status = result.get("status");
+		assertNotNull(status);
+		assertEquals(STATUS_UUID, status.get("uuid"));
+
+		Map<String, Object> durationUnit = result.get("durationUnit");
+		assertNotNull(durationUnit);
+		assertEquals(DURATION_UNIT_MINUTES_UUID, durationUnit.get("uuid"));
+
+		Map<String, Object> patient = result.get("patient");
+		assertNotNull(patient);
+		assertEquals(PATIENT_UUID, patient.get("uuid"));
+	}
+
+	@Test
+	public void doGetAll_shouldReturnProceduresForPatient() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setParameter("patient", PATIENT_UUID);
+		RequestContext context = new RequestContext();
+		context.setRequest(request);
+
+		NeedsPaging<Procedure> result = (NeedsPaging<Procedure>) resource.doGetAll(context);
+
+		assertNotNull(result);
+		List<Procedure> procedures = result.getPageOfResults();
+		assertEquals(1, procedures.size());
+		assertEquals(EXISTING_PROCEDURE_UUID, procedures.get(0).getUuid());
+		assertEquals("Existing procedure for GET test", procedures.get(0).getNotes());
+	}
+
+	@Test(expected = ResourceDoesNotSupportOperationException.class)
+	public void doGetAll_shouldThrowWhenNoPatientParameter() throws Exception {
+		resource.doGetAll(new RequestContext());
+	}
+
+	@Test
+	public void create_shouldCreateProcedure() throws Exception {
+		SimpleObject properties = new SimpleObject();
+		properties.add("patient", PATIENT_UUID);
+		properties.add("procedureCoded", PROCEDURE_CONCEPT_UUID);
+		properties.add("bodySite", BODY_SITE_UUID);
+		properties.add("status", STATUS_UUID);
+		properties.add("duration", 60);
+		properties.add("durationUnit", DURATION_UNIT_MINUTES_UUID);
+		properties.add("notes", "New procedure via resource");
+		properties.add("estimatedStartDate", "2020-06");
+
+		SimpleObject created = (SimpleObject) resource.create(properties, new RequestContext());
+
+		assertNotNull(created);
+		String uuid = (String) created.get("uuid");
+		assertNotNull(uuid);
+		assertEquals("New procedure via resource", created.get("notes"));
+		assertEquals(Integer.valueOf(60), created.get("duration"));
+		assertEquals("2020-06", created.get("estimatedStartDate"));
+
+		// Verify persisted to DB
+		Procedure saved = Context.getService(ProcedureService.class).getProcedureByUuid(uuid);
+		assertNotNull(saved);
+		assertEquals("New procedure via resource", saved.getNotes());
+		assertEquals(Integer.valueOf(60), saved.getDuration());
+		assertEquals(PATIENT_UUID, saved.getPatient().getUuid());
+		assertEquals(PROCEDURE_CONCEPT_UUID, saved.getProcedureCoded().getUuid());
+		assertEquals(BODY_SITE_UUID, saved.getBodySite().getUuid());
+		assertEquals(STATUS_UUID, saved.getStatus().getUuid());
+		assertEquals("2020-06", saved.getEstimatedStartDate());
+	}
+
+	@Test
+	public void create_shouldCreateProcedureWithFreeTextFields() throws Exception {
+		SimpleObject properties = new SimpleObject();
+		properties.add("patient", PATIENT_UUID);
+		properties.add("procedureNonCoded", "Some unlisted procedure");
+      properties.add("startDateTime", "2020-06-15T10:00:00.000+0000");
+		properties.add("bodySite", BODY_SITE_UUID);
+		properties.add("status", STATUS_UUID);
+		properties.add("outcomeNonCoded", "Patient recovered well");
+		properties.add("notes", "Free text procedure test");
+
+		SimpleObject created = (SimpleObject) resource.create(properties, new RequestContext());
+
+		assertNotNull(created);
+		String uuid = (String) created.get("uuid");
+		assertEquals("Some unlisted procedure", created.get("procedureNonCoded"));
+		assertEquals("Patient recovered well", created.get("outcomeNonCoded"));
+
+		Procedure saved = Context.getService(ProcedureService.class).getProcedureByUuid(uuid);
+		assertNotNull(saved);
+		assertEquals("Some unlisted procedure", saved.getProcedureNonCoded());
+		assertEquals("Patient recovered well", saved.getOutcomeNonCoded());
+	}
+
+	@Test(expected = ResourceDoesNotSupportOperationException.class)
+	public void delete_shouldThrowUnsupportedOperation() throws Exception {
+		resource.delete(EXISTING_PROCEDURE_UUID, "test reason", new RequestContext());
+	}
+
+	@Test(expected = ResourceDoesNotSupportOperationException.class)
+	public void purge_shouldThrowUnsupportedOperation() throws Exception {
+		resource.purge(EXISTING_PROCEDURE_UUID, new RequestContext());
+	}
 }

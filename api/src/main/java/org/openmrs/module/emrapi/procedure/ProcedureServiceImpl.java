@@ -37,9 +37,20 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    }
    
    @Override
+   @Transactional(readOnly = true)
+   public Procedure getProcedureByUuid(String uuid) {
+      return procedureDAO.getByUuid(uuid);
+   }
+   
+   @Override
+   @Transactional(readOnly = true)
+   public List<Procedure> getProceduresByPatient(Patient patient) {
+      return procedureDAO.getProceduresByPatient(patient, false);
+   }
+   
+   @Override
    @Transactional
    public Procedure saveProcedure(Procedure procedure) throws APIException {
-      validateProcedure(procedure);
       if (procedure.getEstimatedStartDate() != null) {
          Date calculatedStartDateTime = getDateTimeFromEstimatedDate(procedure.getEstimatedStartDate());
          procedure.setStartDateTime(calculatedStartDateTime);
@@ -88,52 +99,5 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
       catch (DateTimeParseException e) {
          throw new APIException("Procedure.error.invalidEstimateDate", new Object[] { estimatedDate }, e);
       }
-   }
-   
-   /**
-    * Validates a procedure before saving.
-    *
-    * @param procedure the procedure to validate
-    * @throws APIException if validation fails
-    */
-   private void validateProcedure(Procedure procedure) throws APIException {
-      if (procedure.getPatient() == null) {
-         throw new APIException("Procedure.error.patientRequired", (Object[]) null);
-      }
-      if (procedure.getProcedureCoded() == null && StringUtils.isBlank(procedure.getProcedureNonCoded())) {
-         throw new APIException("Procedure.error.procedureRequired", (Object[]) null);
-      }
-      if (procedure.getProcedureCoded() != null && StringUtils.isNotBlank(procedure.getProcedureNonCoded())) {
-         throw new APIException("Procedure.error.procedureCodedAndNonCodedMutuallyExclusive",
-                 (new Object[] { procedure.getProcedureCoded(), procedure.getProcedureNonCoded() }));
-      }
-      if (procedure.getBodySite() == null) {
-         throw new APIException("Procedure.error.bodySiteRequired", (Object[]) null);
-      }
-      if (procedure.getEstimatedStartDate() == null && procedure.getStartDateTime() == null) {
-         throw new APIException("Procedure.error.startDateTimeRequired", (Object[]) null);
-      }
-      if (procedure.getEstimatedStartDate() != null && procedure.getStartDateTime() != null) {
-         throw new APIException("Procedure.error.startDateTimeAndEstimatedDateMutuallyExclusive",
-                 (new Object[] { procedure.getEstimatedStartDate(), procedure.getStartDateTime() }));
-      }
-      if (procedure.getDuration() != null && procedure.getDurationUnit() == null) {
-         throw new APIException("Procedure.error.durationUnitRequired", (Object[]) null);
-      }
-      if (procedure.getStatus() == null) {
-         throw new APIException("Procedure.error.statusRequired", (Object[]) null);
-      }
-   }
-   
-   @Override
-   @Transactional(readOnly = true)
-   public Procedure getProcedureByUuid(String uuid) {
-      return procedureDAO.getByUuid(uuid);
-   }
-   
-   @Override
-   @Transactional(readOnly = true)
-   public List<Procedure> getProceduresByPatient(Patient patient) {
-      return procedureDAO.getProceduresByPatient(patient, false);
    }
 }
