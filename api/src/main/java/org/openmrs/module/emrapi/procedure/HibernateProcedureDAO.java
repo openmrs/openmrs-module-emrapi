@@ -64,4 +64,5 @@ public class HibernateProcedureDAO implements ProcedureDAO {
    public void delete(Procedure procedure) {
       sessionFactory.getCurrentSession().delete(procedure);
    }
+
 }

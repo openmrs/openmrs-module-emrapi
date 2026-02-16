@@ -43,6 +43,9 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
     @Autowired
     private EncounterService encounterService;
 
+    @Autowired
+    private ProcedureTypeDAO procedureTypeDAO;
+
     private Patient patient7;
     private Patient patient8;
 
@@ -126,6 +129,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
     public void saveOrUpdate_shouldSaveNewProcedure() {
         Procedure newProcedure = new Procedure();
         newProcedure.setPatient(patient7);
+        newProcedure.setProcedureType(procedureTypeDAO.getByUuid("procedure-type-uuid-001"));
         newProcedure.setBodySite(conceptService.getConcept(4));
         newProcedure.setStartDateTime(new Date());
         newProcedure.setProcedureNonCoded("New Test Procedure");
@@ -157,16 +161,16 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
         assertNotEquals(originalNotes, updated.getNotes());
     }
 
-//    @Test
-//    public void delete_shouldRemoveProcedureFromDatabase() {
-//        Procedure procedure = procedureDAO.getById(5);
-//        assertNotNull(procedure);
-//
-//        procedureDAO.delete(procedure);
-//
-//        Procedure deleted = procedureDAO.getById(5);
-//        assertNull(deleted);
-//    }
+    @Test
+    public void delete_shouldRemoveProcedureFromDatabase() {
+        Procedure procedure = procedureDAO.getById(5);
+        assertNotNull(procedure);
+
+        procedureDAO.delete(procedure);
+
+        Procedure deleted = procedureDAO.getById(5);
+        assertNull(deleted);
+    }
 
     @Test
     public void procedure_shouldHaveCodedProcedure() {

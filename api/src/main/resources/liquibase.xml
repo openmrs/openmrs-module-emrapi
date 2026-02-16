@@ -8,6 +8,77 @@
     <changeSet id="emrapi-202501211000" author="emrapi">
         <preConditions onFail="MARK_RAN">
             <not>
+                <tableExists tableName="emrapi_procedure_type"/>
+            </not>
+        </preConditions>
+        <comment>Create emrapi_procedure_type table for categorizing procedures</comment>
+
+        <createTable tableName="emrapi_procedure_type">
+            <column name="procedure_type_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Audit fields (from BaseOpenmrsMetadata) -->
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="creator" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_changed" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="retired" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retired_by" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_retired" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="retire_reason" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_type_creator"
+                baseTableName="emrapi_procedure_type"
+                baseColumnNames="creator"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_type_changed_by"
+                baseTableName="emrapi_procedure_type"
+                baseColumnNames="changed_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_type_retired_by"
+                baseTableName="emrapi_procedure_type"
+                baseColumnNames="retired_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+    </changeSet>
+
+    <changeSet id="emrapi-202501211001" author="emrapi">
+        <preConditions onFail="MARK_RAN">
+            <not>
                 <tableExists tableName="emrapi_procedure"/>
             </not>
         </preConditions>
@@ -18,6 +89,9 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="patient_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="procedure_type_id" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="encounter_id" type="int">
@@ -119,6 +193,13 @@
                 referencedColumnNames="patient_id"/>
 
         <addForeignKeyConstraint
+                constraintName="fk_procedure_type"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="procedure_type_id"
+                referencedTableName="emrapi_procedure_type"
+                referencedColumnNames="procedure_type_id"/>
+
+        <addForeignKeyConstraint
                 constraintName="fk_procedure_encounter"
                 baseTableName="emrapi_procedure"
                 baseColumnNames="encounter_id"
@@ -181,75 +262,5 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="emrapi-202501211001" author="emrapi">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="emrapi_procedure_type"/>
-            </not>
-        </preConditions>
-        <comment>Create emrapi_procedure_type table for categorizing procedures</comment>
-
-        <createTable tableName="emrapi_procedure_type">
-            <column name="procedure_type_id" type="int" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="varchar(1024)">
-                <constraints nullable="true"/>
-            </column>
-
-            <!-- Audit fields (from BaseOpenmrsMetadata) -->
-            <column name="uuid" type="varchar(38)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-            <column name="creator" type="int">
-                <constraints nullable="false"/>
-            </column>
-            <column name="date_created" type="datetime">
-                <constraints nullable="false"/>
-            </column>
-            <column name="changed_by" type="int">
-                <constraints nullable="true"/>
-            </column>
-            <column name="date_changed" type="datetime">
-                <constraints nullable="true"/>
-            </column>
-            <column name="retired" type="boolean" defaultValueBoolean="false">
-                <constraints nullable="false"/>
-            </column>
-            <column name="retired_by" type="int">
-                <constraints nullable="true"/>
-            </column>
-            <column name="date_retired" type="datetime">
-                <constraints nullable="true"/>
-            </column>
-            <column name="retire_reason" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-        </createTable>
-
-        <addForeignKeyConstraint
-                constraintName="fk_procedure_type_creator"
-                baseTableName="emrapi_procedure_type"
-                baseColumnNames="creator"
-                referencedTableName="users"
-                referencedColumnNames="user_id"/>
-
-        <addForeignKeyConstraint
-                constraintName="fk_procedure_type_changed_by"
-                baseTableName="emrapi_procedure_type"
-                baseColumnNames="changed_by"
-                referencedTableName="users"
-                referencedColumnNames="user_id"/>
-
-        <addForeignKeyConstraint
-                constraintName="fk_procedure_type_retired_by"
-                baseTableName="emrapi_procedure_type"
-                baseColumnNames="retired_by"
-                referencedTableName="users"
-                referencedColumnNames="user_id"/>
-    </changeSet>
 
 </databaseChangeLog>

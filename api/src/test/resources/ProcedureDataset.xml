@@ -10,6 +10,26 @@
     <visit visit_id="2001" patient_id="7" visit_type_id="1" date_started="2023-01-01 00:00:00.0" location_id="1901" creator="1" date_created="2023-01-01 00:00:00.0" voided="0" uuid="procedure-test-visit-uuid-001"/>
     <encounter encounter_id="2001" encounter_type="2" patient_id="7" location_id="1901" form_id="1" encounter_datetime="2023-01-01 10:00:00.0" creator="1" date_created="2023-01-01 10:00:00.0" voided="false" uuid="procedure-test-encounter-uuid-001" visit_id="2001"/>
 
+    <!-- Procedure types -->
+    <emrapi_procedure_type
+            procedure_type_id="1"
+            name="Historical"
+            description="Historical procedures"
+            uuid="procedure-type-uuid-001"
+            creator="1"
+            date_created="2023-01-01 00:00:00.0"
+            retired="false"
+    />
+    <emrapi_procedure_type
+            procedure_type_id="2"
+            name="Current"
+            description="Current procedures"
+            uuid="cce8ea25-ba2c-4dfe-a386-fba606bc2ef2"
+            creator="1"
+            date_created="2023-01-01 00:00:00.0"
+            retired="false"
+    />
+
     <!-- Procedure records using patients 7 and 8 which exist in standard test data -->
     <!-- Use concept 3 and 4 for procedure and body site which exist in standard test data -->
 
@@ -17,6 +37,7 @@
     <emrapi_procedure
             procedure_id="1"
             patient_id="7"
+            procedure_type_id="1"
             encounter_id="2001"
             procedure_coded="3"
             body_site_coded="4"
@@ -37,6 +58,7 @@
     <emrapi_procedure
             procedure_id="2"
             patient_id="7"
+            procedure_type_id="1"
             procedure_non_coded="Appendectomy"
             body_site_coded="4"
             start_date_time="2020-03-01 00:00:00"
@@ -52,6 +74,7 @@
     <emrapi_procedure
             procedure_id="3"
             patient_id="7"
+            procedure_type_id="2"
             procedure_coded="4"
             body_site_coded="3"
             start_date_time="2023-07-20 14:00:00"
@@ -68,6 +91,7 @@
     <emrapi_procedure
             procedure_id="4"
             patient_id="7"
+            procedure_type_id="1"
             procedure_coded="3"
             body_site_coded="4"
             start_date_time="2023-05-01 09:00:00"
@@ -85,6 +109,7 @@
     <emrapi_procedure
             procedure_id="5"
             patient_id="8"
+            procedure_type_id="2"
             procedure_non_coded="Minor surgery"
             body_site_coded="3"
             start_date_time="2023-08-01 08:00:00"
@@ -99,6 +124,7 @@
     <emrapi_procedure
             procedure_id="6"
             patient_id="8"
+            procedure_type_id="1"
             procedure_non_coded="Tonsillectomy"
             body_site_coded="4"
             start_date_time="2015-01-01 00:00:00"

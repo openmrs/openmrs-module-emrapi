@@ -78,7 +78,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    public Procedure voidProcedure(Procedure procedure, String reason) {
       return procedureDAO.saveOrUpdate(procedure);
    }
-   
+
    Date getDateTimeFromEstimatedDate(String estimatedDate) {
       try {
          // Full datetime

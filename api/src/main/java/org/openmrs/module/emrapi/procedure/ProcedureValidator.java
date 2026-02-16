@@ -8,6 +8,8 @@ import org.springframework.validation.Validator;
 @Handler(supports = { Procedure.class }, order = 50)
 public class ProcedureValidator implements Validator {
    
+   private static final String CURRENT_PROCEDURE_TYPE_UUID = "cce8ea25-ba2c-4dfe-a386-fba606bc2ef2";
+   
    @Override
    public boolean supports(Class<?> clazz) {
       return Procedure.class.isAssignableFrom(clazz);
@@ -45,6 +47,15 @@ public class ProcedureValidator implements Validator {
          }
          if (procedure.getVoided() && StringUtils.isBlank(procedure.getVoidReason())) {
             errors.reject("Procedure.error.voidReasonRequiredWhenVoided");
+         }
+         
+         if (procedure.getProcedureType() != null && procedure.getProcedureType().getUuid().equals(CURRENT_PROCEDURE_TYPE_UUID)){
+            if (procedure.getProcedureType().getRetired()) {
+               errors.reject("Procedure.error.procedureTypeRetired");
+            }
+            if (procedure.getEncounter() == null){
+               errors.reject("Procedure.error.encounterRequiredForCurrentProcedures");
+            }
          }
       }
    }

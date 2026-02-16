@@ -74,5 +74,5 @@ public interface ProcedureService extends OpenmrsService {
     * @throws APIException if the procedure cannot be deleted
     */
    void purgeProcedure(Procedure procedure);
-   
+
 }
