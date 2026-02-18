@@ -19,10 +19,14 @@ import org.openmrs.api.APIException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -184,6 +188,95 @@ class ProcedureServiceTest {
             Procedure saved = procedureService.saveProcedure(procedure);
 
             assertEquals(originalDate, saved.getStartDateTime());
+        }
+
+        @Test
+        void shouldDelegateToDAO() {
+            Procedure procedure = new Procedure();
+            procedure.setPatient(mock(Patient.class));
+            procedure.setProcedureCoded(mock(Concept.class));
+            procedure.setBodySite(mock(Concept.class));
+            procedure.setStatus(mock(Concept.class));
+            procedure.setStartDateTime(new Date());
+
+            procedureService.saveProcedure(procedure);
+
+            verify(procedureDAO).saveOrUpdate(procedure);
+        }
+    }
+
+    @Nested
+    class GetProceduresByPatient {
+
+        @Test
+        void shouldReturnProceduresFromDAO() {
+            Patient patient = mock(Patient.class);
+            List<Procedure> expected = Arrays.asList(new Procedure(), new Procedure());
+            when(procedureDAO.getProceduresByPatient(patient, false)).thenReturn(expected);
+
+            List<Procedure> result = procedureService.getProceduresByPatient(patient);
+
+            assertEquals(expected, result);
+            verify(procedureDAO).getProceduresByPatient(patient, false);
+        }
+    }
+
+    @Nested
+    class VoidProcedure {
+
+        @Test
+        void shouldDelegateToDAO() {
+            Procedure procedure = new Procedure();
+            when(procedureDAO.saveOrUpdate(procedure)).thenReturn(procedure);
+
+            Procedure result = procedureService.voidProcedure(procedure, "test reason");
+
+            assertEquals(procedure, result);
+            verify(procedureDAO).saveOrUpdate(procedure);
+        }
+    }
+
+    @Nested
+    class UnvoidProcedure {
+
+        @Test
+        void shouldClearVoidFields() {
+            Procedure procedure = new Procedure();
+            procedure.setVoided(true);
+            procedure.setVoidReason("some reason");
+            procedure.setDateVoided(new Date());
+            when(procedureDAO.saveOrUpdate(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+
+            Procedure result = procedureService.unvoidProcedure(procedure);
+
+            assertFalse(result.getVoided());
+            assertNull(result.getVoidReason());
+            assertNull(result.getDateVoided());
+            assertNull(result.getVoidedBy());
+        }
+
+        @Test
+        void shouldDelegateToDAO() {
+            Procedure procedure = new Procedure();
+            procedure.setVoided(true);
+            when(procedureDAO.saveOrUpdate(any(Procedure.class))).thenReturn(procedure);
+
+            procedureService.unvoidProcedure(procedure);
+
+            verify(procedureDAO).saveOrUpdate(procedure);
+        }
+    }
+
+    @Nested
+    class PurgeProcedure {
+
+        @Test
+        void shouldDelegateDeleteToDAO() {
+            Procedure procedure = new Procedure();
+
+            procedureService.purgeProcedure(procedure);
+
+            verify(procedureDAO).delete(procedure);
         }
     }
 }

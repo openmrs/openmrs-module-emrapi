@@ -60,10 +60,39 @@
                   creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
                   uuid="hours-concept-name-uuid"/>
 
+    <!-- Procedure types -->
+    <emrapi_procedure_type
+            procedure_type_id="1"
+            name="Historical"
+            description="Historical procedures"
+            uuid="historical-procedure-type-uuid"
+            creator="1"
+            date_created="2023-01-01 00:00:00.0"
+            retired="false"
+    />
+    <emrapi_procedure_type
+            procedure_type_id="2"
+            name="Current"
+            description="Current procedures"
+            uuid="cce8ea25-ba2c-4dfe-a386-fba606bc2ef2"
+            creator="1"
+            date_created="2023-01-01 00:00:00.0"
+            retired="false"
+    />
+
+    <!-- Encounter for current procedure tests -->
+    <encounter_type encounter_type_id="201" name="Procedure Encounter" description="Test encounter type"
+                    creator="1" date_created="2023-01-01 00:00:00.0" retired="false"
+                    uuid="procedure-encounter-type-uuid"/>
+    <encounter encounter_id="201" encounter_type="201" patient_id="201"
+               encounter_datetime="2023-06-15 14:00:00.0" creator="1" date_created="2023-06-15 14:00:00.0"
+               voided="false" uuid="procedure-test-encounter-uuid"/>
+
     <!-- Pre-existing procedure for GET tests -->
     <emrapi_procedure
             procedure_id="101"
             patient_id="201"
+            procedure_type_id="1"
             procedure_coded="5001"
             body_site_coded="5002"
             start_date_time="2023-06-15 14:30:00"

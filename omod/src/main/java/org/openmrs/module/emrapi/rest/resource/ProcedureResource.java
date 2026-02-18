@@ -10,6 +10,7 @@
 package org.openmrs.module.emrapi.rest.resource;
 
 import org.openmrs.Patient;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.procedure.Procedure;
 import org.openmrs.module.emrapi.procedure.ProcedureService;
@@ -35,6 +36,7 @@ public class ProcedureResource extends DelegatingCrudResource<Procedure> {
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
 			description.addProperty("patient", Representation.REF);
+			description.addProperty("procedureType", Representation.REF);
 			description.addProperty("encounter", Representation.REF);
 			description.addProperty("procedureCoded", Representation.REF);
 			description.addProperty("procedureNonCoded");
@@ -61,6 +63,7 @@ public class ProcedureResource extends DelegatingCrudResource<Procedure> {
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
 		description.addProperty("patient");
+		description.addProperty("procedureType");
 		description.addProperty("encounter");
 		description.addProperty("procedureCoded");
 		description.addProperty("procedureNonCoded");
@@ -105,16 +108,19 @@ public class ProcedureResource extends DelegatingCrudResource<Procedure> {
 		if (patientUuid != null) {
 			Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
 			if (patient == null) {
-				throw new IllegalArgumentException("Patient not found with UUID: " + patientUuid);
+				throw new APIException("Procedure.error.patientNotFound");
 			}
 			return new NeedsPaging<>(
 					Context.getService(ProcedureService.class).getProceduresByPatient(patient), context);
 		}
-		throw new ResourceDoesNotSupportOperationException("A patient parameter is required");
+		throw new ResourceDoesNotSupportOperationException("Procedure.error.patientRequired");
 	}
 
 	@Override
 	protected void delete(Procedure procedure, String reason, RequestContext context) throws ResponseException {
+      if(reason == null || reason.trim().isEmpty()) {
+         throw new APIException("Procedure.error.voidReasonRequired");
+      }
 		Context.getService(ProcedureService.class).voidProcedure(procedure, reason);
 	}
 

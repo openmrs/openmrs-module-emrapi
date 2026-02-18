@@ -531,6 +531,8 @@
         </property>
     </bean>
 
+    <bean id="procedureValidator" class="org.openmrs.module.emrapi.procedure.ProcedureValidator"/>
+
     <!-- Procedure Service -->
     <bean id="procedureService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">

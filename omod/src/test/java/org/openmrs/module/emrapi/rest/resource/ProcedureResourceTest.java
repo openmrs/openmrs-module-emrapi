@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.procedure.Procedure;
 import org.openmrs.module.emrapi.procedure.ProcedureService;
@@ -43,6 +44,9 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 	private static final String STATUS_UUID = "status-completed-concept-uuid";
 	private static final String DURATION_UNIT_MINUTES_UUID = "duration-unit-minutes-concept-uuid";
 	private static final String EXISTING_PROCEDURE_UUID = "existing-procedure-uuid";
+	private static final String HISTORICAL_PROCEDURE_TYPE_UUID = "historical-procedure-type-uuid";
+	private static final String CURRENT_PROCEDURE_TYPE_UUID = "cce8ea25-ba2c-4dfe-a386-fba606bc2ef2";
+	private static final String ENCOUNTER_UUID = "procedure-test-encounter-uuid";
 
 	private ProcedureResource resource;
 
@@ -145,9 +149,10 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 	class Create {
 
 		@Test
-		void shouldCreateProcedure() throws Exception {
+		void shouldCreateHistoricalProcedure() throws Exception {
 			SimpleObject properties = new SimpleObject();
 			properties.add("patient", PATIENT_UUID);
+			properties.add("procedureType", HISTORICAL_PROCEDURE_TYPE_UUID);
 			properties.add("procedureCoded", PROCEDURE_CONCEPT_UUID);
 			properties.add("bodySite", BODY_SITE_UUID);
 			properties.add("status", STATUS_UUID);
@@ -175,11 +180,62 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 			assertEquals(STATUS_UUID, saved.getStatus().getUuid());
 			assertEquals("2020-06", saved.getEstimatedStartDate());
 		}
+      
+		@Test
+		void shouldCreateValidCurrentProcedure() throws Exception {
+			SimpleObject properties = new SimpleObject();
+			properties.add("patient", PATIENT_UUID);
+			properties.add("procedureType", CURRENT_PROCEDURE_TYPE_UUID);
+			properties.add("encounter", ENCOUNTER_UUID);
+			properties.add("procedureCoded", PROCEDURE_CONCEPT_UUID);
+			properties.add("bodySite", BODY_SITE_UUID);
+			properties.add("status", STATUS_UUID);
+			properties.add("startDateTime", "2023-06-15T10:00:00.000+0000");
+			properties.add("notes", "Current procedure test");
+
+			SimpleObject created = (SimpleObject) resource.create(properties, new RequestContext());
+
+			assertNotNull(created);
+			String uuid = (String) created.get("uuid");
+			assertNotNull(uuid);
+			assertEquals("Current procedure test", created.get("notes"));
+
+			Procedure saved = Context.getService(ProcedureService.class).getProcedureByUuid(uuid);
+			assertNotNull(saved);
+			assertEquals(CURRENT_PROCEDURE_TYPE_UUID, saved.getProcedureType().getUuid());
+			assertEquals(ENCOUNTER_UUID, saved.getEncounter().getUuid());
+		}
+
+		@Test
+		void shouldRequireEncounterForCurrentProcedure() {
+			SimpleObject properties = new SimpleObject();
+			properties.add("patient", PATIENT_UUID);
+			properties.add("procedureType", CURRENT_PROCEDURE_TYPE_UUID);
+			properties.add("procedureCoded", PROCEDURE_CONCEPT_UUID);
+			properties.add("bodySite", BODY_SITE_UUID);
+			properties.add("status", STATUS_UUID);
+			properties.add("startDateTime", "2023-06-15T10:00:00.000+0000");
+
+			assertThrows(APIException.class, () -> resource.create(properties, new RequestContext()));
+		}
+
+		@Test
+		void shouldRequireStartDateTime() {
+			SimpleObject properties = new SimpleObject();
+			properties.add("patient", PATIENT_UUID);
+			properties.add("procedureType", HISTORICAL_PROCEDURE_TYPE_UUID);
+			properties.add("procedureCoded", PROCEDURE_CONCEPT_UUID);
+			properties.add("bodySite", BODY_SITE_UUID);
+			properties.add("status", STATUS_UUID);
+
+			assertThrows(APIException.class, () -> resource.create(properties, new RequestContext()));
+		}
 
 		@Test
 		void shouldCreateProcedureWithFreeTextFields() throws Exception {
 			SimpleObject properties = new SimpleObject();
 			properties.add("patient", PATIENT_UUID);
+			properties.add("procedureType", HISTORICAL_PROCEDURE_TYPE_UUID);
 			properties.add("procedureNonCoded", "Some unlisted procedure");
 			properties.add("startDateTime", "2020-06-15T10:00:00.000+0000");
 			properties.add("bodySite", BODY_SITE_UUID);
@@ -213,6 +269,12 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 			assertNotNull(voided);
 			assertTrue(voided.getVoided());
 			assertEquals("testing void", voided.getVoidReason());
+		}
+      
+		@Test
+		void shouldNotAllowDeleteWithoutReason() {
+			assertThrows(APIException.class,
+					() -> resource.delete(EXISTING_PROCEDURE_UUID, null, new RequestContext()));
 		}
 	}
 
