@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Service interface for managing ProcedureType metadata.
+ * @since 3.3.0
  */
 public interface ProcedureTypeService extends OpenmrsService {
 

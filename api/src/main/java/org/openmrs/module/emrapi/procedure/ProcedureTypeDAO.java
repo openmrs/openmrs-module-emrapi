@@ -12,7 +12,8 @@ package org.openmrs.module.emrapi.procedure;
 import java.util.List;
 
 /**
- * Data Access Object interface for ProcedureType entity.
+ * Data Access Object interface for {@link ProcedureType} entity.
+ * @since 3.3.0
  */
 public interface ProcedureTypeDAO {
 

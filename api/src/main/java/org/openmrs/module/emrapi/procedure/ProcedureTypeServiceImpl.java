@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * Implementation of the {@link ProcedureTypeService}.
+ * @since 3.3.0
+ */
 @Transactional
 public class ProcedureTypeServiceImpl extends BaseOpenmrsService implements ProcedureTypeService {
 

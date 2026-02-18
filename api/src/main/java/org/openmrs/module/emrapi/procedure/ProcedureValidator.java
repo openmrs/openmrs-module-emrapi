@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+/**
+ * Validator for {@link Procedure} objects.
+ * @since 3.3.0
+ */
 @Handler(supports = { Procedure.class }, order = 50)
 public class ProcedureValidator implements Validator {
 

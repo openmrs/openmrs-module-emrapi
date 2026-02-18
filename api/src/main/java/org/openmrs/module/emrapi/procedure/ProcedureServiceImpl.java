@@ -27,7 +27,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Implementation of the ProcedureService interface.
+ * Implementation of the {@link ProcedureService}.
+ * @since 3.3.0
  */
 @Transactional
 public class ProcedureServiceImpl extends BaseOpenmrsService implements ProcedureService {

@@ -19,6 +19,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
+/**
+ * Hibernate implementation of {@link ProcedureDAO}.
+ * @since 3.3.0
+ */
 @Setter
 public class HibernateProcedureDAO implements ProcedureDAO {
 
