@@ -54,7 +54,6 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
    @JoinColumn(name = "encounter_id")
    private Encounter encounter;
    
-   // Procedure name - coded or free text
    @ManyToOne
    @JoinColumn(name = "procedure_coded")
    private Concept procedureCoded;
@@ -62,12 +61,10 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
    @Column(name = "procedure_non_coded")
    private String procedureNonCoded;
    
-   // Body site (required, coded only)
    @ManyToOne
    @JoinColumn(name = "body_site_coded", nullable = false)
    private Concept bodySite;
    
-   // Timing
    @Column(name = "start_date_time", nullable = false)
    private Date startDateTime;
    
@@ -84,7 +81,6 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
    @JoinColumn(name = "duration_unit_coded", nullable = true)
    private Concept durationUnit;
    
-   // Status
    @ManyToOne
    @JoinColumn(name = "status_coded", nullable = false)
    private Concept status;
@@ -97,7 +93,6 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
    @Column(name = "outcome_non_coded", length = 255)
    private String outcomeNonCoded;
    
-   // Notes
    @Column(name = "notes", columnDefinition = "TEXT")
    private String notes;
    
@@ -127,8 +122,6 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
       this.formNamespace = namespace;
       this.formFieldPath = path;
    }
-   
-   // Getters and setters
    
    @Override
    public Integer getId() {
