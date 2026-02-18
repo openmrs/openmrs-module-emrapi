@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 
-	private static final String TEST_DATASET = "ProcedureControllerTestDataset.xml";
+	private static final String TEST_DATASET = "ProcedureDataset.xml";
 
 	private static final String PATIENT_UUID = "procedure-test-patient-uuid";
 	private static final String PROCEDURE_CONCEPT_UUID = "procedure-concept-uuid";

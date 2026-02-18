@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 
-	private static final String TEST_DATASET = "ProcedureControllerTestDataset.xml";
+	private static final String TEST_DATASET = "ProcedureTypeDataset.xml";
 
 	private static final String HISTORICAL_TYPE_UUID = "historical-procedure-type-uuid";
 	private static final String CURRENT_TYPE_UUID = "cce8ea25-ba2c-4dfe-a386-fba606bc2ef2";
@@ -186,9 +186,9 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 
 		@Test
 		void shouldPermanentlyDeleteProcedureType() {
-			resource.purge(HISTORICAL_TYPE_UUID, new RequestContext());
+			resource.purge(CURRENT_TYPE_UUID, new RequestContext());
 
-			ProcedureType purged = Context.getService(ProcedureTypeService.class).getProcedureTypeByUuid(HISTORICAL_TYPE_UUID);
+			ProcedureType purged = Context.getService(ProcedureTypeService.class).getProcedureTypeByUuid(CURRENT_TYPE_UUID);
 			assertNull(purged);
 		}
 	}
