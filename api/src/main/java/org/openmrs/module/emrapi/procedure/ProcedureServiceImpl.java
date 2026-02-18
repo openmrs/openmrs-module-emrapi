@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -29,7 +31,9 @@ import java.util.List;
  */
 @Transactional
 public class ProcedureServiceImpl extends BaseOpenmrsService implements ProcedureService {
-   
+
+   private static final Logger log = LoggerFactory.getLogger(ProcedureServiceImpl.class);
+
    private ProcedureDAO procedureDAO;
    
    public void setProcedureDAO(ProcedureDAO procedureDAO) {
@@ -39,43 +43,54 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    @Override
    @Transactional(readOnly = true)
    public Procedure getProcedureByUuid(String uuid) {
+      log.debug("Getting procedure by uuid: {}", uuid);
       return procedureDAO.getByUuid(uuid);
    }
    
    @Override
    @Transactional(readOnly = true)
    public List<Procedure> getProceduresByPatient(Patient patient) {
+      log.debug("Getting procedures for patient: {}", patient);
       return procedureDAO.getProceduresByPatient(patient, false);
    }
    
    @Override
    @Transactional
    public Procedure saveProcedure(Procedure procedure) throws APIException {
+      log.info("Saving procedure: {}", procedure.getUuid());
+      
       if (procedure.getEstimatedStartDate() != null) {
+         log.debug("Calculating startDateTime from estimatedStartDate: {}", procedure.getEstimatedStartDate());
          Date calculatedStartDateTime = getDateTimeFromEstimatedDate(procedure.getEstimatedStartDate());
          procedure.setStartDateTime(calculatedStartDateTime);
       }
+      
       return procedureDAO.saveOrUpdate(procedure);
    }
    
    @Override
    @Transactional
    public Procedure unvoidProcedure(Procedure procedure) {
+      log.info("Unvoiding procedure: {}", procedure.getUuid());
+      
       procedure.setVoided(false);
       procedure.setVoidReason(null);
       procedure.setDateVoided(null);
       procedure.setVoidedBy(null);
+      
       return procedureDAO.saveOrUpdate(procedure);
    }
    
    @Override
    @Transactional
    public void purgeProcedure(Procedure procedure) throws APIException {
+      log.info("Purging procedure: {}", procedure.getUuid());
       procedureDAO.delete(procedure);
    }
    
    @Override
    public Procedure voidProcedure(Procedure procedure, String reason) {
+      log.info("Voiding procedure: {} with reason: {}", procedure.getUuid(), reason);
       return procedureDAO.saveOrUpdate(procedure);
    }
 
@@ -118,6 +133,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
          
       }
       catch (DateTimeParseException e) {
+         log.warn("Failed to parse estimated date: {}", estimatedDate, e);
          throw new APIException("Procedure.error.invalidEstimateDate", new Object[] { estimatedDate }, e);
       }
    }

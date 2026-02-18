@@ -12,6 +12,8 @@ package org.openmrs.module.emrapi.procedure;
 import lombok.Setter;
 import org.openmrs.Patient;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Setter
 public class HibernateProcedureDAO implements ProcedureDAO {
+
+   private static final Logger log = LoggerFactory.getLogger(HibernateProcedureDAO.class);
 
    private DbSessionFactory sessionFactory;
 
@@ -28,11 +32,14 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 
    @Override
    public Procedure getById(Integer id) {
+      log.debug("Getting procedure by id: {}", id);
+      
       return getEntityManager().find(Procedure.class, id);
    }
 
    @Override
    public Procedure getByUuid(String uuid) {
+      log.debug("Getting procedure by uuid: {}", uuid);
       String jpql = "SELECT p FROM Procedure p WHERE p.uuid = :uuid";
       
       TypedQuery<Procedure> query = getEntityManager().createQuery(jpql, Procedure.class);
@@ -44,11 +51,14 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 
    @Override
    public Procedure saveOrUpdate(Procedure procedure) {
+      log.debug("Saving or updating procedure: {}", procedure.getUuid());
       return getEntityManager().merge(procedure);
    }
    
    @Override
    public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided) {
+      log.debug("Getting procedures for patient: {}, includeVoided: {}", patient, includeVoided);
+      
       String jpql = "SELECT p FROM Procedure p" +
               " WHERE p.patient = :patient" +
               (includeVoided ? "" : " AND p.voided = false") +
@@ -62,6 +72,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
    
    @Override
    public void delete(Procedure procedure) {
+      log.debug("Deleting procedure: {}", procedure.getUuid());
       sessionFactory.getCurrentSession().delete(procedure);
    }
 
