@@ -114,7 +114,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 	}
 
 	@Nested
-	@DisplayName("doGetAll")
+	@DisplayName("GetAll")
 	class GetAll {
 
 		@Test
