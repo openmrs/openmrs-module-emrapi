@@ -107,6 +107,18 @@ public class AccountDomainWrapper implements DomainWrapper {
         }
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Provider getProvider() {
+        return provider;
+    }
+
     public void setProviderRole(ProviderRole providerRole) {
         if (providerRole != null) {
             initializeProviderIfNecessary();
@@ -124,6 +136,25 @@ public class AccountDomainWrapper implements DomainWrapper {
             return null;
         }
         return this.provider.getProviderRole();
+    }
+
+    public void setProviderIdentifier(String providerIdentifier) {
+        if (StringUtils.isNotBlank(providerIdentifier)) {
+            initializeProviderIfNecessary();
+            provider.setIdentifier(providerIdentifier);
+        }
+        else {
+            if (this.provider != null) {
+                provider.setIdentifier(providerIdentifier);
+            }
+        }
+    }
+
+    public String getProviderIdentifier() {
+        if (this.provider == null) {
+            return null;
+        }
+        return this.provider.getIdentifier();
     }
 
     public void setGivenName(String givenName) {
