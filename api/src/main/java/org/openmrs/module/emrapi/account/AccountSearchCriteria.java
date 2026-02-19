@@ -17,5 +17,6 @@ public class AccountSearchCriteria {
     private Boolean hasProviderRole;
     private List<ProviderRole> providerRoles;
     private Boolean userEnabled;
-
+    private Integer startIndex;
+    private Integer limit;
 }

@@ -7,6 +7,7 @@ import org.openmrs.ProviderRole;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.account.AccountDomainWrapper;
 import org.openmrs.module.emrapi.account.AccountSearchCriteria;
+import org.openmrs.module.emrapi.account.AccountSearchResult;
 import org.openmrs.module.emrapi.account.AccountService;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -16,6 +17,7 @@ import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentat
 import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
+import org.openmrs.module.webservices.rest.web.resource.impl.AlreadyPaged;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
@@ -74,9 +76,21 @@ public class AccountResource extends DelegatingCrudResource<AccountDomainWrapper
             }
             searchCriteria.setProviderRoles(providerRoles);
         }
-        List<AccountDomainWrapper> accounts = getAccountService().getAccounts(searchCriteria);
-        accounts.sort((o1, o2) -> getDisplay(o1).compareTo(getDisplay(o2)));
-        return new NeedsPaging<>(accounts, context);
+
+        Integer startIndex = context.getStartIndex() == null ? 0 : context.getStartIndex();
+        Integer limit = context.getLimit();
+        searchCriteria.setStartIndex(startIndex);
+        searchCriteria.setLimit(limit);
+
+        AccountSearchResult result = getAccountService().getAccountsByCriteria(searchCriteria);
+
+        boolean hasMoreResults = false;
+        if (limit != null) {
+            int recordsProcessed = startIndex + limit + 1;
+            hasMoreResults = recordsProcessed < result.getTotalCount();
+        }
+
+        return new AlreadyPaged<>(context, result.getAccounts(), hasMoreResults, result.getTotalCount());
     }
 
     @Override
