@@ -1,5 +1,6 @@
 package org.openmrs.module.emrapi.adt;
 
+import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
 import org.openmrs.Form;
@@ -10,6 +11,7 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.InvalidAdtEncounterException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.springframework.lang.Nullable;
 
 import java.util.Date;
 import java.util.Map;
@@ -91,8 +93,8 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
-                if (visit.isAdmitted(onDate)) {
+            public void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter encounter) {
+                if (visit.isAdmitted(onDate, encounter)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_ALREADY_ADMITTED, toLocation, onDate);
                 }
             }
@@ -113,8 +115,8 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
-                if (!visit.isAdmitted(onDate)) {
+            public void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter encounter) {
+                if (!visit.isAdmitted(onDate, encounter)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
             }
@@ -135,7 +137,7 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate) {
+            public void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter encounter) {
                 if (!visit.isAdmitted(onDate)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
@@ -150,7 +152,7 @@ public class AdtAction {
         public abstract Form getForm(EmrApiProperties form);
 
         public void checkVisitValid(VisitDomainWrapper visit) {
-                checkVisitValid(visit, null, new Date());
+                checkVisitValid(visit, null, new Date(), null);
         }
 
         /**
@@ -158,8 +160,10 @@ public class AdtAction {
          * @param visit
          * @param toLocation
          * @param onDate
+         * @param adtEncounter the encounter being validated, which represents the AdtAction and may not have been saved yet.
+         * This is used to ignore the encounter when checking the patient's admission status..
          */
-        public abstract void checkVisitValid(VisitDomainWrapper visit, Location toLocation, Date onDate);
+        public abstract void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter adtEncounter);
     }
 
 }
