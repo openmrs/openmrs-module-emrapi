@@ -95,6 +95,11 @@ public class EncounterValidatorTest extends BaseModuleContextSensitiveTest {
         encounter.setLocation(location);
         encounter.setEncounterDatetime(new Date());
 
+        // simulate real scenarios where the encounter is not yet saved but is added to the visit's list
+        // of encounters in memory. Validation should pass by ignoring the encounter when checking the patient's
+        // admission status
+        visit.addEncounter(encounter);
+
         Errors errors = new BindException(encounter, "encounter");
         validator.validate(encounter, errors);
 

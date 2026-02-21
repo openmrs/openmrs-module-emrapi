@@ -837,7 +837,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             adtDatetime = new Date();
         }
 
-        action.getType().checkVisitValid(visit, action.getLocation(), adtDatetime);
+        action.getType().checkVisitValid(visit, action.getLocation(), adtDatetime, null);
 
         visit.errorIfOutsideVisit(adtDatetime, "ADT Datetime outside of visit bounds");
 
@@ -847,10 +847,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         Encounter encounter = buildEncounter(adtEncounterType, visit.getVisit().getPatient(), action.getLocation(), adtForm, adtDatetime, null, null);
         addProviders(encounter, action.getProviders());
 
-        encounter.setVisit(visit.getVisit());
-        encounterService.saveEncounter(encounter);
-        // Add encounter to visit after saving to maintain data consistency in memory
         visit.addEncounter(encounter);
+        encounterService.saveEncounter(encounter);
         return encounter;
     }
 
@@ -864,7 +862,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional
     public VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
         throws ExistingVisitDuringTimePeriodException {
-        
+
         if (startDatetime.after(new Date())) {
             throw new IllegalArgumentException("emrapi.retrospectiveVisit.startDateCannotBeInFuture");
         }
@@ -1094,7 +1092,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         return new ArrayList<>(m.values());
     }
-    
+
     @Override
     @Transactional(readOnly = true)
     public void verifyEncounterForAdtAction(Encounter encounter) {
@@ -1111,9 +1109,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         } else if (encounterType.equals(emrApiProperties.getTransferWithinHospitalEncounterType())) {
             actionType = AdtAction.Type.TRANSFER;
         }
-        
+
         if(actionType != null) {
-            actionType.checkVisitValid(wrappedVisit, encounter.getLocation(), onDate);
+            actionType.checkVisitValid(wrappedVisit, encounter.getLocation(), onDate, encounter);
         }
     }
 }
