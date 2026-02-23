@@ -271,11 +271,11 @@ public class VisitDomainWrapperTest {
         assertFalse(visitDomainWrapper.hasBeenDischarged());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldFailIfDateOutsideOfVisit() {
+    @Test
+    public void shouldNotBeAdmittedIfDateOutsideOfVisit() {
         Date now = new Date();
         when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -3));
-        visitDomainWrapper.isAdmitted(DateUtils.addHours(now, -4));
+        assertFalse(visitDomainWrapper.isAdmitted(DateUtils.addHours(now, -4)));
     }
 
     @Test

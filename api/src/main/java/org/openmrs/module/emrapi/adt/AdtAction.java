@@ -93,8 +93,17 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter encounter) {
-                if (visit.isAdmitted(onDate, encounter)) {
+            public void checkVisitValid(VisitDomainWrapper visit) {
+                if (visit.isAdmitted()) {
+                    throw new IllegalStateException("Patient is already admitted");
+                }
+            }
+
+            @Override
+            public void checkEncounterValid(VisitDomainWrapper visit, Encounter encounter) {
+                Date onDate = encounter.getEncounterDatetime();
+                Location toLocation = encounter.getLocation();
+                if (visit.isAdmittedAtTimeOfEncounter(encounter)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_ALREADY_ADMITTED, toLocation, onDate);
                 }
             }
@@ -115,8 +124,17 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter encounter) {
-                if (!visit.isAdmitted(onDate, encounter)) {
+            public void checkVisitValid(VisitDomainWrapper visit) {
+                if (!visit.isAdmitted()) {
+                    throw new IllegalStateException("Patient is not currently admitted");
+                }
+            }
+
+            @Override
+            public void checkEncounterValid(VisitDomainWrapper visit, Encounter encounter) {
+                Date onDate = encounter.getEncounterDatetime();
+                Location toLocation = encounter.getLocation();
+                if (!visit.isAdmittedAtTimeOfEncounter(encounter)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
             }
@@ -137,7 +155,14 @@ public class AdtAction {
             }
 
             @Override
-            public void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter encounter) {
+            public void checkVisitValid(VisitDomainWrapper visit) {
+            }
+
+            @Override
+            public void checkEncounterValid(VisitDomainWrapper visit, Encounter encounter) {
+                Date onDate = encounter.getEncounterDatetime();
+                Location toLocation = encounter.getLocation();
+                
                 if (!visit.isAdmitted(onDate)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
@@ -151,19 +176,18 @@ public class AdtAction {
         public abstract EncounterType getEncounterType(EmrApiProperties properties);
         public abstract Form getForm(EmrApiProperties form);
 
-        public void checkVisitValid(VisitDomainWrapper visit) {
-                checkVisitValid(visit, null, new Date(), null);
-        }
+        /**
+         * @deprecated since 3.3.0 - use {@link #checkEncounterValid(VisitDomainWrapper, Encounter)} instead.
+         */
+        @Deprecated
+        public abstract void checkVisitValid(VisitDomainWrapper visit);
 
         /**
-         * Verify that for the given visit, the AdtAction is valid in the given location at the given date
-         * @param visit
-         * @param toLocation
-         * @param onDate
-         * @param adtEncounter the encounter being validated, which represents the AdtAction and may not have been saved yet.
-         * This is used to ignore the encounter when checking the patient's admission status..
+         * Verify that the encounter representing this AdtAction is valid
+         * @param visit - the visit associated with the given encounter
+         * @param encounter the encounter being validated, which represents the AdtAction and may not have been saved yet.
          */
-        public abstract void checkVisitValid(VisitDomainWrapper visit, @Nullable Location toLocation, Date onDate, @Nullable Encounter adtEncounter);
+        public abstract void checkEncounterValid(VisitDomainWrapper visit, Encounter encounter);
     }
 
 }

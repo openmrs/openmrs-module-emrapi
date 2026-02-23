@@ -837,8 +837,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
             adtDatetime = new Date();
         }
 
-        action.getType().checkVisitValid(visit, action.getLocation(), adtDatetime, null);
-
         visit.errorIfOutsideVisit(adtDatetime, "ADT Datetime outside of visit bounds");
 
         EncounterType adtEncounterType = action.getType().getEncounterType(emrApiProperties);
@@ -846,6 +844,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         Encounter encounter = buildEncounter(adtEncounterType, visit.getVisit().getPatient(), action.getLocation(), adtForm, adtDatetime, null, null);
         addProviders(encounter, action.getProviders());
+
+        action.getType().checkEncounterValid(visit, encounter);
 
         visit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);
@@ -1111,7 +1111,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         if(actionType != null) {
-            actionType.checkVisitValid(wrappedVisit, encounter.getLocation(), onDate, encounter);
+            actionType.checkEncounterValid(wrappedVisit, encounter);
         }
     }
 }
