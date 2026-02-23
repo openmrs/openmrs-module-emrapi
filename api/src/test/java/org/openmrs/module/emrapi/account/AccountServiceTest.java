@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.hamcrest.MockitoHamcrest;
 import org.openmrs.Person;
+import org.openmrs.PersonName;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
 import org.openmrs.Role;
@@ -70,10 +71,12 @@ public class AccountServiceTest  {
     @Test
     public void getAllAccounts_shouldGetAllUniqueAccounts() throws Exception {
         Person person1 = new Person();
+        person1.addName(new PersonName("John", "","Doe"));
         User user1 = new User();
         user1.setPerson(person1);
         User user2 = new User();
         Person person2 = new Person();
+        person2.addName(new PersonName("Jane", "","Doe"));
         user2.setPerson(person2);
         User daemonUser = new User();
         daemonUser.setUuid(EmrApiConstants.DAEMON_USER_UUID);
@@ -84,6 +87,7 @@ public class AccountServiceTest  {
         provider1.setPerson(person1);//duplicate
         Provider provider2 = new Provider();
         Person person3 = new Person();
+        person3.addName(new PersonName("Doc", "","Brown"));
         provider2.setPerson(person3);
 
         when(userService.getAllUsers()).thenReturn(Arrays.asList(user1, user2, daemonUser));

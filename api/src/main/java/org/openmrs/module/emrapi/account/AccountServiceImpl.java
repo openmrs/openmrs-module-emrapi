@@ -1,13 +1,12 @@
 package org.openmrs.module.emrapi.account;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;
+import org.openmrs.ProviderRole;
 import org.openmrs.Role;
 import org.openmrs.User;
-import org.openmrs.api.APIException;
 import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
@@ -16,16 +15,21 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapperFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Transactional
 public class AccountServiceImpl extends BaseOpenmrsService implements AccountService {
+
+    private Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     private UserService userService;
 
@@ -81,53 +85,110 @@ public class AccountServiceImpl extends BaseOpenmrsService implements AccountSer
         return getAccounts(new AccountSearchCriteria());
     }
 
-    @Override
-    public List<AccountDomainWrapper> getAccounts(AccountSearchCriteria criteria) {
-        Map<Person, AccountDomainWrapper> byPerson = new LinkedHashMap<>();
+    /**
+     * @see org.openmrs.module.emrapi.account.AccountService#getAccountsByCriteria(AccountSearchCriteria)
+     */
+    public AccountSearchResult getAccountsByCriteria(AccountSearchCriteria criteria) {
+        Set<Person> persons = new HashSet<>();
         List<User> users;
         List<Provider> providers;
+        log.debug("Retreiving accounts: " + criteria);
         if (StringUtils.isNotBlank(criteria.getNameOrIdentifier())) {
             Map<String, Object> searchParams = new HashMap<>();
             searchParams.put("search", "%" + criteria.getNameOrIdentifier() + "%");
             users = emrApiDAO.executeHqlFromResource("hql/user_search.hql", searchParams, User.class);
+            log.debug("Retrieved {} users with search: {}", users.size(), criteria.getNameOrIdentifier());
             providers = emrApiDAO.executeHqlFromResource("hql/provider_search.hql", searchParams, Provider.class);
+            log.debug("Retrieved {} providers with search {}", providers.size(), criteria.getNameOrIdentifier());
         }
         else {
             users = userService.getAllUsers();
+            log.debug("Retrieved {} users", users.size());
             providers = providerService.getAllProviders();
+            log.debug("Retrieved {} providers", providers.size());
         }
 
+        // Get the base set of persons
+        for (User user : users) {
+            if (user.getPerson() == null) {
+                log.warn("Users not associated to a person are not supported.  Excluding {}", user.getUuid());
+            }
+            else {
+                persons.add(user.getPerson());
+            }
+        }
+        log.debug("Mapped users to AccountDomainWrappers.  Total accounts: {}", persons.size());
+
+        for (Provider provider : providers) {
+            if (provider.getPerson() == null) {
+                log.warn("Providers not associated to a person are not supported.  Excluding {}", provider.getUuid());
+            }
+            else {
+                persons.add(provider.getPerson());
+            }
+        }
+        log.debug("Mapped providers to AccountDomainWrappers.  Total accounts: {}", persons.size());
+
+        // Exclude persons based on user search criteria
         for (User user : users) {
             //exclude daemon user
             if (EmrApiConstants.DAEMON_USER_UUID.equals(user.getUuid())) {
-                continue;
+                persons.remove(user.getPerson());
             }
-            Person person = user.getPerson();
-            if (BooleanUtils.isNotTrue(person.getPersonVoided())) {
-                byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
+            else if (criteria.getUserEnabled() == Boolean.TRUE && user.isRetired()) {
+                persons.remove(user.getPerson());
+            }
+            else if (criteria.getUserEnabled() == Boolean.FALSE && !user.isRetired()) {
+                persons.remove(user.getPerson());
             }
         }
+        log.debug("Excluded users based on search criteria.  Total accounts: {}", persons.size());
 
+        // Exclude persons based on provider search criteria
+        Provider unknownProvider = emrApiProperties.getUnknownProvider();
         for (Provider provider : providers) {
-
             // skip the baked-in unknown provider
-            if (provider.equals(emrApiProperties.getUnknownProvider())) {
-                continue;
+            if (provider.equals(unknownProvider)) {
+                persons.remove(provider.getPerson());
             }
-
-            Person person = provider.getPerson();
-
-            if (person == null) {
-                throw new APIException("Providers not associated to a person are not supported");
+            if (criteria.getHasProviderRole() == Boolean.TRUE && provider.getProviderRole() == null) {
+                persons.remove(provider.getPerson());
             }
-
-            AccountDomainWrapper account = byPerson.get(person);
-            if (account == null && BooleanUtils.isNotTrue(person.getPersonVoided())) {
-                byPerson.put(person, domainWrapperFactory.newAccountDomainWrapper(person));
+            if (criteria.getHasProviderRole() == Boolean.FALSE && provider.getProviderRole() != null) {
+                persons.remove(provider.getPerson());
+            }
+            if (criteria.getProviderRoles() != null && !criteria.getProviderRoles().isEmpty()) {
+                ProviderRole providerRole = provider.getProviderRole();
+                if (providerRole == null || !criteria.getProviderRoles().contains(providerRole)) {
+                    persons.remove(provider.getPerson());
+                }
             }
         }
+        log.debug("Excluded providers based on search criteria.  Total accounts: {}", persons.size());
 
-        return new ArrayList<>(byPerson.values());
+        List<Person> sortedPersons = new ArrayList<>(persons);
+        sortedPersons.sort((o1, o2) -> o1.getPersonName().getFullName().compareToIgnoreCase(o2.getPersonName().getFullName()));
+        log.debug("Sorted persons based on name");
+
+        long totalCount = persons.size();
+        int startIndex = criteria.getStartIndex() == null ? 0 : criteria.getStartIndex();
+        int endIndex = criteria.getLimit() == null ? sortedPersons.size() : Math.min(startIndex + criteria.getLimit(), persons.size());
+        sortedPersons = sortedPersons.subList(startIndex, endIndex);
+        log.debug("Limited results to those from {} to {}, total results: {}", startIndex, endIndex, sortedPersons.size());
+
+        AccountSearchResult result = new AccountSearchResult();
+        for (Person p : sortedPersons) {
+            result.getAccounts().add(domainWrapperFactory.newAccountDomainWrapper(p));
+        }
+        result.setTotalCount(totalCount);
+        log.debug("Returning {} accounts", result.getAccounts().size());
+        return result;
+    }
+
+    @Override
+    @Deprecated
+    public List<AccountDomainWrapper> getAccounts(AccountSearchCriteria criteria) {
+        return getAccountsByCriteria(criteria).getAccounts();
     }
 
     /**

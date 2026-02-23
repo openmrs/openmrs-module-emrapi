@@ -70,6 +70,7 @@ public class VisitDomainWrapperTest {
         dispositionDescriptor = MockMetadataTestUtil.setupDispositionDescriptor(conceptService);
         when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
         when(dispositionService.dispositionsSupported()).thenReturn(true);
+        when(visit.getStartDatetime()).thenReturn(new Date());
         visitDomainWrapper = new VisitDomainWrapper(visit, emrApiProperties, dispositionService);
     }
 
@@ -158,6 +159,7 @@ public class VisitDomainWrapperTest {
 
         Encounter admit = new Encounter();
         admit.setEncounterType(admitEncounterType);
+        admit.setEncounterDatetime(new Date());
 
         Set<Encounter> encounters = new LinkedHashSet<Encounter>();
         encounters.add(admit);

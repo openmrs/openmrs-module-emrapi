@@ -1,7 +1,11 @@
 package org.openmrs.module.emrapi.account;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.PersonName;
 import org.openmrs.Provider;
 import org.openmrs.ProviderRole;
@@ -12,6 +16,7 @@ import org.openmrs.api.PersonService;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.UserService;
 import org.openmrs.module.emrapi.EmrApiConstants;
+import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.domainwrapper.DomainWrapper;
 import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.util.OpenmrsConstants;
@@ -20,40 +25,59 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+@SuppressWarnings("ALL")
 public class AccountDomainWrapper implements DomainWrapper {
 
+    @Getter
     private Person person;
 
+    @Getter
     private User user;
 
+    @Getter
     private Provider provider;
 
+    @Setter
+    @Getter
     private String password;
 
+    @Setter
+    @Getter
     private String confirmPassword;
 
+    @Setter
     @Qualifier("accountService")
     @Autowired
     protected AccountService accountService;
 
+    @Setter
     @Qualifier("userService")
     @Autowired
     protected UserService userService;
 
+    @Setter
     @Qualifier("personService")
     @Autowired
     protected PersonService personService;
 
+    @Setter
     @Qualifier("providerService")
     @Autowired
     protected ProviderService providerService;
 
+    @Setter
+    @Qualifier("emrApiProperties")
+    @Autowired
+    protected EmrApiProperties emrApiProperties;
+
+    @Setter
     @Autowired(required = false)
     protected ProviderIdentifierGenerator providerIdentifierGenerator;
 
@@ -62,34 +86,15 @@ public class AccountDomainWrapper implements DomainWrapper {
 
     @Deprecated  // use DomainWrapperFactory instead
     public AccountDomainWrapper(Person person, AccountService accountService, UserService userService, ProviderService providerService,
-                                PersonService personService, ProviderIdentifierGenerator providerIdentifierGenerator) {
+                                PersonService personService, ProviderIdentifierGenerator providerIdentifierGenerator, EmrApiProperties emrApiProperties) {
         this.accountService = accountService;
         this.userService = userService;
         this.providerService = providerService;
         this.personService = personService;
         this.providerIdentifierGenerator = providerIdentifierGenerator;
+        this.emrApiProperties = emrApiProperties;
 
         initializeWithPerson(person);
-    }
-
-    public void setAccountService(AccountService accountService) {
-        this.accountService = accountService;
-    }
-
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
-
-    public void setProviderService(ProviderService providerService) {
-        this.providerService = providerService;
-    }
-
-    public void setPersonService(PersonService personService) {
-        this.personService = personService;
-    }
-
-    public void setProviderIdentifierGenerator(ProviderIdentifierGenerator providerIdentifierGenerator) {
-        this.providerIdentifierGenerator = providerIdentifierGenerator;
     }
 
     public void initializeWithPerson(Person person) {
@@ -133,6 +138,25 @@ public class AccountDomainWrapper implements DomainWrapper {
         return this.provider.getProviderRole();
     }
 
+    public void setProviderIdentifier(String providerIdentifier) {
+        if (StringUtils.isNotBlank(providerIdentifier)) {
+            initializeProviderIfNecessary();
+            provider.setIdentifier(providerIdentifier);
+        }
+        else {
+            if (this.provider != null) {
+                provider.setIdentifier(providerIdentifier);
+            }
+        }
+    }
+
+    public String getProviderIdentifier() {
+        if (this.provider == null) {
+            return null;
+        }
+        return this.provider.getIdentifier();
+    }
+
     public void setGivenName(String givenName) {
         initializePersonNameIfNecessary();
         person.getPersonName().setGivenName(givenName);
@@ -170,20 +194,49 @@ public class AccountDomainWrapper implements DomainWrapper {
         return user != null ? user.getUsername() : null;
     }
 
-    public String getPassword() {
-        return password;
+    public boolean isPasswordChangeRequired() {
+        if (user != null && user.getUserProperties() != null) {
+            return Boolean.parseBoolean(user.getUserProperties().get(OpenmrsConstants.USER_PROPERTY_CHANGE_PASSWORD));
+        }
+        return false;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordChangeRequired(boolean passwordChangeRequired) {
+        if (user == null && passwordChangeRequired) {
+            initializeUserIfNecessary();
+        }
+        if (user != null) {
+            if (user.getUserProperties() == null) {
+                user.setUserProperties(new HashMap<>());
+            }
+            user.getUserProperties().put(OpenmrsConstants.USER_PROPERTY_CHANGE_PASSWORD, Boolean.toString(passwordChangeRequired));
+        }
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
+    public String getEmail() {
+        return user != null ? getUser().getEmail() : null;
     }
 
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
+    public void setEmail(String email) {
+        if (user == null && StringUtils.isNotBlank(email)) {
+            initializeUserIfNecessary();
+        }
+        if (user != null) {
+            user.setEmail(email);
+        }
+    }
+
+    public String getPhoneNumber() {
+        PersonAttribute att = person.getAttribute(getPhoneNumberAttributeType());
+        return (att == null ? null : att.getValue());
+    }
+
+    public void setPhoneNumber(String value) {
+       person.addAttribute(new PersonAttribute(getPhoneNumberAttributeType(), value));
+    }
+
+    public PersonAttributeType getPhoneNumberAttributeType() {
+        return emrApiProperties.getTelephoneAttributeType();
     }
 
     public void setDefaultLocale(Locale locale) {

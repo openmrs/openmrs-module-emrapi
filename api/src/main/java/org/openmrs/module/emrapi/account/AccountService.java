@@ -15,9 +15,15 @@ public interface AccountService {
     List<AccountDomainWrapper> getAllAccounts();
 
     /**
+     * @deprecated use getAccountsByCriteria(AccountSearchCriteria)
      * @should get all unique accounts that match the given criteria
      */
     List<AccountDomainWrapper> getAccounts(AccountSearchCriteria criteria);
+
+    /**
+     * @return accounts that match the given search criteria and limit options
+     */
+    AccountSearchResult getAccountsByCriteria(AccountSearchCriteria criteria);
 
     /**
      * Save the account details to the database

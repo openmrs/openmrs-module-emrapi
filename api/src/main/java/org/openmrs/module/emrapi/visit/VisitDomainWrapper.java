@@ -43,6 +43,7 @@ import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -443,10 +444,10 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     public boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType) {
-        return hasEncounterWithoutSubsequentEncounter(lookForEncounterType, withoutSubsequentEncounterType, null);
+        return hasEncounterWithoutSubsequentEncounter(lookForEncounterType, withoutSubsequentEncounterType, null, null);
     }
 
-    private boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType, Date onDate) {
+    private boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType, Date onDate, @Nullable Encounter encounterToIgnore) {
 
         if (visit.getEncounters() == null) {
             return false;
@@ -454,11 +455,13 @@ public class VisitDomainWrapper implements DomainWrapper {
 
         for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
-                if (encounter.getEncounterType().equals(lookForEncounterType)) {
-                    return true;
-                }
-                else if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
-                    return false;
+                if(!encounter.equals(encounterToIgnore)) {       
+                    if (encounter.getEncounterType().equals(lookForEncounterType)) {
+                        return true;
+                    }
+                    else if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
+                        return false;
+                    }
                 }
             }
         }
@@ -467,15 +470,10 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     /**
-     * @return true if the visit includes an admission encounter with no discharge encounter after it
+     * @return true if the visit includes an admission encounter with no discharge encounter after it at the current time
      */
     public boolean isAdmitted() {
-        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
-        EncounterType dischargeEncounterType = emrApiProperties.getExitFromInpatientEncounterType();
-        if (admissionEncounterType == null) {
-            return false;
-        }
-        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType);
+        return isAdmitted(new Date(), null);
     }
 
     public boolean hasBeenDischarged() {
@@ -489,6 +487,18 @@ public class VisitDomainWrapper implements DomainWrapper {
 
     public boolean isAdmitted(Date onDate) {
 
+        return isAdmitted(onDate, null);
+    }
+
+    /**
+     * Determines whether the patient is admitted at onDate.
+     * If encounterToIgnore is not null, this method ignores it when determining the patient's admission status, so it can be
+     * used for data validation on an encounter that has not been saved yet. 
+     * @param onDate
+     * @param encounterToIgnore
+     * @return
+     */
+    public boolean isAdmitted(Date onDate, @Nullable Encounter encounterToIgnore) {
         if (visit.getStartDatetime().after(onDate) || (visit.getStopDatetime() != null && visit.getStopDatetime().before(onDate))) {
             throw new IllegalArgumentException("date does not fall within visit");
         }
@@ -499,7 +509,7 @@ public class VisitDomainWrapper implements DomainWrapper {
             return false;
         }
 
-        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType, onDate);
+        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType, onDate, encounterToIgnore);
     }
 
     public boolean isAwaitingAdmission() {
