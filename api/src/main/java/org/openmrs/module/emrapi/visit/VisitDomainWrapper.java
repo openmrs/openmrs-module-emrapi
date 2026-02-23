@@ -500,7 +500,7 @@ public class VisitDomainWrapper implements DomainWrapper {
      */
     public boolean isAdmitted(Date onDate, @Nullable Encounter encounterToIgnore) {
         if (visit.getStartDatetime().after(onDate) || (visit.getStopDatetime() != null && visit.getStopDatetime().before(onDate))) {
-            throw new IllegalArgumentException("date does not fall within visit");
+            return false;
         }
 
         EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
