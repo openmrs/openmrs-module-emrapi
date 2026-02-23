@@ -45,9 +45,6 @@ public class ProcedureValidator implements Validator {
          if (procedure.getEstimatedStartDate() == null && procedure.getStartDateTime() == null) {
             errors.reject("Procedure.error.startDateTimeRequired");
          }
-         if (procedure.getEstimatedStartDate() != null && procedure.getStartDateTime() != null) {
-            errors.reject("Procedure.error.startDateTimeAndEstimatedDateMutuallyExclusive");
-         }
          if (procedure.getDuration() != null && procedure.getDurationUnit() == null) {
             errors.reject("Procedure.error.durationUnitRequired");
          }
@@ -57,11 +54,22 @@ public class ProcedureValidator implements Validator {
          if (procedure.getVoided() && StringUtils.isBlank(procedure.getVoidReason())) {
             errors.reject("Procedure.error.voidReasonRequiredWhenVoided");
          }
-         
-         if (procedure.getProcedureType() != null && procedure.getProcedureType().getUuid().equals(CURRENT_PROCEDURE_TYPE_UUID)){
-            if (procedure.getProcedureType().getRetired()) {
+         if (procedure.getProcedureType() == null){
+            errors.reject("Procedure.error.procedureTypeRequired");
+         }
+        
+         // Rules for new procedures only
+         if (procedure.getProcedureId() == null){
+            if( procedure.getProcedureType().getRetired()) {
                errors.reject("Procedure.error.procedureTypeRetired");
             }
+            if (procedure.getEstimatedStartDate() != null && procedure.getStartDateTime() != null) {
+               errors.reject("Procedure.error.startDateTimeAndEstimatedDateMutuallyExclusiveForNewProcedures");
+            }
+         }
+         
+         if (procedure.getProcedureType().getUuid().equals(CURRENT_PROCEDURE_TYPE_UUID)){
+            
             if (procedure.getEncounter() == null){
                errors.reject("Procedure.error.encounterRequiredForCurrentProcedures");
             }
