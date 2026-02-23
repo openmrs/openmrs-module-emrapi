@@ -171,6 +171,13 @@
                     <configuration>
                         <target>8</target>
                         <source>8</source>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombokVersion}</version>
+                            </path>
+                        </annotationProcessorPaths>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>

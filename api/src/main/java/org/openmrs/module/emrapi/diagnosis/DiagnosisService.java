@@ -4,7 +4,10 @@ import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.util.PrivilegeConstants;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Date;
@@ -20,6 +23,7 @@ import java.util.Map;
  * @deprecated as of 1.25.0, replaced by {@link DiagnosisService} in the openmrs core platform 2.2.0
  */
 @Deprecated
+@Transactional(readOnly = true)
 public interface DiagnosisService extends OpenmrsService {
 
     /**
@@ -28,6 +32,8 @@ public interface DiagnosisService extends OpenmrsService {
      * @param diagnoses a List of Diagnosis representing the new diagnoses
      * @return
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.EDIT_ENCOUNTERS)
     List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses);
 
 	/**
@@ -37,6 +43,7 @@ public interface DiagnosisService extends OpenmrsService {
 	 * @param fromDate
 	 * @return the list of diagnoses
 	 */
+	@Authorized(PrivilegeConstants.GET_PATIENTS)
 	List<Diagnosis> getDiagnoses(Patient patient, Date fromDate);
 
     /**
@@ -44,6 +51,7 @@ public interface DiagnosisService extends OpenmrsService {
      * @param encounter
      * @return the list of diagnoses
      */
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     List<Diagnosis> getPrimaryDiagnoses(Encounter encounter);
 
     /**
@@ -52,6 +60,7 @@ public interface DiagnosisService extends OpenmrsService {
      * @param diagnosis
      * @return a boolean
      */
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     boolean  hasDiagnosis(Encounter encounter, Diagnosis diagnosis);
 
 	/**
@@ -61,15 +70,18 @@ public interface DiagnosisService extends OpenmrsService {
 	 * @param fromDate
 	 * @return the list of diagnoses
 	 */
+	@Authorized(PrivilegeConstants.GET_PATIENTS)
 	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate);
 
 	/**
 	 * @return a Map from Visit to the List of Diagnoses in that visit, given a List of visits
 	 */
+	@Authorized(PrivilegeConstants.GET_PATIENTS)
 	Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits);
 
 	/**
 	 * @return diagnoses as obs, for the given metadata and primary/confirmed specification
 	 */
+	@Authorized(PrivilegeConstants.GET_PATIENTS)
 	List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly);
 }
