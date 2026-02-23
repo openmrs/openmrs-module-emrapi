@@ -103,7 +103,7 @@ public class AdtAction {
             public void checkEncounterValid(VisitDomainWrapper visit, Encounter encounter) {
                 Date onDate = encounter.getEncounterDatetime();
                 Location toLocation = encounter.getLocation();
-                if (visit.isAdmitted(onDate, encounter)) {
+                if (visit.isAdmittedAtTimeOfEncounter(encounter)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_ALREADY_ADMITTED, toLocation, onDate);
                 }
             }
@@ -134,7 +134,7 @@ public class AdtAction {
             public void checkEncounterValid(VisitDomainWrapper visit, Encounter encounter) {
                 Date onDate = encounter.getEncounterDatetime();
                 Location toLocation = encounter.getLocation();
-                if (!visit.isAdmitted(onDate, encounter)) {
+                if (!visit.isAdmittedAtTimeOfEncounter(encounter)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
             }

@@ -491,6 +491,16 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     /**
+     * Determines whether the patient is admitted at the time of the given encounter, ignoring that encounter when determining admission status
+     * so that this method can be used for data validation on an encounter that has not been saved yet.
+     * @param encounter
+     * @return
+     */
+    public boolean isAdmittedAtTimeOfEncounter(Encounter encounter) {
+        return isAdmitted(encounter.getEncounterDatetime(), encounter);
+    }
+
+    /**
      * Determines whether the patient is admitted at onDate.
      * If encounterToIgnore is not null, this method ignores it when determining the patient's admission status, so it can be
      * used for data validation on an encounter that has not been saved yet. 
@@ -498,7 +508,7 @@ public class VisitDomainWrapper implements DomainWrapper {
      * @param encounterToIgnore
      * @return
      */
-    public boolean isAdmitted(Date onDate, @Nullable Encounter encounterToIgnore) {
+    private boolean isAdmitted(Date onDate, @Nullable Encounter encounterToIgnore) {
         if (visit.getStartDatetime().after(onDate) || (visit.getStopDatetime() != null && visit.getStopDatetime().before(onDate))) {
             return false;
         }
