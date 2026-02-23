@@ -18,9 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-
 public class PatientProfileResourceTest extends BaseModuleWebContextSensitiveTest {
 
     private PatientProfileResource resource;

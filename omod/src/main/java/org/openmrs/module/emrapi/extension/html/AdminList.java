@@ -3,7 +3,6 @@ package org.openmrs.module.emrapi.extension.html;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openmrs.api.context.Context;
 import org.openmrs.module.Extension;
 import org.openmrs.module.ModuleUtil;
 import org.openmrs.module.web.extension.AdministrationSectionExt;

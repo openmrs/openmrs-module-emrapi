@@ -15,7 +15,6 @@
 package org.openmrs.module.emrapi.adt;
 
 import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Order;

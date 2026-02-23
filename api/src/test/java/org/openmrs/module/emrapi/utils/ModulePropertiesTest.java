@@ -19,11 +19,7 @@ import org.junit.Test;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
-import org.openmrs.module.emrapi.EmrApiConstants;
-import org.openmrs.module.metadatamapping.MetadataSet;
-import org.openmrs.module.metadatamapping.api.MetadataMappingService;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;

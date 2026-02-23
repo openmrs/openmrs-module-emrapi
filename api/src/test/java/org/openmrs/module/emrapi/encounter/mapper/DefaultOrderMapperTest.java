@@ -18,7 +18,6 @@ import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
 import org.openmrs.CareSetting;
 import org.openmrs.Concept;

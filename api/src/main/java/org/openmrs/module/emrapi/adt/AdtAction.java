@@ -11,7 +11,6 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.exception.InvalidAdtEncounterException;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
-import org.springframework.lang.Nullable;
 
 import java.util.Date;
 import java.util.Map;
