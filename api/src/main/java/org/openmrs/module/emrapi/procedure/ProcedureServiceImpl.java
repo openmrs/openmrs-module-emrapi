@@ -9,6 +9,7 @@
  */
 package org.openmrs.module.emrapi.procedure;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;
@@ -31,10 +32,9 @@ import java.util.List;
  * @since 3.3.0
  */
 @Transactional
+@Slf4j
 public class ProcedureServiceImpl extends BaseOpenmrsService implements ProcedureService {
-
-   private static final Logger log = LoggerFactory.getLogger(ProcedureServiceImpl.class);
-
+   
    private ProcedureDAO procedureDAO;
    
    public void setProcedureDAO(ProcedureDAO procedureDAO) {
@@ -56,7 +56,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    }
    
    @Override
-   @Transactional
    public Procedure saveProcedure(Procedure procedure) throws APIException {
       log.info("Saving procedure: {}", procedure.getUuid());
       
@@ -70,7 +69,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    }
    
    @Override
-   @Transactional
    public Procedure unvoidProcedure(Procedure procedure) {
       log.info("Unvoiding procedure: {}", procedure.getUuid());
       
@@ -83,7 +81,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    }
    
    @Override
-   @Transactional
    public void purgeProcedure(Procedure procedure) throws APIException {
       log.info("Purging procedure: {}", procedure.getUuid());
       procedureDAO.delete(procedure);

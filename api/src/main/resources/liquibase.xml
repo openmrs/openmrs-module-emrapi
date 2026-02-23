@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
-    <changeSet id="emrapi-202501211000" author="emrapi">
+    <changeSet id="emrapi-202501211000" author="openmrs">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="emrapi_procedure_type"/>
@@ -76,7 +76,7 @@
                 referencedColumnNames="user_id"/>
     </changeSet>
 
-    <changeSet id="emrapi-202501211001" author="emrapi">
+    <changeSet id="emrapi-202501211001" author="openmrs">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="emrapi_procedure"/>

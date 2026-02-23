@@ -20,13 +20,13 @@ import org.openmrs.module.webservices.rest.web.representation.FullRepresentation
 import org.openmrs.module.webservices.rest.web.representation.RefRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
-import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
+import org.openmrs.module.webservices.rest.web.resource.impl.MetadataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
 @Resource(name = RestConstants.VERSION_1 + "/proceduretype", supportedClass = ProcedureType.class, supportedOpenmrsVersions = { "2.2 - 9.*" })
-public class ProcedureTypeResource extends DelegatingCrudResource<ProcedureType> {
+public class ProcedureTypeResource extends MetadataDelegatingCrudResource<ProcedureType> {
 
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
@@ -84,7 +84,7 @@ public class ProcedureTypeResource extends DelegatingCrudResource<ProcedureType>
 	}
 
 	@Override
-	protected void delete(ProcedureType procedureType, String reason, RequestContext context) throws ResponseException {
+   public void delete(ProcedureType procedureType, String reason, RequestContext context) throws ResponseException {
 		Context.getService(ProcedureTypeService.class).retireProcedureType(procedureType, reason);
 	}
 

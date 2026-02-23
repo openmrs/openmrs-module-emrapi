@@ -527,7 +527,7 @@
     <!-- Procedure DAO -->
     <bean id="procedureDAO" class="org.openmrs.module.emrapi.procedure.HibernateProcedureDAO">
         <property name="sessionFactory">
-            <ref bean="dbSessionFactory"/>
+            <ref bean="sessionFactory"/>
         </property>
     </bean>
 
@@ -563,7 +563,7 @@
     <!-- ProcedureType DAO -->
     <bean id="procedureTypeDAO" class="org.openmrs.module.emrapi.procedure.HibernateProcedureTypeDAO">
         <property name="sessionFactory">
-            <ref bean="dbSessionFactory"/>
+            <ref bean="sessionFactory"/>
         </property>
     </bean>
 

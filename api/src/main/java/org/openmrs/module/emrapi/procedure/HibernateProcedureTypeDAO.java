@@ -10,9 +10,8 @@
 package org.openmrs.module.emrapi.procedure;
 
 import lombok.Setter;
-import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -23,14 +22,13 @@ import java.util.List;
  * @since 3.3.0
  */
 @Setter
+@Slf4j
 public class HibernateProcedureTypeDAO implements ProcedureTypeDAO {
 
-	private static final Logger log = LoggerFactory.getLogger(HibernateProcedureTypeDAO.class);
-
-	private DbSessionFactory sessionFactory;
+	private SessionFactory sessionFactory;
 
 	private EntityManager getEntityManager() {
-		return sessionFactory.getHibernateSessionFactory().getCurrentSession();
+		return sessionFactory.getCurrentSession();
 	}
 
 	@Override
@@ -41,7 +39,7 @@ public class HibernateProcedureTypeDAO implements ProcedureTypeDAO {
 				.createQuery("SELECT pt FROM ProcedureType pt WHERE pt.uuid = :uuid", ProcedureType.class);
 		query.setParameter("uuid", uuid);
   
-		List<ProcedureType> results = query.getResultList();
+		List<ProcedureType> results = query.setMaxResults(1).getResultList();
 		return results.isEmpty() ? null : results.get(0);
 	}
 

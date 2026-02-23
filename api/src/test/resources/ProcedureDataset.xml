@@ -1,9 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
-    <!-- Use existing concepts from standard test data -->
-    <!-- Concept 3 and 4 exist in standard test data -->
-
-    <!-- Use existing location from standard test data -->
     <location location_id="1901" name="Test Procedure Location" creator="1" date_created="2005-01-01 00:00:00.0" retired="false" uuid="procedure-test-location-uuid"/>
 
     <!-- Create visits for patients 7 and 8 (which exist in standard test data) -->
@@ -30,14 +26,11 @@
             retired="false"
     />
 
-    <!-- Procedure records using patients 7 and 8 which exist in standard test data -->
-    <!-- Use concept 3 and 4 for procedure and body site which exist in standard test data -->
-
-    <!-- Current procedure (no originalDateText) for patient 7 -->
+    <!-- Current procedure for patient 7 -->
     <emrapi_procedure
             procedure_id="1"
             patient_id="7"
-            procedure_type_id="1"
+            procedure_type_id="2"
             encounter_id="2001"
             procedure_coded="3"
             body_site_coded="4"
@@ -54,7 +47,7 @@
             voided="false"
     />
 
-    <!-- Historical procedure (has originalDateText) for patient 7 -->
+    <!-- Historical procedure for patient 7 -->
     <emrapi_procedure
             procedure_id="2"
             patient_id="7"
@@ -62,6 +55,7 @@
             procedure_non_coded="Appendectomy"
             body_site_coded="4"
             start_date_time="2020-03-01 00:00:00"
+            estimated_start_date="2020-03"
             status_coded="5"
             notes="Patient reported previous appendectomy"
             uuid="procedure-uuid-002"
@@ -109,10 +103,11 @@
     <emrapi_procedure
             procedure_id="5"
             patient_id="8"
-            procedure_type_id="2"
+            procedure_type_id="1"
             procedure_non_coded="Minor surgery"
             body_site_coded="3"
             start_date_time="2023-08-01 08:00:00"
+            estimated_start_date="2023"
             uuid="procedure-uuid-005"
             status_coded="5"
             creator="1"
@@ -128,6 +123,7 @@
             procedure_non_coded="Tonsillectomy"
             body_site_coded="4"
             start_date_time="2015-01-01 00:00:00"
+            estimated_start_date="2015"
             uuid="procedure-uuid-006"
             status_coded="5"
             creator="1"
