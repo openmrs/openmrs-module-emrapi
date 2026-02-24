@@ -455,7 +455,7 @@ public class VisitDomainWrapper implements DomainWrapper {
 
         for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
-                if(!encounter.equals(encounterToIgnore)) {       
+                if(!encounter.equals(encounterToIgnore)) {
                     if (encounter.getEncounterType().equals(lookForEncounterType)) {
                         return true;
                     }
@@ -503,7 +503,7 @@ public class VisitDomainWrapper implements DomainWrapper {
     /**
      * Determines whether the patient is admitted at onDate.
      * If encounterToIgnore is not null, this method ignores it when determining the patient's admission status, so it can be
-     * used for data validation on an encounter that has not been saved yet. 
+     * used for data validation on an encounter that has not been saved yet.
      * @param onDate
      * @param encounterToIgnore
      * @return
@@ -533,8 +533,23 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     public Location getInpatientLocation(Date onDate) {
+        return getInpatientLocation(onDate, null);
+    }
 
-        if (!isAdmitted(onDate)) {
+    /**
+     * Gets the inpatient location of the patient associated with the encounter, at the time of the encounter.
+     * Note that the input encounter (especially if it's an admit or transfer encounter) is ignored when
+     * determining the location
+     * @param encounter
+     * @return
+     */
+    public Location getInpatientLocationAtTimeOfEncounter(Encounter encounter) {
+        return getInpatientLocation(encounter.getEncounterDatetime(), encounter);
+    }
+
+    private Location getInpatientLocation(Date onDate, @Nullable Encounter encounterToIgnore) {
+
+        if (!isAdmitted(onDate, encounterToIgnore)) {
             return null;
         }
 
@@ -543,9 +558,11 @@ public class VisitDomainWrapper implements DomainWrapper {
 
         for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
-                if (encounter.getEncounterType().equals(admissionEncounterType) ||
-                        encounter.getEncounterType().equals(transferEncounterType)) {
-                    return encounter.getLocation();
+                if(!encounter.equals(encounterToIgnore)) {
+                    if (encounter.getEncounterType().equals(admissionEncounterType) ||
+                            encounter.getEncounterType().equals(transferEncounterType)) {
+                        return encounter.getLocation();
+                    }
                 }
             }
         }

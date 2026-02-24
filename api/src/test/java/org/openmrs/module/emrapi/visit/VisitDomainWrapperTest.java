@@ -397,6 +397,7 @@ public class VisitDomainWrapperTest {
        when(visit.getEncounters()).thenReturn(encounters);
 
        assertThat(visitDomainWrapper.getInpatientLocation(DateUtils.addHours(new Date(), -2)), is(icu));
+       assertThat(visitDomainWrapper.getInpatientLocationAtTimeOfEncounter(transfer), is(icu));
        assertThat(visitDomainWrapper.getInpatientLocation(new Date()), is(surgery));
 
    }
