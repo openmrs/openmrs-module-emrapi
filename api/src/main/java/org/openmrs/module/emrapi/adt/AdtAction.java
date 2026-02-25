@@ -162,10 +162,10 @@ public class AdtAction {
                 Date onDate = encounter.getEncounterDatetime();
                 Location toLocation = encounter.getLocation();
                 
-                if (!visit.isAdmitted(onDate)) {
+                if (!visit.isAdmittedAtTimeOfEncounter(encounter)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_NOT_ADMITTED, toLocation, onDate);
                 }
-                Location currentLocation = visit.getInpatientLocation(onDate);
+                Location currentLocation = visit.getInpatientLocationAtTimeOfEncounter(encounter);
                 if (toLocation != null && toLocation.equals(currentLocation)) {
                     throw new InvalidAdtEncounterException(InvalidAdtEncounterException.Type.PATIENT_ALREADY_AT_LOCATION, toLocation, onDate);
                 }
