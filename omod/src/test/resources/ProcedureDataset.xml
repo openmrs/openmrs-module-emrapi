@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <!-- Patient for testing -->
+    <person person_id="201" gender="M" dead="false" creator="1" birthdate_estimated="0"
+            date_created="2023-10-15 10:30:00.0" voided="false" uuid="procedure-test-patient-uuid"/>
+    <person_name person_name_id="201" person_id="201" preferred="true" given_name="Test" family_name="Patient"
+                 creator="1" date_created="2023-10-15 10:31:00.0" voided="false"
+                 uuid="procedure-test-patient-name-uuid"/>
+    <patient patient_id="201" creator="1" date_created="2023-10-15 10:32:00.0" voided="false"/>
+
+    <!-- Concepts for procedure and body site -->
+    <concept concept_id="5001" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="procedure-concept-uuid"/>
+    <concept_name concept_name_id="5001" concept_id="5001" name="Test Procedure" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="procedure-concept-name-uuid"/>
+
+    <concept concept_id="5002" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="body-site-concept-uuid"/>
+    <concept_name concept_name_id="5002" concept_id="5002" name="Test Body Site" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="body-site-concept-name-uuid"/>
+
+    <concept concept_id="5003" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="outcome-concept-uuid"/>
+    <concept_name concept_name_id="5003" concept_id="5003" name="Test Outcome" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="outcome-concept-name-uuid"/>
+<!--    Concepts for status preparation | in-progress | completed -->
+    <concept concept_id="5004" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="status-preparation-concept-uuid"/>
+    <concept_name concept_name_id="5004" concept_id="5004" name="Preparation" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="status-preparation-concept-name-uuid"/>
+    <concept concept_id="5005" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="status-in-progress-concept-uuid"/>
+    <concept_name concept_name_id="5005" concept_id="5005" name="In-Progress" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                    uuid="status-in-progress-concept-name-uuid"/>
+    <concept concept_id="5006" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="status-completed-concept-uuid"/>
+    <concept_name concept_name_id="5006" concept_id="5006" name="Completed" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="status-completed-concept-name-uuid"/>
+
+    <!-- Concept for duration unit -->
+    <concept concept_id="5007" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="duration-unit-seconds-concept-uuid"/>
+    <concept_name concept_name_id="5007" concept_id="5007" name="Seconds" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="seconds-concept-name-uuid"/>
+    <concept concept_id="5008" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="duration-unit-minutes-concept-uuid"/>
+    <concept_name concept_name_id="5008" concept_id="5008" name="Minutes" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="minutes-concept-name-uuid"/>
+    <concept concept_id="5009" retired="false" datatype_id="4" class_id="4" is_set="false" creator="1"
+             date_created="2023-01-01 00:00:00.0" uuid="duration-unit-hours-concept-uuid"/>
+    <concept_name concept_name_id="5009" concept_id="5009" name="Hours" locale="en" locale_preferred="1"
+                  creator="1" date_created="2023-01-01 00:00:00.0" concept_name_type="FULLY_SPECIFIED" voided="false"
+                  uuid="hours-concept-name-uuid"/>
+
+    <!-- Procedure types -->
+    <emrapi_procedure_type
+            procedure_type_id="1"
+            name="Historical"
+            description="Historical procedures"
+            uuid="historical-procedure-type-uuid"
+            creator="1"
+            date_created="2023-01-01 00:00:00.0"
+            retired="false"
+    />
+    <emrapi_procedure_type
+            procedure_type_id="2"
+            name="Current"
+            description="Current procedures"
+            uuid="cce8ea25-ba2c-4dfe-a386-fba606bc2ef2"
+            creator="1"
+            date_created="2023-01-01 00:00:00.0"
+            retired="false"
+    />
+
+    <!-- Encounter for current procedure tests -->
+    <encounter_type encounter_type_id="201" name="Procedure Encounter" description="Test encounter type"
+                    creator="1" date_created="2023-01-01 00:00:00.0" retired="false"
+                    uuid="procedure-encounter-type-uuid"/>
+    <encounter encounter_id="201" encounter_type="201" patient_id="201"
+               encounter_datetime="2023-06-15 14:00:00.0" creator="1" date_created="2023-06-15 14:00:00.0"
+               voided="false" uuid="procedure-test-encounter-uuid"/>
+
+    <!-- Pre-existing procedure for GET tests -->
+    <emrapi_procedure
+            procedure_id="101"
+            patient_id="201"
+            procedure_type_id="1"
+            procedure_coded="5001"
+            body_site_coded="5002"
+            start_date_time="2023-06-15 14:30:00"
+            duration="45"
+            duration_unit_coded="5008"
+            status_coded="5006"
+            notes="Existing procedure for GET test"
+            uuid="existing-procedure-uuid"
+            creator="1"
+            date_created="2023-06-15 14:30:00"
+            voided="false"
+    />
+
+    <emrapi_procedure procedure_id="102" patient_id="201" procedure_type_id="1"
+        procedure_coded="5001" body_site_coded="5002"
+        start_date_time="2023-05-10 09:00:00" status_coded="5006"
+        notes="Second procedure for pagination" uuid="procedure-uuid-page-2"
+        creator="1" date_created="2023-05-10 09:00:00" voided="false"/>
+
+    <emrapi_procedure procedure_id="103" patient_id="201" procedure_type_id="1"
+        procedure_coded="5001" body_site_coded="5002"
+        start_date_time="2023-04-01 08:00:00" status_coded="5006"
+        notes="Third procedure for pagination" uuid="procedure-uuid-page-3"
+        creator="1" date_created="2023-04-01 08:00:00" voided="false"/>
+</dataset>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="emrapi-202501211000" author="openmrs">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="emrapi_procedure_type"/>
+            </not>
+        </preConditions>
+        <comment>Create emrapi_procedure_type table for categorizing procedures</comment>
+
+        <createTable tableName="emrapi_procedure_type">
+            <column name="procedure_type_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Audit fields (from BaseOpenmrsMetadata) -->
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="creator" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_changed" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="retired" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retired_by" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_retired" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="retire_reason" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_type_creator"
+                baseTableName="emrapi_procedure_type"
+                baseColumnNames="creator"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_type_changed_by"
+                baseTableName="emrapi_procedure_type"
+                baseColumnNames="changed_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_type_retired_by"
+                baseTableName="emrapi_procedure_type"
+                baseColumnNames="retired_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+    </changeSet>
+
+    <changeSet id="emrapi-202501211001" author="openmrs">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="emrapi_procedure"/>
+            </not>
+        </preConditions>
+        <comment>Create emrapi_procedure table for recording surgical and medical procedures</comment>
+
+        <createTable tableName="emrapi_procedure">
+            <column name="procedure_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="patient_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="procedure_type_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="encounter_id" type="int">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Procedure name (coded or free text) -->
+            <column name="procedure_coded" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="procedure_non_coded" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Body site (required, coded only) -->
+            <column name="body_site_coded" type="int">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- Timing -->
+            <column name="start_date_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="estimated_start_date" type="varchar(35)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="end_date_time" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="duration" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="duration_unit_coded" type="int">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Status -->
+            <column name="status_coded" type="int">
+                    <constraints nullable="false"/>
+            </column>
+
+            <!-- Outcome (coded or free text) -->
+            <column name="outcome_coded" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="outcome_non_coded" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Notes -->
+            <column name="notes" type="text">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- FormRecordable support -->
+            <column name="form_namespace" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="form_field_path" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+
+            <!-- Audit fields (from BaseOpenmrsData) -->
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="creator" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="changed_by" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_changed" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="voided" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voided_by" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="date_voided" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="void_reason" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+
+        <!-- Foreign key constraints -->
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_patient"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="patient_id"
+                referencedTableName="patient"
+                referencedColumnNames="patient_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_type"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="procedure_type_id"
+                referencedTableName="emrapi_procedure_type"
+                referencedColumnNames="procedure_type_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_encounter"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="encounter_id"
+                referencedTableName="encounter"
+                referencedColumnNames="encounter_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_coded"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="procedure_coded"
+                referencedTableName="concept"
+                referencedColumnNames="concept_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_body_site"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="body_site_coded"
+                referencedTableName="concept"
+                referencedColumnNames="concept_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_outcome"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="outcome_coded"
+                referencedTableName="concept"
+                referencedColumnNames="concept_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_creator"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="creator"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_changed_by"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="changed_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_procedure_voided_by"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="voided_by"
+                referencedTableName="users"
+                referencedColumnNames="user_id"/>
+
+        <!-- Indexes for common queries -->
+        <createIndex indexName="idx_procedure_patient" tableName="emrapi_procedure">
+            <column name="patient_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_procedure_start_date" tableName="emrapi_procedure">
+            <column name="start_date_time"/>
+        </createIndex>
+
+        <createIndex indexName="idx_procedure_encounter" tableName="emrapi_procedure">
+            <column name="encounter_id"/>
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

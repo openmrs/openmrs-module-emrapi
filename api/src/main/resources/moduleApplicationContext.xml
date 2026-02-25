@@ -524,4 +524,74 @@
         </property>
     </bean>
 
+    <!-- Procedure DAO -->
+    <bean id="procedureDAO" class="org.openmrs.module.emrapi.procedure.HibernateProcedureDAO">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <bean id="procedureValidator" class="org.openmrs.module.emrapi.procedure.ProcedureValidator"/>
+
+    <!-- Procedure Service -->
+    <bean id="procedureService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.procedure.ProcedureServiceImpl">
+                <property name="procedureDAO" ref="procedureDAO"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.openmrs.module.emrapi.procedure.ProcedureService</value>
+                <ref bean="procedureService"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- ProcedureType DAO -->
+    <bean id="procedureTypeDAO" class="org.openmrs.module.emrapi.procedure.HibernateProcedureTypeDAO">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+
+    <!-- ProcedureType Service -->
+    <bean id="procedureTypeService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="target">
+            <bean class="org.openmrs.module.emrapi.procedure.ProcedureTypeServiceImpl">
+                <property name="procedureTypeDAO" ref="procedureTypeDAO"/>
+            </bean>
+        </property>
+        <property name="preInterceptors">
+            <ref bean="serviceInterceptors"/>
+        </property>
+        <property name="transactionAttributeSource">
+            <ref bean="transactionAttributeSource"/>
+        </property>
+    </bean>
+
+    <bean parent="serviceContext">
+        <property name="moduleService">
+            <list merge="true">
+                <value>org.openmrs.module.emrapi.procedure.ProcedureTypeService</value>
+                <ref bean="procedureTypeService"/>
+            </list>
+        </property>
+    </bean>
+
 </beans>
