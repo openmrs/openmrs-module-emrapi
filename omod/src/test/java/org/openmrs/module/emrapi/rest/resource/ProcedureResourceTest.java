@@ -153,10 +153,10 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
       void shouldReturnFirstPageWhenLimitIsSet() throws Exception {
          MockHttpServletRequest request = new MockHttpServletRequest();
          request.setParameter("patient", PATIENT_UUID);
-         request.setParameter("limit", "2");
          RequestContext context = new RequestContext();
          context.setRequest(request);
-
+         context.setLimit(2);
+         
          AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
          List<Procedure> procedures = result.getPageOfResults();
 
@@ -169,9 +169,9 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
       void shouldReturnOffsetPageWhenStartIndexIsSet() throws Exception {
          MockHttpServletRequest request = new MockHttpServletRequest();
          request.setParameter("patient", PATIENT_UUID);
-         request.setParameter("startIndex", "1");
-         request.setParameter("limit", "1");
          RequestContext context = new RequestContext();
+         context.setStartIndex(1);
+         context.setLimit(1);
          context.setRequest(request);
 
          AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
@@ -185,11 +185,10 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
       void shouldSetHasMoreTrueWhenMoreResultsExist() throws Exception {
          MockHttpServletRequest request = new MockHttpServletRequest();
          request.setParameter("patient", PATIENT_UUID);
-         request.setParameter("startIndex", "0");
-         request.setParameter("limit", "2");
          RequestContext context = new RequestContext();
          context.setRequest(request);
-
+         context.setStartIndex(0);
+         context.setLimit(2);
          AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
 
          assertTrue(result.hasMoreResults());
@@ -199,10 +198,10 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
       void shouldSetHasMoreFalseOnLastPage() throws Exception {
          MockHttpServletRequest request = new MockHttpServletRequest();
          request.setParameter("patient", PATIENT_UUID);
-         request.setParameter("startIndex", "2");
-         request.setParameter("limit", "2");
          RequestContext context = new RequestContext();
          context.setRequest(request);
+         context.setStartIndex(2);
+         context.setLimit(2);
 
          AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
 
