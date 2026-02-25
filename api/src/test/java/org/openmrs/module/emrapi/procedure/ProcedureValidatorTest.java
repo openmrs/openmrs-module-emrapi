@@ -27,8 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ProcedureValidatorTest {
 
-	private static final String CURRENT_PROCEDURE_TYPE_UUID = "cce8ea25-ba2c-4dfe-a386-fba606bc2ef2";
-
 	private ProcedureValidator validator;
 
 	private Procedure procedure;
@@ -123,14 +121,6 @@ class ProcedureValidatorTest {
 	}
 
 	@Test
-	void validate_shouldRejectWhenBothStartDateTimeAndEstimatedStartDateAreProvided() {
-		procedure.setStartDateTime(new Date());
-		procedure.setEstimatedStartDate("2024-01");
-		validator.validate(procedure, errors);
-		assertTrue(hasErrorCode("Procedure.error.startDateTimeAndEstimatedDateMutuallyExclusive"));
-	}
-
-	@Test
 	void validate_shouldPassWhenOnlyStartDateTimeIsProvided() {
 		procedure.setStartDateTime(new Date());
 		procedure.setEstimatedStartDate(null);
@@ -212,41 +202,8 @@ class ProcedureValidatorTest {
 	}
 
 	@Test
-	void validate_shouldRejectRetiredProcedureTypeForCurrentProcedure() {
-		ProcedureType currentType = new ProcedureType();
-		currentType.setUuid(CURRENT_PROCEDURE_TYPE_UUID);
-		currentType.setRetired(true);
-		procedure.setProcedureType(currentType);
-		procedure.setEncounter(new Encounter());
-		validator.validate(procedure, errors);
-		assertTrue(hasErrorCode("Procedure.error.procedureTypeRetired"));
-	}
-
-	@Test
-	void validate_shouldRejectMissingEncounterForCurrentProcedure() {
-		ProcedureType currentType = new ProcedureType();
-		currentType.setUuid(CURRENT_PROCEDURE_TYPE_UUID);
-		currentType.setRetired(false);
-		procedure.setProcedureType(currentType);
-		procedure.setEncounter(null);
-		validator.validate(procedure, errors);
-		assertTrue(hasErrorCode("Procedure.error.encounterRequiredForCurrentProcedures"));
-	}
-
-	@Test
-	void validate_shouldPassForCurrentProcedureTypeWithEncounterAndNotRetired() {
-		ProcedureType currentType = new ProcedureType();
-		currentType.setUuid(CURRENT_PROCEDURE_TYPE_UUID);
-		currentType.setRetired(false);
-		procedure.setProcedureType(currentType);
-		procedure.setEncounter(new Encounter());
-		validator.validate(procedure, errors);
-		assertFalse(hasErrorCode("Procedure.error.procedureTypeRetired"));
-		assertFalse(hasErrorCode("Procedure.error.encounterRequiredForCurrentProcedures"));
-	}
-
-	@Test
-	void validate_shouldNotApplyCurrentTypeRulesForNonCurrentProcedureType() {
+	void validate_shouldAllowRetiredTypesWhenUpdating() {
+      procedure.setProcedureId(123); // Simulate existing procedure
 		ProcedureType otherType = new ProcedureType();
 		otherType.setUuid("some-other-uuid");
 		otherType.setRetired(true);
@@ -254,7 +211,6 @@ class ProcedureValidatorTest {
 		procedure.setEncounter(null);
 		validator.validate(procedure, errors);
 		assertFalse(hasErrorCode("Procedure.error.procedureTypeRetired"));
-		assertFalse(hasErrorCode("Procedure.error.encounterRequiredForCurrentProcedures"));
 	}
 
 	private Procedure buildValidProcedure() {

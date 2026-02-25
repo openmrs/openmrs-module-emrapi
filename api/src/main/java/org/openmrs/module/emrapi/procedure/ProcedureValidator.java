@@ -3,8 +3,6 @@ package org.openmrs.module.emrapi.procedure;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.annotation.Handler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -16,8 +14,6 @@ import org.springframework.validation.Validator;
 @Slf4j
 public class ProcedureValidator implements Validator {
 
-   private static final String CURRENT_PROCEDURE_TYPE_UUID = "cce8ea25-ba2c-4dfe-a386-fba606bc2ef2";
-   
    @Override
    public boolean supports(Class<?> clazz) {
       return Procedure.class.isAssignableFrom(clazz);
@@ -68,12 +64,6 @@ public class ProcedureValidator implements Validator {
             }
          }
          
-         if (procedure.getProcedureType().getUuid().equals(CURRENT_PROCEDURE_TYPE_UUID)){
-            
-            if (procedure.getEncounter() == null){
-               errors.reject("Procedure.error.encounterRequiredForCurrentProcedures");
-            }
-         }
          if (errors.hasErrors()) {
             log.warn("Validation failed for procedure {}: {}", procedure.getUuid(), errors.getAllErrors());
          }
