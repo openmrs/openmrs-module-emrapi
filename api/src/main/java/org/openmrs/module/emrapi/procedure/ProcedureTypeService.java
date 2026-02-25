@@ -18,7 +18,7 @@ import java.util.List;
  * @since 3.3.0
  */
 public interface ProcedureTypeService extends OpenmrsService {
-
+ 
 	/**
 	 * Saves a procedure type.
 	 *
@@ -26,7 +26,15 @@ public interface ProcedureTypeService extends OpenmrsService {
 	 * @return the saved procedure type
 	 */
 	ProcedureType saveProcedureType(ProcedureType procedureType);
-
+   
+   /**
+    * Gets a procedure type by its internal ID.
+    *
+    * @param id the internal ID of the procedure type
+    * @return the procedure type, or null if not found
+    */
+   ProcedureType getProcedureTypeById(Integer id);
+   
 	/**
 	 * Gets a procedure type by its UUID.
 	 *
@@ -35,6 +43,14 @@ public interface ProcedureTypeService extends OpenmrsService {
 	 */
 	ProcedureType getProcedureTypeByUuid(String uuid);
 
+   /**
+    * Gets a procedure type by its name.
+    *
+    * @param name the name of the procedure type
+    * @return the procedure type, or null if not found
+    */
+   ProcedureType getProcedureTypeByName(String name);
+   
 	/**
 	 * Gets all procedure types.
 	 *

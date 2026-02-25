@@ -105,4 +105,16 @@
             date_created="2023-06-15 14:30:00"
             voided="false"
     />
+
+    <emrapi_procedure procedure_id="102" patient_id="201" procedure_type_id="1"
+        procedure_coded="5001" body_site_coded="5002"
+        start_date_time="2023-05-10 09:00:00" status_coded="5006"
+        notes="Second procedure for pagination" uuid="procedure-uuid-page-2"
+        creator="1" date_created="2023-05-10 09:00:00" voided="false"/>
+
+    <emrapi_procedure procedure_id="103" patient_id="201" procedure_type_id="1"
+        procedure_coded="5001" body_site_coded="5002"
+        start_date_time="2023-04-01 08:00:00" status_coded="5006"
+        notes="Third procedure for pagination" uuid="procedure-uuid-page-3"
+        creator="1" date_created="2023-04-01 08:00:00" voided="false"/>
 </dataset>

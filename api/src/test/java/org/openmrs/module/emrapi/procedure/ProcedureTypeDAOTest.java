@@ -52,6 +52,31 @@ public class ProcedureTypeDAOTest extends BaseModuleContextSensitiveTest {
 	}
 
 	@Test
+	public void getById_shouldReturnProcedureTypeWhenExists() {
+		ProcedureType type = procedureTypeDAO.getById(1);
+		assertNotNull(type);
+		assertEquals("procedure-type-uuid-001", type.getUuid());
+		assertEquals("Historical", type.getName());
+	}
+
+	@Test
+	public void getById_shouldReturnNullWhenNotExists() {
+		assertNull(procedureTypeDAO.getById(999));
+	}
+
+	@Test
+	public void getByName_shouldReturnProcedureTypeWhenExists() {
+		ProcedureType type = procedureTypeDAO.getByName("Historical");
+		assertNotNull(type);
+		assertEquals("procedure-type-uuid-001", type.getUuid());
+	}
+
+	@Test
+	public void getByName_shouldReturnNullWhenNotExists() {
+		assertNull(procedureTypeDAO.getByName("NonExistentType"));
+	}
+
+	@Test
 	public void getAll_shouldReturnOnlyNonRetiredTypes() {
 		List<ProcedureType> types = procedureTypeDAO.getAll(false);
 

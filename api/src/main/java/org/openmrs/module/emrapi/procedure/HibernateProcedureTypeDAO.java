@@ -30,6 +30,12 @@ public class HibernateProcedureTypeDAO implements ProcedureTypeDAO {
 	private EntityManager getEntityManager() {
 		return sessionFactory.getCurrentSession();
 	}
+   
+   @Override
+   public ProcedureType getById(Integer id) {
+      log.debug("Getting procedure type by id: {}", id);
+      return getEntityManager().find(ProcedureType.class, id);
+   }
 
 	@Override
 	public ProcedureType getByUuid(String uuid) {
@@ -42,6 +48,17 @@ public class HibernateProcedureTypeDAO implements ProcedureTypeDAO {
 		List<ProcedureType> results = query.setMaxResults(1).getResultList();
 		return results.isEmpty() ? null : results.get(0);
 	}
+   
+   @Override
+   public ProcedureType getByName(String name) {
+      log.debug("Getting procedure type by name: {}", name);
+      TypedQuery<ProcedureType> query = getEntityManager()
+              .createQuery("SELECT pt FROM ProcedureType pt WHERE pt.name = :name", ProcedureType.class);
+      query.setParameter("name", name);
+      
+      List<ProcedureType> results = query.setMaxResults(1).getResultList();
+      return results.isEmpty() ? null : results.get(0);
+   }
 
 	@Override
 	public List<ProcedureType> getAll(boolean includeRetired) {

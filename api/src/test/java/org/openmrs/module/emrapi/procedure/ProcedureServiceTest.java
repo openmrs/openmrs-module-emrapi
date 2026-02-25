@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -206,18 +207,86 @@ class ProcedureServiceTest {
     }
 
     @Nested
+    class GetProcedureById {
+
+        @Test
+        void shouldDelegateToDAO() {
+            Procedure expected = new Procedure();
+            when(procedureDAO.getById(42)).thenReturn(expected);
+
+            Procedure result = procedureService.getProcedureById(42);
+
+            assertEquals(expected, result);
+            verify(procedureDAO).getById(42);
+        }
+
+        @Test
+        void shouldReturnNullWhenDAOReturnsNull() {
+            when(procedureDAO.getById(999)).thenReturn(null);
+            assertNull(procedureService.getProcedureById(999));
+        }
+    }
+
+    @Nested
+    class GetProcedureCountByPatient {
+
+        @Test
+        void shouldDelegateToDAO() {
+            Patient patient = mock(Patient.class);
+            when(procedureDAO.getProcedureCountByPatient(patient, false)).thenReturn(3L);
+
+            Long result = procedureService.getProcedureCountByPatient(patient, false);
+
+            assertEquals(3L, result);
+            verify(procedureDAO).getProcedureCountByPatient(patient, false);
+        }
+    }
+
+    @Nested
     class GetProceduresByPatient {
 
         @Test
         void shouldReturnProceduresFromDAO() {
             Patient patient = mock(Patient.class);
             List<Procedure> expected = Arrays.asList(new Procedure(), new Procedure());
-            when(procedureDAO.getProceduresByPatient(patient, false)).thenReturn(expected);
+            when(procedureDAO.getProceduresByPatient(patient, false, null, null)).thenReturn(expected);
 
-            List<Procedure> result = procedureService.getProceduresByPatient(patient);
+            List<Procedure> result = procedureService.getProceduresByPatient(patient, false, null, null);
 
             assertEquals(expected, result);
-            verify(procedureDAO).getProceduresByPatient(patient, false);
+            verify(procedureDAO).getProceduresByPatient(patient, false, null, null);
+        }
+
+        @Test
+        void shouldPassPaginationParamsToDAO() {
+            Patient patient = mock(Patient.class);
+            List<Procedure> expected = Collections.singletonList(new Procedure());
+            when(procedureDAO.getProceduresByPatient(patient, false, 5, 10)).thenReturn(expected);
+
+            List<Procedure> result = procedureService.getProceduresByPatient(patient, false, 5, 10);
+
+            assertEquals(expected, result);
+            verify(procedureDAO).getProceduresByPatient(patient, false, 5, 10);
+        }
+
+        @Test
+        void shouldPassNullPaginationParamsToDAOWhenNotProvided() {
+            Patient patient = mock(Patient.class);
+            when(procedureDAO.getProceduresByPatient(patient, false, null, null)).thenReturn(Collections.emptyList());
+
+            procedureService.getProceduresByPatient(patient, false, null, null);
+
+            verify(procedureDAO).getProceduresByPatient(patient, false, null, null);
+        }
+
+        @Test
+        void shouldPassIncludeVoidedToDAO() {
+            Patient patient = mock(Patient.class);
+            when(procedureDAO.getProceduresByPatient(patient, true, null, null)).thenReturn(Collections.emptyList());
+
+            procedureService.getProceduresByPatient(patient, true, null, null);
+
+            verify(procedureDAO).getProceduresByPatient(patient, true, null, null);
         }
     }
 

@@ -10,12 +10,9 @@
 package org.openmrs.module.emrapi.procedure;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -40,6 +37,13 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    public void setProcedureDAO(ProcedureDAO procedureDAO) {
       this.procedureDAO = procedureDAO;
    }
+  
+   @Override
+   @Transactional(readOnly = true)
+   public Procedure getProcedureById(Integer id) {
+      log.debug("Getting procedure by id: {}", id);
+      return procedureDAO.getById(id);
+   }
    
    @Override
    @Transactional(readOnly = true)
@@ -50,9 +54,15 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    
    @Override
    @Transactional(readOnly = true)
-   public List<Procedure> getProceduresByPatient(Patient patient) {
-      log.debug("Getting procedures for patient: {}", patient);
-      return procedureDAO.getProceduresByPatient(patient, false);
+   public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult, Integer maxResults) {
+      log.debug("Getting procedures for patient: {}, includeVoided: {}, firstResult: {}, maxResults: {}", patient, includeVoided, firstResult, maxResults);
+      return procedureDAO.getProceduresByPatient(patient, includeVoided, firstResult, maxResults);
+   }
+   
+   @Override
+   public Long getProcedureCountByPatient(Patient patient, boolean includeVoided) {
+      log.debug("Getting procedure count for patient: {}, includeVoided: {}", patient, includeVoided);
+      return procedureDAO.getProcedureCountByPatient(patient, includeVoided);
    }
    
    @Override
@@ -131,7 +141,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
          
       }
       catch (DateTimeParseException e) {
-         log.warn("Failed to parse estimated date: {}", estimatedDate, e);
+         log.warn("Failed to parse estimated date: {}, error: {}", estimatedDate, e.getMessage());
          throw new APIException("Procedure.error.invalidEstimateDate", new Object[] { estimatedDate }, e);
       }
    }

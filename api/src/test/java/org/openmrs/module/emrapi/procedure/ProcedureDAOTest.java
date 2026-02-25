@@ -91,7 +91,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void getProceduresByPatient_shouldReturnNonVoidedProcedures() {
-        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, false);
+        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, false, null, null);
 
         assertEquals(3, procedures.size());
         // Should be sorted by startDateTime descending
@@ -107,7 +107,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 
     @Test
     public void getProceduresByPatient_shouldIncludeVoidedWhenRequested() {
-        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, true);
+        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, true, null, null);
 
         assertEquals(4, procedures.size());
         // Should include the voided procedure
@@ -119,10 +119,51 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
     public void getProceduresByPatient_shouldReturnEmptyListForPatientWithNoProcedures() {
         Patient patientWithNoProcedures = patientService.getPatient(2); // From standard test data
 
-        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patientWithNoProcedures, false);
+        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patientWithNoProcedures, false, null, null);
 
         assertNotNull(procedures);
         assertTrue(procedures.isEmpty());
+    }
+
+    @Test
+    void getProceduresByPatient_shouldLimitResultsWhenMaxResultsIsSet() {
+        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, false, null, 2);
+        assertEquals(2, procedures.size());
+        assertEquals("procedure-uuid-003", procedures.get(0).getUuid());
+        assertEquals("procedure-uuid-001", procedures.get(1).getUuid());
+    }
+
+    @Test
+    void getProceduresByPatient_shouldOffsetResultsWhenFirstResultIsSet() {
+        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, false, 1, null);
+        assertEquals(2, procedures.size());
+        assertEquals("procedure-uuid-001", procedures.get(0).getUuid());
+        assertEquals("procedure-uuid-002", procedures.get(1).getUuid());
+    }
+
+    @Test
+    void getProceduresByPatient_shouldApplyBothPaginationParams() {
+        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, false, 1, 1);
+        assertEquals(1, procedures.size());
+        assertEquals("procedure-uuid-001", procedures.get(0).getUuid());
+    }
+
+    @Test
+    void getProceduresByPatient_shouldReturnEmptyListWhenFirstResultExceedsTotal() {
+        List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient7, false, 100, null);
+        assertTrue(procedures.isEmpty());
+    }
+
+    @Test
+    void getProcedureCountByPatient_shouldReturnCountOfNonVoidedProcedures() {
+        Long count = procedureDAO.getProcedureCountByPatient(patient7, false);
+        assertEquals(3L, count);
+    }
+
+    @Test
+    void getProcedureCountByPatient_shouldIncludeVoidedWhenRequested() {
+        Long count = procedureDAO.getProcedureCountByPatient(patient7, true);
+        assertEquals(4L, count);
     }
 
     @Test

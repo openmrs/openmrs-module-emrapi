@@ -17,6 +17,14 @@ import java.util.List;
  */
 public interface ProcedureTypeDAO {
 
+   /**
+    * Retrieves a {@link ProcedureType} by its internal ID.
+    *
+    * @param id the internal ID of the procedure type
+    * @return the matching {@link ProcedureType}, or {@code null} if not found
+    */
+   ProcedureType getById(Integer id);
+   
 	/**
 	 * Retrieves a {@link ProcedureType} by its UUID.
 	 *
@@ -25,6 +33,14 @@ public interface ProcedureTypeDAO {
 	 */
 	ProcedureType getByUuid(String uuid);
 
+   /**
+    * Retrieves a {@link ProcedureType} by its name.
+    *
+    * @param name the name of the procedure type
+    * @return the matching {@link ProcedureType}, or {@code null} if not found
+    */
+   ProcedureType getByName(String name);
+   
 	/**
 	 * Retrieves all {@link ProcedureType} records.
 	 *

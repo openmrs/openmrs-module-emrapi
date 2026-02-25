@@ -21,9 +21,9 @@ import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentat
 import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.api.PageableResult;
+import org.openmrs.module.webservices.rest.web.resource.impl.AlreadyPaged;
 import org.openmrs.module.webservices.rest.web.resource.impl.DataDelegatingCrudResource;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
-import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOperationException;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
@@ -104,17 +104,27 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 
 	@Override
 	protected PageableResult doGetAll(RequestContext context) throws ResponseException {
-		String patientUuid = context.getParameter("patient");
-		if (patientUuid != null) {
-			Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
-			if (patient == null) {
-				throw new APIException("Procedure.error.patientNotFound");
-			}
-			return new NeedsPaging<>(
-					Context.getService(ProcedureService.class).getProceduresByPatient(patient), context);
-		}
-		throw new ResourceDoesNotSupportOperationException("Procedure.error.patientRequired");
-	}
+      String patientUuid = context.getParameter("patient");
+      boolean includeVoided = Boolean.parseBoolean(context.getParameter("includeVoided"));
+      Integer firstResult = context.getStartIndex();
+      Integer maxResults = context.getLimit();
+      
+      if (patientUuid == null) {
+         throw new ResourceDoesNotSupportOperationException("Procedure.error.patientRequired");
+      }
+      
+      Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
+      if (patient == null) {
+         throw new APIException("Procedure.error.patientNotFound");
+      }
+      
+      Long count = Context.getService(ProcedureService.class).getProcedureCountByPatient(patient, includeVoided);
+      boolean hasMore = maxResults != null && firstResult != null && (firstResult + maxResults) < count;
+      
+      return new AlreadyPaged<>(context,
+              Context.getService(ProcedureService.class)
+                      .getProceduresByPatient(patient, includeVoided, firstResult, maxResults), hasMore);
+   }
 
 	@Override
 	protected void delete(Procedure procedure, String reason, RequestContext context) throws ResponseException {

@@ -16,6 +16,10 @@ import org.openmrs.Patient;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.List;
 
 /**
@@ -58,18 +62,51 @@ public class HibernateProcedureDAO implements ProcedureDAO {
    }
    
    @Override
-   public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided) {
+   public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult, Integer maxResults) {
       log.debug("Getting procedures for patient: {}, includeVoided: {}", patient, includeVoided);
       
-      String jpql = "SELECT p FROM Procedure p" +
-              " WHERE p.patient = :patient" +
-              (includeVoided ? "" : " AND p.voided = false") +
-              " ORDER BY p.startDateTime DESC";
+      CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+      CriteriaQuery<Procedure> criteria = builder.createQuery(Procedure.class);
+      Root<Procedure> root = criteria.from(Procedure.class);
       
-      TypedQuery<Procedure> query = getEntityManager().createQuery(jpql, Procedure.class);
-      query.setParameter("patient", patient);
+      Predicate predicate = builder.equal(root.get("patient"), patient);
+      if (!includeVoided) {
+         predicate = builder.and(predicate, builder.isFalse(root.get("voided")));
+      }
+      criteria.select(root)
+              .where(predicate)
+              .orderBy(builder.desc(root.get("startDateTime")));
+      
+      TypedQuery<Procedure> query = getEntityManager().createQuery(criteria);
+      
+      if (firstResult != null) {
+         query.setFirstResult(firstResult);
+      }
+      if (maxResults != null) {
+         query.setMaxResults(maxResults);
+      }
       
       return query.getResultList();
+   }
+   
+   @Override
+   public Long getProcedureCountByPatient(Patient patient, boolean includeVoided) {
+      log.debug("Getting procedure count for patient: {}, includeVoided: {}", patient, includeVoided);
+      
+      CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+      CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
+      Root<Procedure> root = criteria.from(Procedure.class);
+      
+      Predicate predicate = builder.equal(root.get("patient"), patient);
+      if (!includeVoided) {
+         predicate = builder.and(predicate, builder.isFalse(root.get("voided")));
+      }
+      criteria.select(builder.count(root))
+              .where(predicate);
+      
+      return getEntityManager()
+              .createQuery(criteria)
+              .getSingleResult();
    }
    
    @Override

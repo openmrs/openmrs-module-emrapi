@@ -9,7 +9,6 @@
  */
 package org.openmrs.module.emrapi.procedure;
 
-import org.openmrs.Encounter;
 import org.openmrs.Patient;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
@@ -34,6 +33,14 @@ public interface ProcedureService extends OpenmrsService {
    Procedure saveProcedure(Procedure procedure) throws APIException;
    
    /**
+    * Gets a procedure by its ID.
+    *
+    * @param id the procedure ID
+    * @return the procedure, or null if not found
+    */
+   Procedure getProcedureById(Integer id);
+   
+   /**
     * Gets a procedure by its UUID.
     *
     * @param uuid the procedure UUID
@@ -42,12 +49,24 @@ public interface ProcedureService extends OpenmrsService {
    Procedure getProcedureByUuid(String uuid);
    
    /**
-    * Gets all non-voided procedures for a patient, sorted by startDateTime descending.
+    * Gets all procedures for a patient, sorted by startDateTime descending.
     *
     * @param patient the patient
+    * @param includeVoided whether to include voided procedures
+    * @param firstResult the index of the first result to return (for pagination), or null to return all
+    * @param maxResults the maximum number of results to return (for pagination), or null to return all
     * @return list of procedures
     */
-   List<Procedure> getProceduresByPatient(Patient patient);
+   List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult, Integer maxResults);
+   
+   /**
+    * Gets count of procedures for a patient.
+    *
+    * @param patient the patient
+    * @param includeVoided whether to include voided procedures
+    * @return count of procedures for the patient
+    */
+   Long getProcedureCountByPatient(Patient patient, boolean includeVoided);
    
    /**
     * Voids a procedure with a reason.

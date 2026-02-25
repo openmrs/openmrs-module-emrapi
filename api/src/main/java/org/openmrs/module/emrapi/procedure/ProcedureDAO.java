@@ -9,7 +9,6 @@
  */
 package org.openmrs.module.emrapi.procedure;
 
-import org.openmrs.Encounter;
 import org.openmrs.Patient;
 
 import java.util.List;
@@ -49,9 +48,20 @@ public interface ProcedureDAO {
     *
     * @param patient the patient
     * @param includeVoided whether to include voided procedures
+    * @param firstResult the index of the first result to return (for pagination), or null to return all
+    * @param maxResults the maximum number of results to return (for pagination), or null to return all
     * @return list of procedures sorted by startDateTime descending
     */
-   List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided);
+   List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult, Integer maxResults);
+   
+   /**
+    * Gets count of procedures for a patient.
+    *
+    * @param patient the patient
+    * @param includeVoided whether to include voided procedures
+    * @return count of procedures for the patient
+    */
+   Long getProcedureCountByPatient(Patient patient, boolean includeVoided);
    
    /**
     * Deletes a procedure from the database.

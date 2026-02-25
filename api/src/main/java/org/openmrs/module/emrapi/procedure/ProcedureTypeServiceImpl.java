@@ -31,6 +31,12 @@ public class ProcedureTypeServiceImpl extends BaseOpenmrsService implements Proc
 		this.procedureTypeDAO = procedureTypeDAO;
 	}
 
+   @Override
+   public ProcedureType getProcedureTypeById(Integer id) {
+      log.debug("Getting procedure type by id: {}", id);
+      return procedureTypeDAO.getById(id);
+   }
+   
 	@Override
 	public ProcedureType saveProcedureType(ProcedureType procedureType) {
 		log.info("Saving procedure type: {}", procedureType.getName());
@@ -43,6 +49,13 @@ public class ProcedureTypeServiceImpl extends BaseOpenmrsService implements Proc
 		log.debug("Getting procedure type by uuid: {}", uuid);
 		return procedureTypeDAO.getByUuid(uuid);
 	}
+   
+   @Override
+   @Transactional(readOnly = true)
+   public ProcedureType getProcedureTypeByName(String name) {
+      log.debug("Getting procedure type by name: {}", name);
+      return procedureTypeDAO.getByName(name);
+   }
 
 	@Override
    @Transactional(readOnly = true)

@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -142,6 +143,48 @@ class ProcedureTypeServiceTest {
 			service.unretireProcedureType(type);
 
 			verify(procedureTypeDAO).saveOrUpdate(type);
+		}
+	}
+
+	@Nested
+	class GetProcedureTypeById {
+
+		@Test
+		void shouldDelegateToDAO() {
+			ProcedureType expected = new ProcedureType();
+			when(procedureTypeDAO.getById(1)).thenReturn(expected);
+
+			ProcedureType result = service.getProcedureTypeById(1);
+
+			assertEquals(expected, result);
+			verify(procedureTypeDAO).getById(1);
+		}
+
+		@Test
+		void shouldReturnNullWhenNotFound() {
+			when(procedureTypeDAO.getById(999)).thenReturn(null);
+			assertNull(service.getProcedureTypeById(999));
+		}
+	}
+
+	@Nested
+	class GetProcedureTypeByName {
+
+		@Test
+		void shouldDelegateToDAO() {
+			ProcedureType expected = new ProcedureType();
+			when(procedureTypeDAO.getByName("Historical")).thenReturn(expected);
+
+			ProcedureType result = service.getProcedureTypeByName("Historical");
+
+			assertEquals(expected, result);
+			verify(procedureTypeDAO).getByName("Historical");
+		}
+
+		@Test
+		void shouldReturnNullWhenNotFound() {
+			when(procedureTypeDAO.getByName("Unknown")).thenReturn(null);
+			assertNull(service.getProcedureTypeByName("Unknown"));
 		}
 	}
 
