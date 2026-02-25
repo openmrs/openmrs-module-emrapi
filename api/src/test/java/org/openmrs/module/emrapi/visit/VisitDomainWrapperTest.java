@@ -25,6 +25,7 @@ import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.disposition.DispositionType;
 import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -166,6 +167,29 @@ public class VisitDomainWrapperTest {
         when(visit.getEncounters()).thenReturn(encounters);
 
         assertTrue(visitDomainWrapper.isAdmitted());
+    }
+
+    @Test
+    public void shouldBeAdmittedAtAdmissionDate() throws Exception {
+        EncounterType admitEncounterType = new EncounterType();
+
+        EmrApiProperties props = mock(EmrApiProperties.class);
+        when(props.getAdmissionEncounterType()).thenReturn(admitEncounterType);
+        visitDomainWrapper.setEmrApiProperties(props);
+
+        Date now = new Date();
+        Encounter admit = new Encounter();
+        admit.setEncounterType(admitEncounterType);
+        // wrap now in java.sql.Timestamp to ensure that the time comparison
+        // in isAdmitted() does not use the Timestamp.equals(date) function,
+        // which returns false if date is of type Date (instead of Timestamp)
+        admit.setEncounterDatetime(new Timestamp(now.getTime()));
+
+        Set<Encounter> encounters = new LinkedHashSet<Encounter>();
+        encounters.add(admit);
+        when(visit.getEncounters()).thenReturn(encounters);
+
+        assertTrue(visitDomainWrapper.isAdmitted(now));
     }
 
     @Test

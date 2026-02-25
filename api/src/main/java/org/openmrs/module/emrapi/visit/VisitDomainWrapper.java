@@ -454,7 +454,8 @@ public class VisitDomainWrapper implements DomainWrapper {
         }
 
         for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
-            if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
+            // check that encounterDatetime is before or at onDate
+            if (onDate == null || encounter.getEncounterDatetime().compareTo(onDate) <= 0) {
                 if(!encounter.equals(encounterToIgnore)) {
                     if (encounter.getEncounterType().equals(lookForEncounterType)) {
                         return true;
