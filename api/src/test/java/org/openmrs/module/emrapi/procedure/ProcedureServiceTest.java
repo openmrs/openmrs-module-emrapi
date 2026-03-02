@@ -363,6 +363,19 @@ class ProcedureServiceTest {
          assertEquals(type, result);
          verify(procedureDAO).saveOrUpdateProcedure(type);
       }
+      
+      @Test
+      void shouldNotAllowDuplicateNames() {
+         ProcedureType existing = new ProcedureType("Test", "Existing type");
+         existing.setUuid("existing-uuid");
+         when(procedureDAO.getProcedureTypeByName("Test")).thenReturn(existing);
+         
+         ProcedureType newType = new ProcedureType("Test", "New type");
+         newType.setUuid("new-uuid");
+         
+         APIException ex = assertThrows(APIException.class, () -> procedureService.saveProcedureType(newType));
+         assertEquals("A procedure type with the name already exists", ex.getMessage());
+      }
    }
    
    @Nested
