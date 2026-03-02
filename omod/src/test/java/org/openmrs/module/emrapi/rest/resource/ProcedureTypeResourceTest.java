@@ -13,10 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.openmrs.module.emrapi.procedure.ProcedureService;
 import org.openmrs.module.webservices.rest.web.response.ConversionException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.procedure.ProcedureType;
-import org.openmrs.module.emrapi.procedure.ProcedureTypeService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.api.RestService;
@@ -116,7 +116,7 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 			assertEquals("Emergency", created.get("name"));
 			assertEquals("Emergency procedures", created.get("description"));
 
-			ProcedureType saved = Context.getService(ProcedureTypeService.class).getProcedureTypeByUuid(uuid);
+			ProcedureType saved = Context.getService(ProcedureService.class).getProcedureTypeByUuid(uuid);
 			assertNotNull(saved);
 			assertEquals("Emergency", saved.getName());
 			assertEquals("Emergency procedures", saved.getDescription());
@@ -159,7 +159,7 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 			assertEquals("Updated Historical", updated.get("name"));
 			assertEquals("Updated description", updated.get("description"));
 
-			ProcedureType saved = Context.getService(ProcedureTypeService.class).getProcedureTypeByUuid(HISTORICAL_TYPE_UUID);
+			ProcedureType saved = Context.getService(ProcedureService.class).getProcedureTypeByUuid(HISTORICAL_TYPE_UUID);
 			assertEquals("Updated Historical", saved.getName());
 			assertEquals("Updated description", saved.getDescription());
 		}
@@ -173,7 +173,7 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 		void shouldRetireProcedureType() {
 			resource.delete(HISTORICAL_TYPE_UUID, "no longer needed", new RequestContext());
 
-			ProcedureType retired = Context.getService(ProcedureTypeService.class).getProcedureTypeByUuid(HISTORICAL_TYPE_UUID);
+			ProcedureType retired = Context.getService(ProcedureService.class).getProcedureTypeByUuid(HISTORICAL_TYPE_UUID);
 			assertNotNull(retired);
 			assertTrue(retired.getRetired());
 			assertEquals("no longer needed", retired.getRetireReason());
@@ -188,7 +188,7 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 		void shouldPermanentlyDeleteProcedureType() {
 			resource.purge(CURRENT_TYPE_UUID, new RequestContext());
 
-			ProcedureType purged = Context.getService(ProcedureTypeService.class).getProcedureTypeByUuid(CURRENT_TYPE_UUID);
+			ProcedureType purged = Context.getService(ProcedureService.class).getProcedureTypeByUuid(CURRENT_TYPE_UUID);
 			assertNull(purged);
 		}
 	}

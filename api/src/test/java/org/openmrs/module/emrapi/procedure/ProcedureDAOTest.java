@@ -39,9 +39,6 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
     @Autowired
     private ConceptService conceptService;
 
-    @Autowired
-    private ProcedureTypeDAO procedureTypeDAO;
-
     private Patient patient;
 
     @BeforeEach
@@ -55,7 +52,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 
         @Test
         void shouldReturnProcedureWhenExists() {
-            Procedure procedure = procedureDAO.getById(1);
+            Procedure procedure = procedureDAO.getProcedure(1);
 
             assertNotNull(procedure);
             assertEquals(Integer.valueOf(1), procedure.getProcedureId());
@@ -65,12 +62,12 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 
         @Test
         void shouldReturnNullWhenNotExists() {
-            assertNull(procedureDAO.getById(999));
+            assertNull(procedureDAO.getProcedure(999));
         }
        
        @Test
        void shouldHaveCodedProcedure() {
-          Procedure procedure = procedureDAO.getById(1);
+          Procedure procedure = procedureDAO.getProcedure(1);
           
           assertNotNull(procedure.getProcedureCoded());
           assertEquals(Integer.valueOf(3), procedure.getProcedureCoded().getConceptId());
@@ -78,7 +75,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
        
        @Test
        void shouldHaveNonCodedProcedure() {
-          Procedure procedure = procedureDAO.getById(2);
+          Procedure procedure = procedureDAO.getProcedure(2);
           
           assertNull(procedure.getProcedureCoded());
           assertEquals("Appendectomy", procedure.getProcedureNonCoded());
@@ -90,7 +87,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 
         @Test
         void shouldReturnProcedureWhenExists() {
-            Procedure procedure = procedureDAO.getByUuid("procedure-uuid-002");
+            Procedure procedure = procedureDAO.getProcedureByUuid("procedure-uuid-002");
 
             assertNotNull(procedure);
             assertEquals(Integer.valueOf(2), procedure.getProcedureId());
@@ -99,7 +96,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 
         @Test
         void shouldReturnNullWhenNotExists() {
-            assertNull(procedureDAO.getByUuid("non-existent-uuid"));
+            assertNull(procedureDAO.getProcedureByUuid("non-existent-uuid"));
         }
     }
 
@@ -195,34 +192,34 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
         void shouldSaveNewProcedure() {
             Procedure newProcedure = new Procedure();
             newProcedure.setPatient(patient);
-            newProcedure.setProcedureType(procedureTypeDAO.getByUuid("procedure-type-uuid-001"));
+            newProcedure.setProcedureType(procedureDAO.getProcedureTypeByUuid("procedure-type-uuid-001"));
             newProcedure.setBodySite(conceptService.getConcept(4));
             newProcedure.setStartDateTime(new Date());
             newProcedure.setProcedureNonCoded("New Test Procedure");
             newProcedure.setStatus(conceptService.getConcept(5)); // Completed
             newProcedure.setEstimatedStartDate("2018");
 
-            Procedure saved = procedureDAO.saveOrUpdate(newProcedure);
+            Procedure saved = procedureDAO.saveOrUpdateProcedure(newProcedure);
 
             assertNotNull(saved.getProcedureId());
             assertNotNull(saved.getUuid());
 
             // Verify it can be retrieved
-            Procedure retrieved = procedureDAO.getById(saved.getProcedureId());
+            Procedure retrieved = procedureDAO.getProcedure(saved.getProcedureId());
             assertNotNull(retrieved);
             assertEquals("New Test Procedure", retrieved.getProcedureNonCoded());
         }
 
         @Test
         void shouldUpdateExistingProcedure() {
-            Procedure procedure = procedureDAO.getById(1);
+            Procedure procedure = procedureDAO.getProcedure(1);
             String originalNotes = procedure.getNotes();
 
             procedure.setNotes("Updated notes for testing");
-            procedureDAO.saveOrUpdate(procedure);
+            procedureDAO.saveOrUpdateProcedure(procedure);
 
             // Clear session and retrieve again
-            Procedure updated = procedureDAO.getById(1);
+            Procedure updated = procedureDAO.getProcedure(1);
             assertEquals("Updated notes for testing", updated.getNotes());
             assertNotEquals(originalNotes, updated.getNotes());
         }
@@ -233,12 +230,140 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 
         @Test
         void shouldRemoveProcedureFromDatabase() {
-            Procedure procedure = procedureDAO.getById(5);
+            Procedure procedure = procedureDAO.getProcedure(5);
             assertNotNull(procedure);
 
-            procedureDAO.delete(procedure);
+            procedureDAO.deleteProcedure(procedure);
 
-            assertNull(procedureDAO.getById(5));
+            assertNull(procedureDAO.getProcedure(5));
         }
+    }
+    
+    @Nested
+    class ProcedureTypeTests {
+       
+       @Test
+       public void getProcedureTypeByUuid_shouldReturnProcedureTypeWhenExists() {
+          ProcedureType type = procedureDAO.getProcedureTypeByUuid("procedure-type-uuid-001");
+          
+          assertNotNull(type);
+          assertEquals("Historical", type.getName());
+          assertEquals("Historical procedures", type.getDescription());
+       }
+       
+       @Test
+       public void getProcedureTypeByUuid_shouldReturnNullWhenNotExists() {
+          assertNull(procedureDAO.getProcedureTypeByUuid("non-existent-uuid"));
+       }
+       
+       @Test
+       public void getProcedureType_shouldReturnProcedureTypeWhenExists() {
+          ProcedureType type = procedureDAO.getProcedureType(1);
+          assertNotNull(type);
+          assertEquals("procedure-type-uuid-001", type.getUuid());
+          assertEquals("Historical", type.getName());
+       }
+       
+       @Test
+       public void getProcedureType_shouldReturnNullWhenNotExists() {
+          assertNull(procedureDAO.getProcedureType(999));
+       }
+       
+       @Test
+       public void getProcedureTypeByName_shouldReturnProcedureTypeWhenExists() {
+          ProcedureType type = procedureDAO.getProcedureTypeByName("Historical");
+          assertNotNull(type);
+          assertEquals("procedure-type-uuid-001", type.getUuid());
+       }
+       
+       @Test
+       public void getProcedureTypeByName_shouldReturnNullWhenNotExists() {
+          assertNull(procedureDAO.getProcedureTypeByName("NonExistentType"));
+       }
+       
+       @Test
+       public void getAll_ProcedureTypes_shouldReturnOnlyNonRetiredTypes() {
+          List<ProcedureType> types = procedureDAO.getAllProcedureTypes(false);
+          
+          assertNotNull(types);
+          assertEquals(2, types.size());
+          for (ProcedureType type : types) {
+             assertFalse(type.getRetired());
+          }
+       }
+       
+       @Test
+       public void getAll_ProcedureTypes_shouldReturnResultsSortedByName() {
+          List<ProcedureType> types = procedureDAO.getAllProcedureTypes(false);
+          
+          assertEquals("Current", types.get(0).getName());
+          assertEquals("Historical", types.get(1).getName());
+       }
+       
+       @Test
+       public void getAll_ProcedureTypes_shouldIncludeRetiredWhenRequested() {
+          // Retire one type first
+          ProcedureType type = procedureDAO.getProcedureTypeByUuid("procedure-type-uuid-001");
+          type.setRetired(true);
+          type.setRetireReason("testing");
+          procedureDAO.saveOrUpdateProcedure(type);
+          
+          List<ProcedureType> nonRetired = procedureDAO.getAllProcedureTypes(false);
+          List<ProcedureType> all = procedureDAO.getAllProcedureTypes(true);
+          
+          assertEquals(1, nonRetired.size());
+          assertEquals(2, all.size());
+       }
+       
+       @Test
+       public void saveOrUpdate_shouldSaveNewProcedureTypeProcedure() {
+          ProcedureType newType = new ProcedureType("Emergency", "Emergency procedures");
+          
+          ProcedureType saved = procedureDAO.saveOrUpdateProcedure(newType);
+          
+          assertNotNull(saved.getProcedureTypeId());
+          assertNotNull(saved.getUuid());
+          
+          ProcedureType retrieved = procedureDAO.getProcedureTypeByUuid(saved.getUuid());
+          assertNotNull(retrieved);
+          assertEquals("Emergency", retrieved.getName());
+          assertEquals("Emergency procedures", retrieved.getDescription());
+       }
+       
+       @Test
+       public void saveOrUpdate_shouldUpdateProcedureExistingProcedureType() {
+          ProcedureType type = procedureDAO.getProcedureTypeByUuid("procedure-type-uuid-001");
+          type.setName("Updated Historical");
+          type.setDescription("Updated description");
+          
+          procedureDAO.saveOrUpdateProcedure(type);
+          
+          ProcedureType updated = procedureDAO.getProcedureTypeByUuid("procedure-type-uuid-001");
+          assertEquals("Updated Historical", updated.getName());
+          assertEquals("Updated description", updated.getDescription());
+       }
+       
+       @Test
+       public void delete_ProcedureType_shouldRemoveProcedureTypeFromDatabase() {
+          // Create a standalone type not referenced by any procedure
+          ProcedureType newType = new ProcedureType("Temporary", "To be deleted");
+          ProcedureType saved = procedureDAO.saveOrUpdateProcedure(newType);
+          String uuid = saved.getUuid();
+          assertNotNull(procedureDAO.getProcedureTypeByUuid(uuid));
+          
+          procedureDAO.deleteProcedureType(saved);
+          
+          assertNull(procedureDAO.getProcedureTypeByUuid(uuid));
+       }
+       
+       @Test
+       public void getProcedureTypeByUuid_shouldReturnCurrentProcedureType() {
+          ProcedureType type = procedureDAO.getProcedureTypeByUuid("cce8ea25-ba2c-4dfe-a386-fba606bc2ef2");
+          
+          assertNotNull(type);
+          assertEquals("Current", type.getName());
+          assertEquals("Current procedures", type.getDescription());
+          assertFalse(type.getRetired());
+       } 
     }
 }

@@ -94,5 +94,68 @@ public interface ProcedureService extends OpenmrsService {
     * @throws APIException if the procedure cannot be deleted
     */
    void purgeProcedure(Procedure procedure);
-
+   
+   /**
+    * Saves a procedure type.
+    *
+    * @param procedureType the procedure type to save
+    * @return the saved procedure type
+    */
+   ProcedureType saveProcedureType(ProcedureType procedureType);
+   
+   /**
+    * Gets a procedure type by its internal ID.
+    *
+    * @param id the internal ID of the procedure type
+    * @return the procedure type, or null if not found
+    */
+   ProcedureType getProcedureType(Integer id);
+   
+   /**
+    * Gets a procedure type by its UUID.
+    *
+    * @param uuid the procedure type UUID
+    * @return the procedure type, or null if not found
+    */
+   ProcedureType getProcedureTypeByUuid(String uuid);
+   
+   /**
+    * Gets a procedure type by its name.
+    *
+    * @param name the name of the procedure type
+    * @return the procedure type, or null if not found
+    */
+   ProcedureType getProcedureTypeByName(String name);
+   
+   /**
+    * Gets all procedure types.
+    *
+    * @param includeRetired whether to include retired types
+    * @return list of procedure types
+    */
+   List<ProcedureType> getAllProcedureTypes(boolean includeRetired);
+   
+   /**
+    * Retires a procedure type with a reason.
+    *
+    * @param procedureType the procedure type to retire
+    * @param reason the reason for retiring
+    * @return the retired procedure type
+    */
+   ProcedureType retireProcedureType(ProcedureType procedureType, String reason);
+   
+   /**
+    * Unretires a previously retired procedure type.
+    *
+    * @param procedureType the procedure type to unretire
+    * @return the unretired procedure type
+    */
+   ProcedureType unretireProcedureType(ProcedureType procedureType);
+   
+   /**
+    * Permanently deletes a procedure type from the database.
+    *
+    * @param procedureType the procedure type to delete
+    */
+   void purgeProcedureType(ProcedureType procedureType);
 }

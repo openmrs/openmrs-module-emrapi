@@ -25,7 +25,7 @@ public interface ProcedureDAO {
     * @param id the procedure ID
     * @return the procedure, or null if not found
     */
-   Procedure getById(Integer id);
+   Procedure getProcedure(Integer id);
    
    /**
     * Gets a procedure by its UUID.
@@ -33,7 +33,7 @@ public interface ProcedureDAO {
     * @param uuid the procedure UUID
     * @return the procedure, or null if not found
     */
-   Procedure getByUuid(String uuid);
+   Procedure getProcedureByUuid(String uuid);
    
    /**
     * Saves or updates a procedure.
@@ -41,7 +41,7 @@ public interface ProcedureDAO {
     * @param procedure the procedure to save
     * @return the saved procedure
     */
-   Procedure saveOrUpdate(Procedure procedure);
+   Procedure saveOrUpdateProcedure(Procedure procedure);
    
    /**
     * Gets all procedures for a patient.
@@ -69,6 +69,52 @@ public interface ProcedureDAO {
     *
     * @param procedure the procedure to delete
     */
-   void delete(Procedure procedure);
-
+   void deleteProcedure(Procedure procedure);
+   
+   /**
+    * Retrieves a {@link ProcedureType} by its internal ID.
+    *
+    * @param id the internal ID of the procedure type
+    * @return the matching {@link ProcedureType}, or {@code null} if not found
+    */
+   ProcedureType getProcedureType(Integer id);
+   
+   /**
+    * Retrieves a {@link ProcedureType} by its UUID.
+    *
+    * @param uuid the UUID of the procedure type
+    * @return the matching {@link ProcedureType}, or {@code null} if not found
+    */
+   ProcedureType getProcedureTypeByUuid(String uuid);
+   
+   /**
+    * Retrieves a {@link ProcedureType} by its name.
+    *
+    * @param name the name of the procedure type
+    * @return the matching {@link ProcedureType}, or {@code null} if not found
+    */
+   ProcedureType getProcedureTypeByName(String name);
+   
+   /**
+    * Retrieves all {@link ProcedureType} records.
+    *
+    * @param includeRetired if {@code true}, retired procedure types are included in the results
+    * @return a list of {@link ProcedureType} records; never {@code null}
+    */
+   List<ProcedureType> getAllProcedureTypes(boolean includeRetired);
+   
+   /**
+    * Persists a new {@link ProcedureType} or updates an existing one.
+    *
+    * @param procedureType the procedure type to save or update
+    * @return the saved or updated {@link ProcedureType}
+    */
+   ProcedureType saveOrUpdateProcedure(ProcedureType procedureType);
+   
+   /**
+    * Permanently deletes a {@link ProcedureType} from the database.
+    *
+    * @param procedureType the procedure type to delete
+    */
+   void deleteProcedureType(ProcedureType procedureType);
 }

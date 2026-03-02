@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -55,12 +56,12 @@ class ProcedureServiceTest {
         Procedure expectedProcedure = new Procedure();
         expectedProcedure.setUuid(uuid);
 
-        when(procedureDAO.getByUuid(uuid)).thenReturn(expectedProcedure);
+        when(procedureDAO.getProcedureByUuid(uuid)).thenReturn(expectedProcedure);
 
         Procedure result = procedureService.getProcedureByUuid(uuid);
 
         assertEquals(expectedProcedure, result);
-        verify(procedureDAO).getByUuid(uuid);
+        verify(procedureDAO).getProcedureByUuid(uuid);
     }
 
     @Nested
@@ -154,7 +155,7 @@ class ProcedureServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(procedureDAO.saveOrUpdate(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+            when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
         }
 
         private Date toDate(LocalDateTime ldt) {
@@ -202,7 +203,7 @@ class ProcedureServiceTest {
 
             procedureService.saveProcedure(procedure);
 
-            verify(procedureDAO).saveOrUpdate(procedure);
+            verify(procedureDAO).saveOrUpdateProcedure(procedure);
         }
     }
 
@@ -212,17 +213,17 @@ class ProcedureServiceTest {
         @Test
         void shouldDelegateToDAO() {
             Procedure expected = new Procedure();
-            when(procedureDAO.getById(42)).thenReturn(expected);
+            when(procedureDAO.getProcedure(42)).thenReturn(expected);
 
             Procedure result = procedureService.getProcedureById(42);
 
             assertEquals(expected, result);
-            verify(procedureDAO).getById(42);
+            verify(procedureDAO).getProcedure(42);
         }
 
         @Test
         void shouldReturnNullWhenDAOReturnsNull() {
-            when(procedureDAO.getById(999)).thenReturn(null);
+            when(procedureDAO.getProcedure(999)).thenReturn(null);
             assertNull(procedureService.getProcedureById(999));
         }
     }
@@ -296,12 +297,12 @@ class ProcedureServiceTest {
         @Test
         void shouldDelegateToDAO() {
             Procedure procedure = new Procedure();
-            when(procedureDAO.saveOrUpdate(procedure)).thenReturn(procedure);
+            when(procedureDAO.saveOrUpdateProcedure(procedure)).thenReturn(procedure);
 
             Procedure result = procedureService.voidProcedure(procedure, "test reason");
 
             assertEquals(procedure, result);
-            verify(procedureDAO).saveOrUpdate(procedure);
+            verify(procedureDAO).saveOrUpdateProcedure(procedure);
         }
     }
 
@@ -314,7 +315,7 @@ class ProcedureServiceTest {
             procedure.setVoided(true);
             procedure.setVoidReason("some reason");
             procedure.setDateVoided(new Date());
-            when(procedureDAO.saveOrUpdate(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+            when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
 
             Procedure result = procedureService.unvoidProcedure(procedure);
 
@@ -328,11 +329,11 @@ class ProcedureServiceTest {
         void shouldDelegateToDAO() {
             Procedure procedure = new Procedure();
             procedure.setVoided(true);
-            when(procedureDAO.saveOrUpdate(any(Procedure.class))).thenReturn(procedure);
+            when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenReturn(procedure);
 
             procedureService.unvoidProcedure(procedure);
 
-            verify(procedureDAO).saveOrUpdate(procedure);
+            verify(procedureDAO).saveOrUpdateProcedure(procedure);
         }
     }
 
@@ -345,7 +346,166 @@ class ProcedureServiceTest {
 
             procedureService.purgeProcedure(procedure);
 
-            verify(procedureDAO).delete(procedure);
+            verify(procedureDAO).deleteProcedure(procedure);
         }
     }
+   
+   @Nested
+   class SaveProcedureType {
+      
+      @Test
+      void shouldDelegateToDAO() {
+         ProcedureType type = new ProcedureType("Test", "Test type");
+         when(procedureDAO.saveOrUpdateProcedure(type)).thenReturn(type);
+         
+         ProcedureType result = procedureService.saveProcedureType(type);
+         
+         assertEquals(type, result);
+         verify(procedureDAO).saveOrUpdateProcedure(type);
+      }
+   }
+   
+   @Nested
+   class GetProcedureTypeByUuid {
+      
+      @Test
+      void shouldDelegateToDAO() {
+         String uuid = "test-uuid";
+         ProcedureType expected = new ProcedureType("Test", "Test type");
+         when(procedureDAO.getProcedureTypeByUuid(uuid)).thenReturn(expected);
+         
+         ProcedureType result = procedureService.getProcedureTypeByUuid(uuid);
+         
+         assertEquals(expected, result);
+         verify(procedureDAO).getProcedureTypeByUuid(uuid);
+      }
+   }
+   
+   @Nested
+   class GetAllProcedureTypes {
+      
+      @Test
+      void shouldDelegateToDAOWithIncludeRetiredFalse() {
+         List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"), new ProcedureType("B", "b"));
+         when(procedureDAO.getAllProcedureTypes(false)).thenReturn(expected);
+         
+         List<ProcedureType> result = procedureService.getAllProcedureTypes(false);
+         
+         assertEquals(expected, result);
+         verify(procedureDAO).getAllProcedureTypes(false);
+      }
+      
+      @Test
+      void shouldDelegateToDAOWithIncludeRetiredTrue() {
+         List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"));
+         when(procedureDAO.getAllProcedureTypes(true)).thenReturn(expected);
+         
+         List<ProcedureType> result = procedureService.getAllProcedureTypes(true);
+         
+         assertEquals(expected, result);
+         verify(procedureDAO).getAllProcedureTypes(true);
+      }
+   }
+   
+   @Nested
+   class RetireProcedureType {
+      
+      @Test
+      void shouldSetRetiredFieldsAndDelegateToDAO() {
+         ProcedureType type = new ProcedureType("Test", "Test type");
+         when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
+         
+         ProcedureType result = procedureService.retireProcedureType(type, "no longer needed");
+         
+         assertTrue(result.getRetired());
+         assertEquals("no longer needed", result.getRetireReason());
+         verify(procedureDAO).saveOrUpdateProcedure(type);
+      }
+   }
+   
+   @Nested
+   class UnretireProcedureType {
+      
+      @Test
+      void shouldClearRetiredFields() {
+         ProcedureType type = new ProcedureType("Test", "Test type");
+         type.setRetired(true);
+         type.setRetireReason("some reason");
+         type.setDateRetired(new Date());
+         when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
+         
+         ProcedureType result = procedureService.unretireProcedureType(type);
+         
+         assertFalse(result.getRetired());
+         assertNull(result.getRetireReason());
+         assertNull(result.getDateRetired());
+         assertNull(result.getRetiredBy());
+      }
+      
+      @Test
+      void shouldDelegateToDAO() {
+         ProcedureType type = new ProcedureType("Test", "Test type");
+         type.setRetired(true);
+         when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenReturn(type);
+         
+         procedureService.unretireProcedureType(type);
+         
+         verify(procedureDAO).saveOrUpdateProcedure(type);
+      }
+   }
+   
+   @Nested
+   class GetProcedureTypeById {
+      
+      @Test
+      void shouldDelegateToDAO() {
+         ProcedureType expected = new ProcedureType();
+         when(procedureDAO.getProcedureType(1)).thenReturn(expected);
+         
+         ProcedureType result = procedureService.getProcedureType(1);
+         
+         assertEquals(expected, result);
+         verify(procedureDAO).getProcedureType(1);
+      }
+      
+      @Test
+      void shouldReturnNullWhenNotFound() {
+         when(procedureDAO.getProcedureType(999)).thenReturn(null);
+         assertNull(procedureService.getProcedureType(999));
+      }
+   }
+   
+   @Nested
+   class GetProcedureTypeByName {
+      
+      @Test
+      void shouldDelegateToDAO() {
+         ProcedureType expected = new ProcedureType();
+         when(procedureDAO.getProcedureTypeByName("Historical")).thenReturn(expected);
+         
+         ProcedureType result = procedureService.getProcedureTypeByName("Historical");
+         
+         assertEquals(expected, result);
+         verify(procedureDAO).getProcedureTypeByName("Historical");
+      }
+      
+      @Test
+      void shouldReturnNullWhenNotFound() {
+         when(procedureDAO.getProcedureTypeByName("Unknown")).thenReturn(null);
+         assertNull(procedureService.getProcedureTypeByName("Unknown"));
+      }
+   }
+   
+   @Nested
+   class PurgeProcedureType {
+      
+      @Test
+      void shouldDelegateDeleteToDAO() {
+         ProcedureType type = new ProcedureType("Test", "Test type");
+         
+         procedureService.purgeProcedureType(type);
+         
+         verify(procedureDAO).deleteProcedureType(type);
+      }
+   }
 }

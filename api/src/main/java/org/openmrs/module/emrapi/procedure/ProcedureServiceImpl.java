@@ -42,14 +42,14 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
    @Transactional(readOnly = true)
    public Procedure getProcedureById(Integer id) {
       log.debug("Getting procedure by id: {}", id);
-      return procedureDAO.getById(id);
+      return procedureDAO.getProcedure(id);
    }
    
    @Override
    @Transactional(readOnly = true)
    public Procedure getProcedureByUuid(String uuid) {
       log.debug("Getting procedure by uuid: {}", uuid);
-      return procedureDAO.getByUuid(uuid);
+      return procedureDAO.getProcedureByUuid(uuid);
    }
    
    @Override
@@ -75,7 +75,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
          procedure.setStartDateTime(calculatedStartDateTime);
       }
       
-      return procedureDAO.saveOrUpdate(procedure);
+      return procedureDAO.saveOrUpdateProcedure(procedure);
    }
    
    @Override
@@ -87,19 +87,76 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
       procedure.setDateVoided(null);
       procedure.setVoidedBy(null);
       
-      return procedureDAO.saveOrUpdate(procedure);
+      return procedureDAO.saveOrUpdateProcedure(procedure);
    }
    
    @Override
    public void purgeProcedure(Procedure procedure) throws APIException {
       log.info("Purging procedure: {}", procedure.getUuid());
-      procedureDAO.delete(procedure);
+      procedureDAO.deleteProcedure(procedure);
    }
    
    @Override
    public Procedure voidProcedure(Procedure procedure, String reason) {
       log.info("Voiding procedure: {} with reason: {}", procedure.getUuid(), reason);
-      return procedureDAO.saveOrUpdate(procedure);
+      return procedureDAO.saveOrUpdateProcedure(procedure);
+   }
+   
+   @Override
+   public ProcedureType getProcedureType(Integer id) {
+      log.debug("Getting procedure type by id: {}", id);
+      return procedureDAO.getProcedureType(id);
+   }
+   
+   @Override
+   public ProcedureType saveProcedureType(ProcedureType procedureType) {
+      log.info("Saving procedure type: {}", procedureType.getName());
+      return procedureDAO.saveOrUpdateProcedure(procedureType);
+   }
+   
+   @Override
+   @Transactional(readOnly = true)
+   public ProcedureType getProcedureTypeByUuid(String uuid) {
+      log.debug("Getting procedure type by uuid: {}", uuid);
+      return procedureDAO.getProcedureTypeByUuid(uuid);
+   }
+   
+   @Override
+   @Transactional(readOnly = true)
+   public ProcedureType getProcedureTypeByName(String name) {
+      log.debug("Getting procedure type by name: {}", name);
+      return procedureDAO.getProcedureTypeByName(name);
+   }
+   
+   @Override
+   @Transactional(readOnly = true)
+   public List<ProcedureType> getAllProcedureTypes(boolean includeRetired) {
+      log.debug("Getting all procedure types, includeRetired: {}", includeRetired);
+      return procedureDAO.getAllProcedureTypes(includeRetired);
+   }
+   
+   @Override
+   public ProcedureType retireProcedureType(ProcedureType procedureType, String reason) {
+      log.info("Retiring procedure type: {} with reason: {}", procedureType.getName(), reason);
+      procedureType.setRetired(true);
+      procedureType.setRetireReason(reason);
+      return procedureDAO.saveOrUpdateProcedure(procedureType);
+   }
+   
+   @Override
+   public ProcedureType unretireProcedureType(ProcedureType procedureType) {
+      log.info("Unretiring procedure type: {}", procedureType.getName());
+      procedureType.setRetired(false);
+      procedureType.setRetireReason(null);
+      procedureType.setDateRetired(null);
+      procedureType.setRetiredBy(null);
+      return procedureDAO.saveOrUpdateProcedure(procedureType);
+   }
+   
+   @Override
+   public void purgeProcedureType(ProcedureType procedureType) {
+      log.info("Purging procedure type: {}", procedureType.getName());
+      procedureDAO.deleteProcedureType(procedureType);
    }
 
    Date getDateTimeFromEstimatedDate(String estimatedDate) {

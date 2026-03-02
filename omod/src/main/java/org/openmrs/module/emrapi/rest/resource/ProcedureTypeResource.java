@@ -10,7 +10,7 @@
 package org.openmrs.module.emrapi.rest.resource;
 
 import org.openmrs.api.context.Context;
-import org.openmrs.module.emrapi.procedure.ProcedureTypeService;
+import org.openmrs.module.emrapi.procedure.ProcedureService;
 import org.openmrs.module.emrapi.procedure.ProcedureType;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
@@ -69,27 +69,27 @@ public class ProcedureTypeResource extends MetadataDelegatingCrudResource<Proced
 
 	@Override
 	public ProcedureType save(ProcedureType procedureType) {
-		return Context.getService(ProcedureTypeService.class).saveProcedureType(procedureType);
+		return Context.getService(ProcedureService.class).saveProcedureType(procedureType);
 	}
 
 	@Override
 	public ProcedureType getByUniqueId(String uuid) {
-		return Context.getService(ProcedureTypeService.class).getProcedureTypeByUuid(uuid);
+		return Context.getService(ProcedureService.class).getProcedureTypeByUuid(uuid);
 	}
 
 	@Override
 	protected PageableResult doGetAll(RequestContext context) throws ResponseException {
 		return new NeedsPaging<>(
-				Context.getService(ProcedureTypeService.class).getAllProcedureTypes(context.getIncludeAll()), context);
+				Context.getService(ProcedureService.class).getAllProcedureTypes(context.getIncludeAll()), context);
 	}
 
 	@Override
    public void delete(ProcedureType procedureType, String reason, RequestContext context) throws ResponseException {
-		Context.getService(ProcedureTypeService.class).retireProcedureType(procedureType, reason);
+		Context.getService(ProcedureService.class).retireProcedureType(procedureType, reason);
 	}
 
 	@Override
 	public void purge(ProcedureType procedureType, RequestContext context) throws ResponseException {
-		Context.getService(ProcedureTypeService.class).purgeProcedureType(procedureType);
+		Context.getService(ProcedureService.class).purgeProcedureType(procedureType);
 	}
 }
