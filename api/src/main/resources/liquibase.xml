@@ -248,17 +248,11 @@
                 referencedTableName="users"
                 referencedColumnNames="user_id"/>
 
-        <!-- Indexes for common queries -->
-        <createIndex indexName="idx_procedure_patient" tableName="emrapi_procedure">
+        <createIndex indexName="idx_procedure_patient_voided_startdate"
+                     tableName="emrapi_procedure">
             <column name="patient_id"/>
-        </createIndex>
-
-        <createIndex indexName="idx_procedure_start_date" tableName="emrapi_procedure">
+            <column name="voided"/>
             <column name="start_date_time"/>
-        </createIndex>
-
-        <createIndex indexName="idx_procedure_encounter" tableName="emrapi_procedure">
-            <column name="encounter_id"/>
         </createIndex>
     </changeSet>
 

@@ -56,7 +56,7 @@ public class ProcedureValidator implements Validator {
         
          // Rules for new procedures only
          if (procedure.getProcedureId() == null){
-            if( procedure.getProcedureType().getRetired()) {
+            if(procedure.getProcedureType() != null && procedure.getProcedureType().getRetired()) {
                errors.reject("Procedure.error.procedureTypeRetired");
             }
             if (procedure.getEstimatedStartDate() != null && procedure.getStartDateTime() != null) {
