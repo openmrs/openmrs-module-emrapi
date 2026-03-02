@@ -40,7 +40,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
   
    @Override
    @Transactional(readOnly = true)
-   public Procedure getProcedureById(Integer id) {
+   public Procedure getProcedure(Integer id) {
       log.debug("Getting procedure by id: {}", id);
       return procedureDAO.getProcedure(id);
    }

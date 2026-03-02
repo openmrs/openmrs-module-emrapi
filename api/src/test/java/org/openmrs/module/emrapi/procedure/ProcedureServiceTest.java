@@ -215,7 +215,7 @@ class ProcedureServiceTest {
             Procedure expected = new Procedure();
             when(procedureDAO.getProcedure(42)).thenReturn(expected);
 
-            Procedure result = procedureService.getProcedureById(42);
+            Procedure result = procedureService.getProcedure(42);
 
             assertEquals(expected, result);
             verify(procedureDAO).getProcedure(42);
@@ -224,7 +224,7 @@ class ProcedureServiceTest {
         @Test
         void shouldReturnNullWhenDAOReturnsNull() {
             when(procedureDAO.getProcedure(999)).thenReturn(null);
-            assertNull(procedureService.getProcedureById(999));
+            assertNull(procedureService.getProcedure(999));
         }
     }
 

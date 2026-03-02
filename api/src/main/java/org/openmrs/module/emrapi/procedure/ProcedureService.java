@@ -38,7 +38,7 @@ public interface ProcedureService extends OpenmrsService {
     * @param id the procedure ID
     * @return the procedure, or null if not found
     */
-   Procedure getProcedureById(Integer id);
+   Procedure getProcedure(Integer id);
    
    /**
     * Gets a procedure by its UUID.
