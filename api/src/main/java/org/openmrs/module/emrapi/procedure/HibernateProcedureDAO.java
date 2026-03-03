@@ -132,14 +132,13 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	}
 	
 	@Override
-	public ProcedureType getProcedureTypeByName(String name) {
+	public List<ProcedureType> getProcedureTypesByName(String name) {
 		log.debug("Getting procedure type by name: {}", name);
 		TypedQuery<ProcedureType> query = getEntityManager()
 				.createQuery("SELECT pt FROM ProcedureType pt WHERE pt.name = :name", ProcedureType.class);
 		query.setParameter("name", name);
 		
-		List<ProcedureType> results = query.setMaxResults(1).getResultList();
-		return results.isEmpty() ? null : results.get(0);
+		return query.getResultList();
 	}
 	
 	@Override

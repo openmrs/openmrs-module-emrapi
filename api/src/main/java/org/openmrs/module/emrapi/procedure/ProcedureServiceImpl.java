@@ -110,12 +110,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Override
 	public ProcedureType saveProcedureType(ProcedureType procedureType) {
 		log.info("Saving procedure type: {}", procedureType.getName());
-		
-		ProcedureType existingTypeWithSameName = procedureDAO.getProcedureTypeByName(procedureType.getName());
-		if (existingTypeWithSameName != null && !existingTypeWithSameName.getUuid().equals(procedureType.getUuid())) {
-			log.warn("Cannot save procedure type with duplicate name: {}", procedureType.getName());
-			throw new APIException("ProcedureType.error.duplicateName", new Object[] { procedureType.getName() });
-		}
 		return procedureDAO.saveOrUpdateProcedure(procedureType);
 	}
 	
@@ -128,9 +122,9 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	
 	@Override
 	@Transactional(readOnly = true)
-	public ProcedureType getProcedureTypeByName(String name) {
+	public List<ProcedureType> getProcedureTypesByName(String name) {
 		log.debug("Getting procedure type by name: {}", name);
-		return procedureDAO.getProcedureTypeByName(name);
+		return procedureDAO.getProcedureTypesByName(name);
 	}
 	
 	@Override

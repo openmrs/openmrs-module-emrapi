@@ -85,12 +85,12 @@ public interface ProcedureDAO {
 	ProcedureType getProcedureTypeByUuid(String uuid);
 	
 	/**
-	 * Retrieves a {@link ProcedureType} by its name.
+	 * Retrieves a list of {@link ProcedureType} by its name.
 	 *
 	 * @param name the name of the procedure type
-	 * @return the matching {@link ProcedureType}, or {@code null} if not found
+	 * @return the matching {@link ProcedureType} records; never {@code null}
 	 */
-	ProcedureType getProcedureTypeByName(String name);
+	List<ProcedureType> getProcedureTypesByName(String name);
 	
 	/**
 	 * Retrieves all {@link ProcedureType} records.

@@ -122,7 +122,7 @@ public interface ProcedureService extends OpenmrsService {
 	 * @param name the name of the procedure type
 	 * @return the procedure type, or null if not found
 	 */
-	ProcedureType getProcedureTypeByName(String name);
+	List<ProcedureType> getProcedureTypesByName(String name);
 	
 	/**
 	 * Gets all procedure types.

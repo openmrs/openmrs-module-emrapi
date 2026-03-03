@@ -361,19 +361,6 @@ class ProcedureServiceTest {
 			assertEquals(type, result);
 			verify(procedureDAO).saveOrUpdateProcedure(type);
 		}
-		
-		@Test
-		void shouldNotAllowDuplicateNames() {
-			ProcedureType existing = new ProcedureType("Test", "Existing type");
-			existing.setUuid("existing-uuid");
-			when(procedureDAO.getProcedureTypeByName("Test")).thenReturn(existing);
-			
-			ProcedureType newType = new ProcedureType("Test", "New type");
-			newType.setUuid("new-uuid");
-			
-			APIException ex = assertThrows(APIException.class, () -> procedureService.saveProcedureType(newType));
-			assertEquals("A procedure type with the name already exists", ex.getMessage());
-		}
 	}
 	
 	@Nested
@@ -487,23 +474,17 @@ class ProcedureServiceTest {
 	}
 	
 	@Nested
-	class GetProcedureTypeByName {
+	class GetProcedureTypesByName {
 		
 		@Test
 		void shouldDelegateToDAO() {
-			ProcedureType expected = new ProcedureType();
-			when(procedureDAO.getProcedureTypeByName("Historical")).thenReturn(expected);
+			List<ProcedureType> expected = Collections.singletonList(new ProcedureType());
+			when(procedureDAO.getProcedureTypesByName("Historical")).thenReturn(expected);
 			
-			ProcedureType result = procedureService.getProcedureTypeByName("Historical");
+			List<ProcedureType> result = procedureService.getProcedureTypesByName("Historical");
 			
 			assertEquals(expected, result);
-			verify(procedureDAO).getProcedureTypeByName("Historical");
-		}
-		
-		@Test
-		void shouldReturnNullWhenNotFound() {
-			when(procedureDAO.getProcedureTypeByName("Unknown")).thenReturn(null);
-			assertNull(procedureService.getProcedureTypeByName("Unknown"));
+			verify(procedureDAO).getProcedureTypesByName("Historical");
 		}
 	}
 	

@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
-	<Appenders>
-		<Console name="CONSOLE" target="SYSTEM_OUT">
-			<PatternLayout pattern="%p - %C{1}.%M(%L) |%d{ISO8601}| %m%n" />
-		</Console>
-	</Appenders>
-	<Loggers>
-		<!-- Suppress noise inherited from openmrs-api test jar -->
-		<Logger name="org.hibernate.tool.hbm2ddl.SchemaExport" level="OFF" />
-		<Logger name="org.openmrs.api" level="OFF" />
-		<Logger name="org.openmrs.test" level="OFF" />
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%p - %C{1}.%M(%L) |%d{ISO8601}| %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <!-- Suppress noise inherited from openmrs-api test jar -->
+        <Logger name="org.hibernate.tool.hbm2ddl.SchemaExport" level="OFF"/>
+        <Logger name="org.openmrs.api" level="OFF"/>
+        <Logger name="org.openmrs.test" level="OFF"/>
 
         <!-- Hibernate SQL logging — set level to DEBUG to see queries, OFF to silence -->
         <Logger name="org.hibernate.SQL" level="OFF" additivity="false">
-            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="CONSOLE"/>
         </Logger>
         <!-- Bound parameter values — set level to TRACE to see substituted values, OFF to silence -->
         <Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="OFF" additivity="false">
-            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="CONSOLE"/>
         </Logger>
 
-		<Root level="OFF">
-			<AppenderRef ref="CONSOLE" />
-		</Root>
-	</Loggers>
+        <Root level="OFF">
+            <AppenderRef ref="CONSOLE"/>
+        </Root>
+    </Loggers>
 </Configuration>
