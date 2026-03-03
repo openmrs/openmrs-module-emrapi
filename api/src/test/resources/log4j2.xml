@@ -12,11 +12,11 @@
 		<Logger name="org.openmrs.test" level="OFF" />
 
 		<!-- Hibernate SQL logging — set level to DEBUG to see queries, OFF to silence -->
-		<Logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+		<Logger name="org.hibernate.SQL" level="OFF" additivity="false">
 			<AppenderRef ref="CONSOLE" />
 		</Logger>
 		<!-- Bound parameter values — set level to TRACE to see substituted values, OFF to silence -->
-		<Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="DEBUG" additivity="false">
+		<Logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="OFF" additivity="false">
 			<AppenderRef ref="CONSOLE" />
 		</Logger>
 

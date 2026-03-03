@@ -1,11 +1,8 @@
 /**
- * This Source Code Form is subject to the terms of the Mozilla Public License,
- * v. 2.0. If a copy of the MPL was not distributed with this file, You can
- * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
- * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
- *
- * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
- * graphic logo is a trademark of OpenMRS Inc.
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
+ * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
+ * of the Healthcare Disclaimer located at http://openmrs.org/license.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.procedure;
 
@@ -39,486 +36,487 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link ProcedureServiceImpl}.
  */
 class ProcedureServiceTest {
-
-    private ProcedureServiceImpl procedureService;
-    private ProcedureDAO procedureDAO;
-
-    @BeforeEach
-    void setUp() {
-        procedureDAO = mock(ProcedureDAO.class);
-        procedureService = new ProcedureServiceImpl();
-        procedureService.setProcedureDAO(procedureDAO);
-    }
-
-    @Test
-    void getProcedureByUuid_shouldReturnProcedureFromDAO() {
-        String uuid = "test-uuid-123";
-        Procedure expectedProcedure = new Procedure();
-        expectedProcedure.setUuid(uuid);
-
-        when(procedureDAO.getProcedureByUuid(uuid)).thenReturn(expectedProcedure);
-
-        Procedure result = procedureService.getProcedureByUuid(uuid);
-
-        assertEquals(expectedProcedure, result);
-        verify(procedureDAO).getProcedureByUuid(uuid);
-    }
-
-    @Nested
-    class GetDateTimeFromEstimatedDate {
-
-        private Date toDate(LocalDateTime ldt) {
-            return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-        }
-
-        @Test
-        void shouldParseFullDatetime() {
-            Date result = procedureService.getDateTimeFromEstimatedDate("2025-06-15T14:30:00");
-            assertEquals(toDate(LocalDateTime.of(2025, 6, 15, 14, 30, 0)), result);
-        }
-
-        @Test
-        void shouldParseDatetimeWithSubSeconds() {
-            Date result = procedureService.getDateTimeFromEstimatedDate("2025-06-15T14:30:45.123");
-            assertEquals(toDate(LocalDateTime.of(2025, 6, 15, 14, 30, 45, 123000000)), result);
-        }
-
-        @Test
-        void shouldParseFullDate() {
-            Date result = procedureService.getDateTimeFromEstimatedDate("2025-06-15");
-            assertEquals(toDate(LocalDate.of(2025, 6, 15).atStartOfDay()), result);
-        }
-
-        @Test
-        void shouldParseYearMonth() {
-            Date result = procedureService.getDateTimeFromEstimatedDate("2025-06");
-            assertEquals(toDate(LocalDate.of(2025, 6, 1).atStartOfDay()), result);
-        }
-
-        @Test
-        void shouldParseYearOnly() {
-            Date result = procedureService.getDateTimeFromEstimatedDate("2025");
-            assertEquals(toDate(LocalDate.of(2025, 1, 1).atStartOfDay()), result);
-        }
-
-        @Test
-        void shouldParseLeapYearDate() {
-            Date result = procedureService.getDateTimeFromEstimatedDate("2024-02-29");
-            assertEquals(toDate(LocalDate.of(2024, 2, 29).atStartOfDay()), result);
-        }
-
-        @Test
-        void shouldThrowForInvalidLeapYearDate() {
-            assertThrows(APIException.class, () ->
-                    procedureService.getDateTimeFromEstimatedDate("2025-02-29"));
-        }
-
-        @Test
-        void shouldThrowForMalformedFullDate() {
-            assertThrows(APIException.class, () ->
-                    procedureService.getDateTimeFromEstimatedDate("2025-13-40"));
-        }
-
-        @Test
-        void shouldThrowForMalformedYearMonth() {
-            assertThrows(APIException.class, () ->
-                    procedureService.getDateTimeFromEstimatedDate("2025-13"));
-        }
-
-        @Test
-        void shouldThrowForMalformedYear() {
-            assertThrows(APIException.class, () ->
-                    procedureService.getDateTimeFromEstimatedDate("abcd"));
-        }
-
-        @Test
-        void shouldThrowForMalformedDatetime() {
-            assertThrows(APIException.class, () ->
-                    procedureService.getDateTimeFromEstimatedDate("2025-06-15Tnotadate"));
-        }
-
-        @Test
-        void shouldThrowForUnrecognizedLength() {
-            assertThrows(APIException.class, () ->
-                    procedureService.getDateTimeFromEstimatedDate("25-06"));
-        }
-
-        @Test
-        void shouldThrowForGarbageInputWithLength10() {
-            assertThrows(APIException.class, () ->
-                    procedureService.getDateTimeFromEstimatedDate("abcdefghij"));
-        }
-    }
-
-    @Nested
-    class SaveProcedure {
-
-        @BeforeEach
-        void setUp() {
-            when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
-        }
-
-        private Date toDate(LocalDateTime ldt) {
-            return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-        }
-
-        @Test
-        void shouldSetStartDateTimeFromEstimatedDate() {
-            Procedure procedure = new Procedure();
-            procedure.setPatient(mock(Patient.class));
-            procedure.setProcedureCoded(mock(Concept.class));
-            procedure.setBodySite(mock(Concept.class));
-            procedure.setStatus(mock(Concept.class));
-            procedure.setEstimatedStartDate("2025-06-15");
-
-            Procedure saved = procedureService.saveProcedure(procedure);
-
-            assertNotNull(saved.getStartDateTime());
-            assertEquals(toDate(LocalDate.of(2025, 6, 15).atStartOfDay()), saved.getStartDateTime());
-        }
-
-        @Test
-        void shouldNotOverwriteStartDateTimeWhenEstimatedDateIsNull() {
-            Procedure procedure = new Procedure();
-            procedure.setPatient(mock(Patient.class));
-            procedure.setProcedureCoded(mock(Concept.class));
-            procedure.setBodySite(mock(Concept.class));
-            procedure.setStatus(mock(Concept.class));
-            procedure.setStartDateTime(new Date());
-
-            Date originalDate = procedure.getStartDateTime();
-            Procedure saved = procedureService.saveProcedure(procedure);
-
-            assertEquals(originalDate, saved.getStartDateTime());
-        }
-
-        @Test
-        void shouldDelegateToDAO() {
-            Procedure procedure = new Procedure();
-            procedure.setPatient(mock(Patient.class));
-            procedure.setProcedureCoded(mock(Concept.class));
-            procedure.setBodySite(mock(Concept.class));
-            procedure.setStatus(mock(Concept.class));
-            procedure.setStartDateTime(new Date());
-
-            procedureService.saveProcedure(procedure);
-
-            verify(procedureDAO).saveOrUpdateProcedure(procedure);
-        }
-    }
-
-    @Nested
-    class GetProcedureById {
-
-        @Test
-        void shouldDelegateToDAO() {
-            Procedure expected = new Procedure();
-            when(procedureDAO.getProcedure(42)).thenReturn(expected);
-
-            Procedure result = procedureService.getProcedure(42);
-
-            assertEquals(expected, result);
-            verify(procedureDAO).getProcedure(42);
-        }
-
-        @Test
-        void shouldReturnNullWhenDAOReturnsNull() {
-            when(procedureDAO.getProcedure(999)).thenReturn(null);
-            assertNull(procedureService.getProcedure(999));
-        }
-    }
-
-    @Nested
-    class GetProcedureCountByPatient {
-
-        @Test
-        void shouldDelegateToDAO() {
-            Patient patient = mock(Patient.class);
-            when(procedureDAO.getProcedureCountByPatient(patient, false)).thenReturn(3L);
-
-            Long result = procedureService.getProcedureCountByPatient(patient, false);
-
-            assertEquals(3L, result);
-            verify(procedureDAO).getProcedureCountByPatient(patient, false);
-        }
-    }
-
-    @Nested
-    class GetProceduresByPatient {
-
-        @Test
-        void shouldReturnProceduresFromDAO() {
-            Patient patient = mock(Patient.class);
-            List<Procedure> expected = Arrays.asList(new Procedure(), new Procedure());
-            when(procedureDAO.getProceduresByPatient(patient, false, null, null)).thenReturn(expected);
-
-            List<Procedure> result = procedureService.getProceduresByPatient(patient, false, null, null);
-
-            assertEquals(expected, result);
-            verify(procedureDAO).getProceduresByPatient(patient, false, null, null);
-        }
-
-        @Test
-        void shouldPassPaginationParamsToDAO() {
-            Patient patient = mock(Patient.class);
-            List<Procedure> expected = Collections.singletonList(new Procedure());
-            when(procedureDAO.getProceduresByPatient(patient, false, 5, 10)).thenReturn(expected);
-
-            List<Procedure> result = procedureService.getProceduresByPatient(patient, false, 5, 10);
-
-            assertEquals(expected, result);
-            verify(procedureDAO).getProceduresByPatient(patient, false, 5, 10);
-        }
-
-        @Test
-        void shouldPassNullPaginationParamsToDAOWhenNotProvided() {
-            Patient patient = mock(Patient.class);
-            when(procedureDAO.getProceduresByPatient(patient, false, null, null)).thenReturn(Collections.emptyList());
-
-            procedureService.getProceduresByPatient(patient, false, null, null);
-
-            verify(procedureDAO).getProceduresByPatient(patient, false, null, null);
-        }
-
-        @Test
-        void shouldPassIncludeVoidedToDAO() {
-            Patient patient = mock(Patient.class);
-            when(procedureDAO.getProceduresByPatient(patient, true, null, null)).thenReturn(Collections.emptyList());
-
-            procedureService.getProceduresByPatient(patient, true, null, null);
-
-            verify(procedureDAO).getProceduresByPatient(patient, true, null, null);
-        }
-    }
-
-    @Nested
-    class VoidProcedure {
-
-        @Test
-        void shouldDelegateToDAO() {
-            Procedure procedure = new Procedure();
-            when(procedureDAO.saveOrUpdateProcedure(procedure)).thenReturn(procedure);
-
-            Procedure result = procedureService.voidProcedure(procedure, "test reason");
-
-            assertEquals(procedure, result);
-            verify(procedureDAO).saveOrUpdateProcedure(procedure);
-        }
-    }
-
-    @Nested
-    class UnvoidProcedure {
-
-        @Test
-        void shouldClearVoidFields() {
-            Procedure procedure = new Procedure();
-            procedure.setVoided(true);
-            procedure.setVoidReason("some reason");
-            procedure.setDateVoided(new Date());
-            when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
-
-            Procedure result = procedureService.unvoidProcedure(procedure);
-
-            assertFalse(result.getVoided());
-            assertNull(result.getVoidReason());
-            assertNull(result.getDateVoided());
-            assertNull(result.getVoidedBy());
-        }
-
-        @Test
-        void shouldDelegateToDAO() {
-            Procedure procedure = new Procedure();
-            procedure.setVoided(true);
-            when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenReturn(procedure);
-
-            procedureService.unvoidProcedure(procedure);
-
-            verify(procedureDAO).saveOrUpdateProcedure(procedure);
-        }
-    }
-
-    @Nested
-    class PurgeProcedure {
-
-        @Test
-        void shouldDelegateDeleteToDAO() {
-            Procedure procedure = new Procedure();
-
-            procedureService.purgeProcedure(procedure);
-
-            verify(procedureDAO).deleteProcedure(procedure);
-        }
-    }
-   
-   @Nested
-   class SaveProcedureType {
-      
-      @Test
-      void shouldDelegateToDAO() {
-         ProcedureType type = new ProcedureType("Test", "Test type");
-         when(procedureDAO.saveOrUpdateProcedure(type)).thenReturn(type);
-         
-         ProcedureType result = procedureService.saveProcedureType(type);
-         
-         assertEquals(type, result);
-         verify(procedureDAO).saveOrUpdateProcedure(type);
-      }
-      
-      @Test
-      void shouldNotAllowDuplicateNames() {
-         ProcedureType existing = new ProcedureType("Test", "Existing type");
-         existing.setUuid("existing-uuid");
-         when(procedureDAO.getProcedureTypeByName("Test")).thenReturn(existing);
-         
-         ProcedureType newType = new ProcedureType("Test", "New type");
-         newType.setUuid("new-uuid");
-         
-         APIException ex = assertThrows(APIException.class, () -> procedureService.saveProcedureType(newType));
-         assertEquals("A procedure type with the name already exists", ex.getMessage());
-      }
-   }
-   
-   @Nested
-   class GetProcedureTypeByUuid {
-      
-      @Test
-      void shouldDelegateToDAO() {
-         String uuid = "test-uuid";
-         ProcedureType expected = new ProcedureType("Test", "Test type");
-         when(procedureDAO.getProcedureTypeByUuid(uuid)).thenReturn(expected);
-         
-         ProcedureType result = procedureService.getProcedureTypeByUuid(uuid);
-         
-         assertEquals(expected, result);
-         verify(procedureDAO).getProcedureTypeByUuid(uuid);
-      }
-   }
-   
-   @Nested
-   class GetAllProcedureTypes {
-      
-      @Test
-      void shouldDelegateToDAOWithIncludeRetiredFalse() {
-         List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"), new ProcedureType("B", "b"));
-         when(procedureDAO.getAllProcedureTypes(false)).thenReturn(expected);
-         
-         List<ProcedureType> result = procedureService.getAllProcedureTypes(false);
-         
-         assertEquals(expected, result);
-         verify(procedureDAO).getAllProcedureTypes(false);
-      }
-      
-      @Test
-      void shouldDelegateToDAOWithIncludeRetiredTrue() {
-         List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"));
-         when(procedureDAO.getAllProcedureTypes(true)).thenReturn(expected);
-         
-         List<ProcedureType> result = procedureService.getAllProcedureTypes(true);
-         
-         assertEquals(expected, result);
-         verify(procedureDAO).getAllProcedureTypes(true);
-      }
-   }
-   
-   @Nested
-   class RetireProcedureType {
-      
-      @Test
-      void shouldSetRetiredFieldsAndDelegateToDAO() {
-         ProcedureType type = new ProcedureType("Test", "Test type");
-         when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
-         
-         ProcedureType result = procedureService.retireProcedureType(type, "no longer needed");
-         
-         assertTrue(result.getRetired());
-         assertEquals("no longer needed", result.getRetireReason());
-         verify(procedureDAO).saveOrUpdateProcedure(type);
-      }
-   }
-   
-   @Nested
-   class UnretireProcedureType {
-      
-      @Test
-      void shouldClearRetiredFields() {
-         ProcedureType type = new ProcedureType("Test", "Test type");
-         type.setRetired(true);
-         type.setRetireReason("some reason");
-         type.setDateRetired(new Date());
-         when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
-         
-         ProcedureType result = procedureService.unretireProcedureType(type);
-         
-         assertFalse(result.getRetired());
-         assertNull(result.getRetireReason());
-         assertNull(result.getDateRetired());
-         assertNull(result.getRetiredBy());
-      }
-      
-      @Test
-      void shouldDelegateToDAO() {
-         ProcedureType type = new ProcedureType("Test", "Test type");
-         type.setRetired(true);
-         when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenReturn(type);
-         
-         procedureService.unretireProcedureType(type);
-         
-         verify(procedureDAO).saveOrUpdateProcedure(type);
-      }
-   }
-   
-   @Nested
-   class GetProcedureTypeById {
-      
-      @Test
-      void shouldDelegateToDAO() {
-         ProcedureType expected = new ProcedureType();
-         when(procedureDAO.getProcedureType(1)).thenReturn(expected);
-         
-         ProcedureType result = procedureService.getProcedureType(1);
-         
-         assertEquals(expected, result);
-         verify(procedureDAO).getProcedureType(1);
-      }
-      
-      @Test
-      void shouldReturnNullWhenNotFound() {
-         when(procedureDAO.getProcedureType(999)).thenReturn(null);
-         assertNull(procedureService.getProcedureType(999));
-      }
-   }
-   
-   @Nested
-   class GetProcedureTypeByName {
-      
-      @Test
-      void shouldDelegateToDAO() {
-         ProcedureType expected = new ProcedureType();
-         when(procedureDAO.getProcedureTypeByName("Historical")).thenReturn(expected);
-         
-         ProcedureType result = procedureService.getProcedureTypeByName("Historical");
-         
-         assertEquals(expected, result);
-         verify(procedureDAO).getProcedureTypeByName("Historical");
-      }
-      
-      @Test
-      void shouldReturnNullWhenNotFound() {
-         when(procedureDAO.getProcedureTypeByName("Unknown")).thenReturn(null);
-         assertNull(procedureService.getProcedureTypeByName("Unknown"));
-      }
-   }
-   
-   @Nested
-   class PurgeProcedureType {
-      
-      @Test
-      void shouldDelegateDeleteToDAO() {
-         ProcedureType type = new ProcedureType("Test", "Test type");
-         
-         procedureService.purgeProcedureType(type);
-         
-         verify(procedureDAO).deleteProcedureType(type);
-      }
-   }
+	
+	private ProcedureServiceImpl procedureService;
+	
+	private ProcedureDAO procedureDAO;
+	
+	@BeforeEach
+	void setUp() {
+		procedureDAO = mock(ProcedureDAO.class);
+		procedureService = new ProcedureServiceImpl();
+		procedureService.setProcedureDAO(procedureDAO);
+	}
+	
+	@Test
+	void getProcedureByUuid_shouldReturnProcedureFromDAO() {
+		String uuid = "test-uuid-123";
+		Procedure expectedProcedure = new Procedure();
+		expectedProcedure.setUuid(uuid);
+		
+		when(procedureDAO.getProcedureByUuid(uuid)).thenReturn(expectedProcedure);
+		
+		Procedure result = procedureService.getProcedureByUuid(uuid);
+		
+		assertEquals(expectedProcedure, result);
+		verify(procedureDAO).getProcedureByUuid(uuid);
+	}
+	
+	@Nested
+	class GetDateTimeFromEstimatedDate {
+		
+		private Date toDate(LocalDateTime ldt) {
+			return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+		}
+		
+		@Test
+		void shouldParseFullDatetime() {
+			Date result = procedureService.getDateTimeFromEstimatedDate("2025-06-15T14:30:00");
+			assertEquals(toDate(LocalDateTime.of(2025, 6, 15, 14, 30, 0)), result);
+		}
+		
+		@Test
+		void shouldParseDatetimeWithSubSeconds() {
+			Date result = procedureService.getDateTimeFromEstimatedDate("2025-06-15T14:30:45.123");
+			assertEquals(toDate(LocalDateTime.of(2025, 6, 15, 14, 30, 45, 123000000)), result);
+		}
+		
+		@Test
+		void shouldParseFullDate() {
+			Date result = procedureService.getDateTimeFromEstimatedDate("2025-06-15");
+			assertEquals(toDate(LocalDate.of(2025, 6, 15).atStartOfDay()), result);
+		}
+		
+		@Test
+		void shouldParseYearMonth() {
+			Date result = procedureService.getDateTimeFromEstimatedDate("2025-06");
+			assertEquals(toDate(LocalDate.of(2025, 6, 1).atStartOfDay()), result);
+		}
+		
+		@Test
+		void shouldParseYearOnly() {
+			Date result = procedureService.getDateTimeFromEstimatedDate("2025");
+			assertEquals(toDate(LocalDate.of(2025, 1, 1).atStartOfDay()), result);
+		}
+		
+		@Test
+		void shouldParseLeapYearDate() {
+			Date result = procedureService.getDateTimeFromEstimatedDate("2024-02-29");
+			assertEquals(toDate(LocalDate.of(2024, 2, 29).atStartOfDay()), result);
+		}
+		
+		@Test
+		void shouldThrowForInvalidLeapYearDate() {
+			assertThrows(APIException.class, () ->
+					procedureService.getDateTimeFromEstimatedDate("2025-02-29"));
+		}
+		
+		@Test
+		void shouldThrowForMalformedFullDate() {
+			assertThrows(APIException.class, () ->
+					procedureService.getDateTimeFromEstimatedDate("2025-13-40"));
+		}
+		
+		@Test
+		void shouldThrowForMalformedYearMonth() {
+			assertThrows(APIException.class, () ->
+					procedureService.getDateTimeFromEstimatedDate("2025-13"));
+		}
+		
+		@Test
+		void shouldThrowForMalformedYear() {
+			assertThrows(APIException.class, () ->
+					procedureService.getDateTimeFromEstimatedDate("abcd"));
+		}
+		
+		@Test
+		void shouldThrowForMalformedDatetime() {
+			assertThrows(APIException.class, () ->
+					procedureService.getDateTimeFromEstimatedDate("2025-06-15Tnotadate"));
+		}
+		
+		@Test
+		void shouldThrowForUnrecognizedLength() {
+			assertThrows(APIException.class, () ->
+					procedureService.getDateTimeFromEstimatedDate("25-06"));
+		}
+		
+		@Test
+		void shouldThrowForGarbageInputWithLength10() {
+			assertThrows(APIException.class, () ->
+					procedureService.getDateTimeFromEstimatedDate("abcdefghij"));
+		}
+	}
+	
+	@Nested
+	class SaveProcedure {
+		
+		@BeforeEach
+		void setUp() {
+			when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+		}
+		
+		private Date toDate(LocalDateTime ldt) {
+			return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+		}
+		
+		@Test
+		void shouldSetStartDateTimeFromEstimatedDate() {
+			Procedure procedure = new Procedure();
+			procedure.setPatient(mock(Patient.class));
+			procedure.setProcedureCoded(mock(Concept.class));
+			procedure.setBodySite(mock(Concept.class));
+			procedure.setStatus(mock(Concept.class));
+			procedure.setEstimatedStartDate("2025-06-15");
+			
+			Procedure saved = procedureService.saveProcedure(procedure);
+			
+			assertNotNull(saved.getStartDateTime());
+			assertEquals(toDate(LocalDate.of(2025, 6, 15).atStartOfDay()), saved.getStartDateTime());
+		}
+		
+		@Test
+		void shouldNotOverwriteStartDateTimeWhenEstimatedDateIsNull() {
+			Procedure procedure = new Procedure();
+			procedure.setPatient(mock(Patient.class));
+			procedure.setProcedureCoded(mock(Concept.class));
+			procedure.setBodySite(mock(Concept.class));
+			procedure.setStatus(mock(Concept.class));
+			procedure.setStartDateTime(new Date());
+			
+			Date originalDate = procedure.getStartDateTime();
+			Procedure saved = procedureService.saveProcedure(procedure);
+			
+			assertEquals(originalDate, saved.getStartDateTime());
+		}
+		
+		@Test
+		void shouldDelegateToDAO() {
+			Procedure procedure = new Procedure();
+			procedure.setPatient(mock(Patient.class));
+			procedure.setProcedureCoded(mock(Concept.class));
+			procedure.setBodySite(mock(Concept.class));
+			procedure.setStatus(mock(Concept.class));
+			procedure.setStartDateTime(new Date());
+			
+			procedureService.saveProcedure(procedure);
+			
+			verify(procedureDAO).saveOrUpdateProcedure(procedure);
+		}
+	}
+	
+	@Nested
+	class GetProcedureById {
+		
+		@Test
+		void shouldDelegateToDAO() {
+			Procedure expected = new Procedure();
+			when(procedureDAO.getProcedure(42)).thenReturn(expected);
+			
+			Procedure result = procedureService.getProcedure(42);
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getProcedure(42);
+		}
+		
+		@Test
+		void shouldReturnNullWhenDAOReturnsNull() {
+			when(procedureDAO.getProcedure(999)).thenReturn(null);
+			assertNull(procedureService.getProcedure(999));
+		}
+	}
+	
+	@Nested
+	class GetProcedureCountByPatient {
+		
+		@Test
+		void shouldDelegateToDAO() {
+			Patient patient = mock(Patient.class);
+			when(procedureDAO.getProcedureCountByPatient(patient, false)).thenReturn(3L);
+			
+			Long result = procedureService.getProcedureCountByPatient(patient, false);
+			
+			assertEquals(3L, result);
+			verify(procedureDAO).getProcedureCountByPatient(patient, false);
+		}
+	}
+	
+	@Nested
+	class GetProceduresByPatient {
+		
+		@Test
+		void shouldReturnProceduresFromDAO() {
+			Patient patient = mock(Patient.class);
+			List<Procedure> expected = Arrays.asList(new Procedure(), new Procedure());
+			when(procedureDAO.getProceduresByPatient(patient, false, null, null)).thenReturn(expected);
+			
+			List<Procedure> result = procedureService.getProceduresByPatient(patient, false, null, null);
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getProceduresByPatient(patient, false, null, null);
+		}
+		
+		@Test
+		void shouldPassPaginationParamsToDAO() {
+			Patient patient = mock(Patient.class);
+			List<Procedure> expected = Collections.singletonList(new Procedure());
+			when(procedureDAO.getProceduresByPatient(patient, false, 5, 10)).thenReturn(expected);
+			
+			List<Procedure> result = procedureService.getProceduresByPatient(patient, false, 5, 10);
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getProceduresByPatient(patient, false, 5, 10);
+		}
+		
+		@Test
+		void shouldPassNullPaginationParamsToDAOWhenNotProvided() {
+			Patient patient = mock(Patient.class);
+			when(procedureDAO.getProceduresByPatient(patient, false, null, null)).thenReturn(Collections.emptyList());
+			
+			procedureService.getProceduresByPatient(patient, false, null, null);
+			
+			verify(procedureDAO).getProceduresByPatient(patient, false, null, null);
+		}
+		
+		@Test
+		void shouldPassIncludeVoidedToDAO() {
+			Patient patient = mock(Patient.class);
+			when(procedureDAO.getProceduresByPatient(patient, true, null, null)).thenReturn(Collections.emptyList());
+			
+			procedureService.getProceduresByPatient(patient, true, null, null);
+			
+			verify(procedureDAO).getProceduresByPatient(patient, true, null, null);
+		}
+	}
+	
+	@Nested
+	class VoidProcedure {
+		
+		@Test
+		void shouldDelegateToDAO() {
+			Procedure procedure = new Procedure();
+			when(procedureDAO.saveOrUpdateProcedure(procedure)).thenReturn(procedure);
+			
+			Procedure result = procedureService.voidProcedure(procedure, "test reason");
+			
+			assertEquals(procedure, result);
+			verify(procedureDAO).saveOrUpdateProcedure(procedure);
+		}
+	}
+	
+	@Nested
+	class UnvoidProcedure {
+		
+		@Test
+		void shouldClearVoidFields() {
+			Procedure procedure = new Procedure();
+			procedure.setVoided(true);
+			procedure.setVoidReason("some reason");
+			procedure.setDateVoided(new Date());
+			when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+			
+			Procedure result = procedureService.unvoidProcedure(procedure);
+			
+			assertFalse(result.getVoided());
+			assertNull(result.getVoidReason());
+			assertNull(result.getDateVoided());
+			assertNull(result.getVoidedBy());
+		}
+		
+		@Test
+		void shouldDelegateToDAO() {
+			Procedure procedure = new Procedure();
+			procedure.setVoided(true);
+			when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenReturn(procedure);
+			
+			procedureService.unvoidProcedure(procedure);
+			
+			verify(procedureDAO).saveOrUpdateProcedure(procedure);
+		}
+	}
+	
+	@Nested
+	class PurgeProcedure {
+		
+		@Test
+		void shouldDelegateDeleteToDAO() {
+			Procedure procedure = new Procedure();
+			
+			procedureService.purgeProcedure(procedure);
+			
+			verify(procedureDAO).deleteProcedure(procedure);
+		}
+	}
+	
+	@Nested
+	class SaveProcedureType {
+		
+		@Test
+		void shouldDelegateToDAO() {
+			ProcedureType type = new ProcedureType("Test", "Test type");
+			when(procedureDAO.saveOrUpdateProcedure(type)).thenReturn(type);
+			
+			ProcedureType result = procedureService.saveProcedureType(type);
+			
+			assertEquals(type, result);
+			verify(procedureDAO).saveOrUpdateProcedure(type);
+		}
+		
+		@Test
+		void shouldNotAllowDuplicateNames() {
+			ProcedureType existing = new ProcedureType("Test", "Existing type");
+			existing.setUuid("existing-uuid");
+			when(procedureDAO.getProcedureTypeByName("Test")).thenReturn(existing);
+			
+			ProcedureType newType = new ProcedureType("Test", "New type");
+			newType.setUuid("new-uuid");
+			
+			APIException ex = assertThrows(APIException.class, () -> procedureService.saveProcedureType(newType));
+			assertEquals("A procedure type with the name already exists", ex.getMessage());
+		}
+	}
+	
+	@Nested
+	class GetProcedureTypeByUuid {
+		
+		@Test
+		void shouldDelegateToDAO() {
+			String uuid = "test-uuid";
+			ProcedureType expected = new ProcedureType("Test", "Test type");
+			when(procedureDAO.getProcedureTypeByUuid(uuid)).thenReturn(expected);
+			
+			ProcedureType result = procedureService.getProcedureTypeByUuid(uuid);
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getProcedureTypeByUuid(uuid);
+		}
+	}
+	
+	@Nested
+	class GetAllProcedureTypes {
+		
+		@Test
+		void shouldDelegateToDAOWithIncludeRetiredFalse() {
+			List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"), new ProcedureType("B", "b"));
+			when(procedureDAO.getAllProcedureTypes(false)).thenReturn(expected);
+			
+			List<ProcedureType> result = procedureService.getAllProcedureTypes(false);
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getAllProcedureTypes(false);
+		}
+		
+		@Test
+		void shouldDelegateToDAOWithIncludeRetiredTrue() {
+			List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"));
+			when(procedureDAO.getAllProcedureTypes(true)).thenReturn(expected);
+			
+			List<ProcedureType> result = procedureService.getAllProcedureTypes(true);
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getAllProcedureTypes(true);
+		}
+	}
+	
+	@Nested
+	class RetireProcedureType {
+		
+		@Test
+		void shouldSetRetiredFieldsAndDelegateToDAO() {
+			ProcedureType type = new ProcedureType("Test", "Test type");
+			when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
+			
+			ProcedureType result = procedureService.retireProcedureType(type, "no longer needed");
+			
+			assertTrue(result.getRetired());
+			assertEquals("no longer needed", result.getRetireReason());
+			verify(procedureDAO).saveOrUpdateProcedure(type);
+		}
+	}
+	
+	@Nested
+	class UnretireProcedureType {
+		
+		@Test
+		void shouldClearRetiredFields() {
+			ProcedureType type = new ProcedureType("Test", "Test type");
+			type.setRetired(true);
+			type.setRetireReason("some reason");
+			type.setDateRetired(new Date());
+			when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
+			
+			ProcedureType result = procedureService.unretireProcedureType(type);
+			
+			assertFalse(result.getRetired());
+			assertNull(result.getRetireReason());
+			assertNull(result.getDateRetired());
+			assertNull(result.getRetiredBy());
+		}
+		
+		@Test
+		void shouldDelegateToDAO() {
+			ProcedureType type = new ProcedureType("Test", "Test type");
+			type.setRetired(true);
+			when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenReturn(type);
+			
+			procedureService.unretireProcedureType(type);
+			
+			verify(procedureDAO).saveOrUpdateProcedure(type);
+		}
+	}
+	
+	@Nested
+	class GetProcedureTypeById {
+		
+		@Test
+		void shouldDelegateToDAO() {
+			ProcedureType expected = new ProcedureType();
+			when(procedureDAO.getProcedureType(1)).thenReturn(expected);
+			
+			ProcedureType result = procedureService.getProcedureType(1);
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getProcedureType(1);
+		}
+		
+		@Test
+		void shouldReturnNullWhenNotFound() {
+			when(procedureDAO.getProcedureType(999)).thenReturn(null);
+			assertNull(procedureService.getProcedureType(999));
+		}
+	}
+	
+	@Nested
+	class GetProcedureTypeByName {
+		
+		@Test
+		void shouldDelegateToDAO() {
+			ProcedureType expected = new ProcedureType();
+			when(procedureDAO.getProcedureTypeByName("Historical")).thenReturn(expected);
+			
+			ProcedureType result = procedureService.getProcedureTypeByName("Historical");
+			
+			assertEquals(expected, result);
+			verify(procedureDAO).getProcedureTypeByName("Historical");
+		}
+		
+		@Test
+		void shouldReturnNullWhenNotFound() {
+			when(procedureDAO.getProcedureTypeByName("Unknown")).thenReturn(null);
+			assertNull(procedureService.getProcedureTypeByName("Unknown"));
+		}
+	}
+	
+	@Nested
+	class PurgeProcedureType {
+		
+		@Test
+		void shouldDelegateDeleteToDAO() {
+			ProcedureType type = new ProcedureType("Test", "Test type");
+			
+			procedureService.purgeProcedureType(type);
+			
+			verify(procedureDAO).deleteProcedureType(type);
+		}
+	}
 }
