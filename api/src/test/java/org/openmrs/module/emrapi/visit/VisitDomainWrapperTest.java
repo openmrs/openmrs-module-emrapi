@@ -160,7 +160,6 @@ public class VisitDomainWrapperTest {
 
         Encounter admit = new Encounter();
         admit.setEncounterType(admitEncounterType);
-        admit.setEncounterDatetime(new Date());
 
         Set<Encounter> encounters = new LinkedHashSet<Encounter>();
         encounters.add(admit);
@@ -295,11 +294,11 @@ public class VisitDomainWrapperTest {
         assertFalse(visitDomainWrapper.hasBeenDischarged());
     }
 
-    @Test
-    public void shouldNotBeAdmittedIfDateOutsideOfVisit() {
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldFailIfDateOutsideOfVisit() {
         Date now = new Date();
         when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -3));
-        assertFalse(visitDomainWrapper.isAdmitted(DateUtils.addHours(now, -4)));
+        visitDomainWrapper.isAdmitted(DateUtils.addHours(now, -4));
     }
 
     @Test
@@ -421,7 +420,6 @@ public class VisitDomainWrapperTest {
        when(visit.getEncounters()).thenReturn(encounters);
 
        assertThat(visitDomainWrapper.getInpatientLocation(DateUtils.addHours(new Date(), -2)), is(icu));
-       assertThat(visitDomainWrapper.getInpatientLocationAtTimeOfEncounter(transfer), is(icu));
        assertThat(visitDomainWrapper.getInpatientLocation(new Date()), is(surgery));
 
    }

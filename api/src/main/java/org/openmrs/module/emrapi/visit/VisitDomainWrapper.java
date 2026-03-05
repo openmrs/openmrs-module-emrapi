@@ -43,7 +43,6 @@ import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -444,10 +443,10 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     public boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType) {
-        return hasEncounterWithoutSubsequentEncounter(lookForEncounterType, withoutSubsequentEncounterType, null, null);
+        return hasEncounterWithoutSubsequentEncounter(lookForEncounterType, withoutSubsequentEncounterType, null);
     }
 
-    private boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType, Date onDate, @Nullable Encounter encounterToIgnore) {
+    private boolean hasEncounterWithoutSubsequentEncounter(EncounterType lookForEncounterType, EncounterType withoutSubsequentEncounterType, Date onDate) {
 
         if (visit.getEncounters() == null) {
             return false;
@@ -456,13 +455,11 @@ public class VisitDomainWrapper implements DomainWrapper {
         for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             // check that encounterDatetime is before or at onDate
             if (onDate == null || encounter.getEncounterDatetime().compareTo(onDate) <= 0) {
-                if(!encounter.equals(encounterToIgnore)) {
-                    if (encounter.getEncounterType().equals(lookForEncounterType)) {
-                        return true;
-                    }
-                    else if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
-                        return false;
-                    }
+                if (encounter.getEncounterType().equals(lookForEncounterType)) {
+                    return true;
+                }
+                else if (encounter.getEncounterType().equals(withoutSubsequentEncounterType)) {
+                    return false;
                 }
             }
         }
@@ -471,10 +468,15 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     /**
-     * @return true if the visit includes an admission encounter with no discharge encounter after it at the current time
+     * @return true if the visit includes an admission encounter with no discharge encounter after it
      */
     public boolean isAdmitted() {
-        return isAdmitted(new Date(), null);
+        EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
+        EncounterType dischargeEncounterType = emrApiProperties.getExitFromInpatientEncounterType();
+        if (admissionEncounterType == null) {
+            return false;
+        }
+        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType);
     }
 
     public boolean hasBeenDischarged() {
@@ -488,30 +490,8 @@ public class VisitDomainWrapper implements DomainWrapper {
 
     public boolean isAdmitted(Date onDate) {
 
-        return isAdmitted(onDate, null);
-    }
-
-    /**
-     * Determines whether the patient is admitted at the time of the given encounter, ignoring that encounter when determining admission status
-     * so that this method can be used for data validation on an encounter that has not been saved yet.
-     * @param encounter
-     * @return
-     */
-    public boolean isAdmittedAtTimeOfEncounter(Encounter encounter) {
-        return isAdmitted(encounter.getEncounterDatetime(), encounter);
-    }
-
-    /**
-     * Determines whether the patient is admitted at onDate.
-     * If encounterToIgnore is not null, this method ignores it when determining the patient's admission status, so it can be
-     * used for data validation on an encounter that has not been saved yet.
-     * @param onDate
-     * @param encounterToIgnore
-     * @return
-     */
-    private boolean isAdmitted(Date onDate, @Nullable Encounter encounterToIgnore) {
         if (visit.getStartDatetime().after(onDate) || (visit.getStopDatetime() != null && visit.getStopDatetime().before(onDate))) {
-            return false;
+            throw new IllegalArgumentException("date does not fall within visit");
         }
 
         EncounterType admissionEncounterType = emrApiProperties.getAdmissionEncounterType();
@@ -520,7 +500,7 @@ public class VisitDomainWrapper implements DomainWrapper {
             return false;
         }
 
-        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType, onDate, encounterToIgnore);
+        return hasEncounterWithoutSubsequentEncounter(admissionEncounterType, dischargeEncounterType, onDate);
     }
 
     public boolean isAwaitingAdmission() {
@@ -534,23 +514,8 @@ public class VisitDomainWrapper implements DomainWrapper {
     }
 
     public Location getInpatientLocation(Date onDate) {
-        return getInpatientLocation(onDate, null);
-    }
 
-    /**
-     * Gets the inpatient location of the patient associated with the encounter, at the time of the encounter.
-     * Note that the input encounter (especially if it's an admit or transfer encounter) is ignored when
-     * determining the location
-     * @param encounter
-     * @return
-     */
-    public Location getInpatientLocationAtTimeOfEncounter(Encounter encounter) {
-        return getInpatientLocation(encounter.getEncounterDatetime(), encounter);
-    }
-
-    private Location getInpatientLocation(Date onDate, @Nullable Encounter encounterToIgnore) {
-
-        if (!isAdmitted(onDate, encounterToIgnore)) {
+        if (!isAdmitted(onDate)) {
             return null;
         }
 
@@ -559,11 +524,9 @@ public class VisitDomainWrapper implements DomainWrapper {
 
         for (Encounter encounter : getSortedEncounters(SortOrder.MOST_RECENT_FIRST)) {
             if (onDate == null || encounter.getEncounterDatetime().before(onDate) || encounter.getEncounterDatetime().equals(onDate)) {
-                if(!encounter.equals(encounterToIgnore)) {
-                    if (encounter.getEncounterType().equals(admissionEncounterType) ||
-                            encounter.getEncounterType().equals(transferEncounterType)) {
-                        return encounter.getLocation();
-                    }
+                if (encounter.getEncounterType().equals(admissionEncounterType) ||
+                        encounter.getEncounterType().equals(transferEncounterType)) {
+                    return encounter.getLocation();
                 }
             }
         }

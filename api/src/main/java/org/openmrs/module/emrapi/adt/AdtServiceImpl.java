@@ -832,6 +832,8 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         VisitDomainWrapper visit = wrap(action.getVisit()) ;
 
+        action.getType().checkVisitValid(visit);
+
         Date adtDatetime = action.getActionDatetime();
         if (adtDatetime == null) {
             adtDatetime = new Date();
@@ -844,8 +846,6 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 
         Encounter encounter = buildEncounter(adtEncounterType, visit.getVisit().getPatient(), action.getLocation(), adtForm, adtDatetime, null, null);
         addProviders(encounter, action.getProviders());
-
-        action.getType().checkEncounterValid(visit, encounter);
 
         visit.addEncounter(encounter);
         encounterService.saveEncounter(encounter);
@@ -862,7 +862,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
     @Transactional
     public VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
         throws ExistingVisitDuringTimePeriodException {
-
+        
         if (startDatetime.after(new Date())) {
             throw new IllegalArgumentException("emrapi.retrospectiveVisit.startDateCannotBeInFuture");
         }
@@ -1091,27 +1091,5 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
         }
 
         return new ArrayList<>(m.values());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public void verifyEncounterForAdtAction(Encounter encounter) {
-        Visit visit = encounter.getVisit();
-        EncounterType encounterType = encounter.getEncounterType();
-        Date onDate = encounter.getEncounterDatetime();
-        VisitDomainWrapper wrappedVisit = wrap(visit);
-        AdtAction.Type actionType = null;
-
-        if (encounterType.equals(emrApiProperties.getAdmissionEncounterType())) {
-            actionType = AdtAction.Type.ADMISSION;
-        } else if (encounterType.equals(emrApiProperties.getExitFromInpatientEncounterType())) {
-            actionType = AdtAction.Type.DISCHARGE;
-        } else if (encounterType.equals(emrApiProperties.getTransferWithinHospitalEncounterType())) {
-            actionType = AdtAction.Type.TRANSFER;
-        }
-
-        if(actionType != null) {
-            actionType.checkEncounterValid(wrappedVisit, encounter);
-        }
     }
 }
