@@ -345,9 +345,9 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
         service.ensureActiveVisit(patient, outpatientDepartment);
         assertTrue(service.hasVisitDuring(patient, outpatientDepartment, now, futureDate));
         
-        // check a date range safely in the past, between the previous retrospective visits and the current active visit
-        Date safelyInThePast = new DateTime(2012, 1, 6, 0, 0, 0).toDate();
-        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, safelyInThePast));
+        // Offset by 1 second to prevent the database timestamp truncation from overlapping with the new visit
+        Date oneSecondAgo = new DateTime(now).minusSeconds(1).toDate();
+        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, oneSecondAgo));
 
         // now lets just add another retrospective visit to do a quick test of the getVisits method
         startDate = new DateTime(2012, 1, 5, 0, 0, 0).toDate();
