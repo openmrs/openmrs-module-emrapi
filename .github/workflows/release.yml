@@ -29,34 +29,3 @@ jobs:
       MAVEN_REPO_API_KEY: ${{ secrets.MAVEN_REPO_API_KEY }}
       BOT_PAT: ${{ secrets.BOT_PAT }}
 
-  create-github-release:
-    needs: release
-    name: Create Release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: refs/tags/${{ inputs.release_version }}
-      - name: Create Release Notes
-        uses: openmrs/openmrs-contrib-create-release-notes@v1.0.3
-        id: create-release-notes
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          head-ref: refs/tags/${{ inputs.release_version }}
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ inputs.release_version }}
-          release_name: ${{ inputs.release_version }}
-          body: |
-            ## What's Changed
-            ${{ steps.create-release-notes.outputs.release-notes }}
-          draft: false
-          prerelease: false
