@@ -1,4 +1,3 @@
-# this build is designed to replicate the Travis CI workflow
 name: Build with Maven
 
 on:
@@ -10,30 +9,8 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        platform: [ ubuntu-latest ]
-        java-version: [ 8 ]
-
-    runs-on: ${{ matrix.platform }}
-    env:
-      PLATFORM: ${{ matrix.platform }}
-      JAVA_VERSION: ${{ matrix.java-version }}
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: ${{ matrix.java-version }}
-      - name: Cache local Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - name: Install dependencies
-        run: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true --batch-mode --show-version --file pom.xml
-      - name: Build with Maven
-        run: mvn test --batch-mode --file pom.xml
+    uses: openmrs/openmrs-contrib-gha-workflows/.github/workflows/build-backend-module.yml@main
+    with:
+      java_versions: '["8"]'
+      main_java_version: '8'
+    secrets: inherit
