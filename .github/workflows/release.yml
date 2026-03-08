@@ -9,6 +9,10 @@ on:
       development_version:
         description: 'Next development version (e.g., 1.4.0-SNAPSHOT)'
         required: true
+      branch:
+        description: 'Branch to release from (e.g., master)'
+        required: false
+        default: 'master'
 
 jobs:
   release:
@@ -18,6 +22,7 @@ jobs:
     with:
       release_version: ${{ inputs.release_version }}
       development_version: ${{ inputs.development_version }}
+      branch: ${{ inputs.branch }}
       java_version: '8'
     secrets:
       MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
