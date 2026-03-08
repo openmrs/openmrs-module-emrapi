@@ -22,11 +22,4 @@ jobs:
     secrets:
       MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
       MAVEN_REPO_API_KEY: ${{ secrets.MAVEN_REPO_API_KEY }}
-      # BOT_PAT is an optional GitHub Personal Access Token from a bot account
-      # (e.g. openmrs-bot) with permission to push to protected branches.
-      # The Maven release plugin pushes the release tag and the next-development-
-      # version commit directly to the branch; the default GITHUB_TOKEN cannot
-      # do this when branch-protection rules are enabled.  If BOT_PAT is not
-      # configured the workflow falls back to GITHUB_TOKEN, which works fine
-      # for repositories without push-protection rules on the release branch.
       BOT_PAT: ${{ secrets.BOT_PAT }}
