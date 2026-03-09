@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
     <name>EMR API Module</name>
     <description>Higher-level APIs to support building EMR functionality in OpenMRS, to supplement the data-level APIs
-        in the OpenMRS core.
+        in the OpenMRS core. Test.
     </description>
     <url>https://wiki.openmrs.org/display/docs/EMR+API+Module+Module</url>
 
