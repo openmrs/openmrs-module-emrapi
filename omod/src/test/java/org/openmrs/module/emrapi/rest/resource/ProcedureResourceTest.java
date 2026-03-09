@@ -134,7 +134,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 			RequestContext context = new RequestContext();
 			context.setRequest(request);
 			
-			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
+			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doSearch(context);
 			
 			assertNotNull(result);
 			List<Procedure> procedures = result.getPageOfResults();
@@ -146,7 +146,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 		@Test
 		void shouldThrowWhenNoPatientParameter() {
 			assertThrows(ResourceDoesNotSupportOperationException.class,
-					() -> resource.doGetAll(new RequestContext()));
+					() -> resource.doSearch(new RequestContext()));
 		}
 		
 		@Test
@@ -157,7 +157,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 			context.setRequest(request);
 			context.setLimit(2);
 			
-			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
+			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doSearch(context);
 			List<Procedure> procedures = result.getPageOfResults();
 			
 			assertEquals(2, procedures.size());
@@ -174,7 +174,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 			context.setLimit(1);
 			context.setRequest(request);
 			
-			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
+			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doSearch(context);
 			List<Procedure> procedures = result.getPageOfResults();
 			
 			assertEquals(1, procedures.size());
@@ -189,7 +189,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 			context.setRequest(request);
 			context.setStartIndex(0);
 			context.setLimit(2);
-			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
+			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doSearch(context);
 			
 			assertTrue(result.hasMoreResults());
 		}
@@ -203,7 +203,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 			context.setStartIndex(2);
 			context.setLimit(2);
 			
-			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doGetAll(context);
+			AlreadyPaged<Procedure> result = (AlreadyPaged<Procedure>) resource.doSearch(context);
 			
 			assertFalse(result.hasMoreResults());
 		}

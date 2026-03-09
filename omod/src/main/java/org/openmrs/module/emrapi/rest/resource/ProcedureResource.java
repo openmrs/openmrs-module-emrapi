@@ -1,8 +1,8 @@
 /**
  * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
  * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
- * of the Healthcare Disclaimer located at http://openmrs.org/license.
- * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
+ * of the Healthcare Disclaimer located at http://openmrs.org/license. Copyright (C) OpenMRS Inc. OpenMRS is a registered
+ * trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.rest.resource;
 
@@ -13,6 +13,7 @@ import org.openmrs.module.emrapi.procedure.Procedure;
 import org.openmrs.module.emrapi.procedure.ProcedureService;
 import org.openmrs.module.webservices.rest.web.RequestContext;
 import org.openmrs.module.webservices.rest.web.RestConstants;
+import org.openmrs.module.webservices.rest.web.annotation.PropertyGetter;
 import org.openmrs.module.webservices.rest.web.annotation.Resource;
 import org.openmrs.module.webservices.rest.web.representation.DefaultRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.FullRepresentation;
@@ -33,6 +34,7 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 		if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
 			DelegatingResourceDescription description = new DelegatingResourceDescription();
 			description.addProperty("uuid");
+			description.addProperty("display");
 			description.addProperty("patient", Representation.REF);
 			description.addProperty("procedureType", Representation.REF);
 			description.addProperty("encounter", Representation.REF);
@@ -85,6 +87,17 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 		return getCreatableProperties();
 	}
 	
+	@PropertyGetter("display")
+	public String getDisplay(Procedure procedure) {
+		if (procedure.getProcedureCoded() != null) {
+			return procedure.getProcedureCoded().getDisplayString();
+		}
+		if (procedure.getProcedureNonCoded() != null) {
+			return procedure.getProcedureNonCoded();
+		}
+		return procedure.getUuid();
+	}
+	
 	@Override
 	public Procedure newDelegate() {
 		return new Procedure();
@@ -101,7 +114,7 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 	}
 	
 	@Override
-	protected PageableResult doGetAll(RequestContext context) throws ResponseException {
+	protected PageableResult doSearch(RequestContext context) throws ResponseException {
 		String patientUuid = context.getParameter("patient");
 		boolean includeVoided = Boolean.parseBoolean(context.getParameter("includeVoided"));
 		Integer firstResult = context.getStartIndex();
