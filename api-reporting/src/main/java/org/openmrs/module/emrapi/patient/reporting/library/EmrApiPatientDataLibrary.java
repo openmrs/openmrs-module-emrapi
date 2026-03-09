@@ -13,17 +13,13 @@
  */
 package org.openmrs.module.emrapi.patient.reporting.library;
 
-import org.openmrs.PatientIdentifier;
 import org.openmrs.annotation.OpenmrsProfile;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.module.reporting.data.converter.PropertyConverter;
-import org.openmrs.module.reporting.data.patient.definition.ConvertedPatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientDataDefinition;
 import org.openmrs.module.reporting.data.patient.definition.PatientIdentifierDataDefinition;
 import org.openmrs.module.reporting.definition.library.BaseDefinitionLibrary;
 import org.openmrs.module.reporting.definition.library.DocumentedDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Basic patient data columns provided by emr-api module

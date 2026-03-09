@@ -1,7 +1,5 @@
 package org.openmrs.module.emrapi.utils;
 
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.impl.WriterBasedGenerator;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -9,8 +7,6 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 public class CustomJsonDateSerializerAndDeserializerTest {
