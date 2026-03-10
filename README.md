@@ -9,7 +9,7 @@ Higher-level APIs to support building EMR functionality in OpenMRS, to supplemen
 
 ## Required core version
 
-* 2.2.1
+* 2.8.0
 
 ## Required modules
 
