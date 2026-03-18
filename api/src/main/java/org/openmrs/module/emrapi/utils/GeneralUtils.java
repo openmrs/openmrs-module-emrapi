@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Date;
 
+import static org.openmrs.module.emrapi.EmrApiConstants.LOCATION_TAG_MEDICAL_RECORD_LOCATION;
+
 /**
  *
  */
@@ -297,5 +299,22 @@ public class GeneralUtils {
 
     public static Date getCurrentDateIfNull(Date date){
         return date == null ? new Date() : date;
+    }
+
+    /**
+     * Finds the medical record location associated with the given location
+     * (This searches up the hierarchy and returns the first location tagged as aMedical Record Location)
+     *
+     * @param location
+     * @return first location with the Medical Record Location tag or null if none found
+     */
+    public static Location getMedicalRecordLocationAssociatedWith(Location location) {
+        if (location == null) {
+            return null;
+        } else if (location.hasTag(LOCATION_TAG_MEDICAL_RECORD_LOCATION)) {
+            return location;
+        } else {
+            return getMedicalRecordLocationAssociatedWith(location.getParentLocation());
+        }
     }
 }
