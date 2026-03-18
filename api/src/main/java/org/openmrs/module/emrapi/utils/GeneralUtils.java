@@ -303,7 +303,7 @@ public class GeneralUtils {
 
     /**
      * Finds the medical record location associated with the given location
-     * (This searches up the hierarchy and returns the first location the Medical Record Location)
+     * (This searches up the hierarchy and returns the first location tagged as aMedical Record Location)
      *
      * @param location
      * @return first location with the Medical Record Location tag or null if none found
