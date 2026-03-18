@@ -307,7 +307,6 @@ public class GeneralUtils {
      *
      * @param location
      * @return first location with the Medical Record Location tag or null if none found
-     * @should ignore retired locations
      */
     public static Location getMedicalRecordLocationAssociatedWith(Location location) {
         if (location == null) {
