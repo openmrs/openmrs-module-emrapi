@@ -28,7 +28,7 @@ import org.openmrs.module.webservices.rest.web.response.ResponseException;
 @Resource(name = RestConstants.VERSION_1 + "/procedure", supportedClass = Procedure.class, supportedOpenmrsVersions = {
 		"2.2 - 9.*" })
 public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
-	
+
 	@Override
 	public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
 		if (rep instanceof DefaultRepresentation || rep instanceof FullRepresentation) {
@@ -50,15 +50,14 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 			description.addProperty("outcomeCoded", Representation.REF);
 			description.addProperty("outcomeNonCoded");
 			description.addProperty("notes");
-			description.addProperty("formNamespace");
-			description.addProperty("formFieldPath");
+			description.addProperty("formNamespaceAndPath");
 			description.addProperty("voided");
 			description.addSelfLink();
 			return description;
 		}
 		return null;
 	}
-	
+
 	@Override
 	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
 		DelegatingResourceDescription description = new DelegatingResourceDescription();
@@ -77,16 +76,15 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 		description.addProperty("outcomeCoded");
 		description.addProperty("outcomeNonCoded");
 		description.addProperty("notes");
-		description.addProperty("formNamespace");
-		description.addProperty("formFieldPath");
+		description.addProperty("formNamespaceAndPath");
 		return description;
 	}
-	
+
 	@Override
 	public DelegatingResourceDescription getUpdatableProperties() throws ResourceDoesNotSupportOperationException {
 		return getCreatableProperties();
 	}
-	
+
 	@PropertyGetter("display")
 	public String getDisplay(Procedure procedure) {
 		if (procedure.getProcedureCoded() != null) {
@@ -97,46 +95,46 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 		}
 		return procedure.getUuid();
 	}
-	
+
 	@Override
 	public Procedure newDelegate() {
 		return new Procedure();
 	}
-	
+
 	@Override
 	public Procedure save(Procedure procedure) {
 		return Context.getService(ProcedureService.class).saveProcedure(procedure);
 	}
-	
+
 	@Override
 	public Procedure getByUniqueId(String uuid) {
 		return Context.getService(ProcedureService.class).getProcedureByUuid(uuid);
 	}
-	
+
 	@Override
 	protected PageableResult doSearch(RequestContext context) throws ResponseException {
 		String patientUuid = context.getParameter("patient");
 		boolean includeVoided = Boolean.parseBoolean(context.getParameter("includeVoided"));
 		Integer firstResult = context.getStartIndex();
 		Integer maxResults = context.getLimit();
-		
+
 		if (patientUuid == null) {
 			throw new ResourceDoesNotSupportOperationException("Procedure.error.patientRequired");
 		}
-		
+
 		Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
 		if (patient == null) {
 			throw new APIException("Procedure.error.patientNotFound");
 		}
-		
+
 		Long totalCount = Context.getService(ProcedureService.class).getProcedureCountByPatient(patient, includeVoided);
 		boolean hasMore = maxResults != null && firstResult != null && (firstResult + maxResults) < totalCount;
-		
+
 		return new AlreadyPaged<>(context,
 				Context.getService(ProcedureService.class)
 						.getProceduresByPatient(patient, includeVoided, firstResult, maxResults), hasMore, totalCount);
 	}
-	
+
 	@Override
 	protected void delete(Procedure procedure, String reason, RequestContext context) throws ResponseException {
 		if (reason == null || reason.trim().isEmpty()) {
@@ -144,7 +142,7 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 		}
 		Context.getService(ProcedureService.class).voidProcedure(procedure, reason);
 	}
-	
+
 	@Override
 	public void purge(Procedure procedure, RequestContext context) throws ResponseException {
 		Context.getService(ProcedureService.class).purgeProcedure(procedure);
