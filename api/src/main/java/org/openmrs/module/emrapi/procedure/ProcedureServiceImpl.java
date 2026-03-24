@@ -12,12 +12,6 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -70,8 +64,13 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 		
 		if (procedure.getEstimatedStartDate() != null) {
 			log.debug("Calculating startDateTime from estimatedStartDate: {}", procedure.getEstimatedStartDate());
-			Date calculatedStartDateTime = getDateTimeFromEstimatedDate(procedure.getEstimatedStartDate());
+			Date calculatedStartDateTime = ProcedureUtil.getDateTimeFromEstimatedDate(procedure.getEstimatedStartDate());
 			procedure.setStartDateTime(calculatedStartDateTime);
+		}
+		
+		if (procedure.getEndDateTime() != null && procedure.getEndDateTime().before(procedure.getStartDateTime())) {
+			log.warn("End date {} is before start date {}", procedure.getEndDateTime(), procedure.getStartDateTime());
+			throw new APIException("Procedure.error.endDateBeforeStartDate");
 		}
 		
 		return procedureDAO.saveOrUpdateProcedureType(procedure);
@@ -156,49 +155,5 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	public void purgeProcedureType(ProcedureType procedureType) {
 		log.info("Purging procedure type: {}", procedureType.getName());
 		procedureDAO.deleteProcedureType(procedureType);
-	}
-	
-	Date getDateTimeFromEstimatedDate(String estimatedDate) {
-		try {
-			// Full datetime
-			if (estimatedDate.length() > 10) {
-				LocalDateTime dateTime = LocalDateTime.parse(estimatedDate);
-				return Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
-			}
-			
-			// yyyy-MM-dd
-			if (estimatedDate.length() == 10) {
-				LocalDate date = LocalDate.parse(estimatedDate);
-				return Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
-			}
-			
-			// yyyy-MM
-			if (estimatedDate.length() == 7) {
-				YearMonth ym = YearMonth.parse(estimatedDate);
-				return Date.from(
-						ym.atDay(1)
-								.atStartOfDay(ZoneId.systemDefault())
-								.toInstant()
-				);
-			}
-			
-			// yyyy
-			if (estimatedDate.length() == 4) {
-				Year year = Year.parse(estimatedDate);
-				return Date.from(
-						year.atMonth(1)
-								.atDay(1)
-								.atStartOfDay(ZoneId.systemDefault())
-								.toInstant()
-				);
-			}
-			
-			throw new APIException("Procedure.error.invalidEstimateDate", new Object[] { estimatedDate });
-			
-		}
-		catch (DateTimeParseException e) {
-			log.warn("Failed to parse estimated date: {}, error: {}", estimatedDate, e.getMessage());
-			throw new APIException("Procedure.error.invalidEstimateDate", new Object[] { estimatedDate }, e);
-		}
 	}
 }

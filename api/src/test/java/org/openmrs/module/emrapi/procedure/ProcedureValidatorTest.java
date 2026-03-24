@@ -14,6 +14,8 @@ import org.openmrs.Patient;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Errors;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -133,6 +135,40 @@ class ProcedureValidatorTest {
 		validator.validate(procedure, errors);
 		assertFalse(hasErrorCode("Procedure.error.startDateTimeRequired"));
 		assertFalse(hasErrorCode("Procedure.error.startDateTimeAndEstimatedDateMutuallyExclusive"));
+	}
+	
+	// should fail if both start date and estimated start date are provided for a new procedure
+	@Test
+	void validate_shouldRejectWhenBothStartDateTimeAndEstimatedStartDateAreProvidedForNewProcedure(){
+		procedure.setStartDateTime(new Date());
+		procedure.setEstimatedStartDate("2024-01");
+		procedure.setProcedureId(null); // Simulate new procedure
+		validator.validate(procedure, errors);
+		assertTrue(hasErrorCode("Procedure.error.startDateTimeAndEstimatedDateMutuallyExclusiveForNewProcedures"));
+	}
+	
+	// should fail if end date is before start date
+	@Test
+	void validate_shouldRejectWhenEndDateTimeIsBeforeStartDateTime() {
+		procedure.setStartDateTime(new Date());
+		procedure.setEndDateTime(new Date(procedure.getStartDateTime().getTime() - 1000)); // 1 second before start
+		validator.validate(procedure, errors);
+		assertTrue(hasErrorCode("Procedure.error.endDateTimeBeforeStartDateTime"));
+	}
+	
+	// should fail if end date is before estimated start date
+	@Test
+	void validate_shouldRejectWhenEndDateTimeIsBeforeEstimatedStartDate() {
+		procedure.setEstimatedStartDate("2024-01");
+		// 2023-10-01 is before 2024-01
+		procedure.setEndDateTime(
+				Date.from(LocalDate.of(2023, 10, 1)
+								.atStartOfDay(ZoneId.systemDefault())
+								.toInstant()
+				)
+		);
+		validator.validate(procedure, errors);
+		assertTrue(hasErrorCode("Procedure.error.endDateTimeBeforeStartDateTime"));
 	}
 	
 	@Test

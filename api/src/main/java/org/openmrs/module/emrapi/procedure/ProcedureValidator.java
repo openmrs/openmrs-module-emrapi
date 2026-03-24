@@ -6,6 +6,8 @@ import org.openmrs.annotation.Handler;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.util.Date;
+
 /**
  * Validator for {@link Procedure} objects.
  *
@@ -36,6 +38,17 @@ public class ProcedureValidator implements Validator {
 			if (procedure.getProcedureCoded() != null && StringUtils.isNotBlank(procedure.getProcedureNonCoded())) {
 				errors.reject("Procedure.error.procedureCodedAndNonCodedMutuallyExclusive");
 			}
+			if (procedure.getEndDateTime() != null) {
+				Date startDateTime = procedure.getStartDateTime();
+				// Calculate startDateTime from estimatedStartDate if provided
+				if (procedure.getEstimatedStartDate() != null) {
+					startDateTime = ProcedureUtil.getDateTimeFromEstimatedDate(procedure.getEstimatedStartDate());
+				}
+				
+				if (procedure.getEndDateTime().before(startDateTime)) {
+					errors.reject("Procedure.error.endDateTimeBeforeStartDateTime");
+				}
+			}
 			if (procedure.getBodySite() == null) {
 				errors.reject("Procedure.error.bodySiteRequired");
 			}
@@ -55,7 +68,7 @@ public class ProcedureValidator implements Validator {
 				errors.reject("Procedure.error.procedureTypeRequired");
 			}
 			
-			// Rules for new procedures only
+			// Rules which applied only for new procedures
 			if (procedure.getProcedureId() == null) {
 				if (procedure.getProcedureType() != null && procedure.getProcedureType().getRetired()) {
 					errors.reject("Procedure.error.procedureTypeRetired");
