@@ -6,7 +6,7 @@
  */
 package org.openmrs.module.emrapi.procedure;
 
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.openmrs.Patient;
@@ -21,13 +21,14 @@ import java.util.List;
 
 /**
  * Hibernate implementation of {@link ProcedureDAO}.
+ *
  * @since 3.3.0
  */
-@Setter
+@RequiredArgsConstructor
 @Slf4j
 public class HibernateProcedureDAO implements ProcedureDAO {
 	
-	private SessionFactory sessionFactory;
+	private final SessionFactory sessionFactory;
 	
 	private EntityManager getEntityManager() {
 		return sessionFactory.getCurrentSession();

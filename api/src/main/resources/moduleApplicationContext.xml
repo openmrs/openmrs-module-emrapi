@@ -526,9 +526,7 @@
 
     <!-- Procedure DAO -->
     <bean id="procedureDAO" class="org.openmrs.module.emrapi.procedure.HibernateProcedureDAO">
-        <property name="sessionFactory">
-            <ref bean="sessionFactory"/>
-        </property>
+        <constructor-arg ref="sessionFactory"/>
     </bean>
 
     <bean id="procedureValidator" class="org.openmrs.module.emrapi.procedure.ProcedureValidator"/>
