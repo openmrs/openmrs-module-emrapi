@@ -8,11 +8,10 @@ package org.openmrs.module.emrapi.procedure;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.openmrs.BaseOpenmrsData;
+import org.openmrs.BaseFormRecordableOpenmrsData;
 import org.openmrs.Concept;
 import org.openmrs.Duration;
 import org.openmrs.Encounter;
-import org.openmrs.FormRecordable;
 import org.openmrs.Patient;
 
 import javax.persistence.Column;
@@ -34,7 +33,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "emrapi_procedure")
-public class Procedure extends BaseOpenmrsData implements FormRecordable {
+public class Procedure extends BaseFormRecordableOpenmrsData {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -96,34 +95,11 @@ public class Procedure extends BaseOpenmrsData implements FormRecordable {
 	
 	@Column(name = "notes", columnDefinition = "TEXT")
 	private String notes;
-	
-	// FormRecordable fields
-	@Column(name = "form_namespace", length = 255)
-	private String formNamespace;
-	
-	@Column(name = "form_field_path", length = 255)
-	private String formFieldPath;
-	
+
 	// Default constructor required by Hibernate
 	public Procedure() {
 	}
-	
-	@Override
-	public String getFormFieldNamespace() {
-		return formNamespace;
-	}
-	
-	@Override
-	public String getFormFieldPath() {
-		return formFieldPath;
-	}
-	
-	@Override
-	public void setFormField(String namespace, String path) {
-		this.formNamespace = namespace;
-		this.formFieldPath = path;
-	}
-	
+
 	@Override
 	public Integer getId() {
 		return procedureId;

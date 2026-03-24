@@ -147,10 +147,7 @@
             </column>
 
             <!-- FormRecordable support -->
-            <column name="form_namespace" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-            <column name="form_field_path" type="varchar(255)">
+            <column name="form_namespace_and_path" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
 
