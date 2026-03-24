@@ -221,6 +221,13 @@
                 referencedColumnNames="concept_id"/>
 
         <addForeignKeyConstraint
+                constraintName="fk_procedure_duration_unit_coded"
+                baseTableName="emrapi_procedure"
+                baseColumnNames="duration_unit_coded"
+                referencedTableName="concept"
+                referencedColumnNames="concept_id"/>
+
+        <addForeignKeyConstraint
                 constraintName="fk_procedure_outcome"
                 baseTableName="emrapi_procedure"
                 baseColumnNames="outcome_coded"

@@ -153,7 +153,7 @@ class ProcedureServiceTest {
 		
 		@BeforeEach
 		void setUp() {
-			when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+			when(procedureDAO.saveOrUpdateProcedureType(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
 		}
 		
 		private Date toDate(LocalDateTime ldt) {
@@ -201,7 +201,7 @@ class ProcedureServiceTest {
 			
 			procedureService.saveProcedure(procedure);
 			
-			verify(procedureDAO).saveOrUpdateProcedure(procedure);
+			verify(procedureDAO).saveOrUpdateProcedureType(procedure);
 		}
 	}
 	
@@ -295,12 +295,12 @@ class ProcedureServiceTest {
 		@Test
 		void shouldDelegateToDAO() {
 			Procedure procedure = new Procedure();
-			when(procedureDAO.saveOrUpdateProcedure(procedure)).thenReturn(procedure);
+			when(procedureDAO.saveOrUpdateProcedureType(procedure)).thenReturn(procedure);
 			
 			Procedure result = procedureService.voidProcedure(procedure, "test reason");
 			
 			assertEquals(procedure, result);
-			verify(procedureDAO).saveOrUpdateProcedure(procedure);
+			verify(procedureDAO).saveOrUpdateProcedureType(procedure);
 		}
 	}
 	
@@ -313,7 +313,7 @@ class ProcedureServiceTest {
 			procedure.setVoided(true);
 			procedure.setVoidReason("some reason");
 			procedure.setDateVoided(new Date());
-			when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+			when(procedureDAO.saveOrUpdateProcedureType(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
 			
 			Procedure result = procedureService.unvoidProcedure(procedure);
 			
@@ -327,11 +327,11 @@ class ProcedureServiceTest {
 		void shouldDelegateToDAO() {
 			Procedure procedure = new Procedure();
 			procedure.setVoided(true);
-			when(procedureDAO.saveOrUpdateProcedure(any(Procedure.class))).thenReturn(procedure);
+			when(procedureDAO.saveOrUpdateProcedureType(any(Procedure.class))).thenReturn(procedure);
 			
 			procedureService.unvoidProcedure(procedure);
 			
-			verify(procedureDAO).saveOrUpdateProcedure(procedure);
+			verify(procedureDAO).saveOrUpdateProcedureType(procedure);
 		}
 	}
 	
@@ -354,12 +354,12 @@ class ProcedureServiceTest {
 		@Test
 		void shouldDelegateToDAO() {
 			ProcedureType type = new ProcedureType("Test", "Test type");
-			when(procedureDAO.saveOrUpdateProcedure(type)).thenReturn(type);
+			when(procedureDAO.saveOrUpdateProcedureType(type)).thenReturn(type);
 			
 			ProcedureType result = procedureService.saveProcedureType(type);
 			
 			assertEquals(type, result);
-			verify(procedureDAO).saveOrUpdateProcedure(type);
+			verify(procedureDAO).saveOrUpdateProcedureType(type);
 		}
 	}
 	
@@ -411,13 +411,13 @@ class ProcedureServiceTest {
 		@Test
 		void shouldSetRetiredFieldsAndDelegateToDAO() {
 			ProcedureType type = new ProcedureType("Test", "Test type");
-			when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
+			when(procedureDAO.saveOrUpdateProcedureType(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
 			
 			ProcedureType result = procedureService.retireProcedureType(type, "no longer needed");
 			
 			assertTrue(result.getRetired());
 			assertEquals("no longer needed", result.getRetireReason());
-			verify(procedureDAO).saveOrUpdateProcedure(type);
+			verify(procedureDAO).saveOrUpdateProcedureType(type);
 		}
 	}
 	
@@ -430,7 +430,7 @@ class ProcedureServiceTest {
 			type.setRetired(true);
 			type.setRetireReason("some reason");
 			type.setDateRetired(new Date());
-			when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
+			when(procedureDAO.saveOrUpdateProcedureType(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
 			
 			ProcedureType result = procedureService.unretireProcedureType(type);
 			
@@ -444,11 +444,11 @@ class ProcedureServiceTest {
 		void shouldDelegateToDAO() {
 			ProcedureType type = new ProcedureType("Test", "Test type");
 			type.setRetired(true);
-			when(procedureDAO.saveOrUpdateProcedure(any(ProcedureType.class))).thenReturn(type);
+			when(procedureDAO.saveOrUpdateProcedureType(any(ProcedureType.class))).thenReturn(type);
 			
 			procedureService.unretireProcedureType(type);
 			
-			verify(procedureDAO).saveOrUpdateProcedure(type);
+			verify(procedureDAO).saveOrUpdateProcedureType(type);
 		}
 	}
 	

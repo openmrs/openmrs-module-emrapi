@@ -53,7 +53,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	}
 	
 	@Override
-	public Procedure saveOrUpdateProcedure(Procedure procedure) {
+	public Procedure saveOrUpdateProcedureType(Procedure procedure) {
 		log.debug("Saving or updating procedure: {}", procedure.getUuid());
 		return getEntityManager().merge(procedure);
 	}
@@ -110,7 +110,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	@Override
 	public void deleteProcedure(Procedure procedure) {
 		log.debug("Deleting procedure: {}", procedure.getUuid());
-		sessionFactory.getCurrentSession().delete(procedure);
+		getEntityManager().remove(procedure);
 	}
 	
 	@Override
@@ -145,15 +145,21 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	public List<ProcedureType> getAllProcedureTypes(boolean includeRetired) {
 		log.debug("Getting all procedure types, includeRetired: {}", includeRetired);
 		
-		String jpql = "SELECT pt FROM ProcedureType pt"
-				+ (includeRetired ? "" : " WHERE pt.retired = false")
-				+ " ORDER BY pt.name ASC";
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+		CriteriaQuery<ProcedureType> criteria = builder.createQuery(ProcedureType.class);
+		Root<ProcedureType> root = criteria.from(ProcedureType.class);
 		
-		return getEntityManager().createQuery(jpql, ProcedureType.class).getResultList();
+		criteria.select(root);
+		if (!includeRetired) {
+			criteria.where(builder.isFalse(root.get("retired")));
+		}
+		criteria.orderBy(builder.asc(root.get("name")));
+		
+		return getEntityManager().createQuery(criteria).getResultList();
 	}
 	
 	@Override
-	public ProcedureType saveOrUpdateProcedure(ProcedureType procedureType) {
+	public ProcedureType saveOrUpdateProcedureType(ProcedureType procedureType) {
 		log.debug("Saving or updating procedure type: {}", procedureType.getName());
 		return getEntityManager().merge(procedureType);
 	}
@@ -161,6 +167,6 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	@Override
 	public void deleteProcedureType(ProcedureType procedureType) {
 		log.debug("Deleting procedure type: {}", procedureType.getName());
-		sessionFactory.getCurrentSession().delete(procedureType);
+		getEntityManager().remove(procedureType);
 	}
 }

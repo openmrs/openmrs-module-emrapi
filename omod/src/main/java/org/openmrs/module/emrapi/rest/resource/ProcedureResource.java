@@ -129,12 +129,12 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 			throw new APIException("Procedure.error.patientNotFound");
 		}
 		
-		Long count = Context.getService(ProcedureService.class).getProcedureCountByPatient(patient, includeVoided);
-		boolean hasMore = maxResults != null && firstResult != null && (firstResult + maxResults) < count;
+		Long totalCount = Context.getService(ProcedureService.class).getProcedureCountByPatient(patient, includeVoided);
+		boolean hasMore = maxResults != null && firstResult != null && (firstResult + maxResults) < totalCount;
 		
 		return new AlreadyPaged<>(context,
 				Context.getService(ProcedureService.class)
-						.getProceduresByPatient(patient, includeVoided, firstResult, maxResults), hasMore);
+						.getProceduresByPatient(patient, includeVoided, firstResult, maxResults), hasMore, totalCount);
 	}
 	
 	@Override

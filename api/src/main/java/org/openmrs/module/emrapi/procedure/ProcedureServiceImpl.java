@@ -74,7 +74,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 			procedure.setStartDateTime(calculatedStartDateTime);
 		}
 		
-		return procedureDAO.saveOrUpdateProcedure(procedure);
+		return procedureDAO.saveOrUpdateProcedureType(procedure);
 	}
 	
 	@Override
@@ -86,7 +86,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 		procedure.setDateVoided(null);
 		procedure.setVoidedBy(null);
 		
-		return procedureDAO.saveOrUpdateProcedure(procedure);
+		return procedureDAO.saveOrUpdateProcedureType(procedure);
 	}
 	
 	@Override
@@ -98,7 +98,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Override
 	public Procedure voidProcedure(Procedure procedure, String reason) {
 		log.info("Voiding procedure: {} with reason: {}", procedure.getUuid(), reason);
-		return procedureDAO.saveOrUpdateProcedure(procedure);
+		return procedureDAO.saveOrUpdateProcedureType(procedure);
 	}
 	
 	@Override
@@ -110,7 +110,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Override
 	public ProcedureType saveProcedureType(ProcedureType procedureType) {
 		log.info("Saving procedure type: {}", procedureType.getName());
-		return procedureDAO.saveOrUpdateProcedure(procedureType);
+		return procedureDAO.saveOrUpdateProcedureType(procedureType);
 	}
 	
 	@Override
@@ -139,7 +139,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 		log.info("Retiring procedure type: {} with reason: {}", procedureType.getName(), reason);
 		procedureType.setRetired(true);
 		procedureType.setRetireReason(reason);
-		return procedureDAO.saveOrUpdateProcedure(procedureType);
+		return procedureDAO.saveOrUpdateProcedureType(procedureType);
 	}
 	
 	@Override
@@ -149,7 +149,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 		procedureType.setRetireReason(null);
 		procedureType.setDateRetired(null);
 		procedureType.setRetiredBy(null);
-		return procedureDAO.saveOrUpdateProcedure(procedureType);
+		return procedureDAO.saveOrUpdateProcedureType(procedureType);
 	}
 	
 	@Override
