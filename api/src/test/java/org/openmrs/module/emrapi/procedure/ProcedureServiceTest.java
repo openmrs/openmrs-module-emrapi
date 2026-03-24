@@ -223,22 +223,6 @@ class ProcedureServiceTest {
 	class UnvoidProcedure {
 		
 		@Test
-		void shouldClearVoidFields() {
-			Procedure procedure = new Procedure();
-			procedure.setVoided(true);
-			procedure.setVoidReason("some reason");
-			procedure.setDateVoided(new Date());
-			when(procedureDAO.saveOrUpdateProcedureType(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
-			
-			Procedure result = procedureService.unvoidProcedure(procedure);
-			
-			assertFalse(result.getVoided());
-			assertNull(result.getVoidReason());
-			assertNull(result.getDateVoided());
-			assertNull(result.getVoidedBy());
-		}
-		
-		@Test
 		void shouldDelegateToDAO() {
 			Procedure procedure = new Procedure();
 			procedure.setVoided(true);
@@ -328,32 +312,13 @@ class ProcedureServiceTest {
 			ProcedureType type = new ProcedureType("Test", "Test type");
 			when(procedureDAO.saveOrUpdateProcedureType(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
 			
-			ProcedureType result = procedureService.retireProcedureType(type, "no longer needed");
-			
-			assertTrue(result.getRetired());
-			assertEquals("no longer needed", result.getRetireReason());
+			procedureService.retireProcedureType(type, "no longer needed");
 			verify(procedureDAO).saveOrUpdateProcedureType(type);
 		}
 	}
 	
 	@Nested
 	class UnretireProcedureType {
-		
-		@Test
-		void shouldClearRetiredFields() {
-			ProcedureType type = new ProcedureType("Test", "Test type");
-			type.setRetired(true);
-			type.setRetireReason("some reason");
-			type.setDateRetired(new Date());
-			when(procedureDAO.saveOrUpdateProcedureType(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
-			
-			ProcedureType result = procedureService.unretireProcedureType(type);
-			
-			assertFalse(result.getRetired());
-			assertNull(result.getRetireReason());
-			assertNull(result.getDateRetired());
-			assertNull(result.getRetiredBy());
-		}
 		
 		@Test
 		void shouldDelegateToDAO() {

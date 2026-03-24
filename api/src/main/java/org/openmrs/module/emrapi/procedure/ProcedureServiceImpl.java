@@ -88,12 +88,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURES)
 	public Procedure unvoidProcedure(Procedure procedure) {
 		log.info("Unvoiding procedure: {}", procedure.getUuid());
-		
-		procedure.setVoided(false);
-		procedure.setVoidReason(null);
-		procedure.setDateVoided(null);
-		procedure.setVoidedBy(null);
-		
 		return procedureDAO.saveOrUpdateProcedureType(procedure);
 	}
 	
@@ -154,8 +148,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType retireProcedureType(ProcedureType procedureType, String reason) {
 		log.info("Retiring procedure type: {} with reason: {}", procedureType.getName(), reason);
-		procedureType.setRetired(true);
-		procedureType.setRetireReason(reason);
 		return procedureDAO.saveOrUpdateProcedureType(procedureType);
 	}
 	
@@ -163,10 +155,6 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType unretireProcedureType(ProcedureType procedureType) {
 		log.info("Unretiring procedure type: {}", procedureType.getName());
-		procedureType.setRetired(false);
-		procedureType.setRetireReason(null);
-		procedureType.setDateRetired(null);
-		procedureType.setRetiredBy(null);
 		return procedureDAO.saveOrUpdateProcedureType(procedureType);
 	}
 	
