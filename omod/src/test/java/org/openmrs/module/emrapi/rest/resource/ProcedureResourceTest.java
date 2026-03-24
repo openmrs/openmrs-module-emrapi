@@ -6,10 +6,12 @@
  */
 package org.openmrs.module.emrapi.rest.resource;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.procedure.Procedure;
@@ -333,11 +335,11 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 	@Nested
 	@DisplayName("purge")
 	class Purge {
-		
+
 		@Test
 		void shouldPermanentlyDeleteProcedure() throws Exception {
 			resource.purge(EXISTING_PROCEDURE_UUID, new RequestContext());
-			
+
 			Procedure purged = Context.getService(ProcedureService.class).getProcedureByUuid(EXISTING_PROCEDURE_UUID);
 			assertNull(purged);
 		}

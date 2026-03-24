@@ -8,8 +8,10 @@ package org.openmrs.module.emrapi.procedure;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openmrs.Patient;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.emrapi.PrivilegeConstants;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -30,6 +32,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURES)
 	@Transactional(readOnly = true)
 	public Procedure getProcedure(Integer id) {
 		log.debug("Getting procedure by id: {}", id);
@@ -37,6 +40,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURES)
 	@Transactional(readOnly = true)
 	public Procedure getProcedureByUuid(String uuid) {
 		log.debug("Getting procedure by uuid: {}", uuid);
@@ -44,6 +48,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURES)
 	@Transactional(readOnly = true)
 	public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult,
 			Integer maxResults) {
@@ -53,6 +58,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURES)
 	@Transactional(readOnly = true)
 	public Long getProcedureCountByPatient(Patient patient, boolean includeVoided) {
 		log.debug("Getting procedure count for patient: {}, includeVoided: {}", patient, includeVoided);
@@ -60,6 +66,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.MANAGE_PROCEDURES)
 	public Procedure saveProcedure(Procedure procedure) throws APIException {
 		log.info("Saving procedure: {}", procedure.getUuid());
 		
@@ -78,6 +85,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.MANAGE_PROCEDURES)
 	public Procedure unvoidProcedure(Procedure procedure) {
 		log.info("Unvoiding procedure: {}", procedure.getUuid());
 		
@@ -90,18 +98,21 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.PURGE_PROCEDURES)
 	public void purgeProcedure(Procedure procedure) throws APIException {
 		log.info("Purging procedure: {}", procedure.getUuid());
 		procedureDAO.deleteProcedure(procedure);
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.MANAGE_PROCEDURES)
 	public Procedure voidProcedure(Procedure procedure, String reason) {
 		log.info("Voiding procedure: {} with reason: {}", procedure.getUuid(), reason);
 		return procedureDAO.saveOrUpdateProcedureType(procedure);
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURE_TYPES)
 	@Transactional(readOnly = true)
 	public ProcedureType getProcedureType(Integer id) {
 		log.debug("Getting procedure type by id: {}", id);
@@ -109,12 +120,14 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType saveProcedureType(ProcedureType procedureType) {
 		log.info("Saving procedure type: {}", procedureType.getName());
 		return procedureDAO.saveOrUpdateProcedureType(procedureType);
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURE_TYPES)
 	@Transactional(readOnly = true)
 	public ProcedureType getProcedureTypeByUuid(String uuid) {
 		log.debug("Getting procedure type by uuid: {}", uuid);
@@ -122,6 +135,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURE_TYPES)
 	@Transactional(readOnly = true)
 	public List<ProcedureType> getProcedureTypesByName(String name) {
 		log.debug("Getting procedure type by name: {}", name);
@@ -129,6 +143,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.GET_PROCEDURE_TYPES)
 	@Transactional(readOnly = true)
 	public List<ProcedureType> getAllProcedureTypes(boolean includeRetired) {
 		log.debug("Getting all procedure types, includeRetired: {}", includeRetired);
@@ -136,6 +151,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType retireProcedureType(ProcedureType procedureType, String reason) {
 		log.info("Retiring procedure type: {} with reason: {}", procedureType.getName(), reason);
 		procedureType.setRetired(true);
@@ -144,6 +160,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType unretireProcedureType(ProcedureType procedureType) {
 		log.info("Unretiring procedure type: {}", procedureType.getName());
 		procedureType.setRetired(false);
@@ -154,6 +171,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Authorized(PrivilegeConstants.PURGE_PROCEDURE_TYPES)
 	public void purgeProcedureType(ProcedureType procedureType) {
 		log.info("Purging procedure type: {}", procedureType.getName());
 		procedureDAO.deleteProcedureType(procedureType);

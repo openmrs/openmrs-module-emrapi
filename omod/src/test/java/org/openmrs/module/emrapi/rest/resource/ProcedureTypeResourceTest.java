@@ -6,13 +6,15 @@
  */
 package org.openmrs.module.emrapi.rest.resource;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.openmrs.api.APIAuthenticationException;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.procedure.ProcedureService;
 import org.openmrs.module.webservices.rest.web.response.ConversionException;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.procedure.ProcedureType;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
@@ -181,11 +183,11 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 	@Nested
 	@DisplayName("purge")
 	class Purge {
-		
+
 		@Test
 		void shouldPermanentlyDeleteProcedureType() {
 			resource.purge(CURRENT_TYPE_UUID, new RequestContext());
-			
+
 			ProcedureType purged = Context.getService(ProcedureService.class).getProcedureTypeByUuid(CURRENT_TYPE_UUID);
 			assertNull(purged);
 		}
