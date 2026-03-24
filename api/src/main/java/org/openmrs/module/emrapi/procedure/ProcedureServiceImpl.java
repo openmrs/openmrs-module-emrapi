@@ -53,6 +53,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public Long getProcedureCountByPatient(Patient patient, boolean includeVoided) {
 		log.debug("Getting procedure count for patient: {}, includeVoided: {}", patient, includeVoided);
 		return procedureDAO.getProcedureCountByPatient(patient, includeVoided);
@@ -101,6 +102,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
 	public ProcedureType getProcedureType(Integer id) {
 		log.debug("Getting procedure type by id: {}", id);
 		return procedureDAO.getProcedureType(id);
