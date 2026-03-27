@@ -26,6 +26,10 @@ import org.openmrs.module.emrapi.adt.exception.ExistingVisitDuringTimePeriodExce
 import org.openmrs.module.emrapi.merge.PatientMergeAction;
 import org.openmrs.module.emrapi.merge.VisitMergeAction;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
+import org.openmrs.annotation.Authorized;
+import org.openmrs.util.PrivilegeConstants;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.Collection;
 import java.util.Date;
@@ -52,6 +56,7 @@ import java.util.List;
  * tag.
  * </pre>
  */
+@Transactional(readOnly = true)
 public interface AdtService extends OpenmrsService {
 
     /**
@@ -62,6 +67,7 @@ public interface AdtService extends OpenmrsService {
      * @param department
      * @return
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     VisitDomainWrapper getActiveVisit(Patient patient, Location department);
 
 
@@ -71,6 +77,7 @@ public interface AdtService extends OpenmrsService {
      * @param visit
      * @return
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     boolean shouldBeClosed(Visit visit);
 
     /**
@@ -79,6 +86,8 @@ public interface AdtService extends OpenmrsService {
      * @param visit
      * @return
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     void closeAndSaveVisit(Visit visit);
 
     /**
@@ -90,6 +99,8 @@ public interface AdtService extends OpenmrsService {
      * @param department
      * @return
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     Visit ensureActiveVisit(Patient patient, Location department);
 
     /**
@@ -101,6 +112,8 @@ public interface AdtService extends OpenmrsService {
      * @param department
      * @return
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     Visit ensureVisit(Patient patient, Date visitTime, Location department);
 
     /**
@@ -115,6 +128,8 @@ public interface AdtService extends OpenmrsService {
      * @param newVisit                  says whether create a new visit or not
      * @return the encounter created (with EncounterService.saveEncounter already called on it)
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     Encounter checkInPatient(Patient patient, Location where, Provider checkInClerk, List<Obs> obsForCheckInEncounter,
                              List<Order> ordersForCheckInEncounter, boolean newVisit);
 
@@ -126,12 +141,14 @@ public interface AdtService extends OpenmrsService {
      * @return location, or its closest ancestor that supports visits
      * @throws IllegalArgumentException if neither location nor its ancestors support visits
      */
+    @Authorized()
     Location getLocationThatSupportsVisits(Location location);
 
     /**
      * @return all locations that are allowed to have visits assigned to them
      * @see org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS
      */
+    @Authorized()
     List<Location> getAllLocationsThatSupportVisits();
 
     /**
@@ -140,6 +157,7 @@ public interface AdtService extends OpenmrsService {
      * @param when
      * @return whether the given visit is suitable to store a patient interaction at the given location and date
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     boolean isSuitableVisit(Visit visit, Location location, Date when);
 
     /**
@@ -148,6 +166,7 @@ public interface AdtService extends OpenmrsService {
      * @param when
      * @return whether the given visit is suitable to store a patient interaction at the given location and date; returns true if this visit occurred on the the same day as the encounter, ignoring time
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     boolean isSuitableVisitIgnoringTime(Visit visit, Location location, Date when);
 
     /**
@@ -157,29 +176,35 @@ public interface AdtService extends OpenmrsService {
      * @param location
      * @return
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     List<VisitDomainWrapper> getActiveVisits(Location location);
 
     /**
      * If any currently-open visits are now inactive per our business logic, close them
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     void closeInactiveVisits();
 
     /**
      * @param patient
      * @return the most recent encounter for the given patient
      */
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     Encounter getLastEncounter(Patient patient);
 
     /**
      * @param patient
      * @return the number of non-voided encounters this patient has had
      */
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     int getCountOfEncounters(Patient patient);
 
     /**
      * @param patient
      * @return the number of non-voided visits this patient has had
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     int getCountOfVisits(Patient patient);
 
     /**
@@ -187,6 +212,7 @@ public interface AdtService extends OpenmrsService {
      * @param v2
      * @return true if both visits are in overlapping locations, and have overlapping datetime ranges
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     boolean visitsOverlap(Visit v1, Visit v2);
 
     /**
@@ -202,6 +228,8 @@ public interface AdtService extends OpenmrsService {
      * @see #visitsOverlap(org.openmrs.Visit, org.openmrs.Visit)
      * @see org.openmrs.api.PatientService#mergePatients(org.openmrs.Patient, org.openmrs.Patient)
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     void mergePatients(Patient preferred, Patient notPreferred);
 
     /**
@@ -213,6 +241,7 @@ public interface AdtService extends OpenmrsService {
      *
      * @param patientMergeAction
      */
+    @Authorized()
     void addPatientMergeAction(PatientMergeAction patientMergeAction);
 
     /**
@@ -221,6 +250,7 @@ public interface AdtService extends OpenmrsService {
      *
      * @param patientMergeAction
      */
+    @Authorized()
     void removePatientMergeAction(PatientMergeAction patientMergeAction);
 
     /**
@@ -232,6 +262,7 @@ public interface AdtService extends OpenmrsService {
      * @since 1.36.0
      * @param visitMergeAction
      */
+    @Authorized()
     void addVisitMergeAction(VisitMergeAction visitMergeAction);
 
     /**
@@ -241,6 +272,7 @@ public interface AdtService extends OpenmrsService {
      * @since 1.36.0
      * @param visitMergeAction
      */
+    @Authorized()
     void removeVisitMergeAction(VisitMergeAction visitMergeAction);
 
     /**
@@ -249,6 +281,8 @@ public interface AdtService extends OpenmrsService {
      * @param patient
      * @return a visit representing the newly merged visit
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     Visit mergeConsecutiveVisits(List<Integer> visits, Patient patient);
 
     /**
@@ -257,6 +291,8 @@ public interface AdtService extends OpenmrsService {
      * @param nonPreferred
      * @return a visit representing the newly merged visit
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     Visit mergeVisits(Visit preferred, Visit nonPreferred);
 
     /**
@@ -265,6 +301,7 @@ public interface AdtService extends OpenmrsService {
      * @param patient
      * @return a boolean indicating whether or not the visits are consecutives
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     boolean areConsecutiveVisits(List<Integer> visits, Patient patient);
 
     /**
@@ -273,6 +310,8 @@ public interface AdtService extends OpenmrsService {
      * @param action
      * @return the encounter representing this discharge
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     Encounter createAdtEncounterFor(AdtAction action);
 
     /**
@@ -281,6 +320,7 @@ public interface AdtService extends OpenmrsService {
      * @return
      */
     @Deprecated  // use new VisitDomainWrapperFactory instead (this service method has been delegated to use the new factory)
+    @Authorized(PrivilegeConstants.GET_VISITS)
     VisitDomainWrapper wrap(Visit visit);
 
     /**
@@ -289,6 +329,7 @@ public interface AdtService extends OpenmrsService {
      * @return
      */
     @Deprecated
+    @Authorized(PrivilegeConstants.GET_VISITS)
     List<VisitDomainWrapper> getInpatientVisits(Location visitLocation, Location ward);
 
     /**
@@ -304,6 +345,8 @@ public interface AdtService extends OpenmrsService {
      * @should throw ExistingVisitDuringTimePeriodException if existing visit during date range
      * @return the created visit
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.ADD_VISITS)
     VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
         throws ExistingVisitDuringTimePeriodException;
 
@@ -317,6 +360,7 @@ public interface AdtService extends OpenmrsService {
      * @param stopDatetime
      * @return
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     List<VisitDomainWrapper> getVisits(Patient patient, Location location, Date startDatetime, Date stopDatetime);
 
     /**
@@ -329,6 +373,7 @@ public interface AdtService extends OpenmrsService {
      * @param stopDatetime
      * @return
      */
+    @Authorized(PrivilegeConstants.GET_VISITS)
     boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
 
 
@@ -336,6 +381,7 @@ public interface AdtService extends OpenmrsService {
      * @return all locations that are tagged to support admissions
      * @see {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
      */
+    @Authorized()
     List<Location> getInpatientLocations();
 
     /**
@@ -346,6 +392,7 @@ public interface AdtService extends OpenmrsService {
      * @return List<Visit></Visit> of the matching visits
      */
     @Deprecated
+    @Authorized(PrivilegeConstants.GET_VISITS)
     List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds);
 
     /**
@@ -353,6 +400,7 @@ public interface AdtService extends OpenmrsService {
      * @param criteria - represents the criteria by which inpatient requests are searched and returned
      * @return List<InpatientRequest> of the matching InpatientRequests that match the criteria
      */
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     List<InpatientRequest> getInpatientRequests(InpatientRequestSearchCriteria criteria);
 
     /**
@@ -360,5 +408,6 @@ public interface AdtService extends OpenmrsService {
      * @param criteria - represents the criteria by which inpatient admissions are searched and returned
      * @return List<InpatientAdmission> of the matching InpatientAdmissions that match the criteria
      */
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     List<InpatientAdmission> getInpatientAdmissions(InpatientAdmissionSearchCriteria criteria);
 }
