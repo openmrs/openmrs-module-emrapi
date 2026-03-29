@@ -18,10 +18,10 @@ public interface EmrEncounterDAO {
      * @param obsConcept the concept associated with the obs
      * @param valueText the value text of the obs
      * @param encounterType optionally limit to encounters of a certain type
-     * @param includeVoided whether or not to include voided obs
+     * @param includeAll whether or not to include voided obs
      * @return
      */
-    List<Encounter> getEncountersByObsValueText(Patient patient, Concept obsConcept, String valueText, EncounterType encounterType, boolean includeVoided);
+    List<Encounter> getEncountersByObsValueText(Patient patient, Concept obsConcept, String valueText, EncounterType encounterType, boolean includeAll);
 
     /**
      * Returns all encounters that have an obs with the specified value text
@@ -29,9 +29,9 @@ public interface EmrEncounterDAO {
      * @param obsConcept the concept associated with the obs
      * @param valueText the value text of the obs
      * @param encounterType optionally limit to encounters of a certain type
-     * @param includeVoided whether or not to include voided obs
+     * @param includeAll whether or not to include voided obs
      * @return
      */
-    List<Encounter> getEncountersByObsValueText(Concept obsConcept, String valueText, EncounterType encounterType, boolean includeVoided);
+    List<Encounter> getEncountersByObsValueText(Concept obsConcept, String valueText, EncounterType encounterType, boolean includeAll);
 
 }

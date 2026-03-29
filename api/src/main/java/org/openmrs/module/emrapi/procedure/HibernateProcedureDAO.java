@@ -60,16 +60,16 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	}
 	
 	@Override
-	public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult,
+	public List<Procedure> getProceduresByPatient(Patient patient, boolean includeAll, Integer firstResult,
 			Integer maxResults) {
-		log.debug("Getting procedures for patient: {}, includeVoided: {}", patient, includeVoided);
+		log.debug("Getting procedures for patient: {}, includeAll: {}", patient, includeAll);
 		
 		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 		CriteriaQuery<Procedure> criteria = builder.createQuery(Procedure.class);
 		Root<Procedure> root = criteria.from(Procedure.class);
 		
 		Predicate predicate = builder.equal(root.get("patient"), patient);
-		if (!includeVoided) {
+		if (!includeAll) {
 			predicate = builder.and(predicate, builder.isFalse(root.get("voided")));
 		}
 		criteria.select(root)
@@ -89,15 +89,15 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	}
 	
 	@Override
-	public Long getProcedureCountByPatient(Patient patient, boolean includeVoided) {
-		log.debug("Getting procedure count for patient: {}, includeVoided: {}", patient, includeVoided);
+	public Long getProcedureCountByPatient(Patient patient, boolean includeAll) {
+		log.debug("Getting procedure count for patient: {}, includeAll: {}", patient, includeAll);
 		
 		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 		CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
 		Root<Procedure> root = criteria.from(Procedure.class);
 		
 		Predicate predicate = builder.equal(root.get("patient"), patient);
-		if (!includeVoided) {
+		if (!includeAll) {
 			predicate = builder.and(predicate, builder.isFalse(root.get("voided")));
 		}
 		criteria.select(builder.count(root))
@@ -143,15 +143,15 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	}
 	
 	@Override
-	public List<ProcedureType> getAllProcedureTypes(boolean includeRetired) {
-		log.debug("Getting all procedure types, includeRetired: {}", includeRetired);
+	public List<ProcedureType> getAllProcedureTypes(boolean includeAll) {
+		log.debug("Getting all procedure types, includeAll: {}", includeAll);
 		
 		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 		CriteriaQuery<ProcedureType> criteria = builder.createQuery(ProcedureType.class);
 		Root<ProcedureType> root = criteria.from(ProcedureType.class);
 		
 		criteria.select(root);
-		if (!includeRetired) {
+		if (!includeAll) {
 			criteria.where(builder.isFalse(root.get("retired")));
 		}
 		criteria.orderBy(builder.asc(root.get("name")));

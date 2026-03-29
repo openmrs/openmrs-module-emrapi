@@ -70,7 +70,7 @@ public class EmrEncounterDAOComponentTest extends BaseModuleContextSensitiveTest
     }
 
     @Test
-    public void getEncountersByObsValueText_shouldIncludeVoidedObsIfIncludeVoidedTrue() {
+    public void getEncountersByObsValueText_shouldIncludeAllObsIfIncludeAllTrue() {
         List<Encounter> encounters = emrEncounterDAO.getEncountersByObsValueText(null, "some test value", null, true);
         assertThat(encounters.size(), is(2));
     }

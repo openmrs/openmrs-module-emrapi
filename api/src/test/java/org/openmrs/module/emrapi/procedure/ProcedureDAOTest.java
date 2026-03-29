@@ -122,7 +122,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 		}
 		
 		@Test
-		void shouldIncludeVoidedWhenRequested() {
+		void shouldIncludeAllWhenRequested() {
 			List<Procedure> procedures = procedureDAO.getProceduresByPatient(patient, true, null, null);
 			
 			assertEquals(4, procedures.size());

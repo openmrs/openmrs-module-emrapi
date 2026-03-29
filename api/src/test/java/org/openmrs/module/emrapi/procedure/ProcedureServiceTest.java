@@ -194,7 +194,7 @@ class ProcedureServiceTest {
 		}
 		
 		@Test
-		void shouldPassIncludeVoidedToDAO() {
+		void shouldPassincludeAllToDAO() {
 			Patient patient = mock(Patient.class);
 			when(procedureDAO.getProceduresByPatient(patient, true, null, null)).thenReturn(Collections.emptyList());
 			
@@ -282,7 +282,7 @@ class ProcedureServiceTest {
 	class GetAllProcedureTypes {
 		
 		@Test
-		void shouldDelegateToDAOWithIncludeRetiredFalse() {
+		void shouldDelegateToDAOWithIncludeAllFalse() {
 			List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"), new ProcedureType("B", "b"));
 			when(procedureDAO.getAllProcedureTypes(false)).thenReturn(expected);
 			
@@ -293,7 +293,7 @@ class ProcedureServiceTest {
 		}
 		
 		@Test
-		void shouldDelegateToDAOWithIncludeRetiredTrue() {
+		void shouldDelegateToDAOWithIncludeAllTrue() {
 			List<ProcedureType> expected = Arrays.asList(new ProcedureType("A", "a"));
 			when(procedureDAO.getAllProcedureTypes(true)).thenReturn(expected);
 			

@@ -44,21 +44,21 @@ public interface ProcedureDAO {
 	 * Gets all procedures for a patient.
 	 *
 	 * @param patient the patient
-	 * @param includeVoided whether to include voided procedures
+	 * @param includeAll whether to include voided procedures
 	 * @param firstResult the index of the first result to return (for pagination), or null to return all
 	 * @param maxResults the maximum number of results to return (for pagination), or null to return all
 	 * @return list of procedures sorted by startDateTime descending
 	 */
-	List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult, Integer maxResults);
+	List<Procedure> getProceduresByPatient(Patient patient, boolean includeAll, Integer firstResult, Integer maxResults);
 	
 	/**
 	 * Gets count of procedures for a patient.
 	 *
 	 * @param patient the patient
-	 * @param includeVoided whether to include voided procedures
+	 * @param includeAll whether to include voided procedures
 	 * @return count of procedures for the patient
 	 */
-	Long getProcedureCountByPatient(Patient patient, boolean includeVoided);
+	Long getProcedureCountByPatient(Patient patient, boolean includeAll);
 	
 	/**
 	 * Deletes a procedure from the database.
@@ -95,10 +95,10 @@ public interface ProcedureDAO {
 	/**
 	 * Retrieves all {@link ProcedureType} records.
 	 *
-	 * @param includeRetired if {@code true}, retired procedure types are included in the results
+	 * @param includeAll if {@code true}, retired procedure types are included in the results
 	 * @return a list of {@link ProcedureType} records; never {@code null}
 	 */
-	List<ProcedureType> getAllProcedureTypes(boolean includeRetired);
+	List<ProcedureType> getAllProcedureTypes(boolean includeAll);
 	
 	/**
 	 * Persists a new {@link ProcedureType} or updates an existing one.

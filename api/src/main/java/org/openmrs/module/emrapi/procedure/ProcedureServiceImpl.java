@@ -50,19 +50,19 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Override
 	@Authorized(PrivilegeConstants.GET_PROCEDURES)
 	@Transactional(readOnly = true)
-	public List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult,
+	public List<Procedure> getProceduresByPatient(Patient patient, boolean includeAll, Integer firstResult,
 			Integer maxResults) {
-		log.debug("Getting procedures for patient: {}, includeVoided: {}, firstResult: {}, maxResults: {}", patient,
-				includeVoided, firstResult, maxResults);
-		return procedureDAO.getProceduresByPatient(patient, includeVoided, firstResult, maxResults);
+		log.debug("Getting procedures for patient: {}, includeAll: {}, firstResult: {}, maxResults: {}", patient,
+				includeAll, firstResult, maxResults);
+		return procedureDAO.getProceduresByPatient(patient, includeAll, firstResult, maxResults);
 	}
 	
 	@Override
 	@Authorized(PrivilegeConstants.GET_PROCEDURES)
 	@Transactional(readOnly = true)
-	public Long getProcedureCountByPatient(Patient patient, boolean includeVoided) {
-		log.debug("Getting procedure count for patient: {}, includeVoided: {}", patient, includeVoided);
-		return procedureDAO.getProcedureCountByPatient(patient, includeVoided);
+	public Long getProcedureCountByPatient(Patient patient, boolean includeAll) {
+		log.debug("Getting procedure count for patient: {}, includeAll: {}", patient, includeAll);
+		return procedureDAO.getProcedureCountByPatient(patient, includeAll);
 	}
 	
 	@Override
@@ -139,9 +139,9 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Override
 	@Authorized(PrivilegeConstants.GET_PROCEDURE_TYPES)
 	@Transactional(readOnly = true)
-	public List<ProcedureType> getAllProcedureTypes(boolean includeRetired) {
-		log.debug("Getting all procedure types, includeRetired: {}", includeRetired);
-		return procedureDAO.getAllProcedureTypes(includeRetired);
+	public List<ProcedureType> getAllProcedureTypes(boolean includeAll) {
+		log.debug("Getting all procedure types, includeAll: {}", includeAll);
+		return procedureDAO.getAllProcedureTypes(includeAll);
 	}
 	
 	@Override

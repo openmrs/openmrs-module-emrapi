@@ -22,7 +22,7 @@ public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
     }
 
     @Override
-    public List<Encounter> getEncountersByObsValueText(Patient patient, Concept obsConcept, String valueText, EncounterType encounterType, boolean includeVoided) {
+    public List<Encounter> getEncountersByObsValueText(Patient patient, Concept obsConcept, String valueText, EncounterType encounterType, boolean includeAll) {
 
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
 
@@ -31,7 +31,7 @@ public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
 
         criteria.add(Restrictions.eq("valueText", valueText));
 
-        if (!includeVoided) {
+        if (!includeAll) {
             criteria.add(Restrictions.eq("voided", false));
         }
 
@@ -53,8 +53,8 @@ public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
     }
 
     @Override
-    public List<Encounter> getEncountersByObsValueText(Concept obsConcept, String valueText, EncounterType encounterType, boolean includeVoided) {
-        return getEncountersByObsValueText(null, obsConcept, valueText, encounterType, includeVoided);
+    public List<Encounter> getEncountersByObsValueText(Concept obsConcept, String valueText, EncounterType encounterType, boolean includeAll) {
+        return getEncountersByObsValueText(null, obsConcept, valueText, encounterType, includeAll);
     }
 
 }

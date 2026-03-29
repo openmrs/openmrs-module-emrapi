@@ -114,7 +114,7 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 	@Override
 	protected PageableResult doSearch(RequestContext context) throws ResponseException {
 		String patientUuid = context.getParameter("patient");
-		boolean includeVoided = Boolean.parseBoolean(context.getParameter("includeVoided"));
+		boolean includeAll = Boolean.parseBoolean(context.getParameter("includeAll"));
 		Integer firstResult = context.getStartIndex();
 		Integer maxResults = context.getLimit();
 
@@ -127,12 +127,12 @@ public class ProcedureResource extends DataDelegatingCrudResource<Procedure> {
 			throw new APIException("Procedure.error.patientNotFound");
 		}
 
-		Long totalCount = Context.getService(ProcedureService.class).getProcedureCountByPatient(patient, includeVoided);
+		Long totalCount = Context.getService(ProcedureService.class).getProcedureCountByPatient(patient, includeAll);
 		boolean hasMore = maxResults != null && firstResult != null && (firstResult + maxResults) < totalCount;
 
 		return new AlreadyPaged<>(context,
 				Context.getService(ProcedureService.class)
-						.getProceduresByPatient(patient, includeVoided, firstResult, maxResults), hasMore, totalCount);
+						.getProceduresByPatient(patient, includeAll, firstResult, maxResults), hasMore, totalCount);
 	}
 
 	@Override

@@ -54,23 +54,23 @@ public interface ProcedureService extends OpenmrsService {
 	 * Gets all procedures for a patient, sorted by startDateTime descending.
 	 *
 	 * @param patient the patient
-	 * @param includeVoided whether to include voided procedures
+	 * @param includeAll whether to include voided procedures
 	 * @param firstResult the index of the first result to return (for pagination), or null to return all
 	 * @param maxResults the maximum number of results to return (for pagination), or null to return all
 	 * @return list of procedures
 	 */
 	@Authorized(PrivilegeConstants.GET_PROCEDURES)
-	List<Procedure> getProceduresByPatient(Patient patient, boolean includeVoided, Integer firstResult, Integer maxResults);
+	List<Procedure> getProceduresByPatient(Patient patient, boolean includeAll, Integer firstResult, Integer maxResults);
 
 	/**
 	 * Gets count of procedures for a patient.
 	 *
 	 * @param patient the patient
-	 * @param includeVoided whether to include voided procedures
+	 * @param includeAll whether to include voided procedures
 	 * @return count of procedures for the patient
 	 */
 	@Authorized(PrivilegeConstants.GET_PROCEDURES)
-	Long getProcedureCountByPatient(Patient patient, boolean includeVoided);
+	Long getProcedureCountByPatient(Patient patient, boolean includeAll);
 
 	/**
 	 * Voids a procedure with a reason.
@@ -141,11 +141,11 @@ public interface ProcedureService extends OpenmrsService {
 	/**
 	 * Gets all procedure types.
 	 *
-	 * @param includeRetired whether to include retired types
+	 * @param includeAll whether to include retired types
 	 * @return list of procedure types
 	 */
 	@Authorized(PrivilegeConstants.GET_PROCEDURE_TYPES)
-	List<ProcedureType> getAllProcedureTypes(boolean includeRetired);
+	List<ProcedureType> getAllProcedureTypes(boolean includeAll);
 
 	/**
 	 * Retires a procedure type with a reason.
