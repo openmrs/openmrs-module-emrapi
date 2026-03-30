@@ -172,5 +172,36 @@
         <description>Able to get conditions</description>
     </privilege>
 
+    <!-- privileges for procedures, see org.openmrs.module.emrapi.PrivilegeConstants -->
+    <privilege>
+        <name>Get Procedures</name>
+        <description>Able to get procedures</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Procedures</name>
+        <description>Able to add, edit, void, and unvoid procedures</description>
+    </privilege>
+
+    <privilege>
+        <name>Purge Procedures</name>
+        <description>Able to permanently delete procedures</description>
+    </privilege>
+
+    <privilege>
+        <name>Get Procedure Types</name>
+        <description>Able to get procedure types</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Procedure Types</name>
+        <description>Able to add, edit, retire, and unretire procedure types</description>
+    </privilege>
+
+    <privilege>
+        <name>Purge Procedure Types</name>
+        <description>Able to permanently delete procedure types</description>
+    </privilege>
+
 </module>
 

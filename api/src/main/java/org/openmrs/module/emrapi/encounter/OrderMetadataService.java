@@ -40,8 +40,8 @@ public class OrderMetadataService {
         return null;
     }
 
-    public OrderFrequency getOrderFrequencyByName(String conceptName, boolean includeRetired) {
-        List<OrderFrequency> orderFrequencies = orderService.getOrderFrequencies(includeRetired);
+    public OrderFrequency getOrderFrequencyByName(String conceptName, boolean includeAll) {
+        List<OrderFrequency> orderFrequencies = orderService.getOrderFrequencies(includeAll);
         for (OrderFrequency orderFrequency : orderFrequencies) {
             if(orderFrequency.getName().equals(conceptName)){
                 return orderFrequency;
