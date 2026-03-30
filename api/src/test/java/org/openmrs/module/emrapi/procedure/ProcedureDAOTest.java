@@ -201,7 +201,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 			newProcedure.setStatus(conceptService.getConcept(5)); // Completed
 			newProcedure.setEstimatedStartDate("2018");
 			
-			Procedure saved = procedureDAO.saveOrUpdateProcedureType(newProcedure);
+			Procedure saved = procedureDAO.saveProcedure(newProcedure);
 			
 			assertNotNull(saved.getProcedureId());
 			assertNotNull(saved.getUuid());
@@ -218,7 +218,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 			String originalNotes = procedure.getNotes();
 			
 			procedure.setNotes("Updated notes for testing");
-			procedureDAO.saveOrUpdateProcedureType(procedure);
+			procedureDAO.saveProcedure(procedure);
 			
 			// Clear session and retrieve again
 			Procedure updated = procedureDAO.getProcedure(1);
@@ -308,7 +308,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 			ProcedureType type = procedureDAO.getProcedureTypeByUuid("procedure-type-uuid-001");
 			type.setRetired(true);
 			type.setRetireReason("testing");
-			procedureDAO.saveOrUpdateProcedureType(type);
+			procedureDAO.saveProcedureType(type);
 			
 			List<ProcedureType> nonRetired = procedureDAO.getAllProcedureTypes(false);
 			List<ProcedureType> all = procedureDAO.getAllProcedureTypes(true);
@@ -321,7 +321,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 		public void saveOrUpdate_shouldSaveNewProcedureTypeProcedure() {
 			ProcedureType newType = new ProcedureType("Emergency", "Emergency procedures");
 			
-			ProcedureType saved = procedureDAO.saveOrUpdateProcedureType(newType);
+			ProcedureType saved = procedureDAO.saveProcedureType(newType);
 			
 			assertNotNull(saved.getProcedureTypeId());
 			assertNotNull(saved.getUuid());
@@ -338,7 +338,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 			type.setName("Updated Historical");
 			type.setDescription("Updated description");
 			
-			procedureDAO.saveOrUpdateProcedureType(type);
+			procedureDAO.saveProcedureType(type);
 			
 			ProcedureType updated = procedureDAO.getProcedureTypeByUuid("procedure-type-uuid-001");
 			assertEquals("Updated Historical", updated.getName());
@@ -349,7 +349,7 @@ public class ProcedureDAOTest extends BaseModuleContextSensitiveTest {
 		public void delete_ProcedureType_shouldRemoveProcedureTypeFromDatabase() {
 			// Create a standalone type not referenced by any procedure
 			ProcedureType newType = new ProcedureType("Temporary", "To be deleted");
-			ProcedureType saved = procedureDAO.saveOrUpdateProcedureType(newType);
+			ProcedureType saved = procedureDAO.saveProcedureType(newType);
 			String uuid = saved.getUuid();
 			assertNotNull(procedureDAO.getProcedureTypeByUuid(uuid));
 			

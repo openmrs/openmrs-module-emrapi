@@ -76,19 +76,14 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 			procedure.setStartDateTime(calculatedStartDateTime);
 		}
 		
-		if (procedure.getEndDateTime() != null && procedure.getEndDateTime().before(procedure.getStartDateTime())) {
-			log.warn("End date {} is before start date {}", procedure.getEndDateTime(), procedure.getStartDateTime());
-			throw new APIException("Procedure.error.endDateBeforeStartDate");
-		}
-		
-		return procedureDAO.saveOrUpdateProcedureType(procedure);
+		return procedureDAO.saveProcedure(procedure);
 	}
 	
 	@Override
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURES)
 	public Procedure unvoidProcedure(Procedure procedure) {
 		log.info("Unvoiding procedure: {}", procedure.getUuid());
-		return procedureDAO.saveOrUpdateProcedureType(procedure);
+		return procedureDAO.saveProcedure(procedure);
 	}
 	
 	@Override
@@ -102,7 +97,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURES)
 	public Procedure voidProcedure(Procedure procedure, String reason) {
 		log.info("Voiding procedure: {} with reason: {}", procedure.getUuid(), reason);
-		return procedureDAO.saveOrUpdateProcedureType(procedure);
+		return procedureDAO.saveProcedure(procedure);
 	}
 	
 	@Override
@@ -117,7 +112,7 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType saveProcedureType(ProcedureType procedureType) {
 		log.info("Saving procedure type: {}", procedureType.getName());
-		return procedureDAO.saveOrUpdateProcedureType(procedureType);
+		return procedureDAO.saveProcedureType(procedureType);
 	}
 	
 	@Override
@@ -148,14 +143,14 @@ public class ProcedureServiceImpl extends BaseOpenmrsService implements Procedur
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType retireProcedureType(ProcedureType procedureType, String reason) {
 		log.info("Retiring procedure type: {} with reason: {}", procedureType.getName(), reason);
-		return procedureDAO.saveOrUpdateProcedureType(procedureType);
+		return procedureDAO.saveProcedureType(procedureType);
 	}
 	
 	@Override
 	@Authorized(PrivilegeConstants.MANAGE_PROCEDURE_TYPES)
 	public ProcedureType unretireProcedureType(ProcedureType procedureType) {
 		log.info("Unretiring procedure type: {}", procedureType.getName());
-		return procedureDAO.saveOrUpdateProcedureType(procedureType);
+		return procedureDAO.saveProcedureType(procedureType);
 	}
 	
 	@Override

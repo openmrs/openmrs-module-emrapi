@@ -54,7 +54,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	}
 	
 	@Override
-	public Procedure saveOrUpdateProcedureType(Procedure procedure) {
+	public Procedure saveProcedure(Procedure procedure) {
 		log.debug("Saving or updating procedure: {}", procedure.getUuid());
 		return getEntityManager().merge(procedure);
 	}
@@ -160,7 +160,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	}
 	
 	@Override
-	public ProcedureType saveOrUpdateProcedureType(ProcedureType procedureType) {
+	public ProcedureType saveProcedureType(ProcedureType procedureType) {
 		log.debug("Saving or updating procedure type: {}", procedureType.getName());
 		return getEntityManager().merge(procedureType);
 	}

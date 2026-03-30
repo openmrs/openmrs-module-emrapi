@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
-import org.openmrs.api.APIException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -68,7 +67,7 @@ class ProcedureServiceTest {
 		
 		@BeforeEach
 		void setUp() {
-			when(procedureDAO.saveOrUpdateProcedureType(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
+			when(procedureDAO.saveProcedure(any(Procedure.class))).thenAnswer(i -> i.getArgument(0));
 		}
 		
 		private Date toDate(LocalDateTime ldt) {
@@ -116,7 +115,7 @@ class ProcedureServiceTest {
 			
 			procedureService.saveProcedure(procedure);
 			
-			verify(procedureDAO).saveOrUpdateProcedureType(procedure);
+			verify(procedureDAO).saveProcedure(procedure);
 		}
 	}
 	
@@ -210,12 +209,12 @@ class ProcedureServiceTest {
 		@Test
 		void shouldDelegateToDAO() {
 			Procedure procedure = new Procedure();
-			when(procedureDAO.saveOrUpdateProcedureType(procedure)).thenReturn(procedure);
+			when(procedureDAO.saveProcedure(procedure)).thenReturn(procedure);
 			
 			Procedure result = procedureService.voidProcedure(procedure, "test reason");
 			
 			assertEquals(procedure, result);
-			verify(procedureDAO).saveOrUpdateProcedureType(procedure);
+			verify(procedureDAO).saveProcedure(procedure);
 		}
 	}
 	
@@ -226,11 +225,11 @@ class ProcedureServiceTest {
 		void shouldDelegateToDAO() {
 			Procedure procedure = new Procedure();
 			procedure.setVoided(true);
-			when(procedureDAO.saveOrUpdateProcedureType(any(Procedure.class))).thenReturn(procedure);
+			when(procedureDAO.saveProcedure(any(Procedure.class))).thenReturn(procedure);
 			
 			procedureService.unvoidProcedure(procedure);
 			
-			verify(procedureDAO).saveOrUpdateProcedureType(procedure);
+			verify(procedureDAO).saveProcedure(procedure);
 		}
 	}
 	
@@ -253,12 +252,12 @@ class ProcedureServiceTest {
 		@Test
 		void shouldDelegateToDAO() {
 			ProcedureType type = new ProcedureType("Test", "Test type");
-			when(procedureDAO.saveOrUpdateProcedureType(type)).thenReturn(type);
+			when(procedureDAO.saveProcedureType(type)).thenReturn(type);
 			
 			ProcedureType result = procedureService.saveProcedureType(type);
 			
 			assertEquals(type, result);
-			verify(procedureDAO).saveOrUpdateProcedureType(type);
+			verify(procedureDAO).saveProcedureType(type);
 		}
 	}
 	
@@ -310,10 +309,10 @@ class ProcedureServiceTest {
 		@Test
 		void shouldSetRetiredFieldsAndDelegateToDAO() {
 			ProcedureType type = new ProcedureType("Test", "Test type");
-			when(procedureDAO.saveOrUpdateProcedureType(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
+			when(procedureDAO.saveProcedureType(any(ProcedureType.class))).thenAnswer(i -> i.getArgument(0));
 			
 			procedureService.retireProcedureType(type, "no longer needed");
-			verify(procedureDAO).saveOrUpdateProcedureType(type);
+			verify(procedureDAO).saveProcedureType(type);
 		}
 	}
 	
@@ -324,11 +323,11 @@ class ProcedureServiceTest {
 		void shouldDelegateToDAO() {
 			ProcedureType type = new ProcedureType("Test", "Test type");
 			type.setRetired(true);
-			when(procedureDAO.saveOrUpdateProcedureType(any(ProcedureType.class))).thenReturn(type);
+			when(procedureDAO.saveProcedureType(any(ProcedureType.class))).thenReturn(type);
 			
 			procedureService.unretireProcedureType(type);
 			
-			verify(procedureDAO).saveOrUpdateProcedureType(type);
+			verify(procedureDAO).saveProcedureType(type);
 		}
 	}
 	

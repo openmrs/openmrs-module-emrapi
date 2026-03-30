@@ -38,7 +38,7 @@ public interface ProcedureDAO {
 	 * @param procedure the procedure to save
 	 * @return the saved procedure
 	 */
-	Procedure saveOrUpdateProcedureType(Procedure procedure);
+	Procedure saveProcedure(Procedure procedure);
 	
 	/**
 	 * Gets all procedures for a patient.
@@ -106,7 +106,7 @@ public interface ProcedureDAO {
 	 * @param procedureType the procedure type to save or update
 	 * @return the saved or updated {@link ProcedureType}
 	 */
-	ProcedureType saveOrUpdateProcedureType(ProcedureType procedureType);
+	ProcedureType saveProcedureType(ProcedureType procedureType);
 	
 	/**
 	 * Permanently deletes a {@link ProcedureType} from the database.
