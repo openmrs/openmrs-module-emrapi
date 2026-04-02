@@ -22,6 +22,7 @@ import org.openmrs.Visit;
 import org.openmrs.api.APIException;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
 
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 @Setter
+@Transactional(readOnly = true)
 public class EmrPatientServiceImpl extends BaseOpenmrsService implements EmrPatientService {
 	
 	private EmrPatientDAO dao;
