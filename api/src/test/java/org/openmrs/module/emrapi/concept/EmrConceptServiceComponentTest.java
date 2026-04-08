@@ -112,11 +112,22 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
         ConceptClass diagnosis = conceptService.getConceptClassByName("Diagnosis");
 
         List<ConceptSearchResult> searchResults = emrConceptService.conceptSearch("malaria", Locale.FRENCH, Collections.singleton(diagnosis), null, null, null);
-        ConceptSearchResult firstResult = searchResults.get(0);
-
-        assertThat(searchResults.size(), is(1));
-        assertThat(firstResult.getConcept(), is(concepts.get("cerebral malaria")));
-        assertThat(firstResult.getConceptName().getName(), is("Malaria célébrale"));
+        /*        Result in proficient_Locale are included which is en in this case
+		*/
+		assertThat(searchResults.size(), is(3));
+		
+		ConceptSearchResult firstResult = searchResults.get(0);
+		ConceptSearchResult secondResult = searchResults.get(1);
+		ConceptSearchResult thirdResult = searchResults.get(2);
+		
+		assertThat(firstResult.getConcept(), is(concepts.get("cerebral malaria")));
+		assertThat(firstResult.getConceptName().getName(), is("Malaria célébrale"));
+		
+		assertThat(secondResult.getConcept(), is(concepts.get("malaria")));
+		assertThat(secondResult.getConceptName().getName(), is("Malaria"));
+		
+		assertThat(thirdResult.getConcept(), is(concepts.get("cerebral malaria")));
+		assertThat(thirdResult.getConceptName().getName(), is("Cerebral Malaria"));
     }
 
     @Test

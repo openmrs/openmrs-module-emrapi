@@ -22,14 +22,19 @@ import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.ConceptService;
+import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,10 +107,26 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
 
     @Override
     public List<ConceptSearchResult> conceptSearch(String query, Locale locale, Collection<ConceptClass> classes, Collection<Concept> inSets, Collection<ConceptSource> sources, Integer limit) {
-        if (limit == null) {
-            limit = 100;
-        }
-        return dao.conceptSearch(query, locale, classes, inSets, sources, limit);
+    	List<ConceptSearchResult> csr=new ArrayList<ConceptSearchResult>();
+    	if (limit == null) {
+    		limit = 100;
+    	}
+    	Set<Locale>locales=new LinkedHashSet<Locale>(); 
+    	List<Locale> allLocales=Context.getAdministrationService().getSearchLocales();
+    	locales.add(locale);
+    	for(Locale l:allLocales) {
+    		locales.add(l);
+    		
+    	}
+    	if(locales!=null) {
+    		for(Locale proficientlocale:locales) {    	
+    			List<ConceptSearchResult> profconceptSearchResults=dao.conceptSearch(query, proficientlocale, classes, inSets, sources, limit);
+    			if(profconceptSearchResults!=null) {
+    				csr.addAll(profconceptSearchResults);
+    			}
+    		}
+    	}   	
+    	return csr;
     }
 
 }
