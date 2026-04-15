@@ -13,8 +13,11 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.util.PrivilegeConstants;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,13 +30,19 @@ import java.util.List;
  * @see org.openmrs.module.emrapi.encounter.matcher.BaseEncounterMatcher
  * </pre>
  */
+@Transactional(readOnly = true)
 public interface EmrEncounterService extends OpenmrsService {
 
+    @Transactional
+    @Authorized(PrivilegeConstants.EDIT_ENCOUNTERS)
     EncounterTransaction save(EncounterTransaction encounterTransaction);
 
+    @Authorized(PrivilegeConstants.GET_ENCOUNTERS)
     List<EncounterTransaction> find(EncounterSearchParameters encounterSearchParameters);
 
+    @Authorized(PrivilegeConstants.GET_ENCOUNTERS)
     EncounterTransaction getActiveEncounter(ActiveEncounterParameters activeEncounterParameters);
 
+    @Authorized(PrivilegeConstants.GET_ENCOUNTERS)
     EncounterTransaction getEncounterTransaction(String uuid, Boolean includeAll);
 }
