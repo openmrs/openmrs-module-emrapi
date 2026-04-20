@@ -282,7 +282,6 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
     }
 
     @Test
-    @Disabled("Unignore after fixing EA-141")
     public void test_getVisitsAndHasVisitDuring() throws Exception {
 
         ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
@@ -345,7 +344,10 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 
         service.ensureActiveVisit(patient, outpatientDepartment);
         assertTrue(service.hasVisitDuring(patient, outpatientDepartment, now, futureDate));
-        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, now));
+        
+        // Offset by 1 second to prevent the database timestamp truncation from overlapping with the new visit
+        Date oneSecondAgo = new DateTime(now).minusSeconds(1).toDate();
+        assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, oneSecondAgo));
 
         // now lets just add another retrospective visit to do a quick test of the getVisits method
         startDate = new DateTime(2012, 1, 5, 0, 0, 0).toDate();
