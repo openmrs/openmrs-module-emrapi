@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import org.openmrs.module.emrapi.diagnosis.MigrateDiagnosis;
+import org.openmrs.module.emrapi.descriptor.MissingConceptException;
 
 @Controller
 public class MigrateDiagnosisController {
@@ -29,7 +30,13 @@ public class MigrateDiagnosisController {
 	
 	@RequestMapping(value = "module/emrapi/migrateEncounterDiagnosis.form", method = RequestMethod.GET)
 	public String doEncounterDiagnosisMigration(HttpSession session, HttpServletRequest request) {
-		DiagnosisMetadata diagnosisMetadata = emrApiProps.getDiagnosisMetadata();
+		DiagnosisMetadata diagnosisMetadata;
+			try {
+				diagnosisMetadata = emrApiProps.getDiagnosisMetadata();
+			} catch (MissingConceptException e) {
+				session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "emrapi.migrateDiagnosis.missingConcept.error.message");
+				return "redirect:encounterDiagnosisMigrationDashboard.form";
+			}
 		if (ModuleUtil.compareVersion(OpenmrsConstants.OPENMRS_VERSION, "2.2.0") >= 0) {
 			if (new MigrateDiagnosis().migrate(diagnosisMetadata)) {
 				session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "emrapi.migrateDiagnosis.success.name");

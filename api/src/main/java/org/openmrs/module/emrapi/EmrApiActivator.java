@@ -16,10 +16,16 @@ package org.openmrs.module.emrapi;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptMapType;
+import org.openmrs.ConceptName;
+import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
 import org.openmrs.EncounterType;
@@ -138,6 +144,9 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
         metadataMappingService = Context.getService(MetadataMappingService.class);
 
         createMissingMetadataMappings();
+        ConceptService conceptService = Context.getConceptService();
+        createConceptSource(conceptService);
+        ensureDiagnosisConceptsExist(conceptService);
         createUnknownProvider();
 
         administrationService.setGlobalProperty(OpenmrsConstants.GP_VISIT_ASSIGNMENT_HANDLER, EmrApiVisitAssignmentHandler.class.getName());
@@ -363,5 +372,68 @@ public class EmrApiActivator extends BaseModuleActivator implements DaemonTokenA
     @Override
     public void setDaemonToken(DaemonToken token) {
         daemonToken = token;
+    }
+
+    /**
+ * Ensures required concepts for DiagnosisMetadata exist with correct
+ * mappings to the emrapi concept source. Required for encounter diagnosis
+ * migration to work correctly. EA-230
+ */
+void ensureDiagnosisConceptsExist(ConceptService conceptService) {
+    ConceptSource emrConceptSource = conceptService.getConceptSourceByName(EmrApiConstants.EMR_CONCEPT_SOURCE_NAME);
+    if (emrConceptSource == null) {
+        log.warn("EmrApi: concept source not found, cannot ensure diagnosis concepts exist.");
+        return;
+    }
+    ConceptMapType sameAs = conceptService.getConceptMapTypeByUuid(EmrApiConstants.SAME_AS_CONCEPT_MAP_TYPE_UUID);
+    if (sameAs == null) {
+        log.warn("EmrApi: SAME-AS concept map type not found, cannot ensure diagnosis concepts exist.");
+        return;
+    }
+    ensureConceptWithMapping(conceptService, emrConceptSource, sameAs,
+            EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CONCEPT_SET, "Diagnosis Concept Set", "ConvSet", "N/A", true);
+    ensureConceptWithMapping(conceptService, emrConceptSource, sameAs,
+            EmrApiConstants.CONCEPT_CODE_CODED_DIAGNOSIS, "Coded Diagnosis", "Misc", "Coded", false);
+    ensureConceptWithMapping(conceptService, emrConceptSource, sameAs,
+            EmrApiConstants.CONCEPT_CODE_NON_CODED_DIAGNOSIS, "Non-Coded Diagnosis", "Misc", "Text", false);
+    ensureConceptWithMapping(conceptService, emrConceptSource, sameAs,
+            EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_ORDER, "Diagnosis Order", "Misc", "Coded", false);
+    ensureConceptWithMapping(conceptService, emrConceptSource, sameAs,
+            EmrApiConstants.CONCEPT_CODE_DIAGNOSIS_CERTAINTY, "Diagnosis Certainty", "Misc", "Coded", false);
+}
+
+private void ensureConceptWithMapping(ConceptService conceptService, ConceptSource source,
+        ConceptMapType mapType, String code, String name, String className, String datatypeName, boolean isSet) {
+    // If already correctly mapped, nothing to do
+    if (conceptService.getConceptByMapping(code, source.getName()) != null) {
+        return;
+    }
+    // Try to find an existing concept by name first
+    Concept concept = null;
+    List<Concept> found = conceptService.getConceptsByName(name);
+    if (found != null && !found.isEmpty()) {
+        concept = found.get(0);
+    }
+    // Create the concept if it doesn't exist at all
+    if (concept == null) {
+        concept = new Concept();
+        concept.setConceptClass(conceptService.getConceptClassByName(className));
+        concept.setDatatype(conceptService.getConceptDatatypeByName(datatypeName));
+        concept.setSet(isSet);
+        ConceptName conceptName = new ConceptName(name, Locale.ENGLISH);
+        concept.addName(conceptName);
+        concept = conceptService.saveConcept(concept);
+        log.info("EmrApi: created missing concept '" + name + "'");
+    }
+    // Ensure the reference term exists in the source
+    ConceptReferenceTerm term = conceptService.getConceptReferenceTermByCode(code, source);
+    if (term == null) {
+        term = new ConceptReferenceTerm(source, code, null);
+        term = conceptService.saveConceptReferenceTerm(term);
+    }
+    // Add the mapping to the concept
+    concept.addConceptMapping(new ConceptMap(term, mapType));
+    conceptService.saveConcept(concept);
+    log.info("EmrApi: added mapping '" + source.getName() + ":" + code + "' to concept '" + name + "'");
     }
 }
