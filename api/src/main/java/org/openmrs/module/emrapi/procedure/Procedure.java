@@ -62,7 +62,7 @@ public class Procedure extends BaseFormRecordableOpenmrsData {
 	private String procedureNonCoded;
 	
 	@ManyToOne
-	@JoinColumn(name = "body_site_coded", nullable = false)
+	@JoinColumn(name = "body_site_coded", nullable = true)
 	private Concept bodySite;
 	
 	@Column(name = "start_date_time", nullable = false)

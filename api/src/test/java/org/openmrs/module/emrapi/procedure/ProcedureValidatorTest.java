@@ -105,13 +105,6 @@ class ProcedureValidatorTest {
 	}
 	
 	@Test
-	void validate_shouldRejectWhenBodySiteIsNull() {
-		procedure.setBodySite(null);
-		validator.validate(procedure, errors);
-		assertTrue(hasErrorCode("Procedure.error.bodySiteRequired"));
-	}
-	
-	@Test
 	void validate_shouldRejectWhenBothStartDateTimeAndEstimatedStartDateAreNull() {
 		procedure.setStartDateTime(null);
 		procedure.setEstimatedStartDate(null);
