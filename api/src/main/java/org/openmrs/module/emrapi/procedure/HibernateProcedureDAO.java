@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Hibernate implementation of {@link ProcedureDAO}.
  *
- * @since 3.3.0
+ * @since 3.4.0
  */
 @RequiredArgsConstructor
 @Slf4j

@@ -8,7 +8,7 @@ package org.openmrs.module.emrapi;
 
 /**
  * Privilege constants for the Procedure module.
- * @since 3.3.0
+ * @since 3.4.0
  */
 public class PrivilegeConstants {
 

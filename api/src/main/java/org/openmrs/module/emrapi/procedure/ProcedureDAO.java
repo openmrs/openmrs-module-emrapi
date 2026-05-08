@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Data Access Object interface for Procedure entity.
- * @since 3.3.0
+ * @since 3.4.0
  */
 public interface ProcedureDAO {
 	

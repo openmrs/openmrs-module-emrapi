@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Service interface for managing Procedure records.
  * Provides methods for creating, retrieving, updating, and voiding procedures.
- * @since 3.3.0
+ * @since 3.4.0
  */
 public interface ProcedureService extends OpenmrsService {
 	

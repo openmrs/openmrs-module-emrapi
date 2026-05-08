@@ -19,7 +19,7 @@ import javax.persistence.Table;
 
 /**
  * Metadata entity representing a type/category of procedure.
- * @since 3.3.0
+ * @since 3.4.0
  */
 @Getter
 @Setter

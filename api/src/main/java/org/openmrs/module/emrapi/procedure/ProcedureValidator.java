@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * Validator for {@link Procedure} objects.
  *
- * @since 3.3.0
+ * @since 3.4.0
  */
 @Handler(supports = { Procedure.class }, order = 50)
 @Slf4j

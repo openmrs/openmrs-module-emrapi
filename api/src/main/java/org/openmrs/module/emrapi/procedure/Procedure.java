@@ -27,7 +27,7 @@ import java.util.Date;
 /**
  * Entity class representing a surgical or medical procedure performed on a patient.
  *
- * @since 3.3.0
+ * @since 3.4.0
  */
 @Getter
 @Setter

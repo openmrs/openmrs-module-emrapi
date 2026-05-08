@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Implementation of the {@link ProcedureService}.
- * @since 3.3.0
+ * @since 3.4.0
  */
 @Transactional
 @Slf4j
