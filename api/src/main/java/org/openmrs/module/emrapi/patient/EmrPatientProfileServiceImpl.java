@@ -9,7 +9,9 @@ import org.openmrs.module.emrapi.person.image.EmrPersonImageService;
 import org.openmrs.module.emrapi.person.image.PersonImage;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 public class EmrPatientProfileServiceImpl implements EmrPatientProfileService {
 
     private PatientService patientService;

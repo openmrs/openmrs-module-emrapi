@@ -11,12 +11,14 @@ import org.openmrs.Patient;
 import org.openmrs.RelationshipType;
 import org.openmrs.api.APIException;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.adt.InpatientAdmission;
 import org.openmrs.module.emrapi.adt.InpatientAdmissionSearchCriteria;
 import org.openmrs.module.emrapi.db.EmrApiDAO;
 
+@Transactional(readOnly = true)
 public class MaternalServiceImpl  extends BaseOpenmrsService implements MaternalService {
 
     private EmrApiProperties emrApiProperties;

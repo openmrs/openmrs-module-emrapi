@@ -16,10 +16,12 @@ package org.openmrs.module.emrapi.event;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.api.impl.BaseOpenmrsService;
+import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.event.Event;
 import org.openmrs.event.EventMessage;
 import org.openmrs.module.emrapi.EmrApiConstants;
 
+@Transactional(readOnly = true)
 public class ApplicationEventServiceImpl extends BaseOpenmrsService implements ApplicationEventService {
 	
 	/**

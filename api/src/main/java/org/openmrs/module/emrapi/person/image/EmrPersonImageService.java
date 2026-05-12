@@ -14,11 +14,15 @@
 package org.openmrs.module.emrapi.person.image;
 
 import org.openmrs.Person;
+import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.util.PrivilegeConstants;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Public API for person image functionality.
  */
+@Transactional(readOnly = true)
 public interface EmrPersonImageService extends OpenmrsService {
 
     /**
@@ -27,8 +31,11 @@ public interface EmrPersonImageService extends OpenmrsService {
      * @throws org.openmrs.api.APIException
      *          if save fails
      */
+    @Transactional
+    @Authorized(PrivilegeConstants.EDIT_PATIENTS)
     public PersonImage savePersonImage(PersonImage personImage);
 
+    @Authorized(PrivilegeConstants.GET_PATIENTS)
     public PersonImage getCurrentPersonImage(Person person);
 
 }
