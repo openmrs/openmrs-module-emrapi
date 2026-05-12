@@ -1,73 +1,74 @@
-/**
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.encounter;
 
 public class ActiveEncounterParameters {
-    String patientUuid;
-    String encounterTypeUuid;
-    String visitTypeUuid;
-    String providerUuid;
-    Boolean includeAll;
-    String locationUuid;
-
-    public String getLocationUuid() {
-        return locationUuid;
-    }
-
-    public void setLocationUuid(String locationUuid) {
-        this.locationUuid = locationUuid;
-    }
-
-    public String getProviderUuid() {
-        return providerUuid;
-    }
-
-    public void setProviderUuid(String providerUuid) {
-        this.providerUuid = providerUuid;
-    }
-
-    public String getPatientUuid() {
-        return patientUuid;
-    }
-
-    public void setPatientUuid(String patientUuid) {
-        this.patientUuid = patientUuid;
-    }
-
-    public String getEncounterTypeUuid() {
-        return encounterTypeUuid;
-    }
-
-    public void setEncounterTypeUuid(String encounterTypeUuid) {
-        this.encounterTypeUuid = encounterTypeUuid;
-    }
-
-    public String getVisitTypeUuid() {
-        return visitTypeUuid;
-    }
-
-    public void setVisitTypeUuid(String visitTypeUuid) {
-        this.visitTypeUuid = visitTypeUuid;
-    }
-
-    public Boolean getIncludeAll() {
-        return includeAll;
-    }
-
-    public void setIncludeAll(Boolean includeAll) {
-        this.includeAll = includeAll;
-    }
-
-
+	
+	String patientUuid;
+	
+	String encounterTypeUuid;
+	
+	String visitTypeUuid;
+	
+	String providerUuid;
+	
+	Boolean includeAll;
+	
+	String locationUuid;
+	
+	public String getLocationUuid() {
+		return locationUuid;
+	}
+	
+	public void setLocationUuid(String locationUuid) {
+		this.locationUuid = locationUuid;
+	}
+	
+	public String getProviderUuid() {
+		return providerUuid;
+	}
+	
+	public void setProviderUuid(String providerUuid) {
+		this.providerUuid = providerUuid;
+	}
+	
+	public String getPatientUuid() {
+		return patientUuid;
+	}
+	
+	public void setPatientUuid(String patientUuid) {
+		this.patientUuid = patientUuid;
+	}
+	
+	public String getEncounterTypeUuid() {
+		return encounterTypeUuid;
+	}
+	
+	public void setEncounterTypeUuid(String encounterTypeUuid) {
+		this.encounterTypeUuid = encounterTypeUuid;
+	}
+	
+	public String getVisitTypeUuid() {
+		return visitTypeUuid;
+	}
+	
+	public void setVisitTypeUuid(String visitTypeUuid) {
+		this.visitTypeUuid = visitTypeUuid;
+	}
+	
+	public Boolean getIncludeAll() {
+		return includeAll;
+	}
+	
+	public void setIncludeAll(Boolean includeAll) {
+		this.includeAll = includeAll;
+	}
+	
 }

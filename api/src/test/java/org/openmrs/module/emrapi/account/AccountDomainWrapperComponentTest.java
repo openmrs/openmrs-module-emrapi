@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.account;
 
 import org.junit.jupiter.api.Test;
@@ -9,16 +18,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 public class AccountDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
-
-    @Autowired
-    private DomainWrapperFactory factory;
-
-    @Test
-    public void testThatBeanCanHavePropertiesAutowired() throws Exception {
-        AccountDomainWrapper accountDomainWrapper = factory.newAccountDomainWrapper();
-        assertThat(accountDomainWrapper.accountService, notNullValue());
-        assertThat(accountDomainWrapper.personService, notNullValue());
-        assertThat(accountDomainWrapper.providerService, notNullValue());
-        assertThat(accountDomainWrapper.userService, notNullValue());
-    }
+	
+	@Autowired
+	private DomainWrapperFactory factory;
+	
+	@Test
+	public void testThatBeanCanHavePropertiesAutowired() throws Exception {
+		AccountDomainWrapper accountDomainWrapper = factory.newAccountDomainWrapper();
+		assertThat(accountDomainWrapper.accountService, notNullValue());
+		assertThat(accountDomainWrapper.personService, notNullValue());
+		assertThat(accountDomainWrapper.providerService, notNullValue());
+		assertThat(accountDomainWrapper.userService, notNullValue());
+	}
 }

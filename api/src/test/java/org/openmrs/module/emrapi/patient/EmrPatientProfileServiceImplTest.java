@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.patient;
 
 import org.junit.Before;
@@ -18,76 +27,76 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class EmrPatientProfileServiceImplTest {
-
-    private EmrPatientProfileServiceImpl emrPatientProfileService;
-
-    private PatientService patientService;
-
-    private PersonService personService;
-
-    private EmrPersonImageService emrPersonImageService;
-
-    @Before
-    public void setup() {
-        emrPatientProfileService = new EmrPatientProfileServiceImpl();
-        patientService = mock(PatientService.class);
-        personService = mock(PersonService.class);
-        emrPersonImageService = mock(EmrPersonImageService.class);
-
-        emrPatientProfileService.setPatientService(patientService);
-        emrPatientProfileService.setPersonService(personService);
-        emrPatientProfileService.setEmrPersonImageService(emrPersonImageService);
-
-        when(patientService.getPatientByUuid("patient_uuid")).thenReturn(constructPatient());
-        Person person = constructPerson();
-        when(personService.getPerson(1)).thenReturn(person);
-        when(personService.getRelationshipsByPerson(person)).thenReturn(constructRelationships());
-    }
-
-    @Test
-    public void shouldSavePatientProfile() throws Exception {
-        PatientProfile patientProfile = emrPatientProfileService.save(constructPatientProfile());
-        assertNotNull(patientProfile);
-        assertEquals(patientProfile.getRelationships().size(), 1);
-    }
-
-    @Test
-    public void shouldGetPatientProfile() throws Exception {
-        PatientProfile patientProfile = emrPatientProfileService.get("patient_uuid");
-        assertNotNull(patientProfile.getPatient());
-        assertEquals(patientProfile.getPatient().getUuid(), "patient_uuid");
-        assertEquals(patientProfile.getRelationships().size(), 1);
-    }
-
-    private PatientProfile constructPatientProfile() {
-        PatientProfile patientProfile = new PatientProfile();
-        List<Relationship> relationships = new ArrayList<Relationship>();
-        relationships.add(new Relationship());
-        patientProfile.setRelationships(relationships);
-
-        return patientProfile;
-    }
-
-    private Patient constructPatient() {
-        Patient patient = new Patient();
-        patient.setUuid("patient_uuid");
-        patient.setPersonId(1);
-
-        return patient;
-    }
-
-    private Person constructPerson() {
-        Person person = new Person();
-        person.setId(1);
-        person.setUuid("person_uuid");
-
-        return person;
-    }
-
-    private List<Relationship> constructRelationships() {
-        List<Relationship> relationships = new ArrayList<Relationship>();
-        relationships.add(new Relationship());
-
-        return relationships;
-    }
+	
+	private EmrPatientProfileServiceImpl emrPatientProfileService;
+	
+	private PatientService patientService;
+	
+	private PersonService personService;
+	
+	private EmrPersonImageService emrPersonImageService;
+	
+	@Before
+	public void setup() {
+		emrPatientProfileService = new EmrPatientProfileServiceImpl();
+		patientService = mock(PatientService.class);
+		personService = mock(PersonService.class);
+		emrPersonImageService = mock(EmrPersonImageService.class);
+		
+		emrPatientProfileService.setPatientService(patientService);
+		emrPatientProfileService.setPersonService(personService);
+		emrPatientProfileService.setEmrPersonImageService(emrPersonImageService);
+		
+		when(patientService.getPatientByUuid("patient_uuid")).thenReturn(constructPatient());
+		Person person = constructPerson();
+		when(personService.getPerson(1)).thenReturn(person);
+		when(personService.getRelationshipsByPerson(person)).thenReturn(constructRelationships());
+	}
+	
+	@Test
+	public void shouldSavePatientProfile() throws Exception {
+		PatientProfile patientProfile = emrPatientProfileService.save(constructPatientProfile());
+		assertNotNull(patientProfile);
+		assertEquals(patientProfile.getRelationships().size(), 1);
+	}
+	
+	@Test
+	public void shouldGetPatientProfile() throws Exception {
+		PatientProfile patientProfile = emrPatientProfileService.get("patient_uuid");
+		assertNotNull(patientProfile.getPatient());
+		assertEquals(patientProfile.getPatient().getUuid(), "patient_uuid");
+		assertEquals(patientProfile.getRelationships().size(), 1);
+	}
+	
+	private PatientProfile constructPatientProfile() {
+		PatientProfile patientProfile = new PatientProfile();
+		List<Relationship> relationships = new ArrayList<Relationship>();
+		relationships.add(new Relationship());
+		patientProfile.setRelationships(relationships);
+		
+		return patientProfile;
+	}
+	
+	private Patient constructPatient() {
+		Patient patient = new Patient();
+		patient.setUuid("patient_uuid");
+		patient.setPersonId(1);
+		
+		return patient;
+	}
+	
+	private Person constructPerson() {
+		Person person = new Person();
+		person.setId(1);
+		person.setUuid("person_uuid");
+		
+		return person;
+	}
+	
+	private List<Relationship> constructRelationships() {
+		List<Relationship> relationships = new ArrayList<Relationship>();
+		relationships.add(new Relationship());
+		
+		return relationships;
+	}
 }

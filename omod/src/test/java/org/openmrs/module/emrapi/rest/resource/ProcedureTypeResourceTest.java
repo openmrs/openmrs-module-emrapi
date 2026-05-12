@@ -1,8 +1,11 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
- * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
- * of the Healthcare Disclaimer located at http://openmrs.org/license.
- * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.rest.resource;
 
@@ -44,7 +47,7 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 	void setUp() {
 		executeDataSet(TEST_DATASET);
 		resource = (ProcedureTypeResource) Context.getService(RestService.class)
-				.getResourceBySupportedClass(ProcedureType.class);
+		        .getResourceBySupportedClass(ProcedureType.class);
 	}
 	
 	@Nested
@@ -138,8 +141,7 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 		void shouldNotCreateProcedureTypeWithoutName() {
 			SimpleObject properties = new SimpleObject();
 			properties.add("description", "Missing name");
-			assertThrows(ConversionException.class,
-					() -> resource.create(properties, new RequestContext()));
+			assertThrows(ConversionException.class, () -> resource.create(properties, new RequestContext()));
 		}
 	}
 	
@@ -183,11 +185,11 @@ class ProcedureTypeResourceTest extends BaseModuleWebContextSensitiveTest {
 	@Nested
 	@DisplayName("purge")
 	class Purge {
-
+		
 		@Test
 		void shouldPermanentlyDeleteProcedureType() {
 			resource.purge(CURRENT_TYPE_UUID, new RequestContext());
-
+			
 			ProcedureType purged = Context.getService(ProcedureService.class).getProcedureTypeByUuid(CURRENT_TYPE_UUID);
 			assertNull(purged);
 		}

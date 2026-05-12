@@ -1,8 +1,11 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
- * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
- * of the Healthcare Disclaimer located at http://openmrs.org/license.
- * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.procedure;
 
@@ -12,6 +15,7 @@ import java.util.List;
 
 /**
  * Data Access Object interface for Procedure entity.
+ * 
  * @since 3.4.0
  */
 public interface ProcedureDAO {
@@ -45,7 +49,8 @@ public interface ProcedureDAO {
 	 *
 	 * @param patient the patient
 	 * @param includeAll whether to include voided procedures
-	 * @param firstResult the index of the first result to return (for pagination), or null to return all
+	 * @param firstResult the index of the first result to return (for pagination), or null to return
+	 *            all
 	 * @param maxResults the maximum number of results to return (for pagination), or null to return all
 	 * @return list of procedures sorted by startDateTime descending
 	 */
@@ -61,8 +66,7 @@ public interface ProcedureDAO {
 	Long getProcedureCountByPatient(Patient patient, boolean includeAll);
 	
 	/**
-	 * Deletes a procedure from the database.
-	 * This is a hard delete - use voiding for soft delete.
+	 * Deletes a procedure from the database. This is a hard delete - use voiding for soft delete.
 	 *
 	 * @param procedure the procedure to delete
 	 */

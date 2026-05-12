@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.rest.converter;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -22,70 +31,65 @@ import org.openmrs.module.webservices.rest.web.response.ResourceDoesNotSupportOp
 import java.beans.PropertyDescriptor;
 import java.util.Map;
 
-@Handler(supports = {
-        EmrApiProperties.class,
-        DiagnosisMetadata.class,
-        Disposition.class,
-        DispositionObs.class,
-        DispositionDescriptor.class,
-        Diagnosis.class,
-}, order = 0)
+@Handler(supports = { EmrApiProperties.class, DiagnosisMetadata.class, Disposition.class, DispositionObs.class,
+        DispositionDescriptor.class, Diagnosis.class, }, order = 0)
 public class SimpleBeanConverter<T> implements Converter<T> {
-
-    private final Log log = LogFactory.getLog(getClass());
-
-    /**
-     * @return a resource description that represents a custom representation, or one that represents all bean properties in the class
-     */
-    public DelegatingResourceDescription getResourceDescription(T o, Representation representation) {
-        if (representation instanceof CustomRepresentation) {
-            return ConversionUtil.getCustomRepresentationDescription((CustomRepresentation) representation);
-        }
-        DelegatingResourceDescription ret = new DelegatingResourceDescription();
-        for (PropertyDescriptor pd : PropertyUtils.getPropertyDescriptors(o.getClass())) {
-            if (pd.getReadMethod() != null && pd.getReadMethod().getDeclaringClass() == o.getClass()) {
-                String propName = pd.getName();
-                ret.addProperty(propName, representation);
-            }
-        }
-        return ret;
-    }
-
-    @Override
-    public SimpleObject asRepresentation(T o, Representation rep) throws ConversionException {
-        SimpleObject ret = new SimpleObject();
-        Map<String, DelegatingResourceDescription.Property> props = getResourceDescription(o, rep).getProperties();
-        for (String propName : props.keySet()) {
-            Object value = null;
-            // Log exception rather than fail if an exception is thrown while trying to retrieve a property
-            try {
-                value = PropertyUtils.getProperty(o, propName);
-            }
-            catch (Exception e) {
-                log.debug("Could not get property value " + propName + " from " + o.getClass(), e);
-            }
-            ret.put(propName, ConversionUtil.convertToRepresentation(value, props.get(propName).getRep()));
-        }
-        return ret;
-    }
-
-    @Override
-    public T newInstance(String s) {
-        throw new ResourceDoesNotSupportOperationException();
-    }
-
-    @Override
-    public T getByUniqueId(String s) {
-        throw new ResourceDoesNotSupportOperationException();
-    }
-
-    @Override
-    public Object getProperty(T o, String s) throws ConversionException {
-        throw new ResourceDoesNotSupportOperationException();
-    }
-
-    @Override
-    public void setProperty(Object o, String s, Object o1) throws ConversionException {
-        throw new ResourceDoesNotSupportOperationException();
-    }
+	
+	private final Log log = LogFactory.getLog(getClass());
+	
+	/**
+	 * @return a resource description that represents a custom representation, or one that represents
+	 *         all bean properties in the class
+	 */
+	public DelegatingResourceDescription getResourceDescription(T o, Representation representation) {
+		if (representation instanceof CustomRepresentation) {
+			return ConversionUtil.getCustomRepresentationDescription((CustomRepresentation) representation);
+		}
+		DelegatingResourceDescription ret = new DelegatingResourceDescription();
+		for (PropertyDescriptor pd : PropertyUtils.getPropertyDescriptors(o.getClass())) {
+			if (pd.getReadMethod() != null && pd.getReadMethod().getDeclaringClass() == o.getClass()) {
+				String propName = pd.getName();
+				ret.addProperty(propName, representation);
+			}
+		}
+		return ret;
+	}
+	
+	@Override
+	public SimpleObject asRepresentation(T o, Representation rep) throws ConversionException {
+		SimpleObject ret = new SimpleObject();
+		Map<String, DelegatingResourceDescription.Property> props = getResourceDescription(o, rep).getProperties();
+		for (String propName : props.keySet()) {
+			Object value = null;
+			// Log exception rather than fail if an exception is thrown while trying to retrieve a property
+			try {
+				value = PropertyUtils.getProperty(o, propName);
+			}
+			catch (Exception e) {
+				log.debug("Could not get property value " + propName + " from " + o.getClass(), e);
+			}
+			ret.put(propName, ConversionUtil.convertToRepresentation(value, props.get(propName).getRep()));
+		}
+		return ret;
+	}
+	
+	@Override
+	public T newInstance(String s) {
+		throw new ResourceDoesNotSupportOperationException();
+	}
+	
+	@Override
+	public T getByUniqueId(String s) {
+		throw new ResourceDoesNotSupportOperationException();
+	}
+	
+	@Override
+	public Object getProperty(T o, String s) throws ConversionException {
+		throw new ResourceDoesNotSupportOperationException();
+	}
+	
+	@Override
+	public void setProperty(Object o, String s, Object o1) throws ConversionException {
+		throw new ResourceDoesNotSupportOperationException();
+	}
 }

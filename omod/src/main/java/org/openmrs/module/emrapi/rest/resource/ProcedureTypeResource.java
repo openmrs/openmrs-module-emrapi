@@ -1,8 +1,11 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
- * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
- * of the Healthcare Disclaimer located at http://openmrs.org/license.
- * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.rest.resource;
 
@@ -22,8 +25,8 @@ import org.openmrs.module.webservices.rest.web.resource.impl.MetadataDelegatingC
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
 import org.openmrs.module.webservices.rest.web.response.ResponseException;
 
-@Resource(name = RestConstants.VERSION_1 + "/proceduretype", supportedClass = ProcedureType.class, supportedOpenmrsVersions = {
-		"2.2 - 9.*" })
+@Resource(name = RestConstants.VERSION_1
+        + "/proceduretype", supportedClass = ProcedureType.class, supportedOpenmrsVersions = { "2.2 - 9.*" })
 public class ProcedureTypeResource extends MetadataDelegatingCrudResource<ProcedureType> {
 	
 	@Override
@@ -77,8 +80,8 @@ public class ProcedureTypeResource extends MetadataDelegatingCrudResource<Proced
 	
 	@Override
 	protected PageableResult doGetAll(RequestContext context) throws ResponseException {
-		return new NeedsPaging<>(
-				Context.getService(ProcedureService.class).getAllProcedureTypes(context.getIncludeAll()), context);
+		return new NeedsPaging<>(Context.getService(ProcedureService.class).getAllProcedureTypes(context.getIncludeAll()),
+		        context);
 	}
 	
 	@Override

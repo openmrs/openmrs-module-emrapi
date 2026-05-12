@@ -1,8 +1,11 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
- * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
- * of the Healthcare Disclaimer located at http://openmrs.org/license. Copyright (C) OpenMRS Inc. OpenMRS is a registered
- * trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.procedure;
 
@@ -61,7 +64,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	
 	@Override
 	public List<Procedure> getProceduresByPatient(Patient patient, boolean includeAll, Integer firstResult,
-			Integer maxResults) {
+	        Integer maxResults) {
 		log.debug("Getting procedures for patient: {}, includeAll: {}", patient, includeAll);
 		
 		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
@@ -72,9 +75,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 		if (!includeAll) {
 			predicate = builder.and(predicate, builder.isFalse(root.get("voided")));
 		}
-		criteria.select(root)
-				.where(predicate)
-				.orderBy(builder.desc(root.get("startDateTime")));
+		criteria.select(root).where(predicate).orderBy(builder.desc(root.get("startDateTime")));
 		
 		TypedQuery<Procedure> query = getEntityManager().createQuery(criteria);
 		
@@ -100,12 +101,9 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 		if (!includeAll) {
 			predicate = builder.and(predicate, builder.isFalse(root.get("voided")));
 		}
-		criteria.select(builder.count(root))
-				.where(predicate);
+		criteria.select(builder.count(root)).where(predicate);
 		
-		return getEntityManager()
-				.createQuery(criteria)
-				.getSingleResult();
+		return getEntityManager().createQuery(criteria).getSingleResult();
 	}
 	
 	@Override
@@ -125,7 +123,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 		log.debug("Getting procedure type by uuid: {}", uuid);
 		
 		TypedQuery<ProcedureType> query = getEntityManager()
-				.createQuery("SELECT pt FROM ProcedureType pt WHERE pt.uuid = :uuid", ProcedureType.class);
+		        .createQuery("SELECT pt FROM ProcedureType pt WHERE pt.uuid = :uuid", ProcedureType.class);
 		query.setParameter("uuid", uuid);
 		
 		List<ProcedureType> results = query.setMaxResults(1).getResultList();
@@ -136,7 +134,7 @@ public class HibernateProcedureDAO implements ProcedureDAO {
 	public List<ProcedureType> getProcedureTypesByName(String name) {
 		log.debug("Getting procedure type by name: {}", name);
 		TypedQuery<ProcedureType> query = getEntityManager()
-				.createQuery("SELECT pt FROM ProcedureType pt WHERE pt.name = :name", ProcedureType.class);
+		        .createQuery("SELECT pt FROM ProcedureType pt WHERE pt.name = :name", ProcedureType.class);
 		query.setParameter("name", name);
 		
 		return query.getResultList();

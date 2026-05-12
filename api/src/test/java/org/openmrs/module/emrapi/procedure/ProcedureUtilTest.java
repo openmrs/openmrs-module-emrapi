@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.procedure;
 
 import org.junit.jupiter.api.Nested;
@@ -60,44 +69,37 @@ public class ProcedureUtilTest {
 		
 		@Test
 		void shouldThrowForInvalidLeapYearDate() {
-			assertThrows(APIException.class, () ->
-					getDateTimeFromEstimatedDate("2025-02-29"));
+			assertThrows(APIException.class, () -> getDateTimeFromEstimatedDate("2025-02-29"));
 		}
 		
 		@Test
 		void shouldThrowForMalformedFullDate() {
-			assertThrows(APIException.class, () ->
-					getDateTimeFromEstimatedDate("2025-13-40"));
+			assertThrows(APIException.class, () -> getDateTimeFromEstimatedDate("2025-13-40"));
 		}
 		
 		@Test
 		void shouldThrowForMalformedYearMonth() {
-			assertThrows(APIException.class, () ->
-					getDateTimeFromEstimatedDate("2025-13"));
+			assertThrows(APIException.class, () -> getDateTimeFromEstimatedDate("2025-13"));
 		}
 		
 		@Test
 		void shouldThrowForMalformedYear() {
-			assertThrows(APIException.class, () ->
-					getDateTimeFromEstimatedDate("abcd"));
+			assertThrows(APIException.class, () -> getDateTimeFromEstimatedDate("abcd"));
 		}
 		
 		@Test
 		void shouldThrowForMalformedDatetime() {
-			assertThrows(APIException.class, () ->
-					getDateTimeFromEstimatedDate("2025-06-15Tnotadate"));
+			assertThrows(APIException.class, () -> getDateTimeFromEstimatedDate("2025-06-15Tnotadate"));
 		}
 		
 		@Test
 		void shouldThrowForUnrecognizedLength() {
-			assertThrows(APIException.class, () ->
-					getDateTimeFromEstimatedDate("25-06"));
+			assertThrows(APIException.class, () -> getDateTimeFromEstimatedDate("25-06"));
 		}
 		
 		@Test
 		void shouldThrowForGarbageInputWithLength10() {
-			assertThrows(APIException.class, () ->
-					getDateTimeFromEstimatedDate("abcdefghij"));
+			assertThrows(APIException.class, () -> getDateTimeFromEstimatedDate("abcdefghij"));
 		}
 	}
 	

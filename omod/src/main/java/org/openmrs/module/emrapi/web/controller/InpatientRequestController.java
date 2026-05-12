@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.web.controller;
 
 import org.openmrs.Location;
@@ -27,34 +36,31 @@ import java.util.stream.Collectors;
 
 @Controller
 public class InpatientRequestController {
-
-    @Autowired
-    private AdtService adtService;
-
-    @RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/inpatient/request")
-    @ResponseBody
-    public SimpleObject getInpatientRequests(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam(required = false, value = "visitLocation") Location visitLocation,
-            @RequestParam(required = false, value = "dispositionLocation") List<Location> dispositionLocations,
-            @RequestParam(required = false, value = "dispositionType") List<DispositionType> dispositionTypes,
-            @RequestParam(required = false, value = "patients") List<Patient> patients,
-            @RequestParam(required = false, value = "visits") List<Visit> visits
-    ) {
-        RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
-        InpatientRequestSearchCriteria criteria = new InpatientRequestSearchCriteria();
-        criteria.setVisitLocation(visitLocation);
-        criteria.setDispositionLocations(dispositionLocations);
-        criteria.setDispositionTypes(dispositionTypes);
-
-        if(patients != null) {
-            criteria.setPatientIds(patients.stream().map(Patient::getId).collect(Collectors.toList()));
-        }
-        if(visits != null) {
-            criteria.setVisitIds(visits.stream().map(Visit::getId).collect(Collectors.toList()));
-        }
-        List<InpatientRequest> requests = adtService.getInpatientRequests(criteria);
-        return new NeedsPaging<>(requests, context).toSimpleObject(new InpatientRequestConverter());
-    }
+	
+	@Autowired
+	private AdtService adtService;
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/inpatient/request")
+	@ResponseBody
+	public SimpleObject getInpatientRequests(HttpServletRequest request, HttpServletResponse response,
+	        @RequestParam(required = false, value = "visitLocation") Location visitLocation,
+	        @RequestParam(required = false, value = "dispositionLocation") List<Location> dispositionLocations,
+	        @RequestParam(required = false, value = "dispositionType") List<DispositionType> dispositionTypes,
+	        @RequestParam(required = false, value = "patients") List<Patient> patients,
+	        @RequestParam(required = false, value = "visits") List<Visit> visits) {
+		RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
+		InpatientRequestSearchCriteria criteria = new InpatientRequestSearchCriteria();
+		criteria.setVisitLocation(visitLocation);
+		criteria.setDispositionLocations(dispositionLocations);
+		criteria.setDispositionTypes(dispositionTypes);
+		
+		if (patients != null) {
+			criteria.setPatientIds(patients.stream().map(Patient::getId).collect(Collectors.toList()));
+		}
+		if (visits != null) {
+			criteria.setVisitIds(visits.stream().map(Visit::getId).collect(Collectors.toList()));
+		}
+		List<InpatientRequest> requests = adtService.getInpatientRequests(criteria);
+		return new NeedsPaging<>(requests, context).toSimpleObject(new InpatientRequestConverter());
+	}
 }

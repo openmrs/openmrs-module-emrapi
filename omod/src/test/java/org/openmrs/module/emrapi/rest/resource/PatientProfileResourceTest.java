@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.rest.resource;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -19,34 +28,40 @@ import java.util.List;
 import java.util.Map;
 
 public class PatientProfileResourceTest extends BaseModuleWebContextSensitiveTest {
-
-    private PatientProfileResource resource;
-
-    @Before
-    public void beforeEachTests() throws Exception {
-        resource = (PatientProfileResource) Context.getService(RestService.class).getResourceBySupportedClass(PatientProfile.class);
-        File personImageDirectory = new File(OpenmrsUtil.getApplicationDataDirectory() + "/person_images");
-        personImageDirectory.mkdirs();
-    }
-
-    @Test
-    public void shouldCreatePatient() throws Exception {
-        SimpleObject patientProfileCreateObject = new SimpleObject();
-        patientProfileCreateObject.putAll(new ObjectMapper().readValue(getClass().getClassLoader().getResourceAsStream("create_patient_profile.json"), HashMap.class));
-        SimpleObject created = (SimpleObject) resource.create(patientProfileCreateObject, new RequestContext());
-        Assert.assertEquals("id-B - Ram Kabir", ((Map) created.get("patient")).get("display"));
-        List<Object> relationships = (List)created.get("relationships");
-        Assert.assertEquals(1,relationships.size());
-        Assert.assertEquals("ba1b19c2-3ed6-4f63-b8c0-f762dc8d7562",((Map)(((Map)relationships.get(0)).get("personB"))).get("uuid"));
-        Assert.assertEquals("6d9002ea-a96b-4889-af78-82d48c57a110",((Map)(((Map)relationships.get(0)).get("relationshipType"))).get("uuid"));
-    }
-
-    @Test
-    public void shouldUpdatePatient() throws Exception {
-        SimpleObject patientProfileUpdateObject = new SimpleObject();
-        patientProfileUpdateObject.putAll(new ObjectMapper().readValue(getClass().getClassLoader().getResourceAsStream("update_patient_profile.json"), HashMap.class));
-        SimpleObject created = (SimpleObject) resource.update("da7f524f-27ce-4bb2-86d6-6d1d05312bd5", patientProfileUpdateObject, new RequestContext());
-        Assert.assertEquals("101-6 - dull skull", ((Map) created.get("patient")).get("display"));
-    }
-
+	
+	private PatientProfileResource resource;
+	
+	@Before
+	public void beforeEachTests() throws Exception {
+		resource = (PatientProfileResource) Context.getService(RestService.class)
+		        .getResourceBySupportedClass(PatientProfile.class);
+		File personImageDirectory = new File(OpenmrsUtil.getApplicationDataDirectory() + "/person_images");
+		personImageDirectory.mkdirs();
+	}
+	
+	@Test
+	public void shouldCreatePatient() throws Exception {
+		SimpleObject patientProfileCreateObject = new SimpleObject();
+		patientProfileCreateObject.putAll(new ObjectMapper()
+		        .readValue(getClass().getClassLoader().getResourceAsStream("create_patient_profile.json"), HashMap.class));
+		SimpleObject created = (SimpleObject) resource.create(patientProfileCreateObject, new RequestContext());
+		Assert.assertEquals("id-B - Ram Kabir", ((Map) created.get("patient")).get("display"));
+		List<Object> relationships = (List) created.get("relationships");
+		Assert.assertEquals(1, relationships.size());
+		Assert.assertEquals("ba1b19c2-3ed6-4f63-b8c0-f762dc8d7562",
+		    ((Map) (((Map) relationships.get(0)).get("personB"))).get("uuid"));
+		Assert.assertEquals("6d9002ea-a96b-4889-af78-82d48c57a110",
+		    ((Map) (((Map) relationships.get(0)).get("relationshipType"))).get("uuid"));
+	}
+	
+	@Test
+	public void shouldUpdatePatient() throws Exception {
+		SimpleObject patientProfileUpdateObject = new SimpleObject();
+		patientProfileUpdateObject.putAll(new ObjectMapper()
+		        .readValue(getClass().getClassLoader().getResourceAsStream("update_patient_profile.json"), HashMap.class));
+		SimpleObject created = (SimpleObject) resource.update("da7f524f-27ce-4bb2-86d6-6d1d05312bd5",
+		    patientProfileUpdateObject, new RequestContext());
+		Assert.assertEquals("101-6 - dull skull", ((Map) created.get("patient")).get("display"));
+	}
+	
 }

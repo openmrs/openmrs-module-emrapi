@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang.StringUtils;
@@ -25,122 +34,129 @@ import java.util.Set;
 import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
 
 public class ObsMapper {
-
-    private ConceptService conceptService;
-    private EmrApiProperties emrApiProperties;
-    private ObsService obsService;
-    private OrderService orderService;
-
-    public ObsMapper(ConceptService conceptService,
-                     EmrApiProperties emrApiProperties,
-                     ObsService obsService, OrderService orderService) {
-        this.conceptService = conceptService;
-        this.emrApiProperties = emrApiProperties;
-        this.obsService = obsService;
-        this.orderService = orderService;
-    }
-
-    public Obs transformEtObs(Encounter encounter,Obs observation, EncounterTransaction.Observation observationData) {
-        if (observation == null) {
-            observation = newObservation(encounter,observationData);
-        }
-
-        mapObservationProperties(observationData, observation);
-
-        for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
-            Obs nextLevelObs = getMatchingObservation(observation.getGroupMembers(), member.getUuid());
-            observation.addGroupMember(transformEtObs(encounter,nextLevelObs, member));
-        }
-        return observation;
-    }
-
-    protected Obs newObservation(Encounter encounter,EncounterTransaction.Observation observationData) {
-        Obs observation = new Obs();
-        if (!StringUtils.isBlank(observationData.getUuid())) {
-            observation.setUuid(observationData.getUuid());
-        }
-        Date observationDateTime = getCurrentDateIfNull(observationData.getObservationDateTime());
-        Concept concept = conceptService.getConceptByUuid(observationData.getConceptUuid());
-        if (concept == null) {
-            throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
-        }
-        observation.setConcept(concept);
-        observation.setPerson(encounter.getPatient());
-        observation.setObsDatetime(observationDateTime);
-        setVoidedObs(observationData, observation);
-        observation.setFormField(observationData.getFormNamespace(),observationData.getFormFieldPath());
-        setInterpretationAndStatus(observation, observationData);
-        return observation;
-    }
-
-
-    private boolean setVoidedObs(EncounterTransaction.Observation observationData, Obs observation) {
-        if (observationData.getVoided()) {
-            observation.setVoided(true);
-            observation.setVoidReason(observationData.getVoidReason());
-        }
-        return observationData.getVoided();
-    }
-
-    protected void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) {
-        if(setVoidedObs(observationData, observation))
-            return;
-        observation.setComment(observationData.getComment());
-        if (observationData.getValue() != null) {
-            if (observation.getConcept().getDatatype().isCoded()) {
-                String uuid = getUuidOfCodedObservationValue(observationData.getValue());
-                Concept conceptByUuid = conceptService.getConceptByUuid(uuid);
-                if (conceptByUuid == null) {
-                    Drug drug = conceptService.getDrugByUuid(uuid);
-                    observation.setValueDrug(drug);
-                    observation.setValueCoded(drug.getConcept());
-                } else {
-                    observation.setValueCoded(conceptByUuid);
-                }
-            } else if (observation.getConcept().isComplex()) {
-                observation.setValueComplex(observationData.getValue().toString());
-                Concept conceptComplex = observation.getConcept();
-                if (conceptComplex instanceof HibernateProxy) {
-                    Hibernate.initialize(conceptComplex);
-                    conceptComplex = (ConceptComplex) ((HibernateProxy) conceptComplex).getHibernateLazyInitializer().getImplementation();
-                }
-                obsService.getHandler(((ConceptComplex) conceptComplex).getHandler()).saveObs(observation);
-            } else if (!observation.getConcept().getDatatype().getUuid().equals(ConceptDatatype.N_A_UUID)) {
-                try {
-                    observation.setValueAsString(observationData.getValue().toString());
-                } catch (ParseException pe) {
-                    throw new IllegalArgumentException("Obs value for the concept uuid [" + observationData.getConceptUuid() + "] cannot be parsed");
-                }
-            }
-        }
-        if (observationData.getOrderUuid() != null && !observationData.getOrderUuid().isEmpty()) {
-            observation.setOrder(getOrderByUuid(observationData.getOrderUuid()));
-        }
-        observation.setObsDatetime(getCurrentDateIfNull(observationData.getObservationDateTime()));
-        setInterpretationAndStatus(observation, observationData);
-    }
-
-    private void setInterpretationAndStatus(Obs obs, EncounterTransaction.Observation observationData) {
-        String interpretation = observationData.getInterpretation();
-        obs.setInterpretation(interpretation == null ? null : Obs.Interpretation.valueOf(interpretation));
-        String status = observationData.getStatus();
-        obs.setStatus(status == null ? Obs.Status.FINAL : Obs.Status.valueOf(status));
-    }
-
-    private String getUuidOfCodedObservationValue(Object codeObsVal) {
-        if (codeObsVal instanceof LinkedHashMap) return (String) ((LinkedHashMap) codeObsVal).get("uuid");
-        return (String) codeObsVal;
-    }
-
-    private Order getOrderByUuid(String orderUuid) {
-        return orderService.getOrderByUuid(orderUuid);
-    }
-
-    public Obs getMatchingObservation(Set<Obs> existingObservations, String observationUuid) {
-        if (existingObservations == null) return null;
-        for (Obs obs : existingObservations) {
-            if (StringUtils.equals(obs.getUuid(), observationUuid)) return obs;
-        }
-        return null;
-    }
+	
+	private ConceptService conceptService;
+	
+	private EmrApiProperties emrApiProperties;
+	
+	private ObsService obsService;
+	
+	private OrderService orderService;
+	
+	public ObsMapper(ConceptService conceptService, EmrApiProperties emrApiProperties, ObsService obsService,
+	    OrderService orderService) {
+		this.conceptService = conceptService;
+		this.emrApiProperties = emrApiProperties;
+		this.obsService = obsService;
+		this.orderService = orderService;
+	}
+	
+	public Obs transformEtObs(Encounter encounter, Obs observation, EncounterTransaction.Observation observationData) {
+		if (observation == null) {
+			observation = newObservation(encounter, observationData);
+		}
+		
+		mapObservationProperties(observationData, observation);
+		
+		for (EncounterTransaction.Observation member : observationData.getGroupMembers()) {
+			Obs nextLevelObs = getMatchingObservation(observation.getGroupMembers(), member.getUuid());
+			observation.addGroupMember(transformEtObs(encounter, nextLevelObs, member));
+		}
+		return observation;
+	}
+	
+	protected Obs newObservation(Encounter encounter, EncounterTransaction.Observation observationData) {
+		Obs observation = new Obs();
+		if (!StringUtils.isBlank(observationData.getUuid())) {
+			observation.setUuid(observationData.getUuid());
+		}
+		Date observationDateTime = getCurrentDateIfNull(observationData.getObservationDateTime());
+		Concept concept = conceptService.getConceptByUuid(observationData.getConceptUuid());
+		if (concept == null) {
+			throw new ConceptNotFoundException("Observation concept does not exist" + observationData.getConceptUuid());
+		}
+		observation.setConcept(concept);
+		observation.setPerson(encounter.getPatient());
+		observation.setObsDatetime(observationDateTime);
+		setVoidedObs(observationData, observation);
+		observation.setFormField(observationData.getFormNamespace(), observationData.getFormFieldPath());
+		setInterpretationAndStatus(observation, observationData);
+		return observation;
+	}
+	
+	private boolean setVoidedObs(EncounterTransaction.Observation observationData, Obs observation) {
+		if (observationData.getVoided()) {
+			observation.setVoided(true);
+			observation.setVoidReason(observationData.getVoidReason());
+		}
+		return observationData.getVoided();
+	}
+	
+	protected void mapObservationProperties(EncounterTransaction.Observation observationData, Obs observation) {
+		if (setVoidedObs(observationData, observation))
+			return;
+		observation.setComment(observationData.getComment());
+		if (observationData.getValue() != null) {
+			if (observation.getConcept().getDatatype().isCoded()) {
+				String uuid = getUuidOfCodedObservationValue(observationData.getValue());
+				Concept conceptByUuid = conceptService.getConceptByUuid(uuid);
+				if (conceptByUuid == null) {
+					Drug drug = conceptService.getDrugByUuid(uuid);
+					observation.setValueDrug(drug);
+					observation.setValueCoded(drug.getConcept());
+				} else {
+					observation.setValueCoded(conceptByUuid);
+				}
+			} else if (observation.getConcept().isComplex()) {
+				observation.setValueComplex(observationData.getValue().toString());
+				Concept conceptComplex = observation.getConcept();
+				if (conceptComplex instanceof HibernateProxy) {
+					Hibernate.initialize(conceptComplex);
+					conceptComplex = (ConceptComplex) ((HibernateProxy) conceptComplex).getHibernateLazyInitializer()
+					        .getImplementation();
+				}
+				obsService.getHandler(((ConceptComplex) conceptComplex).getHandler()).saveObs(observation);
+			} else if (!observation.getConcept().getDatatype().getUuid().equals(ConceptDatatype.N_A_UUID)) {
+				try {
+					observation.setValueAsString(observationData.getValue().toString());
+				}
+				catch (ParseException pe) {
+					throw new IllegalArgumentException(
+					        "Obs value for the concept uuid [" + observationData.getConceptUuid() + "] cannot be parsed");
+				}
+			}
+		}
+		if (observationData.getOrderUuid() != null && !observationData.getOrderUuid().isEmpty()) {
+			observation.setOrder(getOrderByUuid(observationData.getOrderUuid()));
+		}
+		observation.setObsDatetime(getCurrentDateIfNull(observationData.getObservationDateTime()));
+		setInterpretationAndStatus(observation, observationData);
+	}
+	
+	private void setInterpretationAndStatus(Obs obs, EncounterTransaction.Observation observationData) {
+		String interpretation = observationData.getInterpretation();
+		obs.setInterpretation(interpretation == null ? null : Obs.Interpretation.valueOf(interpretation));
+		String status = observationData.getStatus();
+		obs.setStatus(status == null ? Obs.Status.FINAL : Obs.Status.valueOf(status));
+	}
+	
+	private String getUuidOfCodedObservationValue(Object codeObsVal) {
+		if (codeObsVal instanceof LinkedHashMap)
+			return (String) ((LinkedHashMap) codeObsVal).get("uuid");
+		return (String) codeObsVal;
+	}
+	
+	private Order getOrderByUuid(String orderUuid) {
+		return orderService.getOrderByUuid(orderUuid);
+	}
+	
+	public Obs getMatchingObservation(Set<Obs> existingObservations, String observationUuid) {
+		if (existingObservations == null)
+			return null;
+		for (Obs obs : existingObservations) {
+			if (StringUtils.equals(obs.getUuid(), observationUuid))
+				return obs;
+		}
+		return null;
+	}
 }

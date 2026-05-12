@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.diagnosis;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,37 +29,36 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
-
+	
 	private static final String DIAGNOSIS_DATASET = "DiagnosisDataset.xml";
-
+	
 	@Autowired
 	ConceptService conceptService;
-
+	
 	@Autowired
 	EncounterService encounterService;
-
+	
 	@Autowired
 	ObsGroupDiagnosisService obsGroupDiagnosisService;
-
+	
 	@Autowired
 	org.openmrs.api.DiagnosisService diagnosisService;
-
+	
 	@Autowired
 	PatientService patientService;
-
+	
 	@Autowired
 	EmrApiProperties emrApiProperties;
-
+	
 	private DiagnosisMetadata diagnosisMetadata;
-
+	
 	@BeforeEach
 	public void setUp() throws Exception {
 		executeDataSet(DIAGNOSIS_DATASET);
 		diagnosisMetadata = ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
 	}
-
+	
 	@Test
 	public void getAllPatientsWithDiagnosis_shouldReturnListOfPatientIdsWithADiagnosis() {
 		diagnosisMetadata.setDiagnosisSetConcept(conceptService.getConcept(159965));
@@ -58,13 +66,15 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 		
 		assertEquals(2, patientIds.size());
 	}
-
+	
 	@Test
 	public void migrate_shouldVoidEmrapiDiagnosisAndCreateAnewCoreDiagnosis() {
 		Patient patient = patientService.getPatient(7);
 		OldDiagnosisBuilder oldDiagnosisBuilder = new OldDiagnosisBuilder(diagnosisMetadata);
-		Obs obs = oldDiagnosisBuilder.buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).save().get();
-		oldDiagnosisBuilder.buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED, "non-coded disease", encounterService.getEncounter(1)).save();
+		Obs obs = oldDiagnosisBuilder.buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY,
+		    Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).save().get();
+		oldDiagnosisBuilder.buildDiagnosis(patient, "2013-08-10", Diagnosis.Order.PRIMARY, Diagnosis.Certainty.PRESUMED,
+		    "non-coded disease", encounterService.getEncounter(1)).save();
 		assertFalse(obs.getVoided());
 		List<Diagnosis> emrapiDiagnoses = MigrateDiagnosis.getDeprecatedDiagnosisService().getDiagnoses(patient, null);
 		assertEquals(2, emrapiDiagnoses.size());
@@ -82,8 +92,10 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 	public void migrate_shouldVoidChildObsOfMigratedDiagnosis() {
 		Patient patient = patientService.getPatient(7);
 		OldDiagnosisBuilder oldDiagnosisBuilder = new OldDiagnosisBuilder(diagnosisMetadata);
-		ObsBuilder builder = oldDiagnosisBuilder.buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).
-				addMember(Context.getConceptService().getConcept(3), "Some Value");
+		ObsBuilder builder = oldDiagnosisBuilder
+		        .buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY, Diagnosis.Certainty.CONFIRMED,
+		            "non-coded pain", encounterService.getEncounter(1))
+		        .addMember(Context.getConceptService().getConcept(3), "Some Value");
 		Obs obs = builder.save().get();
 		// Before migration
 		assertEquals(4, obs.getGroupMembers().size());
@@ -102,7 +114,7 @@ public class MigrateDiagnosisTest extends BaseModuleContextSensitiveTest {
 	public void migrate_shouldReturnTrueIfAtLeastOneDiagnosisWasMigrated() {
 		Patient patient = patientService.getPatient(7);
 		new OldDiagnosisBuilder(diagnosisMetadata).buildDiagnosis(patient, "2013-09-10", Diagnosis.Order.SECONDARY,
-				Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).save();
+		    Diagnosis.Certainty.CONFIRMED, "non-coded pain", encounterService.getEncounter(1)).save();
 		
 		assertEquals(0, diagnosisService.getDiagnoses(patient, null).size());
 		

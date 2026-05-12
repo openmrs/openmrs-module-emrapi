@@ -1,8 +1,11 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
- * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
- * of the Healthcare Disclaimer located at http://openmrs.org/license. Copyright (C) OpenMRS Inc. OpenMRS is a registered
- * trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.procedure;
 
@@ -139,7 +142,7 @@ class ProcedureValidatorTest {
 	
 	// should fail if both start date and estimated start date are provided for a new procedure
 	@Test
-	void validate_shouldRejectWhenBothStartDateTimeAndEstimatedStartDateAreProvidedForNewProcedure(){
+	void validate_shouldRejectWhenBothStartDateTimeAndEstimatedStartDateAreProvidedForNewProcedure() {
 		procedure.setStartDateTime(new Date());
 		procedure.setEstimatedStartDate("2024-01");
 		procedure.setProcedureId(null); // Simulate new procedure
@@ -161,12 +164,7 @@ class ProcedureValidatorTest {
 	void validate_shouldRejectWhenEndDateTimeIsBeforeEstimatedStartDate() {
 		procedure.setEstimatedStartDate("2024-01");
 		// 2023-10-01 is before 2024-01
-		procedure.setEndDateTime(
-				Date.from(LocalDate.of(2023, 10, 1)
-								.atStartOfDay(ZoneId.systemDefault())
-								.toInstant()
-				)
-		);
+		procedure.setEndDateTime(Date.from(LocalDate.of(2023, 10, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		validator.validate(procedure, errors);
 		assertTrue(hasErrorCode("Procedure.error.endDateTimeBeforeStartDateTime"));
 	}
@@ -266,7 +264,6 @@ class ProcedureValidatorTest {
 	}
 	
 	private boolean hasErrorCode(String code) {
-		return errors.getAllErrors().stream()
-				.anyMatch(e -> e.getCode().equals(code));
+		return errors.getAllErrors().stream().anyMatch(e -> e.getCode().equals(code));
 	}
 }

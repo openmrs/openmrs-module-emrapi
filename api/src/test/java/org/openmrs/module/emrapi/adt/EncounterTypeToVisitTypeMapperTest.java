@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.adt;
 
 import org.junit.jupiter.api.Assertions;
@@ -13,15 +22,18 @@ import org.openmrs.module.emrapi.EmrApiConstants;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EncounterTypeToVisitTypeMapperTest  {
+public class EncounterTypeToVisitTypeMapperTest {
 	
 	private EncounterTypetoVisitTypeMapper encounterTypetoVisitTypeMapper;
+	
 	private EncounterService encounterService;
+	
 	private VisitService visitService;
+	
 	private AdministrationService adminService;
 	
 	@BeforeEach
-	public void before(){
+	public void before() {
 		encounterTypetoVisitTypeMapper = new EncounterTypetoVisitTypeMapper();
 		encounterService = mock(EncounterService.class);
 		visitService = mock(VisitService.class);
@@ -64,7 +76,8 @@ public class EncounterTypeToVisitTypeMapperTest  {
 		encounterTypetoVisitTypeMapper.setMappingString("");
 		EncounterType e = encounterService.getEncounterType(1);
 		
-		when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP)).thenReturn("");
+		when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))
+		        .thenReturn("");
 		encounterTypetoVisitTypeMapper.setAdminService(adminService);
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
@@ -73,7 +86,7 @@ public class EncounterTypeToVisitTypeMapperTest  {
 	}
 	
 	@Test
-	public void testMappingWithEncounterTypeIds(){
+	public void testMappingWithEncounterTypeIds() {
 		encounterTypetoVisitTypeMapper.setMappingString("1:2");
 		EncounterType e = encounterService.getEncounterType(1);
 		
@@ -91,24 +104,25 @@ public class EncounterTypeToVisitTypeMapperTest  {
 	}
 	
 	@Test
-	public void testMappingWithEncounterTypeUuids(){
+	public void testMappingWithEncounterTypeUuids() {
 		encounterTypetoVisitTypeMapper.setMappingString("07000be2-26b6-4cce-8b40-866d8435b613:1");
 		EncounterType e = encounterService.getEncounterType(2);
 		
 		VisitType visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		Assertions.assertNotNull(visitType);
-		Assertions.assertEquals(1,visitType.getId().longValue());
+		Assertions.assertEquals(1, visitType.getId().longValue());
 		
 		// test with the Uuid for the visitType
-		encounterTypetoVisitTypeMapper.setMappingString("07000be2-26b6-4cce-8b40-866d8435b613:c0c579b0-8e59-401d-8a4a-976a0b183519");
+		encounterTypetoVisitTypeMapper
+		        .setMappingString("07000be2-26b6-4cce-8b40-866d8435b613:c0c579b0-8e59-401d-8a4a-976a0b183519");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
 		Assertions.assertNotNull(visitType);
-		Assertions.assertEquals("c0c579b0-8e59-401d-8a4a-976a0b183519",visitType.getUuid());
+		Assertions.assertEquals("c0c579b0-8e59-401d-8a4a-976a0b183519", visitType.getUuid());
 	}
 	
 	@Test
-	public void testMappingWithDefaultEncounterTypeMapping(){
+	public void testMappingWithDefaultEncounterTypeMapping() {
 		encounterTypetoVisitTypeMapper.setMappingString("default:1");
 		EncounterType e = encounterService.getEncounterType(2);
 		
@@ -124,8 +138,9 @@ public class EncounterTypeToVisitTypeMapperTest  {
 		Assertions.assertNotNull(visitType);
 		Assertions.assertEquals(visitType.getUuid(), "c0c579b0-8e59-401d-8a4a-976a0b183519");
 	}
+	
 	@Test
-	public void testMappingWithDefaultEncounterTypeMappingOverride(){
+	public void testMappingWithDefaultEncounterTypeMappingOverride() {
 		//default visit_type is 1 but override is 2
 		encounterTypetoVisitTypeMapper.setMappingString("default:1,2:2");
 		EncounterType e = encounterService.getEncounterType(2);
@@ -136,7 +151,8 @@ public class EncounterTypeToVisitTypeMapperTest  {
 		Assertions.assertEquals(visitType.getId().longValue(), 2);
 		
 		// test with the Uuid for the visitType
-		encounterTypetoVisitTypeMapper.setMappingString("default:c0c579b0-8e59-401d-8a4a-976a0b183519,07000be2-26b6-4cce-8b40-866d8435b613:759799ab-c9a5-435e-b671-77773ada74e4");
+		encounterTypetoVisitTypeMapper.setMappingString(
+		    "default:c0c579b0-8e59-401d-8a4a-976a0b183519,07000be2-26b6-4cce-8b40-866d8435b613:759799ab-c9a5-435e-b671-77773ada74e4");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
 		Assertions.assertNotNull(visitType);
@@ -144,7 +160,7 @@ public class EncounterTypeToVisitTypeMapperTest  {
 	}
 	
 	@Test
-	public void testMappingWithDefaultEncounterTypeMappingOverrideWithDefaultLast(){
+	public void testMappingWithDefaultEncounterTypeMappingOverrideWithDefaultLast() {
 		//default visit_type is 1 but override is 2
 		encounterTypetoVisitTypeMapper.setMappingString("2:2,default:1");
 		EncounterType e = encounterService.getEncounterType(2);
@@ -155,11 +171,12 @@ public class EncounterTypeToVisitTypeMapperTest  {
 		Assertions.assertEquals(2, visitType.getId().longValue());
 		
 		// test with the Uuid for the visitType
-		encounterTypetoVisitTypeMapper.setMappingString("07000be2-26b6-4cce-8b40-866d8435b613:759799ab-c9a5-435e-b671-77773ada74e4,default:c0c579b0-8e59-401d-8a4a-976a0b183519");
+		encounterTypetoVisitTypeMapper.setMappingString(
+		    "07000be2-26b6-4cce-8b40-866d8435b613:759799ab-c9a5-435e-b671-77773ada74e4,default:c0c579b0-8e59-401d-8a4a-976a0b183519");
 		visitType = encounterTypetoVisitTypeMapper.getVisitTypeForEncounterType(e);
 		
 		Assertions.assertNotNull(visitType);
-		Assertions.assertEquals("759799ab-c9a5-435e-b671-77773ada74e4",visitType.getUuid());
+		Assertions.assertEquals("759799ab-c9a5-435e-b671-77773ada74e4", visitType.getUuid());
 	}
 	
 }

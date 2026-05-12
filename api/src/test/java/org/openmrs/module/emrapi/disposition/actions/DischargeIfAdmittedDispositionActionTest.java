@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.disposition.actions;
 
 import org.joda.time.DateTime;
@@ -33,79 +42,86 @@ import static org.mockito.Mockito.when;
  *
  */
 public class DischargeIfAdmittedDispositionActionTest extends AuthenticatedUserTestHelper {
-
-    private DischargeIfAdmittedDispositionAction action;
-    private AdtService adtService;
-    private EmrApiProperties emrApiProperties;
-    private DispositionDescriptor dispositionDescriptor;
-    private DispositionService dispositionService;
-    private VisitDomainWrapper visitDomainWrapper;
-    private Concept dispositionObsGroupConcept = new Concept();;
-
-    @Before
-    public void setUp() throws Exception {
-        adtService = mock(AdtService.class);
-
-        emrApiProperties = mock(EmrApiProperties.class);
-        dispositionService = mock(DispositionService.class);
-        dispositionDescriptor = mock(DispositionDescriptor.class);
-        visitDomainWrapper = mock(VisitDomainWrapper.class);
-
-        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
-        when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
-
-        action = new DischargeIfAdmittedDispositionAction();
-        action.setAdtService(adtService);
-        action.setEmrApiProperties(emrApiProperties);
-    }
-
-    @Test
-    public void testDischargesIfAdmitted() throws Exception {
-
-        final Visit visit = new Visit();
-        final Encounter encounter = new Encounter();
-        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
-        encounter.setVisit(visit);
-        encounter.addProvider(new EncounterRole(), new Provider());
-        encounter.setEncounterDatetime(encounterDate);
-
-        final Obs dispositionObsGroup = new Obs();
-        dispositionObsGroup.setConcept(dispositionObsGroupConcept);
-
-        // TODO note that we really want to only test if the patient is admitted at the encounter datetime, but we have to test against visitDomainWrapper.isAdmitted()
-        // TODO for now because the "createAdtEncounterFor" method will throw an exception if isAdmitted() returns false; see https://minglehosting.thoughtworks.com/unicef/projects/pih_mirebalais/cards/938
-        when(visitDomainWrapper.isAdmitted()).thenReturn(true);
-        //when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(true);
-
-        action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
-        verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
-            @Override
-            public boolean matches(AdtAction adtAction) {
-                return adtAction.getVisit().equals(visit) &&
-                        TestUtils.sameProviders(adtAction.getProviders(), encounter.getProvidersByRoles()) &&
-                        adtAction.getActionDatetime().equals(encounterDate) &&
-                        adtAction.getType().equals(AdtAction.Type.DISCHARGE);
-            }
-        }));
-    }
-
-    @Test
-    public void testDoesNotDischargesIfNotAdmitted() throws Exception {
-
-        final Visit visit = new Visit();
-        final Encounter encounter = new Encounter();
-        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
-        encounter.setVisit(visit);
-        encounter.addProvider(new EncounterRole(), new Provider());
-        encounter.setEncounterDatetime(encounterDate);
-
-        final Obs dispositionObsGroup = new Obs();
-        dispositionObsGroup.setConcept(dispositionObsGroupConcept);
-
-        when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
-
-        action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
-        verify(adtService, never()).createAdtEncounterFor(any(AdtAction.class));
-    }
-
+	
+	private DischargeIfAdmittedDispositionAction action;
+	
+	private AdtService adtService;
+	
+	private EmrApiProperties emrApiProperties;
+	
+	private DispositionDescriptor dispositionDescriptor;
+	
+	private DispositionService dispositionService;
+	
+	private VisitDomainWrapper visitDomainWrapper;
+	
+	private Concept dispositionObsGroupConcept = new Concept();;
+	
+	@Before
+	public void setUp() throws Exception {
+		adtService = mock(AdtService.class);
+		
+		emrApiProperties = mock(EmrApiProperties.class);
+		dispositionService = mock(DispositionService.class);
+		dispositionDescriptor = mock(DispositionDescriptor.class);
+		visitDomainWrapper = mock(VisitDomainWrapper.class);
+		
+		when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+		when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
+		
+		action = new DischargeIfAdmittedDispositionAction();
+		action.setAdtService(adtService);
+		action.setEmrApiProperties(emrApiProperties);
+	}
+	
+	@Test
+	public void testDischargesIfAdmitted() throws Exception {
+		
+		final Visit visit = new Visit();
+		final Encounter encounter = new Encounter();
+		final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
+		encounter.setVisit(visit);
+		encounter.addProvider(new EncounterRole(), new Provider());
+		encounter.setEncounterDatetime(encounterDate);
+		
+		final Obs dispositionObsGroup = new Obs();
+		dispositionObsGroup.setConcept(dispositionObsGroupConcept);
+		
+		// TODO note that we really want to only test if the patient is admitted at the encounter datetime, but we have to test against visitDomainWrapper.isAdmitted()
+		// TODO for now because the "createAdtEncounterFor" method will throw an exception if isAdmitted() returns false; see https://minglehosting.thoughtworks.com/unicef/projects/pih_mirebalais/cards/938
+		when(visitDomainWrapper.isAdmitted()).thenReturn(true);
+		//when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(true);
+		
+		action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
+		verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
+			
+			@Override
+			public boolean matches(AdtAction adtAction) {
+				return adtAction.getVisit().equals(visit)
+				        && TestUtils.sameProviders(adtAction.getProviders(), encounter.getProvidersByRoles())
+				        && adtAction.getActionDatetime().equals(encounterDate)
+				        && adtAction.getType().equals(AdtAction.Type.DISCHARGE);
+			}
+		}));
+	}
+	
+	@Test
+	public void testDoesNotDischargesIfNotAdmitted() throws Exception {
+		
+		final Visit visit = new Visit();
+		final Encounter encounter = new Encounter();
+		final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
+		encounter.setVisit(visit);
+		encounter.addProvider(new EncounterRole(), new Provider());
+		encounter.setEncounterDatetime(encounterDate);
+		
+		final Obs dispositionObsGroup = new Obs();
+		dispositionObsGroup.setConcept(dispositionObsGroupConcept);
+		
+		when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
+		
+		action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
+		verify(adtService, never()).createAdtEncounterFor(any(AdtAction.class));
+	}
+	
 }

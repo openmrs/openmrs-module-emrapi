@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.disposition.actions;
 
 import org.joda.time.DateTime;
@@ -32,65 +41,73 @@ import static org.mockito.Mockito.when;
  *
  */
 public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestHelper {
-
-    private MarkPatientDeadDispositionAction action;
-    private PatientService patientService;
-    private DispositionService dispositionService;
-    private DispositionDescriptor dispositionDescriptor;
-    private ExitFromCareService exitFromCareService;
-    private EmrApiProperties emrApiProperties;
-    private Concept dispositionObsGroupConcept = new Concept();
-    private Concept dateOfDeathConcept = new Concept();
-
-    @Before
-    public void setUp() throws Exception {
-        dispositionService = mock(DispositionService.class);
-        dispositionDescriptor = mock(DispositionDescriptor.class);
-        exitFromCareService = mock(ExitFromCareService.class);
-        emrApiProperties = mock(EmrApiProperties.class);
-
-        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
-
-        patientService = mock(PatientService.class);
-        when(patientService.savePatient(any(Patient.class))).thenAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-            return invocation.getArguments()[0];
-            }
-        });
-
-        action = new MarkPatientDeadDispositionAction();
-        action.setEmrApiProperties(emrApiProperties);
-        action.setExitFromCareService(exitFromCareService);
-        action.setDispositionService(dispositionService);
-    }
-
-    @Test
-    public void testActionShouldMarkPatientAsDead() throws Exception {
-        Concept unknown = new Concept();
-        when(emrApiProperties.getUnknownCauseOfDeathConcept()).thenReturn(unknown);
-
-        Date expectedDeathDate = (new DateTime(2013, 05, 10, 20, 26)).toDate();
-
-        Patient patient = new Patient();
-
-        final Visit visit = new Visit();
-        final Encounter encounter = new Encounter();
-        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
-        encounter.setVisit(visit);
-        encounter.addProvider(new EncounterRole(), new Provider());
-        encounter.setEncounterDatetime(encounterDate);
-        encounter.setPatient(patient);
-
-        final Obs dispositionObsGroup = new Obs();
-        dispositionObsGroup.setConcept(dispositionObsGroupConcept);
-        encounter.addObs(dispositionObsGroup);
-
-        when(dispositionDescriptor.getDateOfDeath(dispositionObsGroup)).thenReturn(expectedDeathDate);
-
-        action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
-
-        verify(exitFromCareService, times(1)).markPatientDead(patient, unknown, expectedDeathDate);
-    }
-
+	
+	private MarkPatientDeadDispositionAction action;
+	
+	private PatientService patientService;
+	
+	private DispositionService dispositionService;
+	
+	private DispositionDescriptor dispositionDescriptor;
+	
+	private ExitFromCareService exitFromCareService;
+	
+	private EmrApiProperties emrApiProperties;
+	
+	private Concept dispositionObsGroupConcept = new Concept();
+	
+	private Concept dateOfDeathConcept = new Concept();
+	
+	@Before
+	public void setUp() throws Exception {
+		dispositionService = mock(DispositionService.class);
+		dispositionDescriptor = mock(DispositionDescriptor.class);
+		exitFromCareService = mock(ExitFromCareService.class);
+		emrApiProperties = mock(EmrApiProperties.class);
+		
+		when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+		
+		patientService = mock(PatientService.class);
+		when(patientService.savePatient(any(Patient.class))).thenAnswer(new Answer<Object>() {
+			
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				return invocation.getArguments()[0];
+			}
+		});
+		
+		action = new MarkPatientDeadDispositionAction();
+		action.setEmrApiProperties(emrApiProperties);
+		action.setExitFromCareService(exitFromCareService);
+		action.setDispositionService(dispositionService);
+	}
+	
+	@Test
+	public void testActionShouldMarkPatientAsDead() throws Exception {
+		Concept unknown = new Concept();
+		when(emrApiProperties.getUnknownCauseOfDeathConcept()).thenReturn(unknown);
+		
+		Date expectedDeathDate = (new DateTime(2013, 05, 10, 20, 26)).toDate();
+		
+		Patient patient = new Patient();
+		
+		final Visit visit = new Visit();
+		final Encounter encounter = new Encounter();
+		final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
+		encounter.setVisit(visit);
+		encounter.addProvider(new EncounterRole(), new Provider());
+		encounter.setEncounterDatetime(encounterDate);
+		encounter.setPatient(patient);
+		
+		final Obs dispositionObsGroup = new Obs();
+		dispositionObsGroup.setConcept(dispositionObsGroupConcept);
+		encounter.addObs(dispositionObsGroup);
+		
+		when(dispositionDescriptor.getDateOfDeath(dispositionObsGroup)).thenReturn(expectedDeathDate);
+		
+		action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
+		
+		verify(exitFromCareService, times(1)).markPatientDead(patient, unknown, expectedDeathDate);
+	}
+	
 }

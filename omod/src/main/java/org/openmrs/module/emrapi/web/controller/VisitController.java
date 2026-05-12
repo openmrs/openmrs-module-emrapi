@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.web.controller;
 
 import lombok.Setter;
@@ -35,102 +44,100 @@ import java.util.Map;
 @Setter
 @Controller
 public class VisitController extends BaseRestController {
-
-    @Autowired
-    PatientService patientService;
-
-    @Autowired
-    DiagnosisService diagnosisService;
-    
-    @Autowired
-    EmrPatientService emrPatientService;
-
-    /**
-     * Custom representation supported includes:
-     * visit:Visit,diagnoses:List<org.openmrs.Diagnosis>,visitNotes:Obs
-     */
+	
+	@Autowired
+	PatientService patientService;
+	
+	@Autowired
+	DiagnosisService diagnosisService;
+	
+	@Autowired
+	EmrPatientService emrPatientService;
+	
+	/**
+	 * Custom representation supported includes:
+	 * visit:Visit,diagnoses:List<org.openmrs.Diagnosis>,visitNotes:Obs
+	 */
 	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visit")
-    public ResponseEntity<?> getVisitsWithDiagnosesAndNotesByPatient(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @PathVariable("patientUuid") String patientUuid) {
-
-        RequestContext context = RestUtil.getRequestContext(request, response, null);
-        Representation representation = context.getRepresentation();
-        Representation defaultRep = (representation instanceof CustomRepresentation) ? null : representation;
-
-        // Determine what representations to render for each property.  Only compute if requested
-        Representation visitRepresentation = defaultRep;
-        Representation notesRepresentation = defaultRep;
-        Representation diagnosisRepresentation = defaultRep;
-
-        if (context.getRepresentation() instanceof CustomRepresentation) {
-            CustomRepresentation customRep = (CustomRepresentation) context.getRepresentation();
-            DelegatingResourceDescription customProps  = ConversionUtil.getCustomRepresentationDescription(customRep);
-            visitRepresentation = getRepresentation(customProps, "visit");
-            diagnosisRepresentation = getRepresentation(customProps, "diagnoses");
-            notesRepresentation = getRepresentation(customProps, "visitNotes");
-        }
-
-        // First, retrieve the appropriate Visits for the patient
-        Map<Visit, SimpleObject> visitData = new LinkedHashMap<>();
-        try {
-            Patient patient = patientService.getPatientByUuid(patientUuid);
-            if (patient == null) {
-                throw new APIException("Patient " + patientUuid + " not found");
-            }
-            List<Visit> visits = emrPatientService.getVisitsForPatient(patient, context.getStartIndex(), context.getLimit());
-            for (Visit visit : visits) {
-                SimpleObject o = new SimpleObject();
-                if (visitRepresentation != null) {
-                    o.put("visit", ConversionUtil.convertToRepresentation(visit, visitRepresentation));
-                }
-                visitData.put(visit, o);
-            }
-        }
-        catch (APIException e) {
-            return new ResponseEntity<>(RestUtil.wrapErrorResponse(e, e.getMessage()), HttpStatus.BAD_REQUEST);
-        }
-
-        // Retrieve diagnoses if requested
-        if (diagnosisRepresentation != null) {
-            Map<Visit, List<org.openmrs.Diagnosis>> diagnoses = diagnosisService.getDiagnoses(visitData.keySet());
-            for (Visit visit : visitData.keySet()) {
-                List<Object> diagnosisData = new ArrayList<>();
-                List<org.openmrs.Diagnosis> visitDiagnoses = diagnoses.get(visit);
-                if (visitDiagnoses != null) {
-                    for (org.openmrs.Diagnosis diagnosis : visitDiagnoses) {
-                        diagnosisData.add(ConversionUtil.convertToRepresentation(diagnosis, diagnosisRepresentation));
-                    }
-                }
-                visitData.get(visit).add("diagnoses", diagnosisData);
-            }
-        }
-
-        // Retrieve visitNotes if requested
-        if (notesRepresentation != null) {
-            Map<Visit, List<Obs>> notes = emrPatientService.getVisitNoteObservations(visitData.keySet());
-            for (Visit visit : visitData.keySet()) {
-                List<Object> notesData = new ArrayList<>();
-                List<Obs> visitNotes = notes.get(visit);
-                if (visitNotes != null) {
-                    for (Obs visitNoteObs : visitNotes) {
-                        notesData.add(ConversionUtil.convertToRepresentation(visitNoteObs, notesRepresentation));
-                    }
-                }
-                visitData.get(visit).add("visitNotes", notesData);
-            }
-        }
-
-        List<SimpleObject> visitDataToReturn = new ArrayList<>(visitData.values());
-        return new ResponseEntity<>(new NeedsPaging<>(visitDataToReturn, context), HttpStatus.OK);
-    }
-
-    private Representation getRepresentation(DelegatingResourceDescription drd, String propertyName) {
-        DelegatingResourceDescription.Property property = drd.getProperties().get(propertyName);
-        if (property == null) {
-            return null;
-        }
-        return property.getRep();
-    }
+	public ResponseEntity<?> getVisitsWithDiagnosesAndNotesByPatient(HttpServletRequest request,
+	        HttpServletResponse response, @PathVariable("patientUuid") String patientUuid) {
+		
+		RequestContext context = RestUtil.getRequestContext(request, response, null);
+		Representation representation = context.getRepresentation();
+		Representation defaultRep = (representation instanceof CustomRepresentation) ? null : representation;
+		
+		// Determine what representations to render for each property.  Only compute if requested
+		Representation visitRepresentation = defaultRep;
+		Representation notesRepresentation = defaultRep;
+		Representation diagnosisRepresentation = defaultRep;
+		
+		if (context.getRepresentation() instanceof CustomRepresentation) {
+			CustomRepresentation customRep = (CustomRepresentation) context.getRepresentation();
+			DelegatingResourceDescription customProps = ConversionUtil.getCustomRepresentationDescription(customRep);
+			visitRepresentation = getRepresentation(customProps, "visit");
+			diagnosisRepresentation = getRepresentation(customProps, "diagnoses");
+			notesRepresentation = getRepresentation(customProps, "visitNotes");
+		}
+		
+		// First, retrieve the appropriate Visits for the patient
+		Map<Visit, SimpleObject> visitData = new LinkedHashMap<>();
+		try {
+			Patient patient = patientService.getPatientByUuid(patientUuid);
+			if (patient == null) {
+				throw new APIException("Patient " + patientUuid + " not found");
+			}
+			List<Visit> visits = emrPatientService.getVisitsForPatient(patient, context.getStartIndex(), context.getLimit());
+			for (Visit visit : visits) {
+				SimpleObject o = new SimpleObject();
+				if (visitRepresentation != null) {
+					o.put("visit", ConversionUtil.convertToRepresentation(visit, visitRepresentation));
+				}
+				visitData.put(visit, o);
+			}
+		}
+		catch (APIException e) {
+			return new ResponseEntity<>(RestUtil.wrapErrorResponse(e, e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+		
+		// Retrieve diagnoses if requested
+		if (diagnosisRepresentation != null) {
+			Map<Visit, List<org.openmrs.Diagnosis>> diagnoses = diagnosisService.getDiagnoses(visitData.keySet());
+			for (Visit visit : visitData.keySet()) {
+				List<Object> diagnosisData = new ArrayList<>();
+				List<org.openmrs.Diagnosis> visitDiagnoses = diagnoses.get(visit);
+				if (visitDiagnoses != null) {
+					for (org.openmrs.Diagnosis diagnosis : visitDiagnoses) {
+						diagnosisData.add(ConversionUtil.convertToRepresentation(diagnosis, diagnosisRepresentation));
+					}
+				}
+				visitData.get(visit).add("diagnoses", diagnosisData);
+			}
+		}
+		
+		// Retrieve visitNotes if requested
+		if (notesRepresentation != null) {
+			Map<Visit, List<Obs>> notes = emrPatientService.getVisitNoteObservations(visitData.keySet());
+			for (Visit visit : visitData.keySet()) {
+				List<Object> notesData = new ArrayList<>();
+				List<Obs> visitNotes = notes.get(visit);
+				if (visitNotes != null) {
+					for (Obs visitNoteObs : visitNotes) {
+						notesData.add(ConversionUtil.convertToRepresentation(visitNoteObs, notesRepresentation));
+					}
+				}
+				visitData.get(visit).add("visitNotes", notesData);
+			}
+		}
+		
+		List<SimpleObject> visitDataToReturn = new ArrayList<>(visitData.values());
+		return new ResponseEntity<>(new NeedsPaging<>(visitDataToReturn, context), HttpStatus.OK);
+	}
+	
+	private Representation getRepresentation(DelegatingResourceDescription drd, String propertyName) {
+		DelegatingResourceDescription.Property property = drd.getProperties().get(propertyName);
+		if (property == null) {
+			return null;
+		}
+		return property.getRep();
+	}
 }

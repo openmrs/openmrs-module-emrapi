@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi;
 
 import org.junit.AfterClass;
@@ -9,17 +18,17 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import java.io.File;
 
 public abstract class BaseReportingTest extends BaseModuleContextSensitiveTest {
-
-    @BeforeClass
-    public static void beforeClass() {
-        Module mod = new Module("", "reporting", "", "", "", "1.25.0", "");
-        mod.setFile(new File(""));
-        ModuleFactory.getStartedModulesMap().put(mod.getModuleId(), mod);
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        ModuleFactory.getStartedModulesMap().remove("reporting");
-    }
-
+	
+	@BeforeClass
+	public static void beforeClass() {
+		Module mod = new Module("", "reporting", "", "", "", "1.25.0", "");
+		mod.setFile(new File(""));
+		ModuleFactory.getStartedModulesMap().put(mod.getModuleId(), mod);
+	}
+	
+	@AfterClass
+	public static void afterClass() {
+		ModuleFactory.getStartedModulesMap().remove("reporting");
+	}
+	
 }

@@ -1,8 +1,11 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
- * distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under the terms
- * of the Healthcare Disclaimer located at http://openmrs.org/license. Copyright (C) OpenMRS Inc. OpenMRS is a registered
- * trademark and the OpenMRS graphic logo is a trademark of OpenMRS Inc.
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.rest.resource;
 
@@ -61,8 +64,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 	@BeforeEach
 	void setUp() {
 		executeDataSet(TEST_DATASET);
-		resource = (ProcedureResource) Context.getService(RestService.class)
-				.getResourceBySupportedClass(Procedure.class);
+		resource = (ProcedureResource) Context.getService(RestService.class).getResourceBySupportedClass(Procedure.class);
 	}
 	
 	@Nested
@@ -147,8 +149,7 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 		
 		@Test
 		void shouldThrowWhenNoPatientParameter() {
-			assertThrows(ResourceDoesNotSupportOperationException.class,
-					() -> resource.doSearch(new RequestContext()));
+			assertThrows(ResourceDoesNotSupportOperationException.class, () -> resource.doSearch(new RequestContext()));
 		}
 		
 		@Test
@@ -327,19 +328,18 @@ class ProcedureResourceTest extends BaseModuleWebContextSensitiveTest {
 		
 		@Test
 		void shouldNotAllowDeleteWithoutReason() {
-			assertThrows(APIException.class,
-					() -> resource.delete(EXISTING_PROCEDURE_UUID, null, new RequestContext()));
+			assertThrows(APIException.class, () -> resource.delete(EXISTING_PROCEDURE_UUID, null, new RequestContext()));
 		}
 	}
 	
 	@Nested
 	@DisplayName("purge")
 	class Purge {
-
+		
 		@Test
 		void shouldPermanentlyDeleteProcedure() throws Exception {
 			resource.purge(EXISTING_PROCEDURE_UUID, new RequestContext());
-
+			
 			Procedure purged = Context.getService(ProcedureService.class).getProcedureByUuid(EXISTING_PROCEDURE_UUID);
 			assertNull(purged);
 		}

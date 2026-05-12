@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.encounter;
 
 import org.junit.After;
@@ -26,182 +35,183 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class EncounterProviderServiceHelperTest {
-
-    private EncounterProviderServiceHelper encounterProviderServiceHelper;
-
-    @Mock
-    private ProviderService providerService;
-
-    @Mock
-    private EncounterService encounterService;
-
-    private MockedStatic<Context> context;
-
-    @Before
-    public void setUp() {
-
-        initMocks(this);
-
-        Provider provider = new Provider();
-        provider.setName("provider-name");
-        provider.setUuid("provider-uuid");
-        when(providerService.getProviderByUuid("provider-uuid")).thenReturn(provider);
-
-        Provider anotherProvider = new Provider();
-        anotherProvider.setName("another-provider-name");
-        anotherProvider.setUuid("another-provider-uuid");
-        when(providerService.getProviderByUuid("another-provider-uuid")).thenReturn(anotherProvider);
-
-        EncounterRole unknownRole = new EncounterRole();
-        unknownRole.setUuid(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID);
-        when(encounterService.getEncounterRoleByUuid(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID)).thenReturn(unknownRole);
-
-        EncounterRole role = new EncounterRole();
-        role.setUuid("role-uuid");
-        when(encounterService.getEncounterRoleByUuid("role-uuid")).thenReturn(role);
-
-
-        EncounterRole anotherRole = new EncounterRole();
-        anotherRole.setUuid("another-role-uuid");
-        when(encounterService.getEncounterRoleByUuid("another-role-uuid")).thenReturn(anotherRole);
-
-        context = Mockito.mockStatic(Context.class);
-
-        encounterProviderServiceHelper = new EncounterProviderServiceHelper(providerService, encounterService);
-    }
-
-    @After
-    public void tearDown() {
-        context.close();
-    }
-
-    @Test
-    public void shouldAddProvider() {
-        Encounter encounter = new Encounter();
-        EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
-        provider.setUuid("provider-uuid");
-        provider.setEncounterRoleUuid("role-uuid");
-
-        encounterProviderServiceHelper.update(encounter, Collections.singleton(provider));
-
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
-
-        EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
-        assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
-        assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
-    }
-
-    @Test
-    public void shouldSetEncounterRoleToUknownIfNotSpecified() {
-        Encounter encounter = new Encounter();
-        EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
-        provider.setUuid("provider-uuid");
-
-        encounterProviderServiceHelper.update(encounter, Collections.singleton(provider));
-
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
-
-        EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
-        assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
-        assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID)));
-    }
-
-    @Test
-    public void shoulAddSecondProvider() {
-
-        Encounter encounter = new Encounter();
-
-        Provider provider = new Provider();
-        provider.setUuid("provider-uuid");
-
-        EncounterRole role = new EncounterRole();
-        role.setUuid("role-uuid");
-        encounter.addProvider(role, provider);
-
-        EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
-        encounterTransactionProvider.setUuid("another-provider-uuid");
-        encounterTransactionProvider.setEncounterRoleUuid("role-uuid");
-
-        // sanity check
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
-
-        encounterProviderServiceHelper.update(encounter, Collections.singleton(encounterTransactionProvider));
-
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(2)));
-
-        Iterator<EncounterProvider> i = encounter.getEncounterProviders().iterator();
-        EncounterProvider encounterProvider1 = i.next();
-        EncounterProvider encounterProvider2 = i.next();
-
-        assertTrue(encounterProvider1.getProvider().getUuid().equals("provider-uuid") && encounterProvider2.getProvider().getUuid().equals("another-provider-uuid") ||
-                encounterProvider1.getProvider().getUuid().equals("another-provider-uuid") && encounterProvider2.getProvider().getUuid().equals("provider-uuid"));
-
-        assertThat(encounterProvider1.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
-        assertThat(encounterProvider2.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
-    }
-
-    @Test
-    public void shouldNotAddProviderIfAlreadyAssociatedWithEncounterWithSpecifiedEncounterRole() {
-
-        Encounter encounter = new Encounter();
-
-        Provider provider = new Provider();
-        provider.setUuid("provider-uuid");
-
-        EncounterRole role = new EncounterRole();
-        role.setUuid("role-uuid");
-        encounter.addProvider(role, provider);
-
-        EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
-        encounterTransactionProvider.setUuid("provider-uuid");
-        encounterTransactionProvider.setEncounterRoleUuid("role-uuid");
-
-        // sanity check
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
-
-        encounterProviderServiceHelper.update(encounter, Collections.singleton(encounterTransactionProvider));
-
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
-
-        EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
-        assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
-        assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
-    }
-
-    @Test
-    public void shouldAddProviderIfAlreadyAssociatedWithEncounterButWithDifferentEncounterRole() {
-
-        Encounter encounter = new Encounter();
-
-        Provider provider = new Provider();
-        provider.setUuid("provider-uuid");
-
-        EncounterRole role = new EncounterRole();
-        role.setUuid("role-uuid");
-        encounter.addProvider(role, provider);
-
-        EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
-        encounterTransactionProvider.setUuid(provider.getUuid());
-        encounterTransactionProvider.setEncounterRoleUuid("another-role-uuid");
-
-        // sanity check
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
-
-        encounterProviderServiceHelper.update(encounter, Collections.singleton(encounterTransactionProvider));
-
-        assertThat(encounter.getEncounterProviders().size(), is(equalTo(2)));
-
-        Iterator<EncounterProvider> i = encounter.getEncounterProviders().iterator();
-        EncounterProvider encounterProvider1 = i.next();
-        EncounterProvider encounterProvider2 = i.next();
-
-        assertThat(encounterProvider1.getProvider().getUuid(), is(equalTo("provider-uuid")));
-        assertThat(encounterProvider2.getProvider().getUuid(), is(equalTo("provider-uuid")));
-
-        EncounterRole role1 = encounterProvider1.getEncounterRole();
-        EncounterRole role2 = encounterProvider2.getEncounterRole();
-
-        assertTrue(role1.getUuid().equals("role-uuid") && role2.getUuid().equals("another-role-uuid") ||
-                role1.getUuid().equals("another-role-uuid") && role2.getUuid().equals("role-uuid"));
-    }
+	
+	private EncounterProviderServiceHelper encounterProviderServiceHelper;
+	
+	@Mock
+	private ProviderService providerService;
+	
+	@Mock
+	private EncounterService encounterService;
+	
+	private MockedStatic<Context> context;
+	
+	@Before
+	public void setUp() {
+		
+		initMocks(this);
+		
+		Provider provider = new Provider();
+		provider.setName("provider-name");
+		provider.setUuid("provider-uuid");
+		when(providerService.getProviderByUuid("provider-uuid")).thenReturn(provider);
+		
+		Provider anotherProvider = new Provider();
+		anotherProvider.setName("another-provider-name");
+		anotherProvider.setUuid("another-provider-uuid");
+		when(providerService.getProviderByUuid("another-provider-uuid")).thenReturn(anotherProvider);
+		
+		EncounterRole unknownRole = new EncounterRole();
+		unknownRole.setUuid(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID);
+		when(encounterService.getEncounterRoleByUuid(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID)).thenReturn(unknownRole);
+		
+		EncounterRole role = new EncounterRole();
+		role.setUuid("role-uuid");
+		when(encounterService.getEncounterRoleByUuid("role-uuid")).thenReturn(role);
+		
+		EncounterRole anotherRole = new EncounterRole();
+		anotherRole.setUuid("another-role-uuid");
+		when(encounterService.getEncounterRoleByUuid("another-role-uuid")).thenReturn(anotherRole);
+		
+		context = Mockito.mockStatic(Context.class);
+		
+		encounterProviderServiceHelper = new EncounterProviderServiceHelper(providerService, encounterService);
+	}
+	
+	@After
+	public void tearDown() {
+		context.close();
+	}
+	
+	@Test
+	public void shouldAddProvider() {
+		Encounter encounter = new Encounter();
+		EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
+		provider.setUuid("provider-uuid");
+		provider.setEncounterRoleUuid("role-uuid");
+		
+		encounterProviderServiceHelper.update(encounter, Collections.singleton(provider));
+		
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
+		
+		EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
+		assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
+		assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
+	}
+	
+	@Test
+	public void shouldSetEncounterRoleToUknownIfNotSpecified() {
+		Encounter encounter = new Encounter();
+		EncounterTransaction.Provider provider = new EncounterTransaction.Provider();
+		provider.setUuid("provider-uuid");
+		
+		encounterProviderServiceHelper.update(encounter, Collections.singleton(provider));
+		
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
+		
+		EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
+		assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
+		assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo(EncounterRole.UNKNOWN_ENCOUNTER_ROLE_UUID)));
+	}
+	
+	@Test
+	public void shoulAddSecondProvider() {
+		
+		Encounter encounter = new Encounter();
+		
+		Provider provider = new Provider();
+		provider.setUuid("provider-uuid");
+		
+		EncounterRole role = new EncounterRole();
+		role.setUuid("role-uuid");
+		encounter.addProvider(role, provider);
+		
+		EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
+		encounterTransactionProvider.setUuid("another-provider-uuid");
+		encounterTransactionProvider.setEncounterRoleUuid("role-uuid");
+		
+		// sanity check
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
+		
+		encounterProviderServiceHelper.update(encounter, Collections.singleton(encounterTransactionProvider));
+		
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(2)));
+		
+		Iterator<EncounterProvider> i = encounter.getEncounterProviders().iterator();
+		EncounterProvider encounterProvider1 = i.next();
+		EncounterProvider encounterProvider2 = i.next();
+		
+		assertTrue(encounterProvider1.getProvider().getUuid().equals("provider-uuid")
+		        && encounterProvider2.getProvider().getUuid().equals("another-provider-uuid")
+		        || encounterProvider1.getProvider().getUuid().equals("another-provider-uuid")
+		                && encounterProvider2.getProvider().getUuid().equals("provider-uuid"));
+		
+		assertThat(encounterProvider1.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
+		assertThat(encounterProvider2.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
+	}
+	
+	@Test
+	public void shouldNotAddProviderIfAlreadyAssociatedWithEncounterWithSpecifiedEncounterRole() {
+		
+		Encounter encounter = new Encounter();
+		
+		Provider provider = new Provider();
+		provider.setUuid("provider-uuid");
+		
+		EncounterRole role = new EncounterRole();
+		role.setUuid("role-uuid");
+		encounter.addProvider(role, provider);
+		
+		EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
+		encounterTransactionProvider.setUuid("provider-uuid");
+		encounterTransactionProvider.setEncounterRoleUuid("role-uuid");
+		
+		// sanity check
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
+		
+		encounterProviderServiceHelper.update(encounter, Collections.singleton(encounterTransactionProvider));
+		
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
+		
+		EncounterProvider encounterProvider = encounter.getEncounterProviders().iterator().next();
+		assertThat(encounterProvider.getProvider().getUuid(), is(equalTo("provider-uuid")));
+		assertThat(encounterProvider.getEncounterRole().getUuid(), is(equalTo("role-uuid")));
+	}
+	
+	@Test
+	public void shouldAddProviderIfAlreadyAssociatedWithEncounterButWithDifferentEncounterRole() {
+		
+		Encounter encounter = new Encounter();
+		
+		Provider provider = new Provider();
+		provider.setUuid("provider-uuid");
+		
+		EncounterRole role = new EncounterRole();
+		role.setUuid("role-uuid");
+		encounter.addProvider(role, provider);
+		
+		EncounterTransaction.Provider encounterTransactionProvider = new EncounterTransaction.Provider();
+		encounterTransactionProvider.setUuid(provider.getUuid());
+		encounterTransactionProvider.setEncounterRoleUuid("another-role-uuid");
+		
+		// sanity check
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(1)));
+		
+		encounterProviderServiceHelper.update(encounter, Collections.singleton(encounterTransactionProvider));
+		
+		assertThat(encounter.getEncounterProviders().size(), is(equalTo(2)));
+		
+		Iterator<EncounterProvider> i = encounter.getEncounterProviders().iterator();
+		EncounterProvider encounterProvider1 = i.next();
+		EncounterProvider encounterProvider2 = i.next();
+		
+		assertThat(encounterProvider1.getProvider().getUuid(), is(equalTo("provider-uuid")));
+		assertThat(encounterProvider2.getProvider().getUuid(), is(equalTo("provider-uuid")));
+		
+		EncounterRole role1 = encounterProvider1.getEncounterRole();
+		EncounterRole role2 = encounterProvider2.getEncounterRole();
+		
+		assertTrue(role1.getUuid().equals("role-uuid") && role2.getUuid().equals("another-role-uuid")
+		        || role1.getUuid().equals("another-role-uuid") && role2.getUuid().equals("role-uuid"));
+	}
 }
