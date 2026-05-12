@@ -1,5 +1,7 @@
 package org.openmrs.module.emrapi.adt.reporting.query;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.openmrs.Location;
 import org.openmrs.Visit;
 import org.openmrs.module.reporting.definition.configuration.ConfigurationProperty;
@@ -18,17 +20,11 @@ import org.openmrs.module.reporting.query.visit.definition.VisitQuery;
  * If a location is specified, restricts the query to only visits that have the chosen location as a visit location
  */
 @Caching(strategy=ConfigurationPropertyCachingStrategy.class)
+@Getter
+@Setter
 public class AwaitingAdmissionVisitQuery extends BaseQuery<Visit> implements VisitQuery {
 
     @ConfigurationProperty
     private Location location;
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
 
 }
