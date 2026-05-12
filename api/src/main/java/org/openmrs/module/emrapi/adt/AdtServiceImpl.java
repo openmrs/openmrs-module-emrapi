@@ -244,7 +244,7 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 	private Visit getActiveVisitHelper(Patient patient, Location department) {
 		Date now = new Date();
 		
-		List<Visit> candidates = visitService.getVisitsByPatient(patient);
+		List<Visit> candidates = visitService.getActiveVisitsByPatient(patient);
 		Visit ret = null;
 		for (Visit candidate : candidates) {
 			if (isSuitableVisit(candidate, department, now)) {

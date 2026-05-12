@@ -239,8 +239,8 @@ public class AdtServiceTest {
 	public void testEnsureActiveVisitCreatesNewVisit() throws Exception {
 		final Patient patient = new Patient();
 		
-		when(mockVisitService.getVisitsByPatient(patient)).thenReturn(new ArrayList<Visit>());
-		
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(new ArrayList<Visit>());
+
 		service.ensureActiveVisit(patient, outpatientDepartment);
 		
 		verify(mockVisitService).saveVisit(argThat(o -> {
@@ -261,8 +261,8 @@ public class AdtServiceTest {
 		recentVisit.setLocation(mirebalaisHospital);
 		recentVisit.setStartDatetime(DateUtils.addHours(new Date(), -1));
 		
-		when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Collections.singletonList(recentVisit));
-		
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(recentVisit));
+
 		assertThat(service.ensureActiveVisit(patient, outpatientDepartment), is(recentVisit));
 		
 		verify(mockVisitService, times(0)).saveVisit(any(Visit.class));
@@ -277,8 +277,8 @@ public class AdtServiceTest {
 		oldVisit.setStartDatetime(DateUtils.addDays(new Date(), -10));
 		oldVisit.setStopDatetime(DateUtils.addDays(new Date(), -9));
 		
-		when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Collections.singletonList(oldVisit));
-		
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(oldVisit));
+
 		final Visit created = service.ensureActiveVisit(patient, outpatientDepartment);
 		assertNotNull(created);
 		assertNotSame(oldVisit, created);
@@ -299,6 +299,90 @@ public class AdtServiceTest {
 		}));
 	}
 	
+	@Test
+	public void getActiveVisit_shouldReturnNullWhenPatientHasNoVisits() {
+		Patient patient = new Patient();
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.emptyList());
+
+		assertNull(service.getActiveVisit(patient, outpatientDepartment));
+	}
+
+	@Test
+	public void getActiveVisit_shouldReturnOpenVisitAtExactLocation() {
+		Patient patient = new Patient();
+		Visit visit = buildVisit(patient, atFacilityVisitType, outpatientDepartment, DateUtils.addHours(new Date(), -1), null);
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(visit));
+
+		VisitDomainWrapper result = service.getActiveVisit(patient, outpatientDepartment);
+		assertNotNull(result);
+		assertSame(visit, result.getVisit());
+	}
+
+	@Test
+	public void getActiveVisit_shouldReturnOpenVisitAtParentLocation() {
+		Patient patient = new Patient();
+		// visit is at mirebalaisHospital (parent of outpatientDepartment)
+		Visit visit = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, DateUtils.addHours(new Date(), -1), null);
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(visit));
+
+		VisitDomainWrapper result = service.getActiveVisit(patient, outpatientDepartment);
+		assertNotNull(result);
+		assertSame(visit, result.getVisit());
+	}
+
+	@Test
+	public void getActiveVisit_shouldReturnNullWhenVisitIsAtChildAndQueryIsAtParent() {
+		Patient patient = new Patient();
+		// visit is at outpatientDepartment (child of mirebalaisHospital), but we query the parent
+		Visit visit = buildVisit(patient, atFacilityVisitType, outpatientDepartment, DateUtils.addHours(new Date(), -1), null);
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(visit));
+
+		assertNull(service.getActiveVisit(patient, mirebalaisHospital));
+	}
+
+	@Test
+	public void getActiveVisit_shouldReturnNullForStoppedVisit() {
+		Patient patient = new Patient();
+		// getActiveVisitsByPatient excludes stopped visits at the DB level, so mock returns empty
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.emptyList());
+
+		assertNull(service.getActiveVisit(patient, outpatientDepartment));
+	}
+
+	@Test
+	public void getActiveVisit_shouldReturnNullForVisitAtUnrelatedLocation() {
+		Patient patient = new Patient();
+		Visit visit = buildVisit(patient, atFacilityVisitType, radiologyDepartment, DateUtils.addHours(new Date(), -1), null);
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(visit));
+
+		assertNull(service.getActiveVisit(patient, outpatientDepartment));
+	}
+
+	@Test
+	public void getActiveVisit_shouldIgnoreStoppedVisitAndReturnActiveOne() {
+		Patient patient = new Patient();
+		// getActiveVisitsByPatient returns only the open visit; the stopped visit is excluded by the DB query
+		Visit openVisit = buildVisit(patient, atFacilityVisitType, outpatientDepartment, DateUtils.addHours(new Date(), -1), null);
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(openVisit));
+
+		VisitDomainWrapper result = service.getActiveVisit(patient, outpatientDepartment);
+		assertNotNull(result);
+		assertSame(openVisit, result.getVisit());
+	}
+
+	@Test
+	public void getActiveVisit_shouldReturnVisitWithFutureStopDate() {
+		// getActiveVisitsByPatient uses stopDatetime IS NULL OR stopDatetime > NOW(), so future stop dates are included
+		Patient patient = new Patient();
+		Visit visit = buildVisit(patient, atFacilityVisitType, outpatientDepartment,
+				DateUtils.addHours(new Date(), -1), DateUtils.addHours(new Date(), 5));
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(Collections.singletonList(visit));
+
+		VisitDomainWrapper result = service.getActiveVisit(patient, outpatientDepartment);
+		assertNotNull(result);
+		assertSame(visit, result.getVisit());
+	}
+
 	@Test
 	public void testMergeVisits() throws Exception {
 		Patient patient = new Patient();
@@ -477,8 +561,8 @@ public class AdtServiceTest {
 	public void test_checkInPatient_forNewVisit() {
 		final Patient patient = new Patient();
 		
-		when(mockVisitService.getVisitsByPatient(patient)).thenReturn(new ArrayList<Visit>());
-		
+		when(mockVisitService.getActiveVisitsByPatient(patient)).thenReturn(new ArrayList<Visit>());
+
 		service.checkInPatient(patient, outpatientDepartment, null, null, null, false);
 		
 		verify(mockVisitService).saveVisit(argThat(visit -> {
