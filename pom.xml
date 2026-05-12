@@ -170,6 +170,19 @@
                         <failOnError>false</failOnError>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <configuration>
+                        <java>
+                            <eclipse>
+                                <version>4.26</version>
+                                <file>eclipse/OpenMRSFormatter.xml</file>
+                            </eclipse>
+                            <lineEndings>UNIX</lineEndings>
+                        </java>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
