@@ -176,7 +176,7 @@
                     <configuration>
                         <java>
                             <eclipse>
-                                <version>4.26</version>
+                                <version>4.19.0</version>
                                 <file>eclipse/OpenMRSFormatter.xml</file>
                             </eclipse>
                             <lineEndings>UNIX</lineEndings>

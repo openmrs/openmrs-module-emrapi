@@ -635,7 +635,7 @@ public class AdtServiceTest {
 		
 		when(mockVisitService.getVisits(anyCollection(), anyCollection(), anyCollection(), anyCollection(), any(Date.class),
 		    any(Date.class), any(Date.class), any(Date.class), anyMap(), anyBoolean(), anyBoolean()))
-		        .thenReturn(Collections.singletonList(visit));
+		            .thenReturn(Collections.singletonList(visit));
 		
 		service.closeInactiveVisits();
 		
