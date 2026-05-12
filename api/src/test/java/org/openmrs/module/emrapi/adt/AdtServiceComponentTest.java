@@ -484,52 +484,52 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 		
 		assertNull(visitService.getVisit(1015).getStopDatetime());
 	}
-
+	
 	@Test
 	public void getActiveVisit_shouldReturnNullWhenNoActiveVisitAtLocation() throws Exception {
 		Patient patient = patientService.getPatient(7);
-
+		
 		Location location = new Location();
 		location.setName("Test Hospital");
 		locationService.saveLocation(location);
-
+		
 		// patient 7 has visits in the test dataset, but not at this new unrelated location
 		assertNull(service.getActiveVisit(patient, location));
 	}
-
+	
 	@Test
 	public void getActiveVisit_shouldReturnOpenVisitAtExactLocation() throws Exception {
 		Patient patient = patientService.getPatient(7);
-
+		
 		Location location = new Location();
 		location.setName("Test Hospital");
 		locationService.saveLocation(location);
-
+		
 		Visit visit = new Visit();
 		visit.setPatient(patient);
 		visit.setLocation(location);
 		visit.setStartDatetime(DateUtils.addHours(new Date(), -1));
 		visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 		visitService.saveVisit(visit);
-
+		
 		VisitDomainWrapper result = service.getActiveVisit(patient, location);
 		assertNotNull(result);
 		assertThat(result.getVisit(), is(visit));
 	}
-
+	
 	@Test
 	public void getActiveVisit_shouldReturnOpenVisitAtParentLocation() throws Exception {
 		Patient patient = patientService.getPatient(7);
-
+		
 		Location parentLocation = new Location();
 		parentLocation.setName("Test Hospital");
 		locationService.saveLocation(parentLocation);
-
+		
 		Location childLocation = new Location();
 		childLocation.setName("Test Department");
 		childLocation.setParentLocation(parentLocation);
 		locationService.saveLocation(childLocation);
-
+		
 		// visit is at parent, query at child
 		Visit visit = new Visit();
 		visit.setPatient(patient);
@@ -537,20 +537,20 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 		visit.setStartDatetime(DateUtils.addHours(new Date(), -1));
 		visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 		visitService.saveVisit(visit);
-
+		
 		VisitDomainWrapper result = service.getActiveVisit(patient, childLocation);
 		assertNotNull(result);
 		assertThat(result.getVisit(), is(visit));
 	}
-
+	
 	@Test
 	public void getActiveVisit_shouldReturnNullForStoppedVisit() throws Exception {
 		Patient patient = patientService.getPatient(7);
-
+		
 		Location location = new Location();
 		location.setName("Test Hospital");
 		locationService.saveLocation(location);
-
+		
 		Visit visit = new Visit();
 		visit.setPatient(patient);
 		visit.setLocation(location);
@@ -558,41 +558,41 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 		visit.setStopDatetime(DateUtils.addHours(new Date(), -1));
 		visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 		visitService.saveVisit(visit);
-
+		
 		assertNull(service.getActiveVisit(patient, location));
 	}
-
+	
 	@Test
 	public void getActiveVisit_shouldReturnNullForVisitAtUnrelatedLocation() throws Exception {
 		Patient patient = patientService.getPatient(7);
-
+		
 		Location locationA = new Location();
 		locationA.setName("Hospital A");
 		locationService.saveLocation(locationA);
-
+		
 		Location locationB = new Location();
 		locationB.setName("Hospital B");
 		locationService.saveLocation(locationB);
-
+		
 		Visit visit = new Visit();
 		visit.setPatient(patient);
 		visit.setLocation(locationA);
 		visit.setStartDatetime(DateUtils.addHours(new Date(), -1));
 		visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 		visitService.saveVisit(visit);
-
+		
 		assertNull(service.getActiveVisit(patient, locationB));
 	}
-
+	
 	@Test
 	public void getActiveVisit_shouldReturnVisitWithFutureStopDate() throws Exception {
 		// getActiveVisitsByPatient uses stopDatetime IS NULL OR stopDatetime > NOW(), so future stop dates are included
 		Patient patient = patientService.getPatient(7);
-
+		
 		Location location = new Location();
 		location.setName("Test Hospital");
 		locationService.saveLocation(location);
-
+		
 		Visit visit = new Visit();
 		visit.setPatient(patient);
 		visit.setLocation(location);
@@ -600,20 +600,20 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 		visit.setStopDatetime(DateUtils.addHours(new Date(), 5));
 		visit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 		visitService.saveVisit(visit);
-
+		
 		VisitDomainWrapper result = service.getActiveVisit(patient, location);
 		assertNotNull(result);
 		assertThat(result.getVisit(), is(visit));
 	}
-
+	
 	@Test
 	public void getActiveVisit_shouldIgnoreStoppedVisitAndReturnActiveOne() throws Exception {
 		Patient patient = patientService.getPatient(7);
-
+		
 		Location location = new Location();
 		location.setName("Test Hospital");
 		locationService.saveLocation(location);
-
+		
 		Visit stoppedVisit = new Visit();
 		stoppedVisit.setPatient(patient);
 		stoppedVisit.setLocation(location);
@@ -621,19 +621,19 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 		stoppedVisit.setStopDatetime(DateUtils.addDays(new Date(), -1));
 		stoppedVisit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 		visitService.saveVisit(stoppedVisit);
-
+		
 		Visit openVisit = new Visit();
 		openVisit.setPatient(patient);
 		openVisit.setLocation(location);
 		openVisit.setStartDatetime(DateUtils.addHours(new Date(), -1));
 		openVisit.setVisitType(emrApiProperties.getAtFacilityVisitType());
 		visitService.saveVisit(openVisit);
-
+		
 		VisitDomainWrapper result = service.getActiveVisit(patient, location);
 		assertNotNull(result);
 		assertThat(result.getVisit(), is(openVisit));
 	}
-
+	
 	/**
 	 * I'm sure there's a standard matcher for this, but sometimes we run into bugs comparing a Date to
 	 * a java.sql.Timestamp
