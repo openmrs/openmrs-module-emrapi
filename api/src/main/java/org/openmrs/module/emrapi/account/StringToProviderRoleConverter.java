@@ -18,9 +18,9 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * Converts String to ProviderRole. Ideally this would be in core.
+ * Converts String to ProviderRole. Ideally, this would be in core.
  */
-@Component
+@Component("emrapiStringToProviderRoleConverter")
 public class StringToProviderRoleConverter implements Converter<String, ProviderRole> {
 	
 	@Autowired
