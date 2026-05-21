@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    This Source Code Form is subject to the terms of the Mozilla Public License,
+    v. 2.0. If a copy of the MPL was not distributed with this file, You can
+    obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+    the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+
+    Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+    graphic logo is a trademark of OpenMRS Inc.
+
+-->
 
 <module configVersion="1.6">
 
@@ -12,7 +23,7 @@
         ${project.parent.description}
     </description>
     <updateURL>https://modules.openmrs.org/modules/download/${project.parent.artifactId}/update.rdf</updateURL>
-	<require_version>${openMRSVersion}</require_version>
+	<require_version>${openmrsPlatformVersion}</require_version>
 
     <conditionalResources>
         <conditionalResource>
@@ -53,6 +64,14 @@
     <messages>
         <lang>de</lang>
         <file>messages_de.properties</file>
+    </messages>
+    <messages>
+        <lang>es</lang>
+        <file>messages_es.properties</file>
+    </messages>
+    <messages>
+        <lang>ht</lang>
+        <file>messages_ht.properties</file>
     </messages>
     <!-- /Internationalization -->
 
@@ -162,6 +181,37 @@
     <privilege>
         <name>Get conditions</name>
         <description>Able to get conditions</description>
+    </privilege>
+
+    <!-- privileges for procedures, see org.openmrs.module.emrapi.PrivilegeConstants -->
+    <privilege>
+        <name>Get Procedures</name>
+        <description>Able to get procedures</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Procedures</name>
+        <description>Able to add, edit, void, and unvoid procedures</description>
+    </privilege>
+
+    <privilege>
+        <name>Purge Procedures</name>
+        <description>Able to permanently delete procedures</description>
+    </privilege>
+
+    <privilege>
+        <name>Get Procedure Types</name>
+        <description>Able to get procedure types</description>
+    </privilege>
+
+    <privilege>
+        <name>Manage Procedure Types</name>
+        <description>Able to add, edit, retire, and unretire procedure types</description>
+    </privilege>
+
+    <privilege>
+        <name>Purge Procedure Types</name>
+        <description>Able to permanently delete procedure types</description>
     </privilege>
 
 </module>

@@ -1,17 +1,12 @@
 /*
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
-
 package org.openmrs.module.emrapi.adt;
 
 import org.openmrs.Encounter;
@@ -53,312 +48,323 @@ import java.util.List;
  * </pre>
  */
 public interface AdtService extends OpenmrsService {
-
-    /**
-     * Gets the patient's <em>active</em> visit at the given location, or null, if none exists..
-     *
-     *
-     * @param patient
-     * @param department
-     * @return
-     */
-    VisitDomainWrapper getActiveVisit(Patient patient, Location department);
-
-
-    /**
-     * Returns true/false as to whether the specified visit should be closed based on the built-in EMR-API logic
-     *
-     * @param visit
-     * @return
-     */
-    boolean shouldBeClosed(Visit visit);
-
-    /**
-     * Close the patient's active visit at the given location
-     *
-     * @param visit
-     * @return
-     */
-    void closeAndSaveVisit(Visit visit);
-
-    /**
-     * Like #getActiveVisit, but if the patient has no active visit, one is created (and persisted).
-     * (This has the same side-effects as #getActiveVisit.)
-     * The visit's location will be a valid visit location per our business logic.
-     *
-     * @param patient
-     * @param department
-     * @return
-     */
-    Visit ensureActiveVisit(Patient patient, Location department);
-
-    /**
-     * If the patient has no active visit on the day of @visitTime, one is created (and persisted).
-     * The visit's location will be a valid visit location per our business logic.
-     *
-     * @param patient
-     * @param visitTime
-     * @param department
-     * @return
-     */
-    Visit ensureVisit(Patient patient, Date visitTime, Location department);
-
-    /**
-     * Creates a "check-in" encounter for the given patient, at the location where, and adds it to the active visit.
-     * (This method calls ensureActiveVisit.)
-     *
-     * @param patient                   required
-     * @param where                     required (must either support visits, or have an ancestor location that does)
-     * @param checkInClerk              optional (defaults to Provider for currently-authenticated user)
-     * @param obsForCheckInEncounter    optional
-     * @param ordersForCheckInEncounter optional
-     * @param newVisit                  says whether create a new visit or not
-     * @return the encounter created (with EncounterService.saveEncounter already called on it)
-     */
-    Encounter checkInPatient(Patient patient, Location where, Provider checkInClerk, List<Obs> obsForCheckInEncounter,
-                             List<Order> ordersForCheckInEncounter, boolean newVisit);
-
-    /**
-     * Looks at this location, then its ancestors in the location hierarchy, to find a location tagged with
-     * {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS}
-     *
-     * @param location
-     * @return location, or its closest ancestor that supports visits
-     * @throws IllegalArgumentException if neither location nor its ancestors support visits
-     */
-    Location getLocationThatSupportsVisits(Location location);
-
-    /**
-     * @return all locations that are allowed to have visits assigned to them
-     * @see org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS
-     */
-    List<Location> getAllLocationsThatSupportVisits();
-
-    /**
-     * @param visit
-     * @param location
-     * @param when
-     * @return whether the given visit is suitable to store a patient interaction at the given location and date
-     */
-    boolean isSuitableVisit(Visit visit, Location location, Date when);
-
-    /**
-     * @param visit
-     * @param location
-     * @param when
-     * @return whether the given visit is suitable to store a patient interaction at the given location and date; returns true if this visit occurred on the the same day as the encounter, ignoring time
-     */
-    boolean isSuitableVisitIgnoringTime(Visit visit, Location location, Date when);
-
-    /**
-     * Gets all currently-active visits at the given location or any of its children
-     *
-     *
-     * @param location
-     * @return
-     */
-    List<VisitDomainWrapper> getActiveVisits(Location location);
-
-    /**
-     * If any currently-open visits are now inactive per our business logic, close them
-     */
-    void closeInactiveVisits();
-
-    /**
-     * @param patient
-     * @return the most recent encounter for the given patient
-     */
-    Encounter getLastEncounter(Patient patient);
-
-    /**
-     * @param patient
-     * @return the number of non-voided encounters this patient has had
-     */
-    int getCountOfEncounters(Patient patient);
-
-    /**
-     * @param patient
-     * @return the number of non-voided visits this patient has had
-     */
-    int getCountOfVisits(Patient patient);
-
-    /**
-     * @param v1
-     * @param v2
-     * @return true if both visits are in overlapping locations, and have overlapping datetime ranges
-     */
-    boolean visitsOverlap(Visit v1, Visit v2);
-
-    /**
-     * Merges patients using the underlying OpenMRS core mechanism, but applying extra business logic:
-     * <ul>
-     * <li>Any two visits that overlap will be joined together into one</li>
-     * <li>Merging an "unknown" patient into a known one does _not_ copy the unknown flag to the target patient</li>
-     * <li>Any additional {@link org.openmrs.module.emrapi.merge.PatientMergeAction}s</li>
-     * </ul>
-     *
-     * @param preferred
-     * @param notPreferred
-     * @see #visitsOverlap(org.openmrs.Visit, org.openmrs.Visit)
-     * @see org.openmrs.api.PatientService#mergePatients(org.openmrs.Patient, org.openmrs.Patient)
-     */
-    void mergePatients(Patient preferred, Patient notPreferred);
-
-    /**
-     * Allows another module to add a patient merge action to the list of actions to be performed
-     * when a patient is merged; (ideally, this would just happen via @Autowired, but because @Autowired
-     * in service impls greatly slow down startup, instead we have other modules inject the beans explicitly
-     * via this method). (See the FixPaperRecordRequestsForMerge class and the PaperRecordModuleActivator
-     * in the Paper Record module for an example)
-     *
-     * @param patientMergeAction
-     */
-    void addPatientMergeAction(PatientMergeAction patientMergeAction);
-
-    /**
-     * Allows another module to remove a patient merge action to the list of actions to be performed
-     * when a patient is merged; (see addPatientMergeAction above)
-     *
-     * @param patientMergeAction
-     */
-    void removePatientMergeAction(PatientMergeAction patientMergeAction);
-
-    /**
-     * Allows another module to add a visit merge action to the list of actions to be performed
-     * when a visit is merged; (ideally, this would just happen via @Autowired, but because @Autowired
-     * in service impls greatly slow down startup, instead we have other modules inject the beans explicitly
-     * via this method)
-     *
-     * @since 1.36.0
-     * @param visitMergeAction
-     */
-    void addVisitMergeAction(VisitMergeAction visitMergeAction);
-
-    /**
-     * Allows another module to remove a visit merge action to the list of actions to be performed
-     * when a visit is merged; (see addVisitMergeAction above)
-     *
-     * @since 1.36.0
-     * @param visitMergeAction
-     */
-    void removeVisitMergeAction(VisitMergeAction visitMergeAction);
-
-    /**
-     * Merge a set of consecutive patient visits
-     * @param visits
-     * @param patient
-     * @return a visit representing the newly merged visit
-     */
-    Visit mergeConsecutiveVisits(List<Integer> visits, Patient patient);
-
-    /**
-     * Merges patient visits
-     * @param preferred
-     * @param nonPreferred
-     * @return a visit representing the newly merged visit
-     */
-    Visit mergeVisits(Visit preferred, Visit nonPreferred);
-
-    /**
-     * Checks if the list of visits passed in are consecutive
-     * @param visits
-     * @param patient
-     * @return a boolean indicating whether or not the visits are consecutives
-     */
-    boolean areConsecutiveVisits(List<Integer> visits, Patient patient);
-
-    /**
-     * Creates an encounter for specific adt action.
-     * Throws an exception if not valid with visit.
-     * @param action
-     * @return the encounter representing this discharge
-     */
-    Encounter createAdtEncounterFor(AdtAction action);
-
-    /**
-     * Helper method to get a {@link VisitDomainWrapper} given a {@link Visit}
-     * @param visit
-     * @return
-     */
-    @Deprecated  // use new VisitDomainWrapperFactory instead (this service method has been delegated to use the new factory)
-    VisitDomainWrapper wrap(Visit visit);
-
-    /**
-     * Gets all currently-active inpatient visits (patients who have been admitted) at the given location or any of its children
-     * @param visitLocation
-     * @return
-     */
-    @Deprecated
-    List<VisitDomainWrapper> getInpatientVisits(Location visitLocation, Location ward);
-
-    /**
-     * Creates a retrospective visit for the specified patient with the specified start and stop dates
-     *
-     * @param patient
-     * @param location
-     * @param startDatetime
-     * @param stopDatetime
-     * @should throw IllegalArgumentException if startDatetime in future
-     * @should throw IllegalArgumentException it stopDatetime in future
-     * @should throw IllegalArgumentException if stopDatetime before startDatetime
-     * @should throw ExistingVisitDuringTimePeriodException if existing visit during date range
-     * @return the created visit
-     */
-    VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
-        throws ExistingVisitDuringTimePeriodException;
-
-    /**
-     * Gets all visits for the patient at the visit location associated with the specified location
-     * during the specified datetime range
-     *
-     * @param patient
-     * @param location
-     * @param startDatetime
-     * @param stopDatetime
-     * @return
-     */
-    List<VisitDomainWrapper> getVisits(Patient patient, Location location, Date startDatetime, Date stopDatetime);
-
-    /**
-     * Returns true/false whether or not the patient has any visits at the visit location associated with
-     * the specified location during the specified datetime range
-     *
-     * @param patient
-     * @param location
-     * @param startDatetime
-     * @param stopDatetime
-     * @return
-     */
-    boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
-
-
-    /**
-     * @return all locations that are tagged to support admissions
-     * @see {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
-     */
-    List<Location> getInpatientLocations();
-
-    /**
-     * returns patients awaiting admission
-     * @param location - if supplied, only checks waiting admissions at the visit location associated with this location
-     * @param patientIds - if non-null, only returns matches for patients with the given ids
-     * @param visitIds - if non-null, only returns matches for visits with the given ids
-     * @return List<Visit></Visit> of the matching visits
-     */
-    @Deprecated
-    List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds);
-
-    /**
-     * Returns all List of InpatientRequest that match the given search criteria
-     * @param criteria - represents the criteria by which inpatient requests are searched and returned
-     * @return List<InpatientRequest> of the matching InpatientRequests that match the criteria
-     */
-    List<InpatientRequest> getInpatientRequests(InpatientRequestSearchCriteria criteria);
-
-    /**
-     * Returns all List of InpatientAdmission that match the given search criteria
-     * @param criteria - represents the criteria by which inpatient admissions are searched and returned
-     * @return List<InpatientAdmission> of the matching InpatientAdmissions that match the criteria
-     */
-    List<InpatientAdmission> getInpatientAdmissions(InpatientAdmissionSearchCriteria criteria);
+	
+	/**
+	 * Gets the patient's <em>active</em> visit at the given location, or null, if none exists..
+	 *
+	 * @param patient
+	 * @param department
+	 * @return
+	 */
+	VisitDomainWrapper getActiveVisit(Patient patient, Location department);
+	
+	/**
+	 * Returns true/false as to whether the specified visit should be closed based on the built-in
+	 * EMR-API logic
+	 *
+	 * @param visit
+	 * @return
+	 */
+	boolean shouldBeClosed(Visit visit);
+	
+	/**
+	 * Close the patient's active visit at the given location
+	 *
+	 * @param visit
+	 * @return
+	 */
+	void closeAndSaveVisit(Visit visit);
+	
+	/**
+	 * Like #getActiveVisit, but if the patient has no active visit, one is created (and persisted).
+	 * (This has the same side-effects as #getActiveVisit.) The visit's location will be a valid visit
+	 * location per our business logic.
+	 *
+	 * @param patient
+	 * @param department
+	 * @return
+	 */
+	Visit ensureActiveVisit(Patient patient, Location department);
+	
+	/**
+	 * If the patient has no active visit on the day of @visitTime, one is created (and persisted). The
+	 * visit's location will be a valid visit location per our business logic.
+	 *
+	 * @param patient
+	 * @param visitTime
+	 * @param department
+	 * @return
+	 */
+	Visit ensureVisit(Patient patient, Date visitTime, Location department);
+	
+	/**
+	 * Creates a "check-in" encounter for the given patient, at the location where, and adds it to the
+	 * active visit. (This method calls ensureActiveVisit.)
+	 *
+	 * @param patient required
+	 * @param where required (must either support visits, or have an ancestor location that does)
+	 * @param checkInClerk optional (defaults to Provider for currently-authenticated user)
+	 * @param obsForCheckInEncounter optional
+	 * @param ordersForCheckInEncounter optional
+	 * @param newVisit says whether create a new visit or not
+	 * @return the encounter created (with EncounterService.saveEncounter already called on it)
+	 */
+	Encounter checkInPatient(Patient patient, Location where, Provider checkInClerk, List<Obs> obsForCheckInEncounter,
+	        List<Order> ordersForCheckInEncounter, boolean newVisit);
+	
+	/**
+	 * Looks at this location, then its ancestors in the location hierarchy, to find a location tagged
+	 * with {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS}
+	 *
+	 * @param location
+	 * @return location, or its closest ancestor that supports visits
+	 * @throws IllegalArgumentException if neither location nor its ancestors support visits
+	 */
+	Location getLocationThatSupportsVisits(Location location);
+	
+	/**
+	 * @return all locations that are allowed to have visits assigned to them
+	 * @see org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_VISITS
+	 */
+	List<Location> getAllLocationsThatSupportVisits();
+	
+	/**
+	 * @param visit
+	 * @param location
+	 * @param when
+	 * @return whether the given visit is suitable to store a patient interaction at the given location
+	 *         and date
+	 */
+	boolean isSuitableVisit(Visit visit, Location location, Date when);
+	
+	/**
+	 * @param visit
+	 * @param location
+	 * @param when
+	 * @return whether the given visit is suitable to store a patient interaction at the given location
+	 *         and date; returns true if this visit occurred on the the same day as the encounter,
+	 *         ignoring time
+	 */
+	boolean isSuitableVisitIgnoringTime(Visit visit, Location location, Date when);
+	
+	/**
+	 * Gets all currently-active visits at the given location or any of its children
+	 *
+	 * @param location
+	 * @return
+	 */
+	List<VisitDomainWrapper> getActiveVisits(Location location);
+	
+	/**
+	 * If any currently-open visits are now inactive per our business logic, close them
+	 */
+	void closeInactiveVisits();
+	
+	/**
+	 * @param patient
+	 * @return the most recent encounter for the given patient
+	 */
+	Encounter getLastEncounter(Patient patient);
+	
+	/**
+	 * @param patient
+	 * @return the number of non-voided encounters this patient has had
+	 */
+	int getCountOfEncounters(Patient patient);
+	
+	/**
+	 * @param patient
+	 * @return the number of non-voided visits this patient has had
+	 */
+	int getCountOfVisits(Patient patient);
+	
+	/**
+	 * @param v1
+	 * @param v2
+	 * @return true if both visits are in overlapping locations, and have overlapping datetime ranges
+	 */
+	boolean visitsOverlap(Visit v1, Visit v2);
+	
+	/**
+	 * Merges patients using the underlying OpenMRS core mechanism, but applying extra business logic:
+	 * <ul>
+	 * <li>Any two visits that overlap will be joined together into one</li>
+	 * <li>Merging an "unknown" patient into a known one does _not_ copy the unknown flag to the target
+	 * patient</li>
+	 * <li>Any additional {@link org.openmrs.module.emrapi.merge.PatientMergeAction}s</li>
+	 * </ul>
+	 *
+	 * @param preferred
+	 * @param notPreferred
+	 * @see #visitsOverlap(org.openmrs.Visit, org.openmrs.Visit)
+	 * @see org.openmrs.api.PatientService#mergePatients(org.openmrs.Patient, org.openmrs.Patient)
+	 */
+	void mergePatients(Patient preferred, Patient notPreferred);
+	
+	/**
+	 * Allows another module to add a patient merge action to the list of actions to be performed when a
+	 * patient is merged; (ideally, this would just happen via @Autowired, but because @Autowired in
+	 * service impls greatly slow down startup, instead we have other modules inject the beans
+	 * explicitly via this method). (See the FixPaperRecordRequestsForMerge class and the
+	 * PaperRecordModuleActivator in the Paper Record module for an example)
+	 *
+	 * @param patientMergeAction
+	 */
+	void addPatientMergeAction(PatientMergeAction patientMergeAction);
+	
+	/**
+	 * Allows another module to remove a patient merge action to the list of actions to be performed
+	 * when a patient is merged; (see addPatientMergeAction above)
+	 *
+	 * @param patientMergeAction
+	 */
+	void removePatientMergeAction(PatientMergeAction patientMergeAction);
+	
+	/**
+	 * Allows another module to add a visit merge action to the list of actions to be performed when a
+	 * visit is merged; (ideally, this would just happen via @Autowired, but because @Autowired in
+	 * service impls greatly slow down startup, instead we have other modules inject the beans
+	 * explicitly via this method)
+	 *
+	 * @since 1.36.0
+	 * @param visitMergeAction
+	 */
+	void addVisitMergeAction(VisitMergeAction visitMergeAction);
+	
+	/**
+	 * Allows another module to remove a visit merge action to the list of actions to be performed when
+	 * a visit is merged; (see addVisitMergeAction above)
+	 *
+	 * @since 1.36.0
+	 * @param visitMergeAction
+	 */
+	void removeVisitMergeAction(VisitMergeAction visitMergeAction);
+	
+	/**
+	 * Merge a set of consecutive patient visits
+	 * 
+	 * @param visits
+	 * @param patient
+	 * @return a visit representing the newly merged visit
+	 */
+	Visit mergeConsecutiveVisits(List<Integer> visits, Patient patient);
+	
+	/**
+	 * Merges patient visits
+	 * 
+	 * @param preferred
+	 * @param nonPreferred
+	 * @return a visit representing the newly merged visit
+	 */
+	Visit mergeVisits(Visit preferred, Visit nonPreferred);
+	
+	/**
+	 * Checks if the list of visits passed in are consecutive
+	 * 
+	 * @param visits
+	 * @param patient
+	 * @return a boolean indicating whether or not the visits are consecutives
+	 */
+	boolean areConsecutiveVisits(List<Integer> visits, Patient patient);
+	
+	/**
+	 * Creates an encounter for specific adt action. Throws an exception if not valid with visit.
+	 * 
+	 * @param action
+	 * @return the encounter representing this discharge
+	 */
+	Encounter createAdtEncounterFor(AdtAction action);
+	
+	/**
+	 * Helper method to get a {@link VisitDomainWrapper} given a {@link Visit}
+	 * 
+	 * @param visit
+	 * @return
+	 */
+	@Deprecated // use new VisitDomainWrapperFactory instead (this service method has been delegated to use the new factory)
+	VisitDomainWrapper wrap(Visit visit);
+	
+	/**
+	 * Gets all currently-active inpatient visits (patients who have been admitted) at the given
+	 * location or any of its children
+	 * 
+	 * @param visitLocation
+	 * @return
+	 */
+	@Deprecated
+	List<VisitDomainWrapper> getInpatientVisits(Location visitLocation, Location ward);
+	
+	/**
+	 * Creates a retrospective visit for the specified patient with the specified start and stop dates
+	 *
+	 * @param patient
+	 * @param location
+	 * @param startDatetime
+	 * @param stopDatetime
+	 * @should throw IllegalArgumentException if startDatetime in future
+	 * @should throw IllegalArgumentException it stopDatetime in future
+	 * @should throw IllegalArgumentException if stopDatetime before startDatetime
+	 * @should throw ExistingVisitDuringTimePeriodException if existing visit during date range
+	 * @return the created visit
+	 */
+	VisitDomainWrapper createRetrospectiveVisit(Patient patient, Location location, Date startDatetime, Date stopDatetime)
+	        throws ExistingVisitDuringTimePeriodException;
+	
+	/**
+	 * Gets all visits for the patient at the visit location associated with the specified location
+	 * during the specified datetime range
+	 *
+	 * @param patient
+	 * @param location
+	 * @param startDatetime
+	 * @param stopDatetime
+	 * @return
+	 */
+	List<VisitDomainWrapper> getVisits(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+	
+	/**
+	 * Returns true/false whether or not the patient has any visits at the visit location associated
+	 * with the specified location during the specified datetime range
+	 *
+	 * @param patient
+	 * @param location
+	 * @param startDatetime
+	 * @param stopDatetime
+	 * @return
+	 */
+	boolean hasVisitDuring(Patient patient, Location location, Date startDatetime, Date stopDatetime);
+	
+	/**
+	 * @return all locations that are tagged to support admissions
+	 * @see {@link org.openmrs.module.emrapi.EmrApiConstants#LOCATION_TAG_SUPPORTS_ADMISSION}
+	 */
+	List<Location> getInpatientLocations();
+	
+	/**
+	 * returns patients awaiting admission
+	 * 
+	 * @param location - if supplied, only checks waiting admissions at the visit location associated
+	 *            with this location
+	 * @param patientIds - if non-null, only returns matches for patients with the given ids
+	 * @param visitIds - if non-null, only returns matches for visits with the given ids
+	 * @return List<Visit></Visit> of the matching visits
+	 */
+	@Deprecated
+	List<Visit> getVisitsAwaitingAdmission(Location location, Collection<Integer> patientIds, Collection<Integer> visitIds);
+	
+	/**
+	 * Returns all List of InpatientRequest that match the given search criteria
+	 * 
+	 * @param criteria - represents the criteria by which inpatient requests are searched and returned
+	 * @return List<InpatientRequest> of the matching InpatientRequests that match the criteria
+	 */
+	List<InpatientRequest> getInpatientRequests(InpatientRequestSearchCriteria criteria);
+	
+	/**
+	 * Returns all List of InpatientAdmission that match the given search criteria
+	 * 
+	 * @param criteria - represents the criteria by which inpatient admissions are searched and returned
+	 * @return List<InpatientAdmission> of the matching InpatientAdmissions that match the criteria
+	 */
+	List<InpatientAdmission> getInpatientAdmissions(InpatientAdmissionSearchCriteria criteria);
 }

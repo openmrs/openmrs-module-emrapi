@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.patient;
 
 import org.openmrs.Patient;
@@ -11,56 +20,58 @@ import org.openmrs.module.emrapi.person.image.PersonImage;
 import java.util.List;
 
 public class EmrPatientProfileServiceImpl implements EmrPatientProfileService {
-
-    private PatientService patientService;
-    private PersonService personService;
-    private EmrPersonImageService emrPersonImageService;
-    
-    @Override
-    public PatientProfile save(PatientProfile patientProfile) {
-        Patient patient = patientService.savePatient(patientProfile.getPatient());
-
-        saveRelationships(patientProfile.getRelationships());
-
-        patientProfile.setPatient(patient);
-
-        PersonImage personImage = new PersonImage();
-        personImage.setPerson(patient);
-        personImage.setBase64EncodedImage(patientProfile.getImage());
-
-        emrPersonImageService.savePersonImage(personImage);
-        return patientProfile;
-    }
-
-    @Override
-    public PatientProfile get(String patientUuid) {
-        PatientProfile delegate = new PatientProfile();
-
-        Patient patient = patientService.getPatientByUuid(patientUuid);
-        delegate.setPatient(patient);
-
-        Person person = personService.getPerson(patient.getPersonId());
-        List<Relationship> relationships = personService.getRelationshipsByPerson(person);
-        delegate.setRelationships(relationships);
-
-        return delegate;
-    }
-
-    private void saveRelationships(List<Relationship> relationships) {
-        for(Relationship relationship: relationships) {
-            personService.saveRelationship(relationship);
-        }
-    }
-
-    public void setPatientService(PatientService patientService) {
-        this.patientService = patientService;
-    }
-
-    public void setPersonService(PersonService personService) {
-        this.personService = personService;
-    }
-
-    public void setEmrPersonImageService(EmrPersonImageService emrPersonImageService) {
-        this.emrPersonImageService = emrPersonImageService;
-    }
+	
+	private PatientService patientService;
+	
+	private PersonService personService;
+	
+	private EmrPersonImageService emrPersonImageService;
+	
+	@Override
+	public PatientProfile save(PatientProfile patientProfile) {
+		Patient patient = patientService.savePatient(patientProfile.getPatient());
+		
+		saveRelationships(patientProfile.getRelationships());
+		
+		patientProfile.setPatient(patient);
+		
+		PersonImage personImage = new PersonImage();
+		personImage.setPerson(patient);
+		personImage.setBase64EncodedImage(patientProfile.getImage());
+		
+		emrPersonImageService.savePersonImage(personImage);
+		return patientProfile;
+	}
+	
+	@Override
+	public PatientProfile get(String patientUuid) {
+		PatientProfile delegate = new PatientProfile();
+		
+		Patient patient = patientService.getPatientByUuid(patientUuid);
+		delegate.setPatient(patient);
+		
+		Person person = personService.getPerson(patient.getPersonId());
+		List<Relationship> relationships = personService.getRelationshipsByPerson(person);
+		delegate.setRelationships(relationships);
+		
+		return delegate;
+	}
+	
+	private void saveRelationships(List<Relationship> relationships) {
+		for (Relationship relationship : relationships) {
+			personService.saveRelationship(relationship);
+		}
+	}
+	
+	public void setPatientService(PatientService patientService) {
+		this.patientService = patientService;
+	}
+	
+	public void setPersonService(PersonService personService) {
+		this.personService = personService;
+	}
+	
+	public void setEmrPersonImageService(EmrPersonImageService emrPersonImageService) {
+		this.emrPersonImageService = emrPersonImageService;
+	}
 }

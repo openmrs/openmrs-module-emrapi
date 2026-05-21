@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,30 +32,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MothersAndChildrenController {
-
-    @Autowired
-    private MaternalService maternalService;
-
-    @RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/maternal/mothersAndChildren")
-    @ResponseBody
-    public SimpleObject getMothersAndChildren(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            @RequestParam(required = false, value = "mother") List<String> motherUuids,
-            @RequestParam(required = false, value = "child") List<String> childUuids,
-            @RequestParam(required = false, value = "requireMotherHasActiveVisit") boolean requireMotherHasActiveVisit,
-            @RequestParam(required = false, value = "requireChildHasActiveVisit") boolean requireChildHasActiveVisit,
-            @RequestParam(required = false, value = "requireChildBornDuringMothersActiveVisit") boolean requireChildBornDuringMothersActiveVisit
-    ) {
-        RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
-        MothersAndChildrenSearchCriteria criteria = new MothersAndChildrenSearchCriteria();
-        criteria.setMotherUuids(motherUuids);
-        criteria.setChildUuids(childUuids);
-        criteria.setMotherRequiredToHaveActiveVisit(requireMotherHasActiveVisit);
-        criteria.setChildRequiredToHaveActiveVisit(requireChildHasActiveVisit);
-        criteria.setChildRequiredToBeBornDuringMothersActiveVisit(requireChildBornDuringMothersActiveVisit);
-        List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(criteria);
-        return new NeedsPaging<>(motherAndChildList, context).toSimpleObject(new SimpleBeanConverter<MotherAndChild>());
-    }
-
+	
+	@Autowired
+	private MaternalService maternalService;
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/maternal/mothersAndChildren")
+	@ResponseBody
+	public SimpleObject getMothersAndChildren(HttpServletRequest request, HttpServletResponse response,
+	        @RequestParam(required = false, value = "mother") List<String> motherUuids,
+	        @RequestParam(required = false, value = "child") List<String> childUuids,
+	        @RequestParam(required = false, value = "requireMotherHasActiveVisit") boolean requireMotherHasActiveVisit,
+	        @RequestParam(required = false, value = "requireChildHasActiveVisit") boolean requireChildHasActiveVisit,
+	        @RequestParam(required = false, value = "requireChildBornDuringMothersActiveVisit") boolean requireChildBornDuringMothersActiveVisit) {
+		RequestContext context = RestUtil.getRequestContext(request, response, Representation.DEFAULT);
+		MothersAndChildrenSearchCriteria criteria = new MothersAndChildrenSearchCriteria();
+		criteria.setMotherUuids(motherUuids);
+		criteria.setChildUuids(childUuids);
+		criteria.setMotherRequiredToHaveActiveVisit(requireMotherHasActiveVisit);
+		criteria.setChildRequiredToHaveActiveVisit(requireChildHasActiveVisit);
+		criteria.setChildRequiredToBeBornDuringMothersActiveVisit(requireChildBornDuringMothersActiveVisit);
+		List<MotherAndChild> motherAndChildList = maternalService.getMothersAndChildren(criteria);
+		return new NeedsPaging<>(motherAndChildList, context).toSimpleObject(new SimpleBeanConverter<MotherAndChild>());
+	}
+	
 }

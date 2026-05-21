@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.adt;
 
 import lombok.Data;
@@ -8,43 +17,47 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents criteria for searching for AdtRequests
- * Currently the assumption is that all requests returned are active, and this will be the default regardless
+ * Represents criteria for searching for AdtRequests Currently the assumption is that all requests
+ * returned are active, and this will be the default regardless
  */
 @Data
 public class InpatientRequestSearchCriteria {
-
-    private Location visitLocation;
-    private List<Location> dispositionLocations;
-    private List<DispositionType> dispositionTypes;
-    private List<Integer> patientIds;
-    private List<Integer> visitIds;
-
-    public void addDispositionLocation(Location location) {
-        if (dispositionLocations == null) {
-            dispositionLocations = new ArrayList<>();
-        }
-        dispositionLocations.add(location);
-    }
-
-    public void addDispositionType(DispositionType dispositionType) {
-        if (dispositionTypes == null) {
-            dispositionTypes = new ArrayList<>();
-        }
-        dispositionTypes.add(dispositionType);
-    }
-
-    public void addPatientId(Integer patientId) {
-        if (patientIds == null) {
-            patientIds = new ArrayList<>();
-        }
-        patientIds.add(patientId);
-    }
-
-    public void addVisitId(Integer visitId) {
-        if (visitIds == null) {
-            visitIds = new ArrayList<>();
-        }
-        visitIds.add(visitId);
-    }
+	
+	private Location visitLocation;
+	
+	private List<Location> dispositionLocations;
+	
+	private List<DispositionType> dispositionTypes;
+	
+	private List<Integer> patientIds;
+	
+	private List<Integer> visitIds;
+	
+	public void addDispositionLocation(Location location) {
+		if (dispositionLocations == null) {
+			dispositionLocations = new ArrayList<>();
+		}
+		dispositionLocations.add(location);
+	}
+	
+	public void addDispositionType(DispositionType dispositionType) {
+		if (dispositionTypes == null) {
+			dispositionTypes = new ArrayList<>();
+		}
+		dispositionTypes.add(dispositionType);
+	}
+	
+	public void addPatientId(Integer patientId) {
+		if (patientIds == null) {
+			patientIds = new ArrayList<>();
+		}
+		patientIds.add(patientId);
+	}
+	
+	public void addVisitId(Integer visitId) {
+		if (visitIds == null) {
+			visitIds = new ArrayList<>();
+		}
+		visitIds.add(visitId);
+	}
 }

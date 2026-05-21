@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.diagnosis;
 
 import lombok.Setter;
@@ -17,35 +26,36 @@ import java.util.Map;
 
 /**
  * class implementing the DiagnosisService while delegating calls to the core module
- * */
+ */
 @Setter
 public class CoreDiagnosisService {
-
+	
 	private EmrDiagnosisDAO emrDiagnosisDAO;
-
+	
 	EmrApiDAO emrApiDAO;
-
+	
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
 		return DiagnosisUtils.convert(Context.getDiagnosisService().getDiagnoses(patient, fromDate));
 	}
-
-	public 	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate){
+	
+	public List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate) {
 		return DiagnosisUtils.convert(Context.getDiagnosisService().getUniqueDiagnoses(patient, fromDate));
 	}
-
-	public List<Diagnosis> getPrimaryDiagnoses(Encounter encounter){
+	
+	public List<Diagnosis> getPrimaryDiagnoses(Encounter encounter) {
 		return DiagnosisUtils.convert(Context.getDiagnosisService().getPrimaryDiagnoses(encounter));
 	}
-
-	public boolean hasDiagnosis(Encounter encounter, Diagnosis diagnosis){
+	
+	public boolean hasDiagnosis(Encounter encounter, Diagnosis diagnosis) {
 		return true;
 	}
-
-	public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses){
+	
+	public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses) {
 		return null;
 	}
-
-	public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
+	
+	public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly,
+	        Boolean confirmedOnly) {
 		List<org.openmrs.Diagnosis> diagnoses = emrDiagnosisDAO.getDiagnoses(visit, primaryOnly, confirmedOnly);
 		List<Obs> diagnosisList = new ArrayList<Obs>();
 		for (Diagnosis diagnosis : DiagnosisUtils.convert(diagnoses)) {
@@ -53,14 +63,11 @@ public class CoreDiagnosisService {
 		}
 		return diagnosisList;
 	}
-
+	
 	public Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits) {
 		Map<Visit, List<org.openmrs.Diagnosis>> ret = new HashMap<>();
-        String query =
-				"select distinct diag FROM Diagnosis diag " +
-                "where diag.encounter.visit in :visits " +
-                "and diag.voided = false " +
-                "order by diag.rank";
+		String query = "select distinct diag FROM Diagnosis diag " + "where diag.encounter.visit in :visits "
+		        + "and diag.voided = false " + "order by diag.rank";
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("visits", visits);
 		List<org.openmrs.Diagnosis> diagnoses = emrApiDAO.executeHql(query, parameters, org.openmrs.Diagnosis.class);

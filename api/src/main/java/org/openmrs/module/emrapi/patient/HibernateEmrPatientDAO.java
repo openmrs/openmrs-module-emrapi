@@ -1,15 +1,11 @@
-/**
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.patient;
 
@@ -52,42 +48,39 @@ public class HibernateEmrPatientDAO implements EmrPatientDAO {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Patient> cq = cb.createQuery(Patient.class);
 		Root<Patient> patient = cq.from(Patient.class);
-
+		
 		List<Predicate> preds = new ArrayList<>();
-
+		
 		if (checkedInAt != null) {
 			Join<Patient, Visit> visit = patient.join("visits");
 			preds.add(cb.equal(visit.get("location"), checkedInAt));
 			preds.add(cb.isNull(visit.get("stopDatetime")));
 		}
-
+		
 		if (StringUtils.isNotBlank(query)) {
 			if (query.matches(".*\\d.*")) {
 				Join<Patient, PatientIdentifier> ids = patient.join("identifiers", JoinType.LEFT);
-				preds.add(cb.like(cb.lower(ids.get("identifier")),
-						"%" + query.toLowerCase() + "%"));
+				preds.add(cb.like(cb.lower(ids.get("identifier")), "%" + query.toLowerCase() + "%"));
 			} else {
 				Join<Patient, PersonName> names = patient.join("names");
 				String like = "%" + query.toLowerCase() + "%";
-				preds.add(cb.or(cb.like(cb.lower(names.get("givenName")),  like),
-						cb.like(cb.lower(names.get("familyName")), like)));
+				preds.add(cb.or(cb.like(cb.lower(names.get("givenName")), like),
+				    cb.like(cb.lower(names.get("familyName")), like)));
 			}
 		}
-
-		cq.select(patient)
-				.where(cb.and(preds.toArray(new Predicate[0])))
-				.distinct(true);
-
+		
+		cq.select(patient).where(cb.and(preds.toArray(new Predicate[0]))).distinct(true);
+		
 		TypedQuery<Patient> typed = em.createQuery(cq);
-		if (start != null)    {
+		if (start != null) {
 			typed.setFirstResult(start);
 		}
 		if (maxResults != null) {
 			typed.setMaxResults(maxResults);
 		}
-
+		
 		return typed.getResultList();
-
+		
 	}
 	
 	@Override
@@ -105,7 +98,7 @@ public class HibernateEmrPatientDAO implements EmrPatientDAO {
 		}
 		return criteria.list();
 	}
-
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Obs> getVisitNoteObservations(Collection<Visit> visits) {

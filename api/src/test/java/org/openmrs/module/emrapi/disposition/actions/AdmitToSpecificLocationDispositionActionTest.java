@@ -1,17 +1,12 @@
 /*
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
-
 package org.openmrs.module.emrapi.disposition.actions;
 
 import org.joda.time.DateTime;
@@ -49,81 +44,87 @@ import static org.mockito.Mockito.when;
  *
  */
 public class AdmitToSpecificLocationDispositionActionTest extends AuthenticatedUserTestHelper {
-
-    private AdmitToSpecificLocationDispositionAction action;
-    private AdtService adtService;
-    private LocationService locationService;
-    private DispositionService dispositionService;
-    private DispositionDescriptor dispositionDescriptor;
-    private VisitDomainWrapper visitDomainWrapper;
-    private Concept dispositionObsGroupConcept = new Concept();
-
-
-    @Before
-    public void setUp() throws Exception {
-        locationService = mock(LocationService.class);
-        adtService = mock(AdtService.class);
-        dispositionService = mock(DispositionService.class);
-        dispositionDescriptor = mock(DispositionDescriptor.class);
-        visitDomainWrapper = mock(VisitDomainWrapper.class);;
-
-        when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
-        when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
-
-        action = new AdmitToSpecificLocationDispositionAction();
-        action.setLocationService(locationService);
-        action.setAdtService(adtService);
-        action.setDispositionService(dispositionService);
-    }
-
-    @Test
-    public void testAction() throws Exception {
-
-        final Location toLocation = new Location();
-        final Visit visit = new Visit();
-        final Encounter encounter = new Encounter();
-        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
-        encounter.setVisit(visit);
-        encounter.addProvider(new EncounterRole(), new Provider());
-        encounter.setEncounterDatetime(encounterDate);
-
-        final Obs dispositionObsGroup = new Obs();
-        dispositionObsGroup.setConcept(dispositionObsGroupConcept);
-        encounter.addObs(dispositionObsGroup);
-
-        when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
-        when(dispositionDescriptor.getAdmissionLocation(dispositionObsGroup, locationService)).thenReturn(toLocation);
-
-        action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
-
-        verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
-            @Override
-            public boolean matches(AdtAction adtAction) {
-                return adtAction.getVisit().equals(visit) &&
-                        adtAction.getLocation().equals(toLocation) &&
-                        TestUtils.sameProviders(adtAction.getProviders(), encounter.getProvidersByRoles()) &&
-                        adtAction.getActionDatetime().equals(encounterDate) &&
-                        adtAction.getType().equals(AdtAction.Type.ADMISSION);
-            }
-        }));
-
-    }
-
-    @Test
-    public void testActionWhenAlreadyAdmitted() throws Exception {
-
-        final Visit visit = new Visit();
-        final Encounter encounter = new Encounter();
-        final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
-        encounter.setVisit(visit);
-        encounter.addProvider(new EncounterRole(), new Provider());
-        encounter.setEncounterDatetime(encounterDate);
-
-        when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
-
-        action.action(new EncounterDomainWrapper(encounter), new Obs(), new HashMap<String, String[]>());
-
-        verify(adtService, never()).createAdtEncounterFor(any(AdtAction.class));
-    }
-
+	
+	private AdmitToSpecificLocationDispositionAction action;
+	
+	private AdtService adtService;
+	
+	private LocationService locationService;
+	
+	private DispositionService dispositionService;
+	
+	private DispositionDescriptor dispositionDescriptor;
+	
+	private VisitDomainWrapper visitDomainWrapper;
+	
+	private Concept dispositionObsGroupConcept = new Concept();
+	
+	@Before
+	public void setUp() throws Exception {
+		locationService = mock(LocationService.class);
+		adtService = mock(AdtService.class);
+		dispositionService = mock(DispositionService.class);
+		dispositionDescriptor = mock(DispositionDescriptor.class);
+		visitDomainWrapper = mock(VisitDomainWrapper.class);
+		;
+		
+		when(dispositionService.getDispositionDescriptor()).thenReturn(dispositionDescriptor);
+		when(adtService.wrap(any(Visit.class))).thenReturn(visitDomainWrapper);
+		
+		action = new AdmitToSpecificLocationDispositionAction();
+		action.setLocationService(locationService);
+		action.setAdtService(adtService);
+		action.setDispositionService(dispositionService);
+	}
+	
+	@Test
+	public void testAction() throws Exception {
+		
+		final Location toLocation = new Location();
+		final Visit visit = new Visit();
+		final Encounter encounter = new Encounter();
+		final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
+		encounter.setVisit(visit);
+		encounter.addProvider(new EncounterRole(), new Provider());
+		encounter.setEncounterDatetime(encounterDate);
+		
+		final Obs dispositionObsGroup = new Obs();
+		dispositionObsGroup.setConcept(dispositionObsGroupConcept);
+		encounter.addObs(dispositionObsGroup);
+		
+		when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
+		when(dispositionDescriptor.getAdmissionLocation(dispositionObsGroup, locationService)).thenReturn(toLocation);
+		
+		action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
+		
+		verify(adtService).createAdtEncounterFor(argThat(new ArgumentMatcher<AdtAction>() {
+			
+			@Override
+			public boolean matches(AdtAction adtAction) {
+				return adtAction.getVisit().equals(visit) && adtAction.getLocation().equals(toLocation)
+				        && TestUtils.sameProviders(adtAction.getProviders(), encounter.getProvidersByRoles())
+				        && adtAction.getActionDatetime().equals(encounterDate)
+				        && adtAction.getType().equals(AdtAction.Type.ADMISSION);
+			}
+		}));
+		
+	}
+	
+	@Test
+	public void testActionWhenAlreadyAdmitted() throws Exception {
+		
+		final Visit visit = new Visit();
+		final Encounter encounter = new Encounter();
+		final Date encounterDate = (new DateTime(2013, 05, 13, 20, 26)).toDate();
+		encounter.setVisit(visit);
+		encounter.addProvider(new EncounterRole(), new Provider());
+		encounter.setEncounterDatetime(encounterDate);
+		
+		when(visitDomainWrapper.isAdmitted(encounterDate)).thenReturn(false);
+		
+		action.action(new EncounterDomainWrapper(encounter), new Obs(), new HashMap<String, String[]>());
+		
+		verify(adtService, never()).createAdtEncounterFor(any(AdtAction.class));
+	}
+	
 }

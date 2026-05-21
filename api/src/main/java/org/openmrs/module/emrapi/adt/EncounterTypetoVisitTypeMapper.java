@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.adt;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,16 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides a mapping between encounter types and visit types from a comma delimited list of mappings of the following format
- *
- * 1. "3:4, 5:2, 1:2, 2:2" for encounterTypeId:visitTypeId
- * 2. encounterTypeUuid:visitTypeUuid
- * 3. A mixture of uuids and id
- * 4. default:visitTypeId or default:visitTypeUuid which maps all encounter types to the specified visitType
- *
- * Any specific mapping will override the default mapping
- *
- *
+ * Provides a mapping between encounter types and visit types from a comma delimited list of
+ * mappings of the following format 1. "3:4, 5:2, 1:2, 2:2" for encounterTypeId:visitTypeId 2.
+ * encounterTypeUuid:visitTypeUuid 3. A mixture of uuids and id 4. default:visitTypeId or
+ * default:visitTypeUuid which maps all encounter types to the specified visitType Any specific
+ * mapping will override the default mapping
  */
 @Component
 public class EncounterTypetoVisitTypeMapper {
@@ -43,7 +47,7 @@ public class EncounterTypetoVisitTypeMapper {
 		if (StringUtils.isBlank(mappingString)) {
 			return null;
 		}
-			
+		
 		String[] mappings = mappingString.split(",");
 		VisitType defaultVisitType = null;
 		VisitType visitType = null;
@@ -51,9 +55,9 @@ public class EncounterTypetoVisitTypeMapper {
 			int index = mapping.indexOf(':');
 			if (index > 0) {
 				String mappedEncounterTypeIdOrUuid = mapping.substring(0, index).trim();
-				if ("default".equals(mappedEncounterTypeIdOrUuid) ||
-						encounterType.getId().toString().equals(mappedEncounterTypeIdOrUuid)
-						|| encounterType.getUuid().equals(mappedEncounterTypeIdOrUuid)) {
+				if ("default".equals(mappedEncounterTypeIdOrUuid)
+				        || encounterType.getId().toString().equals(mappedEncounterTypeIdOrUuid)
+				        || encounterType.getUuid().equals(mappedEncounterTypeIdOrUuid)) {
 					
 					String visitTypeIdOrUuid = mapping.substring(index + 1).trim();
 					if (StringUtils.isNumeric(visitTypeIdOrUuid)) {
@@ -76,7 +80,7 @@ public class EncounterTypetoVisitTypeMapper {
 		// Return any mapped visit type over the default
 		if (visitType == null) {
 			return defaultVisitType;
-		}  else {
+		} else {
 			return visitType;
 		}
 	}
@@ -107,7 +111,8 @@ public class EncounterTypetoVisitTypeMapper {
 	
 	public void updateMappings() {
 		if (StringUtils.isBlank(mappingString)) {
-			mappingString = adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP);
+			mappingString = adminService
+			        .getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP);
 		}
 	}
 }

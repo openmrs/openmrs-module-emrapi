@@ -1,15 +1,11 @@
-/**
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.encounter;
 
@@ -26,43 +22,44 @@ import java.util.List;
 import java.util.Set;
 
 public class DiagnosisMapper {
-
-    private final ConceptMapper conceptMapper = new ConceptMapper();
-    private final EncounterProviderMapper encounterProviderMapper = new EncounterProviderMapper();
-
-    public EncounterTransaction.Diagnosis map(Obs obs, DiagnosisMetadata diagnosisMetadata) {
-        Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
-        return convert(diagnosis);
-    }
-
-    public List<EncounterTransaction.Diagnosis> convert(List<Diagnosis> pastDiagnoses) {
-        List<EncounterTransaction.Diagnosis> pastEncounterDiagnoses = new ArrayList<EncounterTransaction.Diagnosis>();
-        for (Diagnosis diagnosis : pastDiagnoses) {
-            pastEncounterDiagnoses.add(convert(diagnosis));
-        }
-        return pastEncounterDiagnoses;
-    }
-
-    public EncounterTransaction.Diagnosis convert(Diagnosis diagnosis) {
-        EncounterTransaction.Diagnosis encounterDiagnosis = new EncounterTransaction.Diagnosis();
-        encounterDiagnosis.setCertainty(String.valueOf(diagnosis.getCertainty()));
-        CodedOrFreeTextAnswer codedOrFreeTextAnswer = diagnosis.getDiagnosis();
-        if (StringUtils.isNotBlank(codedOrFreeTextAnswer.getNonCodedAnswer())) {
-            encounterDiagnosis.setFreeTextAnswer(codedOrFreeTextAnswer.getNonCodedAnswer());
-        } else {
-            encounterDiagnosis.setCodedAnswer(conceptMapper.map(codedOrFreeTextAnswer.getCodedAnswer()));
-        }
-        encounterDiagnosis.setOrder(String.valueOf(diagnosis.getOrder()));
-        Obs existingObs = diagnosis.getExistingObs();
-        if(existingObs != null) {
-            encounterDiagnosis.setDiagnosisDateTime(existingObs.getObsDatetime());
-            encounterDiagnosis.setExistingObs(existingObs.getUuid());
-
-            Set<EncounterProvider> encounterProviders = existingObs.getEncounter().getEncounterProviders();
-            encounterDiagnosis.setProviders(encounterProviderMapper.convert(encounterProviders));
-            encounterDiagnosis.setComments(existingObs.getComment());
-        }
-
-        return encounterDiagnosis;
-    }
+	
+	private final ConceptMapper conceptMapper = new ConceptMapper();
+	
+	private final EncounterProviderMapper encounterProviderMapper = new EncounterProviderMapper();
+	
+	public EncounterTransaction.Diagnosis map(Obs obs, DiagnosisMetadata diagnosisMetadata) {
+		Diagnosis diagnosis = diagnosisMetadata.toDiagnosis(obs);
+		return convert(diagnosis);
+	}
+	
+	public List<EncounterTransaction.Diagnosis> convert(List<Diagnosis> pastDiagnoses) {
+		List<EncounterTransaction.Diagnosis> pastEncounterDiagnoses = new ArrayList<EncounterTransaction.Diagnosis>();
+		for (Diagnosis diagnosis : pastDiagnoses) {
+			pastEncounterDiagnoses.add(convert(diagnosis));
+		}
+		return pastEncounterDiagnoses;
+	}
+	
+	public EncounterTransaction.Diagnosis convert(Diagnosis diagnosis) {
+		EncounterTransaction.Diagnosis encounterDiagnosis = new EncounterTransaction.Diagnosis();
+		encounterDiagnosis.setCertainty(String.valueOf(diagnosis.getCertainty()));
+		CodedOrFreeTextAnswer codedOrFreeTextAnswer = diagnosis.getDiagnosis();
+		if (StringUtils.isNotBlank(codedOrFreeTextAnswer.getNonCodedAnswer())) {
+			encounterDiagnosis.setFreeTextAnswer(codedOrFreeTextAnswer.getNonCodedAnswer());
+		} else {
+			encounterDiagnosis.setCodedAnswer(conceptMapper.map(codedOrFreeTextAnswer.getCodedAnswer()));
+		}
+		encounterDiagnosis.setOrder(String.valueOf(diagnosis.getOrder()));
+		Obs existingObs = diagnosis.getExistingObs();
+		if (existingObs != null) {
+			encounterDiagnosis.setDiagnosisDateTime(existingObs.getObsDatetime());
+			encounterDiagnosis.setExistingObs(existingObs.getUuid());
+			
+			Set<EncounterProvider> encounterProviders = existingObs.getEncounter().getEncounterProviders();
+			encounterDiagnosis.setProviders(encounterProviderMapper.convert(encounterProviders));
+			encounterDiagnosis.setComments(existingObs.getComment());
+		}
+		
+		return encounterDiagnosis;
+	}
 }

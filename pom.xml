@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.openmrs.maven.parents</groupId>
+        <artifactId>maven-parent-openmrs-module</artifactId>
+        <version>2.1.0</version>
+    </parent>
+
     <groupId>org.openmrs.module</groupId>
     <artifactId>emrapi</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>EMR API Module</name>
     <description>Higher-level APIs to support building EMR functionality in OpenMRS, to supplement the data-level APIs
@@ -17,17 +24,12 @@
         </developer>
     </developers>
 
-    <organization>
-        <name>OpenMRS</name>
-        <url>http://openmrs.org</url>
-    </organization>
-
     <scm>
         <connection>scm:git:git@github.com:openmrs/openmrs-module-emrapi.git</connection>
         <developerConnection>scm:git:git@github.com:openmrs/openmrs-module-emrapi.git</developerConnection>
         <url>https://github.com/openmrs/openmrs-module-emrapi.git</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <modules>
         <module>api</module>
@@ -36,8 +38,9 @@
     </modules>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <openMRSVersion>2.8.0</openMRSVersion>
+        <openmrsPlatformVersion>2.8.0</openmrsPlatformVersion>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <legacyuiVersion>1.16.0</legacyuiVersion>
         <lombokVersion>1.18.38</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
@@ -52,13 +55,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <version>${openMRSVersion}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>metadatasharing-api</artifactId>
@@ -76,22 +72,6 @@
             <artifactId>metadatamapping-api</artifactId>
             <version>${metadatamappingVersion}</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!--Tests -->
-        <dependency>
-            <groupId>org.openmrs.test</groupId>
-            <artifactId>openmrs-test</artifactId>
-            <version>${openMRSVersion}</version>
-            <type>pom</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openmrs.api</groupId>
-            <artifactId>openmrs-api</artifactId>
-            <version>${openMRSVersion}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -158,7 +138,6 @@
             <version>${byteBuddyVersion}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -166,35 +145,7 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.1</version>
-                    <configuration>
-                        <target>8</target>
-                        <source>8</source>
-                        <encoding>UTF-8</encoding>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.openmrs.maven.plugins</groupId>
-                    <artifactId>maven-openmrs-plugin</artifactId>
-                    <version>1.0.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.9.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.5.0</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>test-jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <excludes>
                             <exclude>TestingApplicationContext.xml</exclude>
@@ -204,7 +155,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.4</version>
                     <configuration>
                         <argLine>-Xmx512m -Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
                         <includes>
@@ -214,54 +164,42 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5</version>
+                    <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
-                        <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <tagNameFormat>@{project.version}</tagNameFormat>
-                        <!-- refapp distro contains SNAPSHOT dependencies -->
-                        <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+                        <doclint>none</doclint>
+                        <failOnError>false</failOnError>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
                     <configuration>
-                        <additionalJOption>-Xdoclint:none</additionalJOption>
+                        <java>
+                            <eclipse>
+                                <version>4.19.0</version>
+                                <file>eclipse/OpenMRSFormatter.xml</file>
+                            </eclipse>
+                            <lineEndings>UNIX</lineEndings>
+                        </java>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-        </plugins>
     </build>
 
     <repositories>
         <repository>
             <id>openmrs-repo</id>
-            <name>OpenMRS Nexus Repository</name>
-            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+            <name>OpenMRS Public</name>
+            <url>https://mavenrepo.openmrs.org/public</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
             <id>openmrs-repo</id>
-            <name>OpenMRS Nexus Repository</name>
-            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+            <name>OpenMRS Public</name>
+            <url>https://mavenrepo.openmrs.org/public</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -270,14 +208,14 @@
 
     <distributionManagement>
         <repository>
-            <id>openmrs-repo-modules</id>
-            <name>OpenMRS Modules</name>
-            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/modules</url>
+            <id>openmrs-repo-releases</id>
+            <name>OpenMRS Releases</name>
+            <url>https://mavenrepo.openmrs.org/releases</url>
         </repository>
         <snapshotRepository>
             <id>openmrs-repo-snapshots</id>
             <name>OpenMRS Snapshots</name>
-            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
+            <url>https://mavenrepo.openmrs.org/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 

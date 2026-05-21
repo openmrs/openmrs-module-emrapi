@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.adt;
 
 import lombok.Data;
@@ -19,103 +28,107 @@ import java.util.stream.Collectors;
  */
 @Data
 public class InpatientAdmission {
-
-    private Visit visit;
-    private Patient patient;
-    private InpatientRequest currentInpatientRequest;
-    private Set<Encounter> admissionEncounters = new TreeSet<>(getEncounterComparator());
-    private Set<Encounter> transferEncounters = new TreeSet<>(getEncounterComparator());
-    private Set<Encounter> dischargeEncounters = new TreeSet<>(getEncounterComparator());
-
-    public List<Encounter> getAdmissionAndTransferEncounters() {
-        List<Encounter> encounters = new ArrayList<>();
-        encounters.addAll(admissionEncounters);
-        encounters.addAll(transferEncounters);
-        encounters.sort(getEncounterComparator());
-        return Collections.unmodifiableList(encounters);
-    }
-
-    public List<Encounter> getAdtEncounters() {
-        List<Encounter> encounters = new ArrayList<>();
-        encounters.addAll(admissionEncounters);
-        encounters.addAll(transferEncounters);
-        encounters.addAll(dischargeEncounters);
-        encounters.sort(getEncounterComparator());
-        return Collections.unmodifiableList(encounters);
-    }
-
-    public Encounter getFirstAdmissionOrTransferEncounter() {
-        List<Encounter> encounters = getAdmissionAndTransferEncounters();
-        return encounters.isEmpty() ? null : encounters.get(0);
-    }
-
-    public Encounter getLatestAdmissionOrTransferEncounter() {
-        List<Encounter> encounters = getAdmissionAndTransferEncounters();
-        return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
-    }
-
-    public Encounter getLatestAdtEncounter() {
-        List<Encounter> encounters = getAdtEncounters();
-        return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
-    }
-
-    public Location getCurrentInpatientLocation() {
-        if (isDischarged()) {
-            return null;
-        }
-        Encounter encounter = getLatestAdmissionOrTransferEncounter();
-        return encounter == null ? null : encounter.getLocation();
-    }
-
-    public Encounter getEncounterAssigningToCurrentInpatientLocation() {
-        Location location = getCurrentInpatientLocation();
-        if (location == null) {
-            return null;
-        }
-        List<Encounter> encounters = getAdmissionAndTransferEncounters();
-        if (encounters.isEmpty()) {
-            return null;
-        }
-        Encounter ret = encounters.get(encounters.size() - 1);
-        if (!ret.getLocation().equals(location)) { // Sanity check, this should not happen
-            return null;
-        }
-        for (int i=encounters.size()-2; i>=0; i--) {
-            Encounter e = encounters.get(i);
-            if (e.getLocation().equals(location)) {
-                ret = e;
-            }
-            else {
-                return ret;
-            }
-        }
-        return ret;
-    }
-
-    public boolean isDischarged() {
-        if (dischargeEncounters.isEmpty()) {
-            return false;
-        }
-        return dischargeEncounters.contains(getLatestAdtEncounter());
-    }
-
-    private Comparator<Encounter> getEncounterComparator() {
-        return Comparator.comparing(Encounter::getEncounterDatetime)
-                .thenComparing(Encounter::getDateCreated)
-                .thenComparing(Encounter::getEncounterId);
-    }
-
-    public List<Encounter> getAllEncounters() {
-        return Collections.unmodifiableList(visit.getEncounters().stream().filter(e -> !e.getVoided()).sorted(getEncounterComparator()).collect(Collectors.toList()));
-    }
-
-    public Encounter getFirstEncounter() {
-        List<Encounter> encounters = getAllEncounters();
-        return encounters.isEmpty() ? null : encounters.get(0);
-    }
-
-    public Encounter getLatestEncounter() {
-        List<Encounter> encounters = getAllEncounters();
-        return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
-    }
+	
+	private Visit visit;
+	
+	private Patient patient;
+	
+	private InpatientRequest currentInpatientRequest;
+	
+	private Set<Encounter> admissionEncounters = new TreeSet<>(getEncounterComparator());
+	
+	private Set<Encounter> transferEncounters = new TreeSet<>(getEncounterComparator());
+	
+	private Set<Encounter> dischargeEncounters = new TreeSet<>(getEncounterComparator());
+	
+	public List<Encounter> getAdmissionAndTransferEncounters() {
+		List<Encounter> encounters = new ArrayList<>();
+		encounters.addAll(admissionEncounters);
+		encounters.addAll(transferEncounters);
+		encounters.sort(getEncounterComparator());
+		return Collections.unmodifiableList(encounters);
+	}
+	
+	public List<Encounter> getAdtEncounters() {
+		List<Encounter> encounters = new ArrayList<>();
+		encounters.addAll(admissionEncounters);
+		encounters.addAll(transferEncounters);
+		encounters.addAll(dischargeEncounters);
+		encounters.sort(getEncounterComparator());
+		return Collections.unmodifiableList(encounters);
+	}
+	
+	public Encounter getFirstAdmissionOrTransferEncounter() {
+		List<Encounter> encounters = getAdmissionAndTransferEncounters();
+		return encounters.isEmpty() ? null : encounters.get(0);
+	}
+	
+	public Encounter getLatestAdmissionOrTransferEncounter() {
+		List<Encounter> encounters = getAdmissionAndTransferEncounters();
+		return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
+	}
+	
+	public Encounter getLatestAdtEncounter() {
+		List<Encounter> encounters = getAdtEncounters();
+		return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
+	}
+	
+	public Location getCurrentInpatientLocation() {
+		if (isDischarged()) {
+			return null;
+		}
+		Encounter encounter = getLatestAdmissionOrTransferEncounter();
+		return encounter == null ? null : encounter.getLocation();
+	}
+	
+	public Encounter getEncounterAssigningToCurrentInpatientLocation() {
+		Location location = getCurrentInpatientLocation();
+		if (location == null) {
+			return null;
+		}
+		List<Encounter> encounters = getAdmissionAndTransferEncounters();
+		if (encounters.isEmpty()) {
+			return null;
+		}
+		Encounter ret = encounters.get(encounters.size() - 1);
+		if (!ret.getLocation().equals(location)) { // Sanity check, this should not happen
+			return null;
+		}
+		for (int i = encounters.size() - 2; i >= 0; i--) {
+			Encounter e = encounters.get(i);
+			if (e.getLocation().equals(location)) {
+				ret = e;
+			} else {
+				return ret;
+			}
+		}
+		return ret;
+	}
+	
+	public boolean isDischarged() {
+		if (dischargeEncounters.isEmpty()) {
+			return false;
+		}
+		return dischargeEncounters.contains(getLatestAdtEncounter());
+	}
+	
+	private Comparator<Encounter> getEncounterComparator() {
+		return Comparator.comparing(Encounter::getEncounterDatetime).thenComparing(Encounter::getDateCreated)
+		        .thenComparing(Encounter::getEncounterId);
+	}
+	
+	public List<Encounter> getAllEncounters() {
+		return Collections.unmodifiableList(visit.getEncounters().stream().filter(e -> !e.getVoided())
+		        .sorted(getEncounterComparator()).collect(Collectors.toList()));
+	}
+	
+	public Encounter getFirstEncounter() {
+		List<Encounter> encounters = getAllEncounters();
+		return encounters.isEmpty() ? null : encounters.get(0);
+	}
+	
+	public Encounter getLatestEncounter() {
+		List<Encounter> encounters = getAllEncounters();
+		return encounters.isEmpty() ? null : encounters.get(encounters.size() - 1);
+	}
 }
