@@ -140,7 +140,7 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
 			if ("false"
 			        .equalsIgnoreCase(administrationService.getGlobalProperty(
 			            EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ALLOW_OVERLAPPING_VISITS_AT_ANOTHER_LOCATION))
-			        && hasActiveVisitAtDatetime(candidates, when)) {
+			        && hasActiveVisitOnSameDay(candidates, when)) {
 				throw new APIException("emrapi.visitassignment.patientAlreadyHasActiveVisitAtAnotherLocation",
 				        (Object[]) null);
 			}
@@ -183,12 +183,16 @@ public class EmrApiVisitAssignmentHandler extends BaseEncounterVisitHandler impl
 		}
 	}
 	
-	private boolean hasActiveVisitAtDatetime(List<Visit> candidates, Date when) {
+	// we need to check the entire day because we will create a visit that spans the entire day
+	private boolean hasActiveVisitOnSameDay(List<Visit> candidates, Date when) {
 		if (candidates == null) {
 			return false;
 		}
+		Date startOfDay = DateUtils.truncate(when, java.util.Calendar.DAY_OF_MONTH);
+		Date endOfDay = new Date(DateUtils.addDays(startOfDay, 1).getTime() - 1);
 		for (Visit candidate : candidates) {
-			if (candidate.getStopDatetime() == null || !candidate.getStopDatetime().before(when)) {
+			if (!candidate.getStartDatetime().after(endOfDay)
+			        && (candidate.getStopDatetime() == null || !candidate.getStopDatetime().before(startOfDay))) {
 				return true;
 			}
 		}
