@@ -151,6 +151,13 @@
         </description>
     </globalProperty>
     <globalProperty>
+        <property>emrapi.EmrApiVisitAssignmentHandler.allowOverlappingVisitsAtAnotherLocation</property>
+        <defaultValue>true</defaultValue>
+        <description>
+            If false, an exception will be thrown when attempting to create a new visit for a patient who already has an active visit at another location on the same date
+        </description>
+    </globalProperty>
+    <globalProperty>
         <property>emrapi.conceptSourcesForDiagnosisSearch</property>
         <defaultValue>ICD-10-WHO</defaultValue>
         <description>
