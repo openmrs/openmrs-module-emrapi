@@ -243,49 +243,50 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		Location locationA = new Location();
 		Location locationB = new Location();
 		locationB.addTag(new LocationTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS, "Tag that supports visits"));
-
+		
 		// patient has an open (active) visit at locationA
 		Visit activeVisitElsewhere = new Visit();
 		activeVisitElsewhere.setPatient(patient);
 		activeVisitElsewhere.setStartDatetime(DateUtils.addHours(new Date(), -2));
 		activeVisitElsewhere.setLocation(locationA);
 		// stopDatetime == null -> still active
-
+		
 		when(visitService.getVisits(isNull(), anyCollection(), isNull(), isNull(), isNull(), any(Date.class), isNull(),
 		    isNull(), isNull(), eq(true), eq(false))).thenReturn(Collections.singletonList(activeVisitElsewhere));
 		when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))
 		        .thenReturn("default:1");
-		when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ALLOW_OVERLAPPING_VISITS_AT_ANOTHER_LOCATION))
-		        .thenReturn("false");
+		when(adminService
+		        .getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ALLOW_OVERLAPPING_VISITS_AT_ANOTHER_LOCATION))
+		                .thenReturn("false");
 		VisitType visitType = new VisitType();
 		visitType.setId(1);
 		when(visitService.getVisitType(1)).thenReturn(visitType);
 		encounterTypetoVisitTypeMapper.setAdminService(adminService);
 		encounterTypetoVisitTypeMapper.setVisitService(visitService);
 		handler.setEncounterTypetoVisitTypeMapper(encounterTypetoVisitTypeMapper);
-
+		
 		Encounter encounter = new Encounter();
 		encounter.setPatient(patient);
 		encounter.setLocation(locationB);
 		encounter.setEncounterDatetime(new Date());
 		encounter.setEncounterType(encounterType);
-
+		
 		handler.beforeCreateEncounter(encounter);
 	}
-
+	
 	@Test
 	public void testCreatesNewVisitWhenPatientOnlyHasClosedVisitsAtDatetime() {
 		Patient patient = new Patient();
 		Location location = new Location();
 		location.addTag(new LocationTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS, "Tag that supports visits"));
-
+		
 		// patient has a closed visit from yesterday (same calendar day as encounter? no — use yesterday)
 		Visit closedVisit = new Visit();
 		closedVisit.setPatient(patient);
 		closedVisit.setStartDatetime(DateUtils.addDays(new Date(), -1));
 		closedVisit.setStopDatetime(DateUtils.addHours(DateUtils.addDays(new Date(), -1), 4));
 		closedVisit.setLocation(location);
-
+		
 		when(visitService.getVisits(isNull(), anyCollection(), isNull(), isNull(), isNull(), any(Date.class), isNull(),
 		    isNull(), isNull(), eq(true), eq(false))).thenReturn(Collections.singletonList(closedVisit));
 		when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))
@@ -296,18 +297,18 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		encounterTypetoVisitTypeMapper.setAdminService(adminService);
 		encounterTypetoVisitTypeMapper.setVisitService(visitService);
 		handler.setEncounterTypetoVisitTypeMapper(encounterTypetoVisitTypeMapper);
-
+		
 		Encounter encounter = new Encounter();
 		encounter.setPatient(patient);
 		encounter.setLocation(location);
 		encounter.setEncounterDatetime(new Date());
 		encounter.setEncounterType(encounterType);
-
+		
 		handler.beforeCreateEncounter(encounter);
-
+		
 		Assert.assertNotNull(encounter.getVisit());
 	}
-
+	
 	@Test
 	public void testAdjustingEncounterTimeToStartOfVisitWhenAssignedToVisit() throws Exception {
 		
