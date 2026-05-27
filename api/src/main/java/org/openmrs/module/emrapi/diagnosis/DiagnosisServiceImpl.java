@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.diagnosis;
 
 import org.openmrs.Encounter;
@@ -15,93 +24,88 @@ import java.util.Map;
 
 /**
  * class implementing the DiagnosisService while delegating calls to the core module
- * */
+ */
 public class DiagnosisServiceImpl extends BaseOpenmrsService implements DiagnosisService {
-
+	
 	private CoreDiagnosisService coreDiagnosisService;
-
+	
 	private ObsGroupDiagnosisService obsGroupDiagnosisService;
-
+	
 	private AdministrationService adminService;
-
+	
 	public void setCoreDiagnosisService(CoreDiagnosisService coreDiagnosisService) {
 		this.coreDiagnosisService = coreDiagnosisService;
 	}
-
+	
 	public void setObsGroupDiagnosisService(ObsGroupDiagnosisService obsGroupDiagnosisService) {
 		this.obsGroupDiagnosisService = obsGroupDiagnosisService;
 	}
-
+	
 	public void setAdminService(AdministrationService adminService) {
 		this.adminService = adminService;
 	}
-
+	
 	protected boolean useDiagnosesAsObs() {
-		return adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false").equalsIgnoreCase("true");
+		return adminService.getGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "false")
+		        .equalsIgnoreCase("true");
 	}
-
+	
 	public List<Diagnosis> getDiagnoses(Patient patient, Date fromDate) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.getDiagnoses(patient, fromDate);
-		}
-		 else {
+		} else {
 			return coreDiagnosisService.getDiagnoses(patient, fromDate);
 		}
 	}
-
-	public 	List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate) {
+	
+	public List<Diagnosis> getUniqueDiagnoses(Patient patient, Date fromDate) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.getUniqueDiagnoses(patient, fromDate);
-		}
-		else {
+		} else {
 			return coreDiagnosisService.getUniqueDiagnoses(patient, fromDate);
 		}
-
+		
 	}
-
+	
 	public List<Diagnosis> getPrimaryDiagnoses(Encounter encounter) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.getPrimaryDiagnoses(encounter);
-		}
-		else {
+		} else {
 			return coreDiagnosisService.getPrimaryDiagnoses(encounter);
 		}
 	}
-
+	
 	public boolean hasDiagnosis(Encounter encounter, Diagnosis diagnosis) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.hasDiagnosis(encounter, diagnosis);
-		}
-		else {
+		} else {
 			return coreDiagnosisService.hasDiagnosis(encounter, diagnosis);
 		}
 	}
-
+	
 	public List<Obs> codeNonCodedDiagnosis(Obs nonCodedObs, List<Diagnosis> diagnoses) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.codeNonCodedDiagnosis(nonCodedObs, diagnoses);
-		}
-		else {
+		} else {
 			return coreDiagnosisService.codeNonCodedDiagnosis(nonCodedObs, diagnoses);
 		}
 	}
-
+	
 	public Map<Visit, List<org.openmrs.Diagnosis>> getDiagnoses(Collection<Visit> visits) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.getDiagnoses(visits);
-		}
-		else {
+		} else {
 			return coreDiagnosisService.getDiagnoses(visits);
 		}
 	}
-
-	public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly, Boolean confirmedOnly) {
+	
+	public List<Obs> getDiagnosesAsObs(Visit visit, DiagnosisMetadata diagnosisMetadata, Boolean primaryOnly,
+	        Boolean confirmedOnly) {
 		if (useDiagnosesAsObs()) {
 			return obsGroupDiagnosisService.getDiagnosesAsObs(visit, diagnosisMetadata, primaryOnly, confirmedOnly);
-		}
-		else {
+		} else {
 			return coreDiagnosisService.getDiagnosesAsObs(visit, diagnosisMetadata, primaryOnly, confirmedOnly);
 		}
 	}
-
+	
 }

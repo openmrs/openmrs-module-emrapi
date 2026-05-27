@@ -1,15 +1,11 @@
-/**
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
 package org.openmrs.module.emrapi.encounter;
 
@@ -35,83 +31,88 @@ import java.util.Set;
  * Add/update/delete a {@link org.openmrs.Obs} on an {@link org.openmrs.Encounter}.
  */
 public class EncounterObservationServiceHelper {
-
-    private ConceptService conceptService;
-    private EmrApiProperties emrApiProperties;
-    private ObsService obsService;
-    private OrderService orderService;
-    private ObsMapper obsMapper;
-
-    @Autowired
-    public EncounterObservationServiceHelper(ConceptService conceptService,
-                                             EmrApiProperties emrApiProperties,
-                                             ObsService obsService, OrderService orderService,
-                                             ObsMapper obsMapper ) {
-        this.conceptService = conceptService;
-        this.emrApiProperties = emrApiProperties;
-        this.obsService = obsService;
-        this.orderService = orderService;
-        this.obsMapper = obsMapper;
-    }
-
-    public void update(Encounter encounter, List<EncounterTransaction.Observation> observations) {
-            Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
-            for (EncounterTransaction.Observation observationData : observations) {
-                Obs obsFound = this.obsMapper.getMatchingObservation(existingObservations,observationData.getUuid());
-                encounter.addObs(this.obsMapper.transformEtObs(encounter,obsFound, observationData));
-            }
-    }
-
-    public void updateDiagnoses(Encounter encounter, List<EncounterTransaction.Diagnosis> diagnoses) {
-        for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
-            org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
-            Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
-            if (diagnosisRequest.getDiagnosisDateTime() != null) {
-                obs.setObsDatetime(diagnosisRequest.getDiagnosisDateTime());
-            }
-            if (obs.getObsDatetime() == null) {
-                obs.setObsDatetime(new Date());
-            }
-            obs.setComment(diagnosisRequest.getComments());
-            if (diagnosisRequest.isVoided()) {
-                voidDiagnosisObservation(diagnosisRequest, obs);
-            }
-            encounter.addObs(obs);
-        }
-    }
-
-    private void voidDiagnosisObservation(EncounterTransaction.Diagnosis diagnosisRequest, Obs obs) {
-        obs.setVoided(diagnosisRequest.isVoided());
-        obs.setVoidReason(diagnosisRequest.getVoidReason());
-        for (Obs groupMember : obs.getGroupMembers()) {
-            groupMember.setVoided(diagnosisRequest.isVoided());
-            groupMember.setVoidReason(diagnosisRequest.getVoidReason());
-        }
-    }
-
-    private org.openmrs.module.emrapi.diagnosis.Diagnosis createDiagnosis(EncounterTransaction.Diagnosis diagnosisRequest) {
-        CodedOrFreeTextAnswer codedOrFreeTextAnswer = getCodedOrFreeTextAnswer(diagnosisRequest);
-        org.openmrs.module.emrapi.diagnosis.Diagnosis.Order order = org.openmrs.module.emrapi.diagnosis.Diagnosis.Order.valueOf(diagnosisRequest.getOrder());
-        org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty certainty = org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty.valueOf(diagnosisRequest.getCertainty());
-        Obs existingObs = obsService.getObsByUuid(diagnosisRequest.getExistingObs());
-        org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = new org.openmrs.module.emrapi.diagnosis.Diagnosis(codedOrFreeTextAnswer, order);
-        diagnosis.setCertainty(certainty);
-        diagnosis.setExistingObs(existingObs);
-        return diagnosis;
-    }
-
-    private CodedOrFreeTextAnswer getCodedOrFreeTextAnswer(EncounterTransaction.Diagnosis diagnosisRequest) {
-        if (StringUtils.isNotBlank(diagnosisRequest.getFreeTextAnswer())) {
-            return new CodedOrFreeTextAnswer(diagnosisRequest.getFreeTextAnswer());
-        }
-        EncounterTransaction.Concept codedAnswer = diagnosisRequest.getCodedAnswer();
-        if(codedAnswer != null) {
-            Concept concept = conceptService.getConceptByUuid(codedAnswer.getUuid());
-            if (concept == null) {
-                throw new ConceptNotFoundException("Coded answer concept does not exist" + codedAnswer.getUuid());
-            }
-            return new CodedOrFreeTextAnswer(concept);
-        }
-        throw new RuntimeException("Diagnosis should have either free text or coded answer");
-    }
+	
+	private ConceptService conceptService;
+	
+	private EmrApiProperties emrApiProperties;
+	
+	private ObsService obsService;
+	
+	private OrderService orderService;
+	
+	private ObsMapper obsMapper;
+	
+	@Autowired
+	public EncounterObservationServiceHelper(ConceptService conceptService, EmrApiProperties emrApiProperties,
+	    ObsService obsService, OrderService orderService, ObsMapper obsMapper) {
+		this.conceptService = conceptService;
+		this.emrApiProperties = emrApiProperties;
+		this.obsService = obsService;
+		this.orderService = orderService;
+		this.obsMapper = obsMapper;
+	}
+	
+	public void update(Encounter encounter, List<EncounterTransaction.Observation> observations) {
+		Set<Obs> existingObservations = encounter.getObsAtTopLevel(false);
+		for (EncounterTransaction.Observation observationData : observations) {
+			Obs obsFound = this.obsMapper.getMatchingObservation(existingObservations, observationData.getUuid());
+			encounter.addObs(this.obsMapper.transformEtObs(encounter, obsFound, observationData));
+		}
+	}
+	
+	public void updateDiagnoses(Encounter encounter, List<EncounterTransaction.Diagnosis> diagnoses) {
+		for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
+			org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
+			Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
+			if (diagnosisRequest.getDiagnosisDateTime() != null) {
+				obs.setObsDatetime(diagnosisRequest.getDiagnosisDateTime());
+			}
+			if (obs.getObsDatetime() == null) {
+				obs.setObsDatetime(new Date());
+			}
+			obs.setComment(diagnosisRequest.getComments());
+			if (diagnosisRequest.isVoided()) {
+				voidDiagnosisObservation(diagnosisRequest, obs);
+			}
+			encounter.addObs(obs);
+		}
+	}
+	
+	private void voidDiagnosisObservation(EncounterTransaction.Diagnosis diagnosisRequest, Obs obs) {
+		obs.setVoided(diagnosisRequest.isVoided());
+		obs.setVoidReason(diagnosisRequest.getVoidReason());
+		for (Obs groupMember : obs.getGroupMembers()) {
+			groupMember.setVoided(diagnosisRequest.isVoided());
+			groupMember.setVoidReason(diagnosisRequest.getVoidReason());
+		}
+	}
+	
+	private org.openmrs.module.emrapi.diagnosis.Diagnosis createDiagnosis(EncounterTransaction.Diagnosis diagnosisRequest) {
+		CodedOrFreeTextAnswer codedOrFreeTextAnswer = getCodedOrFreeTextAnswer(diagnosisRequest);
+		org.openmrs.module.emrapi.diagnosis.Diagnosis.Order order = org.openmrs.module.emrapi.diagnosis.Diagnosis.Order
+		        .valueOf(diagnosisRequest.getOrder());
+		org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty certainty = org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty
+		        .valueOf(diagnosisRequest.getCertainty());
+		Obs existingObs = obsService.getObsByUuid(diagnosisRequest.getExistingObs());
+		org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = new org.openmrs.module.emrapi.diagnosis.Diagnosis(
+		        codedOrFreeTextAnswer, order);
+		diagnosis.setCertainty(certainty);
+		diagnosis.setExistingObs(existingObs);
+		return diagnosis;
+	}
+	
+	private CodedOrFreeTextAnswer getCodedOrFreeTextAnswer(EncounterTransaction.Diagnosis diagnosisRequest) {
+		if (StringUtils.isNotBlank(diagnosisRequest.getFreeTextAnswer())) {
+			return new CodedOrFreeTextAnswer(diagnosisRequest.getFreeTextAnswer());
+		}
+		EncounterTransaction.Concept codedAnswer = diagnosisRequest.getCodedAnswer();
+		if (codedAnswer != null) {
+			Concept concept = conceptService.getConceptByUuid(codedAnswer.getUuid());
+			if (concept == null) {
+				throw new ConceptNotFoundException("Coded answer concept does not exist" + codedAnswer.getUuid());
+			}
+			return new CodedOrFreeTextAnswer(concept);
+		}
+		throw new RuntimeException("Diagnosis should have either free text or coded answer");
+	}
 }

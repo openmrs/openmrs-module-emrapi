@@ -1,4 +1,13 @@
 /*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
+/*
 * The contents of this file are subject to the OpenMRS Public License
 * Version 1.0 (the "License"); you may not use this file except in
 * compliance with the License. You may obtain a copy of the License at
@@ -59,12 +68,12 @@ public class TestUtils {
 				// pass
 			}
 		}
-		Assert.fail("Collection does not contain an element with " + property + " = " + value + ". Collection: "
-		        + collection);
+		Assert.fail(
+		    "Collection does not contain an element with " + property + " = " + value + ". Collection: " + collection);
 	}
 	
 	public static <T> ArgumentMatcher<T> containsElementsWithProperties(final String property,
-	                                                                    final T... expectedPropertyValues) {
+	        final T... expectedPropertyValues) {
 		return new ArgumentMatcher<T>() {
 			
 			@Override
@@ -80,9 +89,9 @@ public class TestUtils {
 	}
 	
 	public static <T> ArgumentMatcher<T> isCollectionOfExactlyElementsWithProperties(final String property,
-	                                                                                 final Object... expectedPropertyValues) {
+	        final Object... expectedPropertyValues) {
 		return new ArgumentMatcher<T>() {
-
+			
 			@Override
 			public boolean matches(Object o) {
 				assertTrue(o instanceof Collection);
@@ -128,8 +137,8 @@ public class TestUtils {
 	}
 	
 	/**
-	 * Tests whether the substring is contained in the actual string. Allows for inclusion of
-	 * regular expressions in the substring. Ignores white space. Ignores capitalization.
+	 * Tests whether the substring is contained in the actual string. Allows for inclusion of regular
+	 * expressions in the substring. Ignores white space. Ignores capitalization.
 	 */
 	public static void assertFuzzyContains(String substring, String actual) {
 		if (substring == null) {
@@ -168,28 +177,28 @@ public class TestUtils {
 		string = string.replaceAll("\\s", "");
 		return string;
 	}
-
-    //use DateMatchers.within(2, SECONDS, date)
-    @Deprecated
+	
+	//use DateMatchers.within(2, SECONDS, date)
+	@Deprecated
 	public static Matcher<Date> isJustNow() {
 		return new TypeSafeMatcher<Date>() {
-
+			
 			@Override
 			public void describeTo(Description description) {
-
+				
 			}
-
+			
 			@Override
 			protected boolean matchesSafely(Date date) {
 				return Math.abs(System.currentTimeMillis() - ((Date) date).getTime()) < 2000;
 			}
-
+			
 		};
 	}
 	
 	/**
-	 * Creates an argument matcher that tests equality based on the equals method, the developer
-	 * doesn't have to type cast the returned argument when pass it to
+	 * Creates an argument matcher that tests equality based on the equals method, the developer doesn't
+	 * have to type cast the returned argument when pass it to
 	 * {@link org.mockito.Mockito#argThat(org.hamcrest.Matcher)} as it would be the case if we used
 	 * {@link org.mockito.internal.matchers.Equals} matcher
 	 * 
@@ -199,17 +208,17 @@ public class TestUtils {
 	@SuppressWarnings("unchecked")
 	public static <T> Matcher<T> equalsMatcher(final T object) {
 		return new TypeSafeMatcher<T>() {
-
+			
 			@Override
 			public void describeTo(Description description) {
-
+				
 			}
-
+			
 			@Override
 			protected boolean matchesSafely(T t) {
-				return OpenmrsUtil.nullSafeEquals(object,t);
+				return OpenmrsUtil.nullSafeEquals(object, t);
 			}
-
+			
 		};
 	}
 	
@@ -261,17 +270,17 @@ public class TestUtils {
 	
 	public static Matcher<Encounter> hasProviders(final Map<EncounterRole, Set<Provider>> providers) {
 		return new TypeSafeMatcher<Encounter>() {
-
+			
 			@Override
 			public void describeTo(Description description) {
-
+				
 			}
-
+			
 			@Override
 			protected boolean matchesSafely(Encounter encounter) {
 				return sameProviders(encounter.getProvidersByRoles(), providers);
 			}
-
+			
 		};
 	}
 }

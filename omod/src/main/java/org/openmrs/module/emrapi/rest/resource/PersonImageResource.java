@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.rest.resource;
 
 import org.openmrs.Person;
@@ -24,71 +33,74 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-@Resource(name = RestConstants.VERSION_1 + "/personimage", supportedClass = PersonImage.class, supportedOpenmrsVersions = { "2.2 - 9.*" })
+@Resource(name = RestConstants.VERSION_1 + "/personimage", supportedClass = PersonImage.class, supportedOpenmrsVersions = {
+        "2.2 - 9.*" })
 public class PersonImageResource extends DelegatingCrudResource<PersonImage> {
-
-    @Override
-    public List<Representation> getAvailableRepresentations() {
-        return Arrays.asList(Representation.DEFAULT, Representation.FULL);
-    }
-
-    @Override
-    public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
-        return new DelegatingResourceDescription();
-    }
-
-    @Override
-    public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
-        DelegatingResourceDescription description = new DelegatingResourceDescription();
-        description.addProperty("person", Representation.DEFAULT);
-        description.addProperty("base64EncodedImage");
-        return description;
-    }
-
-    @Override
-    public PersonImage newDelegate() {
-        return new PersonImage();
-    }
-
-    @Override
-    public PersonImage save(PersonImage personImage) {
-        return Context.getService(EmrPersonImageService.class).savePersonImage(personImage);
-    }
-
-    @Override
-    public PersonImage getByUniqueId(String personUuid) {
-        Person person = Context.getPersonService().getPersonByUuid(personUuid);
-        if (person == null) {
-            throw new PersonNotFoundException(String.format("Person with UUID:%s not found.", personUuid));
-        }
-        return Context.getService(EmrPersonImageService.class).getCurrentPersonImage(person);
-    }
-
-    @Override
-    public Object retrieve(String uuid, RequestContext context) throws ResponseException {
-        PersonImage personImage = getByUniqueId(uuid);
-        InputStream inputStream;
-
-        try {
-            inputStream = new FileInputStream(personImage.getSavedImage());
-            OpenmrsUtil.copyFile(inputStream, context.getResponse().getOutputStream());
-            context.getResponse().flushBuffer();
-        } catch (FileNotFoundException e) {
-            throw new ObjectNotFoundException();
-        } catch (IOException e) {
-            throw new GenericRestException("Failure when loading the file for uuid: " + uuid, e.getCause());
-        }
-        return null;
-    }
-
-    @Override
-    protected void delete(PersonImage delegate, String reason, RequestContext context) throws ResponseException {
-        throw new ResourceDoesNotSupportOperationException("delete of person image not supported");
-    }
-
-    @Override
-    public void purge(PersonImage delegate, RequestContext context) throws ResponseException {
-        throw new ResourceDoesNotSupportOperationException("delete forever of person image not supported");
-    }
-
+	
+	@Override
+	public List<Representation> getAvailableRepresentations() {
+		return Arrays.asList(Representation.DEFAULT, Representation.FULL);
+	}
+	
+	@Override
+	public DelegatingResourceDescription getRepresentationDescription(Representation rep) {
+		return new DelegatingResourceDescription();
+	}
+	
+	@Override
+	public DelegatingResourceDescription getCreatableProperties() throws ResourceDoesNotSupportOperationException {
+		DelegatingResourceDescription description = new DelegatingResourceDescription();
+		description.addProperty("person", Representation.DEFAULT);
+		description.addProperty("base64EncodedImage");
+		return description;
+	}
+	
+	@Override
+	public PersonImage newDelegate() {
+		return new PersonImage();
+	}
+	
+	@Override
+	public PersonImage save(PersonImage personImage) {
+		return Context.getService(EmrPersonImageService.class).savePersonImage(personImage);
+	}
+	
+	@Override
+	public PersonImage getByUniqueId(String personUuid) {
+		Person person = Context.getPersonService().getPersonByUuid(personUuid);
+		if (person == null) {
+			throw new PersonNotFoundException(String.format("Person with UUID:%s not found.", personUuid));
+		}
+		return Context.getService(EmrPersonImageService.class).getCurrentPersonImage(person);
+	}
+	
+	@Override
+	public Object retrieve(String uuid, RequestContext context) throws ResponseException {
+		PersonImage personImage = getByUniqueId(uuid);
+		InputStream inputStream;
+		
+		try {
+			inputStream = new FileInputStream(personImage.getSavedImage());
+			OpenmrsUtil.copyFile(inputStream, context.getResponse().getOutputStream());
+			context.getResponse().flushBuffer();
+		}
+		catch (FileNotFoundException e) {
+			throw new ObjectNotFoundException();
+		}
+		catch (IOException e) {
+			throw new GenericRestException("Failure when loading the file for uuid: " + uuid, e.getCause());
+		}
+		return null;
+	}
+	
+	@Override
+	protected void delete(PersonImage delegate, String reason, RequestContext context) throws ResponseException {
+		throw new ResourceDoesNotSupportOperationException("delete of person image not supported");
+	}
+	
+	@Override
+	public void purge(PersonImage delegate, RequestContext context) throws ResponseException {
+		throw new ResourceDoesNotSupportOperationException("delete forever of person image not supported");
+	}
+	
 }

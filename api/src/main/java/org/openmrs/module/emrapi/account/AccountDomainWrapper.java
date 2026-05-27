@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.account;
 
 import lombok.Getter;
@@ -34,442 +43,441 @@ import java.util.Set;
 
 @SuppressWarnings("ALL")
 public class AccountDomainWrapper implements DomainWrapper {
-
-    @Getter
-    private Person person;
-
-    @Getter
-    private User user;
-
-    @Getter
-    private Provider provider;
-
-    @Setter
-    @Getter
-    private String password;
-
-    @Setter
-    @Getter
-    private String confirmPassword;
-
-    @Setter
-    @Qualifier("accountService")
-    @Autowired
-    protected AccountService accountService;
-
-    @Setter
-    @Qualifier("userService")
-    @Autowired
-    protected UserService userService;
-
-    @Setter
-    @Qualifier("personService")
-    @Autowired
-    protected PersonService personService;
-
-    @Setter
-    @Qualifier("providerService")
-    @Autowired
-    protected ProviderService providerService;
-
-    @Setter
-    @Qualifier("emrApiProperties")
-    @Autowired
-    protected EmrApiProperties emrApiProperties;
-
-    @Setter
-    @Autowired(required = false)
-    protected ProviderIdentifierGenerator providerIdentifierGenerator;
-
-    public AccountDomainWrapper() {
-    }
-
-    @Deprecated  // use DomainWrapperFactory instead
-    public AccountDomainWrapper(Person person, AccountService accountService, UserService userService, ProviderService providerService,
-                                PersonService personService, ProviderIdentifierGenerator providerIdentifierGenerator, EmrApiProperties emrApiProperties) {
-        this.accountService = accountService;
-        this.userService = userService;
-        this.providerService = providerService;
-        this.personService = personService;
-        this.providerIdentifierGenerator = providerIdentifierGenerator;
-        this.emrApiProperties = emrApiProperties;
-
-        initializeWithPerson(person);
-    }
-
-    public void initializeWithPerson(Person person) {
-        this.person = person;
-
-        // only fetch user and provider if person has been persisted
-        if (person.getId() != null) {
-            this.user = getUserByPerson(this.person);
-            this.provider = getProviderByPerson(this.person);
-        }
-    }
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Provider getProvider() {
-        return provider;
-    }
-
-    public void setProviderRole(ProviderRole providerRole) {
-        if (providerRole != null) {
-            initializeProviderIfNecessary();
-            provider.setProviderRole(providerRole);
-        } else {
-            // this prevents us from creating a new provider if we are only setting the provider role to null
-            if (this.provider != null) {
-                provider.setProviderRole(null);
-            }
-        }
-    }
-
-    public Object getProviderRole() {
-        if (this.provider == null) {
-            return null;
-        }
-        return this.provider.getProviderRole();
-    }
-
-    public void setProviderIdentifier(String providerIdentifier) {
-        if (StringUtils.isNotBlank(providerIdentifier)) {
-            initializeProviderIfNecessary();
-            provider.setIdentifier(providerIdentifier);
-        }
-        else {
-            if (this.provider != null) {
-                provider.setIdentifier(providerIdentifier);
-            }
-        }
-    }
-
-    public String getProviderIdentifier() {
-        if (this.provider == null) {
-            return null;
-        }
-        return this.provider.getIdentifier();
-    }
-
-    public void setGivenName(String givenName) {
-        initializePersonNameIfNecessary();
-        person.getPersonName().setGivenName(givenName);
-    }
-
-    public String getGivenName() {
-        return person.getGivenName();
-    }
-
-    public void setFamilyName(String familyName) {
-        initializePersonNameIfNecessary();
-        person.getPersonName().setFamilyName(familyName);
-    }
-
-    public String getFamilyName() {
-        return person.getFamilyName();
-    }
-
-    public void setGender(String gender) {
-        person.setGender(gender);
-    }
-
-    public String getGender() {
-        return person.getGender();
-    }
-
-    public void setUsername(String username) {
-        if (StringUtils.isNotBlank(username)) {
-            initializeUserIfNecessary();
-            user.setUsername(username);
-        }
-    }
-
-    public String getUsername() {
-        return user != null ? user.getUsername() : null;
-    }
-
-    public boolean isPasswordChangeRequired() {
-        if (user != null && user.getUserProperties() != null) {
-            return Boolean.parseBoolean(user.getUserProperties().get(OpenmrsConstants.USER_PROPERTY_CHANGE_PASSWORD));
-        }
-        return false;
-    }
-
-    public void setPasswordChangeRequired(boolean passwordChangeRequired) {
-        if (user == null && passwordChangeRequired) {
-            initializeUserIfNecessary();
-        }
-        if (user != null) {
-            if (user.getUserProperties() == null) {
-                user.setUserProperties(new HashMap<>());
-            }
-            user.getUserProperties().put(OpenmrsConstants.USER_PROPERTY_CHANGE_PASSWORD, Boolean.toString(passwordChangeRequired));
-        }
-    }
-
-    public String getEmail() {
-        return user != null ? getUser().getEmail() : null;
-    }
-
-    public void setEmail(String email) {
-        if (user == null && StringUtils.isNotBlank(email)) {
-            initializeUserIfNecessary();
-        }
-        if (user != null) {
-            user.setEmail(email);
-        }
-    }
-
-    public String getPhoneNumber() {
-        PersonAttribute att = person.getAttribute(getPhoneNumberAttributeType());
-        return (att == null ? null : att.getValue());
-    }
-
-    public void setPhoneNumber(String value) {
-       person.addAttribute(new PersonAttribute(getPhoneNumberAttributeType(), value));
-    }
-
-    public PersonAttributeType getPhoneNumberAttributeType() {
-        return emrApiProperties.getTelephoneAttributeType();
-    }
-
-    public void setDefaultLocale(Locale locale) {
-        if (locale != null) {
-            initializeUserIfNecessary();
-            user.setUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE, locale.toString());
-        } else if (user != null) {
-            user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE);
-        }
-    }
-
-    public Locale getDefaultLocale() {
-        return GeneralUtils.getDefaultLocale(user);
-    }
-
-    public void setPrivilegeLevel(Role privilegeLevel) {
-
-        if (privilegeLevel != null) {
-
-            if (!accountService.getAllPrivilegeLevels().contains(privilegeLevel)) {
-                throw new APIException("Attempting to set invalid privilege level");
-            }
-
-            initializeUserIfNecessary();
-
-            if (!user.hasRole(privilegeLevel.getRole(), true)) {
-                if (user.getRoles() != null) {
-                    accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
-                }
-                user.addRole(privilegeLevel);
-            }
-        } else if (user != null) {
-            // privilege level is mandatory, so technically we shouldn't ever get here
-            if (user.getRoles() != null) {
-                accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
-            }
-        }
-    }
-
-    public Role getPrivilegeLevel() {
-        // use getRoles instead of getAllRoles since privilege-level should be explicitly set
-        if (user != null && user.getRoles() != null) {
-            for (Role role : user.getRoles()) {
-                if (role.getRole().startsWith(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL)) {
-                    return role;
-                }
-            }
-
-        }
-        return null;
-    }
-
-    public void setCapabilities(Set<Role> capabilities) {
-
-        if (capabilities != null && !capabilities.isEmpty()) {
-            if (!new HashSet<>(accountService.getAllCapabilities()).containsAll(capabilities)) {
-                throw new APIException("Attempt to set invalid capability");
-            }
-
-            initializeUserIfNecessary();
-
-            if (user.getRoles() != null) {
-                user.getRoles().removeAll(accountService.getAllCapabilities());
-            }
-
-            for (Role role : capabilities) {
-                user.addRole(role);
-            }
-        } else if (user != null && user.getRoles() != null) {
-            user.getRoles().removeAll(accountService.getAllCapabilities());
-        }
-    }
-
-    public Set<Role> getCapabilities() {
-
-        if (user == null) {
-            return null;
-        }
-
-        Set<Role> capabilities = new HashSet<Role>();
-
-        if (user.getRoles() != null) {
-            for (Role role : user.getRoles()) {
-                if (role.getRole().startsWith(EmrApiConstants.ROLE_PREFIX_CAPABILITY)) {
-                    capabilities.add(role);
-                }
-            }
-        }
-        return capabilities;
-    }
-
-    public void setUserEnabled(Boolean userEnabled) {
-        if (user != null) {
-            if (userEnabled && user.isRetired()) {
-                user.setRetired(false);
-                user.setRetireReason(null);
-                user.setRetiredBy(null);
-                user.setDateRetired(null);
-            } else if (!userEnabled && !user.isRetired()) {
-                user.setRetired(true);
-                user.setRetireReason("retired during account management");
-                user.setDateRetired(new Date());
-                // TODO: figure out how to set retired by
-            }
-        } else if (userEnabled != null && userEnabled) {
-            initializeUserIfNecessary();
-        }
-    }
-
-
-    public Boolean getUserEnabled() {
-        if (user == null) {
-            return null;
-        } else {
-            return !user.isRetired();
-        }
-    }
-
-
-    public boolean isLocked() {
-        if (user == null) {
-            return false;
-        }
-        String lockoutTimeProperty = user.getUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
-        if (lockoutTimeProperty != null) {
-            try {
-                long lockedOutUntil = Long.parseLong(lockoutTimeProperty) + 300000;
-                return System.currentTimeMillis() < lockedOutUntil;
-            } catch (NumberFormatException ex) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Unlocks this account (in case it has been locked for getting the password wrong too many times), and saves that
-     * to the database.
-     */
-    public void unlock() {
-        if (user == null) {
-            throw new IllegalStateException("Cannot unlock an account that doesn't have a user");
-        }
-        user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
-        user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS);
-        userService.saveUser(user);
-    }
-
-    public void save() {
-
-        if (person != null) {
-            personService.savePerson(person);
-        }
-
-        if (user != null) {
-            boolean existingUser = (user.getUserId() != null);
-
-            if (!existingUser) {
-                userService.createUser(user, password);
-            }
-            else {
-                userService.saveUser(user);
-            }
-
-            // the saveUser(user, password) method will *only* set a password for a new user, it won't change an existing one
-            if (existingUser && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(confirmPassword)) {
-                userService.changePassword(user, password);
-            }
-        }
-
-        if (provider != null) {
-            providerService.saveProvider(provider);
-            // generate identifier if one doesn't exist and a provider generator has been specified
-            if (providerIdentifierGenerator != null && StringUtils.isBlank(provider.getIdentifier())) {
-                provider.setIdentifier(providerIdentifierGenerator.generateIdentifier(provider));
-                providerService.saveProvider(provider);
-            }
-        }
-    }
-
-    private void initializePersonNameIfNecessary() {
-        if (person.getPersonName() == null) {
-            person.addName(new PersonName());
-        }
-    }
-
-    private void initializeUserIfNecessary() {
-        if (user == null) {
-            user = new User();
-            user.setPerson(person);
-        }
-    }
-
-    private void initializeProviderIfNecessary() {
-        if (provider == null) {
-            provider = new Provider();
-            provider.setPerson(person);
-        }
-    }
-
-    private User getUserByPerson(Person person) {
-        User user = null;
-        List<User> users = userService.getUsersByPerson(person, false);
-        //exclude daemon user
-        for (Iterator<User> i = users.iterator(); i.hasNext(); ) {
-            User candidate = i.next();
-            if (EmrApiConstants.DAEMON_USER_UUID.equals(candidate.getUuid())) {
-                i.remove();
-                break;
-            }
-        }
-        //return a retired account if they have none
-        if (users.isEmpty())
-            users = userService.getUsersByPerson(person, true);
-
-        if (users.size() == 1)
-            user = users.get(0);
-        else if (users.size() > 1)
-            throw new APIException("Found multiple users associated to the person with id: " + person.getPersonId());
-
-        return user;
-    }
-
-    private Provider getProviderByPerson(Person person) {
-        Collection<? extends Provider> providers = providerService.getProvidersByPerson(person);
-        if (providers != null && !providers.isEmpty()) {
-            if (providers.size() == 1) {
-                return providers.iterator().next();
-            } else {
-                throw new APIException("Multiple provider/provider roles per person not supported");
-            }
-        }
-        return null;
-    }
-
+	
+	@Getter
+	private Person person;
+	
+	@Getter
+	private User user;
+	
+	@Getter
+	private Provider provider;
+	
+	@Setter
+	@Getter
+	private String password;
+	
+	@Setter
+	@Getter
+	private String confirmPassword;
+	
+	@Setter
+	@Qualifier("accountService")
+	@Autowired
+	protected AccountService accountService;
+	
+	@Setter
+	@Qualifier("userService")
+	@Autowired
+	protected UserService userService;
+	
+	@Setter
+	@Qualifier("personService")
+	@Autowired
+	protected PersonService personService;
+	
+	@Setter
+	@Qualifier("providerService")
+	@Autowired
+	protected ProviderService providerService;
+	
+	@Setter
+	@Qualifier("emrApiProperties")
+	@Autowired
+	protected EmrApiProperties emrApiProperties;
+	
+	@Setter
+	@Autowired(required = false)
+	protected ProviderIdentifierGenerator providerIdentifierGenerator;
+	
+	public AccountDomainWrapper() {
+	}
+	
+	@Deprecated // use DomainWrapperFactory instead
+	public AccountDomainWrapper(Person person, AccountService accountService, UserService userService,
+	    ProviderService providerService, PersonService personService,
+	    ProviderIdentifierGenerator providerIdentifierGenerator, EmrApiProperties emrApiProperties) {
+		this.accountService = accountService;
+		this.userService = userService;
+		this.providerService = providerService;
+		this.personService = personService;
+		this.providerIdentifierGenerator = providerIdentifierGenerator;
+		this.emrApiProperties = emrApiProperties;
+		
+		initializeWithPerson(person);
+	}
+	
+	public void initializeWithPerson(Person person) {
+		this.person = person;
+		
+		// only fetch user and provider if person has been persisted
+		if (person.getId() != null) {
+			this.user = getUserByPerson(this.person);
+			this.provider = getProviderByPerson(this.person);
+		}
+	}
+	
+	public Person getPerson() {
+		return person;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public Provider getProvider() {
+		return provider;
+	}
+	
+	public void setProviderRole(ProviderRole providerRole) {
+		if (providerRole != null) {
+			initializeProviderIfNecessary();
+			provider.setProviderRole(providerRole);
+		} else {
+			// this prevents us from creating a new provider if we are only setting the provider role to null
+			if (this.provider != null) {
+				provider.setProviderRole(null);
+			}
+		}
+	}
+	
+	public Object getProviderRole() {
+		if (this.provider == null) {
+			return null;
+		}
+		return this.provider.getProviderRole();
+	}
+	
+	public void setProviderIdentifier(String providerIdentifier) {
+		if (StringUtils.isNotBlank(providerIdentifier)) {
+			initializeProviderIfNecessary();
+			provider.setIdentifier(providerIdentifier);
+		} else {
+			if (this.provider != null) {
+				provider.setIdentifier(providerIdentifier);
+			}
+		}
+	}
+	
+	public String getProviderIdentifier() {
+		if (this.provider == null) {
+			return null;
+		}
+		return this.provider.getIdentifier();
+	}
+	
+	public void setGivenName(String givenName) {
+		initializePersonNameIfNecessary();
+		person.getPersonName().setGivenName(givenName);
+	}
+	
+	public String getGivenName() {
+		return person.getGivenName();
+	}
+	
+	public void setFamilyName(String familyName) {
+		initializePersonNameIfNecessary();
+		person.getPersonName().setFamilyName(familyName);
+	}
+	
+	public String getFamilyName() {
+		return person.getFamilyName();
+	}
+	
+	public void setGender(String gender) {
+		person.setGender(gender);
+	}
+	
+	public String getGender() {
+		return person.getGender();
+	}
+	
+	public void setUsername(String username) {
+		if (StringUtils.isNotBlank(username)) {
+			initializeUserIfNecessary();
+			user.setUsername(username);
+		}
+	}
+	
+	public String getUsername() {
+		return user != null ? user.getUsername() : null;
+	}
+	
+	public boolean isPasswordChangeRequired() {
+		if (user != null && user.getUserProperties() != null) {
+			return Boolean.parseBoolean(user.getUserProperties().get(OpenmrsConstants.USER_PROPERTY_CHANGE_PASSWORD));
+		}
+		return false;
+	}
+	
+	public void setPasswordChangeRequired(boolean passwordChangeRequired) {
+		if (user == null && passwordChangeRequired) {
+			initializeUserIfNecessary();
+		}
+		if (user != null) {
+			if (user.getUserProperties() == null) {
+				user.setUserProperties(new HashMap<>());
+			}
+			user.getUserProperties().put(OpenmrsConstants.USER_PROPERTY_CHANGE_PASSWORD,
+			    Boolean.toString(passwordChangeRequired));
+		}
+	}
+	
+	public String getEmail() {
+		return user != null ? getUser().getEmail() : null;
+	}
+	
+	public void setEmail(String email) {
+		if (user == null && StringUtils.isNotBlank(email)) {
+			initializeUserIfNecessary();
+		}
+		if (user != null) {
+			user.setEmail(email);
+		}
+	}
+	
+	public String getPhoneNumber() {
+		PersonAttribute att = person.getAttribute(getPhoneNumberAttributeType());
+		return (att == null ? null : att.getValue());
+	}
+	
+	public void setPhoneNumber(String value) {
+		person.addAttribute(new PersonAttribute(getPhoneNumberAttributeType(), value));
+	}
+	
+	public PersonAttributeType getPhoneNumberAttributeType() {
+		return emrApiProperties.getTelephoneAttributeType();
+	}
+	
+	public void setDefaultLocale(Locale locale) {
+		if (locale != null) {
+			initializeUserIfNecessary();
+			user.setUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE, locale.toString());
+		} else if (user != null) {
+			user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE);
+		}
+	}
+	
+	public Locale getDefaultLocale() {
+		return GeneralUtils.getDefaultLocale(user);
+	}
+	
+	public void setPrivilegeLevel(Role privilegeLevel) {
+		
+		if (privilegeLevel != null) {
+			
+			if (!accountService.getAllPrivilegeLevels().contains(privilegeLevel)) {
+				throw new APIException("Attempting to set invalid privilege level");
+			}
+			
+			initializeUserIfNecessary();
+			
+			if (!user.hasRole(privilegeLevel.getRole(), true)) {
+				if (user.getRoles() != null) {
+					accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
+				}
+				user.addRole(privilegeLevel);
+			}
+		} else if (user != null) {
+			// privilege level is mandatory, so technically we shouldn't ever get here
+			if (user.getRoles() != null) {
+				accountService.getAllPrivilegeLevels().forEach(user.getRoles()::remove);
+			}
+		}
+	}
+	
+	public Role getPrivilegeLevel() {
+		// use getRoles instead of getAllRoles since privilege-level should be explicitly set
+		if (user != null && user.getRoles() != null) {
+			for (Role role : user.getRoles()) {
+				if (role.getRole().startsWith(EmrApiConstants.ROLE_PREFIX_PRIVILEGE_LEVEL)) {
+					return role;
+				}
+			}
+			
+		}
+		return null;
+	}
+	
+	public void setCapabilities(Set<Role> capabilities) {
+		
+		if (capabilities != null && !capabilities.isEmpty()) {
+			if (!new HashSet<>(accountService.getAllCapabilities()).containsAll(capabilities)) {
+				throw new APIException("Attempt to set invalid capability");
+			}
+			
+			initializeUserIfNecessary();
+			
+			if (user.getRoles() != null) {
+				user.getRoles().removeAll(accountService.getAllCapabilities());
+			}
+			
+			for (Role role : capabilities) {
+				user.addRole(role);
+			}
+		} else if (user != null && user.getRoles() != null) {
+			user.getRoles().removeAll(accountService.getAllCapabilities());
+		}
+	}
+	
+	public Set<Role> getCapabilities() {
+		
+		if (user == null) {
+			return null;
+		}
+		
+		Set<Role> capabilities = new HashSet<Role>();
+		
+		if (user.getRoles() != null) {
+			for (Role role : user.getRoles()) {
+				if (role.getRole().startsWith(EmrApiConstants.ROLE_PREFIX_CAPABILITY)) {
+					capabilities.add(role);
+				}
+			}
+		}
+		return capabilities;
+	}
+	
+	public void setUserEnabled(Boolean userEnabled) {
+		if (user != null) {
+			if (userEnabled && user.isRetired()) {
+				user.setRetired(false);
+				user.setRetireReason(null);
+				user.setRetiredBy(null);
+				user.setDateRetired(null);
+			} else if (!userEnabled && !user.isRetired()) {
+				user.setRetired(true);
+				user.setRetireReason("retired during account management");
+				user.setDateRetired(new Date());
+				// TODO: figure out how to set retired by
+			}
+		} else if (userEnabled != null && userEnabled) {
+			initializeUserIfNecessary();
+		}
+	}
+	
+	public Boolean getUserEnabled() {
+		if (user == null) {
+			return null;
+		} else {
+			return !user.isRetired();
+		}
+	}
+	
+	public boolean isLocked() {
+		if (user == null) {
+			return false;
+		}
+		String lockoutTimeProperty = user.getUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
+		if (lockoutTimeProperty != null) {
+			try {
+				long lockedOutUntil = Long.parseLong(lockoutTimeProperty) + 300000;
+				return System.currentTimeMillis() < lockedOutUntil;
+			}
+			catch (NumberFormatException ex) {
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Unlocks this account (in case it has been locked for getting the password wrong too many times),
+	 * and saves that to the database.
+	 */
+	public void unlock() {
+		if (user == null) {
+			throw new IllegalStateException("Cannot unlock an account that doesn't have a user");
+		}
+		user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOCKOUT_TIMESTAMP);
+		user.removeUserProperty(OpenmrsConstants.USER_PROPERTY_LOGIN_ATTEMPTS);
+		userService.saveUser(user);
+	}
+	
+	public void save() {
+		
+		if (person != null) {
+			personService.savePerson(person);
+		}
+		
+		if (user != null) {
+			boolean existingUser = (user.getUserId() != null);
+			
+			if (!existingUser) {
+				userService.createUser(user, password);
+			} else {
+				userService.saveUser(user);
+			}
+			
+			// the saveUser(user, password) method will *only* set a password for a new user, it won't change an existing one
+			if (existingUser && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(confirmPassword)) {
+				userService.changePassword(user, password);
+			}
+		}
+		
+		if (provider != null) {
+			providerService.saveProvider(provider);
+			// generate identifier if one doesn't exist and a provider generator has been specified
+			if (providerIdentifierGenerator != null && StringUtils.isBlank(provider.getIdentifier())) {
+				provider.setIdentifier(providerIdentifierGenerator.generateIdentifier(provider));
+				providerService.saveProvider(provider);
+			}
+		}
+	}
+	
+	private void initializePersonNameIfNecessary() {
+		if (person.getPersonName() == null) {
+			person.addName(new PersonName());
+		}
+	}
+	
+	private void initializeUserIfNecessary() {
+		if (user == null) {
+			user = new User();
+			user.setPerson(person);
+		}
+	}
+	
+	private void initializeProviderIfNecessary() {
+		if (provider == null) {
+			provider = new Provider();
+			provider.setPerson(person);
+		}
+	}
+	
+	private User getUserByPerson(Person person) {
+		User user = null;
+		List<User> users = userService.getUsersByPerson(person, false);
+		//exclude daemon user
+		for (Iterator<User> i = users.iterator(); i.hasNext();) {
+			User candidate = i.next();
+			if (EmrApiConstants.DAEMON_USER_UUID.equals(candidate.getUuid())) {
+				i.remove();
+				break;
+			}
+		}
+		//return a retired account if they have none
+		if (users.isEmpty())
+			users = userService.getUsersByPerson(person, true);
+		
+		if (users.size() == 1)
+			user = users.get(0);
+		else if (users.size() > 1)
+			throw new APIException("Found multiple users associated to the person with id: " + person.getPersonId());
+		
+		return user;
+	}
+	
+	private Provider getProviderByPerson(Person person) {
+		Collection<? extends Provider> providers = providerService.getProvidersByPerson(person);
+		if (providers != null && !providers.isEmpty()) {
+			if (providers.size() == 1) {
+				return providers.iterator().next();
+			} else {
+				throw new APIException("Multiple provider/provider roles per person not supported");
+			}
+		}
+		return null;
+	}
+	
 }

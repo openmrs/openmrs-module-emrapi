@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.web.controller;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -29,25 +38,26 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensitiveTest {
-
+	
 	MockHttpServletRequest request;
+	
 	MockHttpServletResponse response;
-
+	
 	@Autowired
 	EmrApiProperties emrApiProperties;
-
+	
 	@Autowired
 	EmrApiConfigurationController emrApiConfigurationController;
-
+	
 	@Autowired
 	MetadataMappingService metadataMappingService;
-
+	
 	@Autowired
 	ConceptService conceptService;
-
+	
 	@Autowired
 	DispositionService dispositionService;
-
+	
 	@Before
 	public void setUp() {
 		executeDataSet("baseTestDataset.xml");
@@ -55,7 +65,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		request = new MockHttpServletRequest();
 		response = new MockHttpServletResponse();
 	}
-
+	
 	@Test
 	public void shouldGetAsJson() throws Exception {
 		request.addParameter("v", "full");
@@ -63,7 +73,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		String jsonString = new ObjectMapper().writeValueAsString(config);
 		Assert.assertTrue(jsonString.contains("unknownLocation"));
 	}
-
+	
 	@Test
 	public void shouldGetDefaultRepresentation() {
 		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
@@ -75,7 +85,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		assertThat(unknownLocation.keySet(), containsInAnyOrder("uuid", "display", "links"));
 		assertEquals("Unknown Location", unknownLocation.get("display"));
 	}
-
+	
 	@Test
 	public void shouldGetFullRepresentation() {
 		request.addParameter("v", "full");
@@ -86,12 +96,12 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		for (String prop : expectedProps) {
 			Assert.assertTrue("Expected property: " + prop, unknownLocation.containsKey(prop));
 		}
-		for (int i=1; i<=15; i++) {
-			assertTrue(unknownLocation.containsKey("address"+i));
+		for (int i = 1; i <= 15; i++) {
+			assertTrue(unknownLocation.containsKey("address" + i));
 		}
 		assertEquals("Unknown Location", unknownLocation.get("display"));
 	}
-
+	
 	@Test
 	public void shouldGetCustomRepresentation() {
 		request.addParameter("v", "custom:(unknownLocation:(display),admissionEncounterType:full)");
@@ -103,7 +113,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		assertEquals("06087111-222-11e3-9c1a-0800200c9a66", mapNode(config, "admissionEncounterType").get("uuid"));
 		assertEquals("Admission", mapNode(config, "admissionEncounterType").get("name"));
 	}
-
+	
 	@Test
 	public void shouldGetDispositions() {
 		request.addParameter("v", "custom:(dispositions)");
@@ -115,34 +125,30 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 				assertThat(d.get("name"), equalTo("disposition.death"));
 				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Death"));
 				assertThat(listNode(d, "additionalObs").size(), equalTo(1));
-				assertThat(listNode(d, "additionalObs").get(0).get("conceptCode"), equalTo("org.openmrs.module.emrapi:Date of death"));
-			}
-			else if (d.get("uuid").equals("66de7f60-b73a-11e2-9e96-0800200c9a66")) {
+				assertThat(listNode(d, "additionalObs").get(0).get("conceptCode"),
+				    equalTo("org.openmrs.module.emrapi:Date of death"));
+			} else if (d.get("uuid").equals("66de7f60-b73a-11e2-9e96-0800200c9a66")) {
 				assertThat(d.get("name"), equalTo("disposition.admit"));
 				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Admit to hospital"));
 				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
-			}
-			else if (d.get("uuid").equals("8297651b-4046-11ef-ba6a-0242ac120002")) {
+			} else if (d.get("uuid").equals("8297651b-4046-11ef-ba6a-0242ac120002")) {
 				assertThat(d.get("name"), equalTo("disposition.transfer"));
 				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Transfer out of hospital"));
 				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
-			}
-			else if (d.get("uuid").equals("687d966bb-9c91-4886-b8b0-e63361f495f0")) {
+			} else if (d.get("uuid").equals("687d966bb-9c91-4886-b8b0-e63361f495f0")) {
 				assertThat(d.get("name"), equalTo("disposition.observation"));
 				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:ED Observation"));
 				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
-			}
-			else if (d.get("uuid").equals("12129630-b698-11e2-9e96-0800200c9a66")) {
+			} else if (d.get("uuid").equals("12129630-b698-11e2-9e96-0800200c9a66")) {
 				assertThat(d.get("name"), equalTo("disposition.discharge"));
 				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Discharged"));
 				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
-			}
-			else {
+			} else {
 				Assert.fail("Unexpected disposition uuid: " + d.get("uuid"));
 			}
 		}
 	}
-
+	
 	@Test
 	public void shouldGetDispositionDescriptor() {
 		ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
@@ -153,10 +159,11 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		assertThat(mapNode(descriptor, "dispositionSetConcept", "name").get("name"), equalTo("Disposition Construct"));
 		assertThat(mapNode(descriptor, "dispositionConcept", "name").get("name"), equalTo("Disposition"));
 		assertThat(mapNode(descriptor, "admissionLocationConcept", "name").get("name"), equalTo("Admission Location"));
-		assertThat(mapNode(descriptor, "internalTransferLocationConcept", "name").get("name"), equalTo("Internal Transfer Location"));
+		assertThat(mapNode(descriptor, "internalTransferLocationConcept", "name").get("name"),
+		    equalTo("Internal Transfer Location"));
 		assertThat(mapNode(descriptor, "dateOfDeathConcept", "name").get("name"), equalTo("Date of Death"));
 	}
-
+	
 	@Test
 	public void shouldGetDiagnosisMetadata() {
 		ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
@@ -170,7 +177,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		assertThat(mapNode(dm, "diagnosisOrderConcept", "name").get("name"), equalTo("Diagnosis order"));
 		assertThat(mapNode(dm, "diagnosisCertaintyConcept", "name").get("name"), equalTo("Diagnosis certainty"));
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private Map<String, Object> mapNode(Map<String, Object> o, String... keys) {
 		Map<String, Object> ret = o;
@@ -179,12 +186,12 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		}
 		return ret;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private List<Map<String, Object>> listNode(Map<String, Object> o, String key) {
-		return (List<Map<String, Object>>)o.get(key);
+		return (List<Map<String, Object>>) o.get(key);
 	}
-
+	
 	private void printAsJson(Object o) {
 		try {
 			System.out.println(new ObjectMapper().writeValueAsString(o));

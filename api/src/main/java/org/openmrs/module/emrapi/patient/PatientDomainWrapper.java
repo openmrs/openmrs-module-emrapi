@@ -1,17 +1,12 @@
 /*
- * The contents of this file are subject to the OpenMRS Public License
- * Version 1.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://license.openmrs.org
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
- *
- * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
  */
-
 package org.openmrs.module.emrapi.patient;
 
 import org.joda.time.DateTime;
@@ -52,116 +47,117 @@ import java.util.Set;
  * A rich-domain-model class that wraps a Patient, and lets you perform common queries.
  */
 public class PatientDomainWrapper implements DomainWrapper {
-
+	
 	private Patient patient;
-
+	
 	@Qualifier("emrApiProperties")
 	@Autowired
 	protected EmrApiProperties emrApiProperties;
-
+	
 	@Qualifier("adtService")
 	@Autowired
 	protected AdtService adtService;
-
+	
 	@Qualifier("visitService")
 	@Autowired
 	protected VisitService visitService;
-
+	
 	@Qualifier("encounterService")
 	@Autowired
 	protected EncounterService encounterService;
-
+	
 	@Qualifier("emrDiagnosisService")
 	@Autowired
 	protected DiagnosisService diagnosisService;
-    
-   @Qualifier("domainWrapperFactory")
-   @Autowired
-   protected DomainWrapperFactory domainWrapperFactory;
-
+	
+	@Qualifier("domainWrapperFactory")
+	@Autowired
+	protected DomainWrapperFactory domainWrapperFactory;
+	
 	public PatientDomainWrapper() {
 	}
-
-    @Deprecated  // use the PatientDomainWrapperFactory component to instantiate a new PDW
+	
+	@Deprecated // use the PatientDomainWrapperFactory component to instantiate a new PDW
 	public PatientDomainWrapper(Patient patient, EmrApiProperties emrApiProperties, AdtService adtService,
-								VisitService visitService, EncounterService encounterService, DiagnosisService diagnosisService, DomainWrapperFactory domainWrapperFactory) {
+	    VisitService visitService, EncounterService encounterService, DiagnosisService diagnosisService,
+	    DomainWrapperFactory domainWrapperFactory) {
 		this.patient = patient;
 		this.emrApiProperties = emrApiProperties;
 		this.adtService = adtService;
 		this.visitService = visitService;
 		this.encounterService = encounterService;
 		this.diagnosisService = diagnosisService;
-		this.domainWrapperFactory = domainWrapperFactory; 
+		this.domainWrapperFactory = domainWrapperFactory;
 	}
-
+	
 	public void setPatient(Patient patient) {
 		this.patient = patient;
 	}
-
-    public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
-        this.emrApiProperties = emrApiProperties;
-    }
-
-    public void setAdtService(AdtService adtService) {
-        this.adtService = adtService;
-    }
-
-    public void setVisitService(VisitService visitService) {
-        this.visitService = visitService;
-    }
-
-    public void setEncounterService(EncounterService encounterService) {
-        this.encounterService = encounterService;
-    }
-
-    public void setDiagnosisService(DiagnosisService diagnosisService) {
-        this.diagnosisService = diagnosisService;
-    }
-
-    public Patient getPatient() {
+	
+	public void setEmrApiProperties(EmrApiProperties emrApiProperties) {
+		this.emrApiProperties = emrApiProperties;
+	}
+	
+	public void setAdtService(AdtService adtService) {
+		this.adtService = adtService;
+	}
+	
+	public void setVisitService(VisitService visitService) {
+		this.visitService = visitService;
+	}
+	
+	public void setEncounterService(EncounterService encounterService) {
+		this.encounterService = encounterService;
+	}
+	
+	public void setDiagnosisService(DiagnosisService diagnosisService) {
+		this.diagnosisService = diagnosisService;
+	}
+	
+	public Patient getPatient() {
 		return patient;
 	}
-
+	
 	public Integer getId() {
 		return patient.getPatientId();
 	}
-
+	
 	public String getGender() {
 		return patient.getGender();
 	}
-
+	
 	public Integer getAge() {
 		return patient.getAge();
 	}
-
+	
 	public Integer getAgeInMonths() {
-
+		
 		if (patient.getBirthdate() == null) {
 			return null;
 		}
-
+		
 		Date endDate = patient.isDead() ? patient.getDeathDate() : new Date();
 		return Months.monthsBetween(new DateTime(patient.getBirthdate()), new DateTime(endDate)).getMonths();
 	}
-
+	
 	public Integer getAgeInDays() {
-
+		
 		if (patient.getBirthdate() == null) {
 			return null;
 		}
-
+		
 		Date endDate = patient.isDead() ? patient.getDeathDate() : new Date();
 		return Days.daysBetween(new DateTime(patient.getBirthdate()), new DateTime(endDate)).getDays();
 	}
-
+	
 	public Boolean getBirthdateEstimated() {
 		return patient.getBirthdateEstimated();
 	}
-
+	
 	public Date getBirthdate() {
 		return patient.getBirthdate();
 	}
-
+	
 	public String getTelephoneNumber() {
 		String telephoneNumber = null;
 		PersonAttributeType type = emrApiProperties.getTelephoneAttributeType();
@@ -173,11 +169,11 @@ public class PatientDomainWrapper implements DomainWrapper {
 		}
 		return telephoneNumber;
 	}
-
+	
 	public PersonAddress getPersonAddress() {
 		return patient.getPersonAddress();
 	}
-
+	
 	public PatientIdentifier getPrimaryIdentifier() {
 		List<PatientIdentifier> primaryIdentifiers = getPrimaryIdentifiers();
 		if (primaryIdentifiers.isEmpty()) {
@@ -186,112 +182,114 @@ public class PatientDomainWrapper implements DomainWrapper {
 			return primaryIdentifiers.get(0);
 		}
 	}
-
+	
 	public List<PatientIdentifier> getPrimaryIdentifiers() {
 		return patient.getPatientIdentifiers(emrApiProperties.getPrimaryIdentifierType());
 	}
-
-
-    public List<PatientIdentifier> getExtraIdentifiers() {
-	    return getExtraIdentifiers(null);
-    }
-
-    /**
-     * Return all extra identifiers associated with this patient, restricted by the specified location
-     *
-     * If an identifier type has locationBehaviour = REQUIRED, only return identifiers for which
-     * the specified location fails within the hierarchy of the location associated with the identifier (ie, if "Clinic B"
-     * is passed in as the location parameter, don't return identifiers that fall under the "Clinic A" location hierarchy)
-     *
-     * @param location
-     * @return
-     */
-   public List<PatientIdentifier> getExtraIdentifiers(Location location) {
-
-       List<PatientIdentifier> patientIdentifiers = null;
-       List<PatientIdentifierType> types = emrApiProperties.getExtraPatientIdentifierTypes();
-
-       if (types != null && types.size() > 0) {
-           patientIdentifiers = new ArrayList<PatientIdentifier>();
-
-           for (PatientIdentifierType type : types) {
-               List<PatientIdentifier> extraPatientIdentifiers = patient.getPatientIdentifiers(type);
-
-               if (extraPatientIdentifiers != null) {
-
-                   for (PatientIdentifier extraPatientIdentifier: extraPatientIdentifiers) {
-                        if (type.getLocationBehavior() == null || !type.getLocationBehavior().equals(PatientIdentifierType.LocationBehavior.REQUIRED)
-                                || location == null || Location.isInHierarchy(location, extraPatientIdentifier.getLocation())) {
-                            patientIdentifiers.add(extraPatientIdentifier);
-                        }
-
-                   }
-               }
-           }
-       }
-       return patientIdentifiers;
-   }
-
-    public Map<PatientIdentifierType, List<PatientIdentifier>> getExtraIdentifiersMappedByType(Location location) {
-
-        Map<PatientIdentifierType, List<PatientIdentifier>> identifierMap = new HashMap<PatientIdentifierType, List<PatientIdentifier>>();
-
-        List<PatientIdentifier> patientIdentifiers = getExtraIdentifiers(location);
-
-        if (patientIdentifiers != null) {
-
-            for (PatientIdentifier patientIdentifier : patientIdentifiers) {
-
-                if (!identifierMap.containsKey(patientIdentifier.getIdentifierType())) {
-                    identifierMap.put(patientIdentifier.getIdentifierType(), new ArrayList<PatientIdentifier>());
-                }
-                identifierMap.get(patientIdentifier.getIdentifierType()).add(patientIdentifier);
-            }
-        }
-
-        return identifierMap;
-    }
-
-    public Map<PatientIdentifierType, List<PatientIdentifier>> getExtraIdentifiersMappedByType() {
-        return getExtraIdentifiersMappedByType(null);
-    }
-
-
+	
+	public List<PatientIdentifier> getExtraIdentifiers() {
+		return getExtraIdentifiers(null);
+	}
+	
+	/**
+	 * Return all extra identifiers associated with this patient, restricted by the specified location
+	 * If an identifier type has locationBehaviour = REQUIRED, only return identifiers for which the
+	 * specified location fails within the hierarchy of the location associated with the identifier (ie,
+	 * if "Clinic B" is passed in as the location parameter, don't return identifiers that fall under
+	 * the "Clinic A" location hierarchy)
+	 *
+	 * @param location
+	 * @return
+	 */
+	public List<PatientIdentifier> getExtraIdentifiers(Location location) {
+		
+		List<PatientIdentifier> patientIdentifiers = null;
+		List<PatientIdentifierType> types = emrApiProperties.getExtraPatientIdentifierTypes();
+		
+		if (types != null && types.size() > 0) {
+			patientIdentifiers = new ArrayList<PatientIdentifier>();
+			
+			for (PatientIdentifierType type : types) {
+				List<PatientIdentifier> extraPatientIdentifiers = patient.getPatientIdentifiers(type);
+				
+				if (extraPatientIdentifiers != null) {
+					
+					for (PatientIdentifier extraPatientIdentifier : extraPatientIdentifiers) {
+						if (type.getLocationBehavior() == null
+						        || !type.getLocationBehavior().equals(PatientIdentifierType.LocationBehavior.REQUIRED)
+						        || location == null
+						        || Location.isInHierarchy(location, extraPatientIdentifier.getLocation())) {
+							patientIdentifiers.add(extraPatientIdentifier);
+						}
+						
+					}
+				}
+			}
+		}
+		return patientIdentifiers;
+	}
+	
+	public Map<PatientIdentifierType, List<PatientIdentifier>> getExtraIdentifiersMappedByType(Location location) {
+		
+		Map<PatientIdentifierType, List<PatientIdentifier>> identifierMap = new HashMap<PatientIdentifierType, List<PatientIdentifier>>();
+		
+		List<PatientIdentifier> patientIdentifiers = getExtraIdentifiers(location);
+		
+		if (patientIdentifiers != null) {
+			
+			for (PatientIdentifier patientIdentifier : patientIdentifiers) {
+				
+				if (!identifierMap.containsKey(patientIdentifier.getIdentifierType())) {
+					identifierMap.put(patientIdentifier.getIdentifierType(), new ArrayList<PatientIdentifier>());
+				}
+				identifierMap.get(patientIdentifier.getIdentifierType()).add(patientIdentifier);
+			}
+		}
+		
+		return identifierMap;
+	}
+	
+	public Map<PatientIdentifierType, List<PatientIdentifier>> getExtraIdentifiersMappedByType() {
+		return getExtraIdentifiersMappedByType(null);
+	}
+	
 	public Encounter getLastEncounter() {
 		return adtService.getLastEncounter(patient);
 	}
-
+	
 	public VisitDomainWrapper getActiveVisit(Location location) {
 		return adtService.getActiveVisit(patient, location);
 	}
-
+	
 	public int getCountOfEncounters() {
 		return adtService.getCountOfEncounters(patient);
 	}
-
+	
 	public int getCountOfVisits() {
 		return adtService.getCountOfVisits(patient);
 	}
-
+	
 	public List<Encounter> getAllEncounters() {
 		return encounterService.getEncountersByPatient(patient);
 	}
-
+	
 	public List<Visit> getVisitsByType(VisitType visitType) {
-   		List<VisitType> visitTypes = null;
-   		if (visitType != null) {
-			   visitTypes = Collections.singletonList(visitType);
+		List<VisitType> visitTypes = null;
+		if (visitType != null) {
+			visitTypes = Collections.singletonList(visitType);
 		}
-		return visitService.getVisits(visitTypes, Collections.singletonList(patient), null, null, null, null, null, null, null, true, false);
+		return visitService.getVisits(visitTypes, Collections.singletonList(patient), null, null, null, null, null, null,
+		    null, true, false);
 	}
+	
 	public List<Visit> getAllVisits() {
 		return visitService.getVisitsByPatient(patient, true, false);
 	}
-
+	
 	public boolean hasOverlappingVisitsWith(Patient otherPatient) {
 		List<Visit> otherVisits = visitService.getVisitsByPatient(otherPatient, true, false);
 		List<Visit> myVisits = getAllVisits();
-
+		
 		for (Visit v : myVisits) {
 			for (Visit o : otherVisits) {
 				if (adtService.visitsOverlap(v, o)) {
@@ -301,7 +299,7 @@ public class PatientDomainWrapper implements DomainWrapper {
 		}
 		return false;
 	}
-
+	
 	public boolean isUnknownPatient() {
 		boolean unknownPatient = false;
 		PersonAttributeType unknownPatientAttributeType = emrApiProperties.getUnknownPatientPersonAttributeType();
@@ -313,27 +311,27 @@ public class PatientDomainWrapper implements DomainWrapper {
 		}
 		return unknownPatient;
 	}
-
+	
 	public List<VisitDomainWrapper> getVisitsByTypeUsingWrappers(VisitType visitType) {
 		List<VisitDomainWrapper> visitDomainWrappers = new ArrayList<VisitDomainWrapper>();
-
-		for (Visit visit : (visitType != null ) ? getVisitsByType(visitType) : getAllVisits()) {
+		
+		for (Visit visit : (visitType != null) ? getVisitsByType(visitType) : getAllVisits()) {
 			VisitDomainWrapper visitWrapper = domainWrapperFactory.newVisitDomainWrapper(visit);
 			visitWrapper.setEmrApiProperties(emrApiProperties);
 			visitDomainWrappers.add(visitWrapper);
 		}
-
+		
 		return visitDomainWrappers;
 	}
-
+	
 	public List<VisitDomainWrapper> getAllVisitsUsingWrappers() {
 		return getVisitsByTypeUsingWrappers(null);
 	}
-
+	
 	public String getFormattedName() {
 		return getPersonName().getFamilyName() + ", " + getPersonName().getGivenName();
 	}
-
+	
 	public PersonName getPersonName() {
 		Set<PersonName> names = patient.getNames();
 		if (names != null && names.size() > 0) {
@@ -344,11 +342,11 @@ public class PatientDomainWrapper implements DomainWrapper {
 			for (PersonName name : names) {
 				return name;
 			}
-
+			
 		}
 		return null;
 	}
-
+	
 	public boolean isTestPatient() {
 		boolean testPatient = false;
 		PersonAttributeType testPatientPersonAttributeType = emrApiProperties.getTestPatientPersonAttributeType();
@@ -360,17 +358,17 @@ public class PatientDomainWrapper implements DomainWrapper {
 		}
 		return testPatient;
 	}
-
+	
 	public List<Diagnosis> getDiagnosesSince(Date date) {
 		List<Diagnosis> diagnoses = diagnosisService.getDiagnoses(patient, date);
-
+		
 		return diagnoses;
 	}
-
+	
 	public List<Diagnosis> getUniqueDiagnosesSince(Date date) {
 		List<Diagnosis> diagnoses = diagnosisService.getUniqueDiagnoses(patient, date);
-
+		
 		return diagnoses;
 	}
-
+	
 }

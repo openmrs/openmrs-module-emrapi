@@ -1,3 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public License,
+ * v. 2.0. If a copy of the MPL was not distributed with this file, You can
+ * obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+ * the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+ *
+ * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+ * graphic logo is a trademark of OpenMRS Inc.
+ */
 package org.openmrs.module.emrapi.visit;
 
 import org.joda.time.DateTime;
@@ -44,301 +53,288 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.util.AssertionErrors.fail;
 
 public class VisitDomainWrapperComponentTest extends BaseModuleContextSensitiveTest {
-
-    @Autowired
-    private ConceptService conceptService;
-
-    @Autowired
-    private EmrConceptService emrConceptService;
-
-    @Autowired
-    private DispositionService dispositionService;
-
-    @Autowired
-    private EmrApiProperties emrApiProperties;
-
-    @Autowired
-    private TestDataManager testDataManager;
-
-    @Autowired
-    private DomainWrapperFactory factory;
-
-    @Autowired
-    private VisitService visitService;
-
-    private DispositionDescriptor dispositionDescriptor;
-
-    @BeforeEach
-    public void setup() throws Exception {
-        executeDataSet("baseTestDataset.xml");
-        dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
-        dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService, dispositionService);
-        ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
-        ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
-        Context.getAdministrationService().setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
-        Context.flushSession();
-    }
-
-    private Obs createDispositionObs(Encounter encounter, Concept disposition) {
-        ObsBuilder groupBuilder = testDataManager.obs().encounter(encounter).concept(dispositionDescriptor.getDispositionSetConcept());
-        groupBuilder.member(testDataManager.obs().encounter(encounter).concept(dispositionDescriptor.getDispositionConcept()).value(disposition).get());
-        return groupBuilder.save();
-    }
-
-    @Test
-    public void testThatBeanCanHavePropertiesAutowired() throws Exception {
-        VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper();
-        assertThat(visitDomainWrapper.emrApiProperties, notNullValue());
-    }
-
-    @Test
-    public void isAwaitingAdmission_shouldReturnTrueIfVisitAwaitingAdmission() throws Exception {
-
-        Patient patient = testDataManager.randomPatient().save();
-
-        Location visitLocation = testDataManager.location().name("Visit Location")
-                .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
-
-        // a visit with a single visit note encounter with dispo = ADMIT
-        Visit visit = testDataManager.visit()
-                .patient(patient)
-                .visitType(emrApiProperties.getAtFacilityVisitType())
-                .started(new Date())
-                .location(visitLocation)
-                .save();
-        Encounter encounter = testDataManager.encounter()
-                .patient(patient)
-                .visit(visit)
-                .encounterDatetime(new Date())
-                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                .save();
-        createDispositionObs(encounter, emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
-
-        VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
-        assertThat(visitDomainWrapper.isAwaitingAdmission(), is(true));
-    }
-
-    @Test
-    public void isAwaitingAdmission_shouldReturnFalseIfVisitNotAwaitingAdmission() throws Exception {
-
-        Patient patient = testDataManager.randomPatient().save();
-
-        Location visitLocation = testDataManager.location().name("Visit Location")
-                .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
-
-        // a visit with a single *voided* visit note encounter with dispo = ADMIT
-        Visit visit = testDataManager.visit()
-                .patient(patient)
-                .visitType(emrApiProperties.getAtFacilityVisitType())
-                .started(new Date())
-                .location(visitLocation)
-                .save();
-        Encounter encounter = testDataManager.encounter()
-                .patient(patient)
-                .visit(visit)
-                .encounterDatetime(new Date())
-                .encounterType(emrApiProperties.getVisitNoteEncounterType())
-                .voided(true)
-                .dateVoided(new Date())
-                .voidReason("test")
-                .save();
-        createDispositionObs(encounter, emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
-
-        VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
-        assertThat(visitDomainWrapper.isAwaitingAdmission(), is(false));
-    }
-
-    @Test
-    public void getVisitAttribute_shouldReturnNullIfNoVisitAttributes() {
-        Visit visit = visitService.getVisit(1); // from standard test dataset
-        assertNull(factory.newVisitDomainWrapper(visit).getVisitAttribute("Visit Template"));
-    }
-
-    @Test
-    public void getVisitTemplate_shouldReturnVisitAttributeMatchedByName() {
-        Visit visit = visitService.getVisit(2); // from standard test dataset
-         assertThat(factory.newVisitDomainWrapper(visit).getVisitAttribute("Visit Template").toString(), is("pedsInitialOutpatient"));
-    }
-
-    @Test
-    public void getVisitTemplate_shouldReturnVisitAttributeMatchedByUuid() {
-        Visit visit = visitService.getVisit(2); // from standard test dataset
-        assertThat(factory.newVisitDomainWrapper(visit).getVisitAttribute("f7b07c80-27c3-49de-8830-cb9e3e805eeb").toString(), is("pedsInitialOutpatient"));
-    }
-
-    @Test
-    public void getVisitTemplate_shouldReturnNullIfNoMatchingVisitAttributes() {
-        Visit visit = visitService.getVisit(2); // from standard test dataset
-        assertNull(factory.newVisitDomainWrapper(visit).getVisitAttribute("Non-existent attribute"));
-    }
-    
-    protected List<Obs> createRandomDiagnosisObsGroups(int count, int diagnosisNamesCount, DiagnosisMetadata diagnosisMetadata) {
-       assertThat(count, greaterThan(0));
-       assertThat(diagnosisNamesCount, greaterThan(0));
-       
-       // Generating the names (as "Diagnosis 1", "Diagnosis 2", ... etc)
-       List<String> diagnosisNames = new ArrayList<String>();
-       for (int i = 1; i <= diagnosisNamesCount; i++) {
-          diagnosisNames.add("Diagnosis " + i);
-       }
-       
-       List<Obs> diagnoses = new ArrayList<Obs>();
-       final Random rand = new Random();
-       for (int i = 0; i < count; i++) {
-          String diagnosisName = diagnosisNames.get(rand.nextInt(diagnosisNames.size()));
-          Diagnosis.Order order = Diagnosis.Order.values()[rand.nextInt(Diagnosis.Order.values().length)];
-          Diagnosis.Certainty certainty = Diagnosis.Certainty.values()[rand.nextInt(Diagnosis.Certainty.values().length)];
-          
-          diagnoses.add( diagnosisMetadata.buildDiagnosisObsGroup( new Diagnosis(new CodedOrFreeTextAnswer(diagnosisName), order, certainty) ) );
-       }
-       return diagnoses;
-    }
-    
-    /**
-     * @param count The number of random encounters to generate.
-     * @param density The percentage of encounters containing diagnoses obs.
-     * @param diagnosisInEncounter Average number of diagnoses (for encounters that are added diagnoses).
-     * @param visit the Visit to assign the encounters to
-     * @param patient
-     * @param encounterType
-     * @param diagnosisList A sample of diagnosis obs groups to be randomly "recorded" within the encounters.
-     * @return
-     * @throws ParseException
-     */
-    protected List<Encounter> createRandomEncountersWithDiagnoses(int count, double density, int diagnosisInEncounter, Visit visit, Patient patient, EncounterType encounterType, List<Obs> diagnosisList) throws ParseException {
-       assertThat(density, allOf(greaterThan(0.),lessThanOrEqualTo(1.)));
-       assertThat(count, greaterThan(0));
-       
-       List<Encounter> encounters = new ArrayList<Encounter>();
-       
-       // http://stackoverflow.com/a/11016689/321797
-       long startMilli = visit.getStartDatetime().getTime();
-       final long hourInMilli = 1000 * 60 * 60;
-       final long yearInMilli = hourInMilli * 24 * 365 + 1000; // Have to account for the leap second!
-       
-       Random rand = new Random();
-       
-       for (int i = 0; i < count; i++) {
-          Encounter e = testDataManager.encounter()
-                         .patient(patient)
-                         .encounterDatetime(new Date(startMilli + Math.round(yearInMilli * Math.random()))) // An encounter in 'startYear'
-                         .encounterType(encounterType)
-                         .visit(visit)
-                         .get();
-          
-          if (Math.random() <= density) {
-          // then we add at least 1 diagnosis
-             int diagnosesCount = 1 + rand.nextInt(diagnosisInEncounter);
-             long lastTime = e.getEncounterDatetime().getTime();
-             for (int j = 0; j < diagnosesCount; j++) {
-                Obs obs = Obs.newInstance( diagnosisList.get(rand.nextInt(diagnosisList.size())) );
-                obs.setObsDatetime( new Date(lastTime + Math.round(2 * hourInMilli * Math.random())) );   // Obs in the encounter are recorded around 2 hours apart
-                e.addObs(obs);
-                lastTime = obs.getObsDatetime().getTime();
-             }
-          }
-          Context.getEncounterService().saveEncounter(e);
-          encounters.add(e);
-       }
-       
-       return encounters;
-    }
-    
-    public enum Implementation {
-       CURRENT,
-       LEGACY
-    }
-    
-    @Test
-    public void getUniqueDiagnoses_shouldConvergeWithLegacyImpl() throws ParseException {
-       
-       /*
-        * Setup
-        */
-       Patient patient = testDataManager.randomPatient().birthdate("1970-03-15").save();
-
-       Location visitLocation = testDataManager.location().name("Visit Location")
-               .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
-       
-       DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
-       List<Obs> sampleDiagnoses = createRandomDiagnosisObsGroups(200, 125, diagnosisMetadata);
-       
-       final Date visitStartDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
-       Visit visit =
-             testDataManager.visit()
-                     .patient(patient)
-                     .visitType(emrApiProperties.getAtFacilityVisitType())
-                     .started(visitStartDate)
-                     .location(visitLocation)
-                     .save();
-       
-       // Adding a bunch of encounters to the test visit
-       List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visit, patient, emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
-       for (Encounter e : encounters) {
-           visit.addEncounter(e);
-       }
-       visit = Context.getVisitService().saveVisit(visit);
-       VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper( visit );
-       
-       /*
-        * Replay & Asserts
-        */
-       
-       List<Diagnosis> diagnoses;
-       List<Diagnosis> diagnosesLegacy;
-       
-       diagnoses = getUniqueDiagnoses(visitDomainWrapper, false, false, Implementation.CURRENT);
-       diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, false, false, Implementation.LEGACY);
-       assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
-       
-       diagnoses = getUniqueDiagnoses(visitDomainWrapper, true, false, Implementation.CURRENT);
-       diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, true, false, Implementation.LEGACY);
-       assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
-
-       diagnoses = getUniqueDiagnoses(visitDomainWrapper, false, true, Implementation.CURRENT);
-       diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, false, true, Implementation.LEGACY);
-       assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
-
-       diagnoses = getUniqueDiagnoses(visitDomainWrapper, true, true, Implementation.CURRENT);
-       diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, true, true, Implementation.LEGACY);
-       assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
-    }
-    
-    /*
-     * Wrapper to log execution time
-     */
-    private List<Diagnosis> getUniqueDiagnoses(VisitDomainWrapper visitDomainWrapper, Boolean primaryOnly, Boolean confirmedOnly, Implementation impl) {
-       List<Diagnosis> res = null;
-       String whichOne = "";
-       long time0 = System.currentTimeMillis();
-       switch (impl) {
-       case CURRENT:
-          res = visitDomainWrapper.getUniqueDiagnoses(primaryOnly, confirmedOnly);
-          whichOne = impl.name();
-          break;
-       case LEGACY:
-          res = visitDomainWrapper.getUniqueDiagnosesLegacy(primaryOnly, confirmedOnly);
-          whichOne = impl.name();
-          break;
-       default:
-          fail("Invalid implementation specified.");
-       }
-       long time1 = System.currentTimeMillis();
-       System.out.println(whichOne + " getUniqueDiagnoses(..) | primaryOnly=" + primaryOnly.toString() + ", confirmedOnly=" + confirmedOnly.toString());
-       System.out.println("time (msec): " + (time1 - time0));
-       System.out.println();
-       return res;
-    }
-    
-    private static void assertThatSameUniqueDiagnoses(List<Diagnosis> actualDiagnoses, List<Diagnosis> expectedDiagnoses) {
-       assertEquals(expectedDiagnoses.size(), actualDiagnoses.size());
-       Set<CodedOrFreeTextAnswer> actualAnswers = new HashSet<CodedOrFreeTextAnswer>();
-       Set<CodedOrFreeTextAnswer> expectedAnswers = new HashSet<CodedOrFreeTextAnswer>();
-       // What matters is that inner 'CodedOrFreeTextAnswer' instances are reported as being the same sets 
-       for (int i = 0; i < expectedDiagnoses.size(); i++) {
-          actualAnswers.add(actualDiagnoses.get(i).getDiagnosis());
-          expectedAnswers.add(expectedDiagnoses.get(i).getDiagnosis());
-       }
-       assertEquals(actualAnswers, expectedAnswers);
-    }
+	
+	@Autowired
+	private ConceptService conceptService;
+	
+	@Autowired
+	private EmrConceptService emrConceptService;
+	
+	@Autowired
+	private DispositionService dispositionService;
+	
+	@Autowired
+	private EmrApiProperties emrApiProperties;
+	
+	@Autowired
+	private TestDataManager testDataManager;
+	
+	@Autowired
+	private DomainWrapperFactory factory;
+	
+	@Autowired
+	private VisitService visitService;
+	
+	private DispositionDescriptor dispositionDescriptor;
+	
+	@BeforeEach
+	public void setup() throws Exception {
+		executeDataSet("baseTestDataset.xml");
+		dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
+		dispositionDescriptor = ContextSensitiveMetadataTestUtils.setupDispositionDescriptor(conceptService,
+		    dispositionService);
+		ContextSensitiveMetadataTestUtils.setupAdmissionDecisionConcept(conceptService, emrApiProperties);
+		ContextSensitiveMetadataTestUtils.setupDiagnosisMetadata(conceptService, emrApiProperties);
+		Context.getAdministrationService().setGlobalProperty(EmrApiConstants.GP_USE_LEGACY_DIAGNOSIS_SERVICE, "true");
+		Context.flushSession();
+	}
+	
+	private Obs createDispositionObs(Encounter encounter, Concept disposition) {
+		ObsBuilder groupBuilder = testDataManager.obs().encounter(encounter)
+		        .concept(dispositionDescriptor.getDispositionSetConcept());
+		groupBuilder.member(testDataManager.obs().encounter(encounter).concept(dispositionDescriptor.getDispositionConcept())
+		        .value(disposition).get());
+		return groupBuilder.save();
+	}
+	
+	@Test
+	public void testThatBeanCanHavePropertiesAutowired() throws Exception {
+		VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper();
+		assertThat(visitDomainWrapper.emrApiProperties, notNullValue());
+	}
+	
+	@Test
+	public void isAwaitingAdmission_shouldReturnTrueIfVisitAwaitingAdmission() throws Exception {
+		
+		Patient patient = testDataManager.randomPatient().save();
+		
+		Location visitLocation = testDataManager.location().name("Visit Location")
+		        .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
+		
+		// a visit with a single visit note encounter with dispo = ADMIT
+		Visit visit = testDataManager.visit().patient(patient).visitType(emrApiProperties.getAtFacilityVisitType())
+		        .started(new Date()).location(visitLocation).save();
+		Encounter encounter = testDataManager.encounter().patient(patient).visit(visit).encounterDatetime(new Date())
+		        .encounterType(emrApiProperties.getVisitNoteEncounterType()).save();
+		createDispositionObs(encounter, emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
+		
+		VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
+		assertThat(visitDomainWrapper.isAwaitingAdmission(), is(true));
+	}
+	
+	@Test
+	public void isAwaitingAdmission_shouldReturnFalseIfVisitNotAwaitingAdmission() throws Exception {
+		
+		Patient patient = testDataManager.randomPatient().save();
+		
+		Location visitLocation = testDataManager.location().name("Visit Location")
+		        .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
+		
+		// a visit with a single *voided* visit note encounter with dispo = ADMIT
+		Visit visit = testDataManager.visit().patient(patient).visitType(emrApiProperties.getAtFacilityVisitType())
+		        .started(new Date()).location(visitLocation).save();
+		Encounter encounter = testDataManager.encounter().patient(patient).visit(visit).encounterDatetime(new Date())
+		        .encounterType(emrApiProperties.getVisitNoteEncounterType()).voided(true).dateVoided(new Date())
+		        .voidReason("test").save();
+		createDispositionObs(encounter, emrConceptService.getConcept("org.openmrs.module.emrapi:Admit to hospital"));
+		
+		VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
+		assertThat(visitDomainWrapper.isAwaitingAdmission(), is(false));
+	}
+	
+	@Test
+	public void getVisitAttribute_shouldReturnNullIfNoVisitAttributes() {
+		Visit visit = visitService.getVisit(1); // from standard test dataset
+		assertNull(factory.newVisitDomainWrapper(visit).getVisitAttribute("Visit Template"));
+	}
+	
+	@Test
+	public void getVisitTemplate_shouldReturnVisitAttributeMatchedByName() {
+		Visit visit = visitService.getVisit(2); // from standard test dataset
+		assertThat(factory.newVisitDomainWrapper(visit).getVisitAttribute("Visit Template").toString(),
+		    is("pedsInitialOutpatient"));
+	}
+	
+	@Test
+	public void getVisitTemplate_shouldReturnVisitAttributeMatchedByUuid() {
+		Visit visit = visitService.getVisit(2); // from standard test dataset
+		assertThat(factory.newVisitDomainWrapper(visit).getVisitAttribute("f7b07c80-27c3-49de-8830-cb9e3e805eeb").toString(),
+		    is("pedsInitialOutpatient"));
+	}
+	
+	@Test
+	public void getVisitTemplate_shouldReturnNullIfNoMatchingVisitAttributes() {
+		Visit visit = visitService.getVisit(2); // from standard test dataset
+		assertNull(factory.newVisitDomainWrapper(visit).getVisitAttribute("Non-existent attribute"));
+	}
+	
+	protected List<Obs> createRandomDiagnosisObsGroups(int count, int diagnosisNamesCount,
+	        DiagnosisMetadata diagnosisMetadata) {
+		assertThat(count, greaterThan(0));
+		assertThat(diagnosisNamesCount, greaterThan(0));
+		
+		// Generating the names (as "Diagnosis 1", "Diagnosis 2", ... etc)
+		List<String> diagnosisNames = new ArrayList<String>();
+		for (int i = 1; i <= diagnosisNamesCount; i++) {
+			diagnosisNames.add("Diagnosis " + i);
+		}
+		
+		List<Obs> diagnoses = new ArrayList<Obs>();
+		final Random rand = new Random();
+		for (int i = 0; i < count; i++) {
+			String diagnosisName = diagnosisNames.get(rand.nextInt(diagnosisNames.size()));
+			Diagnosis.Order order = Diagnosis.Order.values()[rand.nextInt(Diagnosis.Order.values().length)];
+			Diagnosis.Certainty certainty = Diagnosis.Certainty.values()[rand.nextInt(Diagnosis.Certainty.values().length)];
+			
+			diagnoses.add(diagnosisMetadata
+			        .buildDiagnosisObsGroup(new Diagnosis(new CodedOrFreeTextAnswer(diagnosisName), order, certainty)));
+		}
+		return diagnoses;
+	}
+	
+	/**
+	 * @param count The number of random encounters to generate.
+	 * @param density The percentage of encounters containing diagnoses obs.
+	 * @param diagnosisInEncounter Average number of diagnoses (for encounters that are added
+	 *            diagnoses).
+	 * @param visit the Visit to assign the encounters to
+	 * @param patient
+	 * @param encounterType
+	 * @param diagnosisList A sample of diagnosis obs groups to be randomly "recorded" within the
+	 *            encounters.
+	 * @return
+	 * @throws ParseException
+	 */
+	protected List<Encounter> createRandomEncountersWithDiagnoses(int count, double density, int diagnosisInEncounter,
+	        Visit visit, Patient patient, EncounterType encounterType, List<Obs> diagnosisList) throws ParseException {
+		assertThat(density, allOf(greaterThan(0.), lessThanOrEqualTo(1.)));
+		assertThat(count, greaterThan(0));
+		
+		List<Encounter> encounters = new ArrayList<Encounter>();
+		
+		// http://stackoverflow.com/a/11016689/321797
+		long startMilli = visit.getStartDatetime().getTime();
+		final long hourInMilli = 1000 * 60 * 60;
+		final long yearInMilli = hourInMilli * 24 * 365 + 1000; // Have to account for the leap second!
+		
+		Random rand = new Random();
+		
+		for (int i = 0; i < count; i++) {
+			Encounter e = testDataManager.encounter().patient(patient)
+			        .encounterDatetime(new Date(startMilli + Math.round(yearInMilli * Math.random()))) // An encounter in 'startYear'
+			        .encounterType(encounterType).visit(visit).get();
+			
+			if (Math.random() <= density) {
+				// then we add at least 1 diagnosis
+				int diagnosesCount = 1 + rand.nextInt(diagnosisInEncounter);
+				long lastTime = e.getEncounterDatetime().getTime();
+				for (int j = 0; j < diagnosesCount; j++) {
+					Obs obs = Obs.newInstance(diagnosisList.get(rand.nextInt(diagnosisList.size())));
+					obs.setObsDatetime(new Date(lastTime + Math.round(2 * hourInMilli * Math.random()))); // Obs in the encounter are recorded around 2 hours apart
+					e.addObs(obs);
+					lastTime = obs.getObsDatetime().getTime();
+				}
+			}
+			Context.getEncounterService().saveEncounter(e);
+			encounters.add(e);
+		}
+		
+		return encounters;
+	}
+	
+	public enum Implementation {
+		CURRENT,
+		LEGACY
+	}
+	
+	@Test
+	public void getUniqueDiagnoses_shouldConvergeWithLegacyImpl() throws ParseException {
+		
+		/*
+		* Setup
+		*/
+		Patient patient = testDataManager.randomPatient().birthdate("1970-03-15").save();
+		
+		Location visitLocation = testDataManager.location().name("Visit Location")
+		        .tag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS).save();
+		
+		DiagnosisMetadata diagnosisMetadata = emrApiProperties.getDiagnosisMetadata();
+		List<Obs> sampleDiagnoses = createRandomDiagnosisObsGroups(200, 125, diagnosisMetadata);
+		
+		final Date visitStartDate = new DateTime(2012, 1, 1, 0, 0, 0).toDate();
+		Visit visit = testDataManager.visit().patient(patient).visitType(emrApiProperties.getAtFacilityVisitType())
+		        .started(visitStartDate).location(visitLocation).save();
+		
+		// Adding a bunch of encounters to the test visit
+		List<Encounter> encounters = createRandomEncountersWithDiagnoses(50, 0.15, 2, visit, patient,
+		    emrApiProperties.getVisitNoteEncounterType(), sampleDiagnoses);
+		for (Encounter e : encounters) {
+			visit.addEncounter(e);
+		}
+		visit = Context.getVisitService().saveVisit(visit);
+		VisitDomainWrapper visitDomainWrapper = factory.newVisitDomainWrapper(visit);
+		
+		/*
+		* Replay & Asserts
+		*/
+		
+		List<Diagnosis> diagnoses;
+		List<Diagnosis> diagnosesLegacy;
+		
+		diagnoses = getUniqueDiagnoses(visitDomainWrapper, false, false, Implementation.CURRENT);
+		diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, false, false, Implementation.LEGACY);
+		assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
+		
+		diagnoses = getUniqueDiagnoses(visitDomainWrapper, true, false, Implementation.CURRENT);
+		diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, true, false, Implementation.LEGACY);
+		assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
+		
+		diagnoses = getUniqueDiagnoses(visitDomainWrapper, false, true, Implementation.CURRENT);
+		diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, false, true, Implementation.LEGACY);
+		assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
+		
+		diagnoses = getUniqueDiagnoses(visitDomainWrapper, true, true, Implementation.CURRENT);
+		diagnosesLegacy = getUniqueDiagnoses(visitDomainWrapper, true, true, Implementation.LEGACY);
+		assertThatSameUniqueDiagnoses(diagnoses, diagnosesLegacy);
+	}
+	
+	/*
+	 * Wrapper to log execution time
+	 */
+	private List<Diagnosis> getUniqueDiagnoses(VisitDomainWrapper visitDomainWrapper, Boolean primaryOnly,
+	        Boolean confirmedOnly, Implementation impl) {
+		List<Diagnosis> res = null;
+		String whichOne = "";
+		long time0 = System.currentTimeMillis();
+		switch (impl) {
+			case CURRENT:
+				res = visitDomainWrapper.getUniqueDiagnoses(primaryOnly, confirmedOnly);
+				whichOne = impl.name();
+				break;
+			case LEGACY:
+				res = visitDomainWrapper.getUniqueDiagnosesLegacy(primaryOnly, confirmedOnly);
+				whichOne = impl.name();
+				break;
+			default:
+				fail("Invalid implementation specified.");
+		}
+		long time1 = System.currentTimeMillis();
+		System.out.println(whichOne + " getUniqueDiagnoses(..) | primaryOnly=" + primaryOnly.toString() + ", confirmedOnly="
+		        + confirmedOnly.toString());
+		System.out.println("time (msec): " + (time1 - time0));
+		System.out.println();
+		return res;
+	}
+	
+	private static void assertThatSameUniqueDiagnoses(List<Diagnosis> actualDiagnoses, List<Diagnosis> expectedDiagnoses) {
+		assertEquals(expectedDiagnoses.size(), actualDiagnoses.size());
+		Set<CodedOrFreeTextAnswer> actualAnswers = new HashSet<CodedOrFreeTextAnswer>();
+		Set<CodedOrFreeTextAnswer> expectedAnswers = new HashSet<CodedOrFreeTextAnswer>();
+		// What matters is that inner 'CodedOrFreeTextAnswer' instances are reported as being the same sets 
+		for (int i = 0; i < expectedDiagnoses.size(); i++) {
+			actualAnswers.add(actualDiagnoses.get(i).getDiagnosis());
+			expectedAnswers.add(expectedDiagnoses.get(i).getDiagnosis());
+		}
+		assertEquals(actualAnswers, expectedAnswers);
+	}
 }
