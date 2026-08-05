@@ -116,6 +116,8 @@ public class EmrApiConstants {
 	
 	public static final String NARROWER_THAN_CONCEPT_MAP_TYPE_UUID = "43ac5109-7d8c-11e1-909d-c80aa9edcf4e";
 	
+	public static final String ROUTE_OF_ADMINISTRATION_CONCEPT_MAP_TYPE_UUID = "8ee5b13d-7d8e-11e1-909d-c80aa9edcf4e";
+	
 	public static final String EMR_CONCEPT_SOURCE_NAME = "org.openmrs.module.emrapi";
 	
 	public static final String EMR_CONCEPT_SOURCE_DESCRIPTION = "Source used to tag concepts used in the EMR API module";

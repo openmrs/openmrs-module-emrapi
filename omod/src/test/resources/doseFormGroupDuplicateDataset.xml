@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+    This Source Code Form is subject to the terms of the Mozilla Public License,
+    v. 2.0. If a copy of the MPL was not distributed with this file, You can
+    obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+    the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+
+    Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+    graphic logo is a trademark of OpenMRS Inc.
+
+-->
+<!--
+    Loaded on top of doseFormGroupDataset.xml to create the illegal state the controller must
+    reject: a third dose form group, Oral Liquid (5003), that also claims Tablet (5011) as a set
+    member even though Oral Solid (5001) already does.
+-->
+<dataset>
+
+    <concept concept_id="5003" retired="false" datatype_id="4" class_id="50" is_set="true" creator="1" date_created="2004-08-12 00:00:00.0" uuid="c3e6a0d4-5b8f-4c1e-d7a9-0f4b2c8e3d03"/>
+
+    <concept_name concept_name_id="5003" concept_id="5003" name="Oral Liquid" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="c3e6a0d4-5b8f-4c1e-d7a9-0f4b2c8e3003"/>
+
+    <concept_set concept_set_id="5104" concept_id="5011" concept_set="5003" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="44f7b1e5-6c9a-4d2f-e8b0-1a5c3d9f4104"/>
+
+</dataset>

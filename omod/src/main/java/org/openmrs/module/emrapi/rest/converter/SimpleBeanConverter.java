@@ -19,6 +19,9 @@ import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.disposition.Disposition;
 import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionObs;
+import org.openmrs.module.emrapi.web.controller.types.DoseFormGroupRoutes;
+import org.openmrs.module.emrapi.web.controller.types.DoseFormGroupsResponse;
+import org.openmrs.module.emrapi.web.controller.types.DoseFormMembership;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.representation.CustomRepresentation;
@@ -32,7 +35,8 @@ import java.beans.PropertyDescriptor;
 import java.util.Map;
 
 @Handler(supports = { EmrApiProperties.class, DiagnosisMetadata.class, Disposition.class, DispositionObs.class,
-        DispositionDescriptor.class, Diagnosis.class, }, order = 0)
+        DispositionDescriptor.class, Diagnosis.class, DoseFormGroupsResponse.class, DoseFormMembership.class,
+        DoseFormGroupRoutes.class, }, order = 0)
 public class SimpleBeanConverter<T> implements Converter<T> {
 	
 	private final Log log = LogFactory.getLog(getClass());
