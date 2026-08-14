@@ -7,16 +7,16 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.emrapi.web.controller.types;
+package org.openmrs.module.emrapi.concept;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.openmrs.Concept;
 
 /**
- * A dose form and the dose form group it belongs to, if any.
- * <p>
- * Converted to a representation by SimpleBeanConverter, which is registered for this class.
+ * A dose form and the dose form groups it belongs to, if any.
  */
 @Data
 @AllArgsConstructor
@@ -25,7 +25,9 @@ public class DoseFormMembership {
 	private Concept doseForm;
 	
 	/**
-	 * Null when no dose form group claims this dose form. A dose form belongs to at most one group.
+	 * Empty when no dose form group claims this dose form. A dose form may belong to more than one
+	 * group, e.g. "oral spray" belongs to both the oral spray group and the oral group, in which case
+	 * its routes of administration are the union of the routes of all of its groups.
 	 */
-	private Concept doseFormGroup;
+	private List<Concept> doseFormGroups;
 }

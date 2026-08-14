@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.emrapi.web.controller.types;
+package org.openmrs.module.emrapi.concept;
 
 import java.util.List;
 
@@ -17,8 +17,6 @@ import org.openmrs.Concept;
 
 /**
  * A dose form group and its routes of administration.
- * <p>
- * Converted to a representation by SimpleBeanConverter, which is registered for this class.
  */
 @Data
 @AllArgsConstructor

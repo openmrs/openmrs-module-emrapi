@@ -118,6 +118,14 @@ public class EmrApiConstants {
 	
 	public static final String ROUTE_OF_ADMINISTRATION_CONCEPT_MAP_TYPE_UUID = "8ee5b13d-7d8e-11e1-909d-c80aa9edcf4e";
 	
+	/**
+	 * The concept class of a dose form. The dictionary names it "Drug form", even though the concepts
+	 * in it are referred to as dose forms.
+	 */
+	public static final String DOSE_FORM_CONCEPT_CLASS_NAME = "Drug form";
+	
+	public static final String DOSE_FORM_GROUP_CONCEPT_CLASS_NAME = "Dose Form Group";
+	
 	public static final String EMR_CONCEPT_SOURCE_NAME = "org.openmrs.module.emrapi";
 	
 	public static final String EMR_CONCEPT_SOURCE_DESCRIPTION = "Source used to tag concepts used in the EMR API module";

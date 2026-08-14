@@ -11,14 +11,16 @@ package org.openmrs.module.emrapi.web.controller.types;
 
 import java.util.List;
 
+import org.openmrs.module.emrapi.concept.DoseFormGroupRoutes;
+import org.openmrs.module.emrapi.concept.DoseFormMembership;
 import org.openmrs.module.emrapi.web.controller.DoseFormGroupController;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * The response of {@link DoseFormGroupController}: which dose form group each dose form belongs to,
- * and which routes of administration each dose form group has.
+ * The response of {@link DoseFormGroupController}: which dose form groups each dose form belongs
+ * to, and which routes of administration each dose form group has.
  * <p>
  * Converted to a representation by SimpleBeanConverter, which is registered for this class.
  */

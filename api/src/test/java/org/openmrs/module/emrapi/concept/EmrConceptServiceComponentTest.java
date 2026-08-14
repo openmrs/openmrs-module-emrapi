@@ -28,15 +28,19 @@ import org.openmrs.module.emrapi.test.builder.ConceptBuilder;
 import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.nullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  *
@@ -81,6 +85,139 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
 		List<Concept> actual = emrConceptService.getConceptsSameOrNarrowerThan(term);
 		assertThat(actual.size(), is(2));
 		assertThat(actual, IsIterableContainingInAnyOrder.containsInAnyOrder(foodAssistance, foodAssistanceForEntireFamily));
+	}
+	
+	/**
+	 * Unlike getConceptsSameOrNarrowerThan(), only SAME-AS mappings count. Note that the term carries
+	 * mappings of three different types here: that is the case ConceptService.getConceptByMapping()
+	 * rejects, and the reason this method exists.
+	 */
+	@Test
+	public void testGetConceptsSameAsTerm() throws Exception {
+		ConceptSource source = conceptService.getConceptSource(1);
+		
+		ConceptMapType sameAs = conceptService.getConceptMapTypeByUuid(EmrApiConstants.SAME_AS_CONCEPT_MAP_TYPE_UUID);
+		ConceptMapType narrowerThan = conceptService
+		        .getConceptMapTypeByUuid(EmrApiConstants.NARROWER_THAN_CONCEPT_MAP_TYPE_UUID);
+		ConceptMapType someOtherType = conceptService.getConceptMapType(5);
+		
+		ConceptReferenceTerm term = new ConceptReferenceTerm(source, "food-assist", null);
+		conceptService.saveConceptReferenceTerm(term);
+		
+		Concept foodAssistance = conceptService.getConcept(18);
+		foodAssistance.addConceptMapping(new ConceptMap(term, sameAs));
+		conceptService.saveConcept(foodAssistance);
+		
+		Concept foodAssistanceForEntireFamily = conceptService.getConcept(21);
+		foodAssistanceForEntireFamily.addConceptMapping(new ConceptMap(term, narrowerThan));
+		conceptService.saveConcept(foodAssistanceForEntireFamily);
+		
+		Concept anotherConcept = conceptService.getConcept(20);
+		anotherConcept.addConceptMapping(new ConceptMap(term, someOtherType));
+		conceptService.saveConcept(anotherConcept);
+		
+		List<Concept> actual = emrConceptService.getConceptsSameAs(term);
+		assertThat(actual.size(), is(1));
+		assertThat(actual.get(0), is(foodAssistance));
+	}
+	
+	@Test
+	public void testGetConceptsSameAsRequiresATerm() throws Exception {
+		assertThrows(IllegalArgumentException.class, () -> emrConceptService.getConceptsSameAs(null));
+	}
+	
+	/**
+	 * "Ointment", which belongs to no group, is still reported, with no dose form groups. Retired dose
+	 * forms and retired dose form groups are left out altogether: ConceptService.getConceptsByClass()
+	 * returns them, but a retired dose form must not reach a prescriber's dose form picker.
+	 */
+	@Test
+	public void testGetDoseFormMemberships() throws Exception {
+		executeDataSet("doseFormGroupDataset.xml");
+		
+		Map<String, Set<String>> groupsByDoseForm = groupsByDoseForm();
+		
+		assertThat(groupsByDoseForm.keySet(), is(setOf("Tablet", "Capsule", "Solution for Injection", "Ointment")));
+		assertThat(groupsByDoseForm.get("Tablet"), is(setOf("Oral Solid")));
+		assertThat(groupsByDoseForm.get("Capsule"), is(setOf("Oral Solid")));
+		assertThat(groupsByDoseForm.get("Solution for Injection"), is(setOf("Injectable")));
+		assertThat("a dose form in no group has no dose form groups", groupsByDoseForm.get("Ointment"),
+		    is(Collections.<String> emptySet()));
+	}
+	
+	/**
+	 * A dose form may belong to more than one dose form group, e.g. CIEL has "oral spray" in both the
+	 * oral spray group and the oral group.
+	 */
+	@Test
+	public void testGetDoseFormMembershipsForADoseFormInMoreThanOneGroup() throws Exception {
+		executeDataSet("doseFormGroupDataset.xml");
+		executeDataSet("doseFormGroupMultipleGroupsDataset.xml");
+		
+		Map<String, Set<String>> groupsByDoseForm = groupsByDoseForm();
+		
+		assertThat(groupsByDoseForm.get("Tablet"), is(setOf("Oral Solid", "Oral Liquid")));
+		assertThat("a form in two groups should not affect the others", groupsByDoseForm.get("Capsule"),
+		    is(setOf("Oral Solid")));
+	}
+	
+	/**
+	 * A dose form group's routes come from its route-of-administration mappings, resolved to concepts
+	 * via a SAME-AS mapping on the same reference term. "Oral Solid" points at a term that concept
+	 * "Oral" claims that way, so the route resolves; it also points at a term only the retired concept
+	 * "Retired Oral" claims, which is dropped. "Injectable" points at a term no concept claims at all,
+	 * and that too is dropped rather than failing the whole lookup.
+	 */
+	@Test
+	public void testGetDoseFormGroupRoutes() throws Exception {
+		executeDataSet("doseFormGroupDataset.xml");
+		
+		Map<String, Set<String>> routesByGroup = new HashMap<String, Set<String>>();
+		for (DoseFormGroupRoutes doseFormGroupRoutes : emrConceptService.getDoseFormGroupRoutes()) {
+			routesByGroup.put(nameOf(doseFormGroupRoutes.getDoseFormGroup()), namesOf(doseFormGroupRoutes.getRoutes()));
+		}
+		
+		assertThat("a retired dose form group should not be reported", routesByGroup.keySet(),
+		    is(setOf("Oral Solid", "Injectable")));
+		assertThat("a route whose only SAME-AS mapped concept is retired should be omitted", routesByGroup.get("Oral Solid"),
+		    is(setOf("Oral")));
+		assertThat("a route with no SAME-AS mapped concept should be omitted", routesByGroup.get("Injectable"),
+		    is(Collections.<String> emptySet()));
+	}
+	
+	/**
+	 * The routes of a dose form are the union of the routes of every group it belongs to, which is what
+	 * a caller holding a drug's dosage form actually wants to know.
+	 */
+	@Test
+	public void testGetRoutesOfAdministration() throws Exception {
+		executeDataSet("doseFormGroupDataset.xml");
+		executeDataSet("doseFormGroupMultipleGroupsDataset.xml");
+		
+		// Tablet is in Oral Solid, whose route is Oral, and in Oral Liquid, whose routes are Oral and Nasal
+		assertThat(namesOf(emrConceptService.getRoutesOfAdministration(conceptService.getConcept(5011))),
+		    is(setOf("Oral", "Nasal")));
+		assertThat("a dose form in no dose form group has no routes",
+		    emrConceptService.getRoutesOfAdministration(conceptService.getConcept(5014)).size(), is(0));
+	}
+	
+	@Test
+	public void testGetRoutesOfAdministrationRequiresADoseForm() throws Exception {
+		assertThrows(IllegalArgumentException.class, () -> emrConceptService.getRoutesOfAdministration(null));
+	}
+	
+	/**
+	 * A dictionary that has not imported the dose form group metadata has neither concept class, which
+	 * has to degrade to nothing rather than fail. Note that no dose form dataset is loaded here.
+	 */
+	@Test
+	public void testGetDoseFormsWithoutTheDoseFormConceptClasses() throws Exception {
+		assertThat(conceptService.getConceptClassByName(EmrApiConstants.DOSE_FORM_CONCEPT_CLASS_NAME), is(nullValue()));
+		assertThat(conceptService.getConceptClassByName(EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME),
+		    is(nullValue()));
+		
+		assertThat(emrConceptService.getDoseFormMemberships().size(), is(0));
+		assertThat(emrConceptService.getDoseFormGroupRoutes().size(), is(0));
 	}
 	
 	@Test
@@ -173,6 +310,36 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
 		
 		assertThat(thirdResult.getConcept(), is(concepts.get("diabetes")));
 		assertThat(thirdResult.getConceptName().getName(), is("Diabetes Mellitus, Type II"));
+	}
+	
+	/**
+	 * The name of every dose form, mapped to the names of the dose form groups it belongs to.
+	 */
+	private Map<String, Set<String>> groupsByDoseForm() {
+		Map<String, Set<String>> groupsByDoseForm = new HashMap<String, Set<String>>();
+		for (DoseFormMembership membership : emrConceptService.getDoseFormMemberships()) {
+			groupsByDoseForm.put(nameOf(membership.getDoseForm()), namesOf(membership.getDoseFormGroups()));
+		}
+		return groupsByDoseForm;
+	}
+	
+	/**
+	 * A Set because the order concepts come back in is not guaranteed.
+	 */
+	private Set<String> namesOf(List<Concept> concepts) {
+		Set<String> names = new HashSet<String>();
+		for (Concept concept : concepts) {
+			names.add(nameOf(concept));
+		}
+		return names;
+	}
+	
+	private String nameOf(Concept concept) {
+		return concept.getName().getName();
+	}
+	
+	private Set<String> setOf(String... values) {
+		return new HashSet<String>(Arrays.asList(values));
 	}
 	
 	private Map<String, Concept> setupConcepts() {
