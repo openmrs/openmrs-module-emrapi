@@ -16,6 +16,7 @@ import org.openmrs.ConceptClass;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
+import org.openmrs.ConceptSet;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.impl.BaseOpenmrsService;
@@ -153,9 +154,13 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
 			throw new IllegalArgumentException("doseForm is required");
 		}
 		
-		List<Concept> doseFormGroups = getDoseFormGroupsByDoseFormUuid().get(doseForm.getUuid());
-		if (doseFormGroups == null) {
-			return Collections.emptyList();
+		List<ConceptSet> setsContainingDoseForm = conceptService.getSetsContainingConcept(doseForm);
+		List<Concept> doseFormGroups = new ArrayList<>();
+		for(ConceptSet parentSet : setsContainingDoseForm) {
+			Concept parentSetConcept = parentSet.getConceptSet();
+			if (EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME.equals(parentSetConcept.getConceptClass().getName())) {
+				doseFormGroups.add(parentSetConcept);
+			}
 		}
 		
 		List<Concept> routes = new ArrayList<Concept>();
