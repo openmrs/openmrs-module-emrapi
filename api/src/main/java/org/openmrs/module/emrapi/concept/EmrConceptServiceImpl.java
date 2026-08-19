@@ -154,11 +154,15 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
 			throw new IllegalArgumentException("doseForm is required");
 		}
 		
+		// ConceptService.getSetsContainingConcept() does not filter on retired, so the parents are
+		// filtered here, the same way getConceptsByClassName() filters the other two lookups. A route
+		// reachable only through a retired dose form group has been withdrawn and must not be offered.
 		List<ConceptSet> setsContainingDoseForm = conceptService.getSetsContainingConcept(doseForm);
 		List<Concept> doseFormGroups = new ArrayList<>();
 		for (ConceptSet parentSet : setsContainingDoseForm) {
 			Concept parentSetConcept = parentSet.getConceptSet();
-			if (EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME.equals(parentSetConcept.getConceptClass().getName())) {
+			if (!parentSetConcept.getRetired()
+			        && EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME.equals(parentSetConcept.getConceptClass().getName())) {
 				doseFormGroups.add(parentSetConcept);
 			}
 		}

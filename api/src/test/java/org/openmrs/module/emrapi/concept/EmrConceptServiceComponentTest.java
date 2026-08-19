@@ -187,17 +187,20 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
 	
 	/**
 	 * The routes of a dose form are the union of the routes of every group it belongs to, which is what
-	 * a caller holding a drug's dosage form actually wants to know.
+	 * a caller holding a drug's dosage form actually wants to know. Retired groups are not among them:
+	 * Tablet is also claimed by Retired Group, whose route Rectal resolves like any other, so a missing
+	 * retired check on the parent sets would offer a prescriber a route that has been withdrawn.
 	 */
 	@Test
 	public void testGetRoutesOfAdministration() throws Exception {
 		executeDataSet("doseFormGroupDataset.xml");
 		executeDataSet("doseFormGroupMultipleGroupsDataset.xml");
-		
+
 		// Tablet is in Oral Solid, whose route is Oral, and in Oral Liquid, whose routes are Oral and Nasal
 		List<Concept> tabletRoutes = emrConceptService.getRoutesOfAdministration(conceptService.getConcept(5011));
 		assertThat("Oral is a route of both of Tablet's groups, and should be reported once", tabletRoutes.size(), is(2));
-		assertThat(namesOf(tabletRoutes), is(setOf("Oral", "Nasal")));
+		assertThat("Rectal is reachable only through a retired dose form group", namesOf(tabletRoutes),
+		    is(setOf("Oral", "Nasal")));
 		assertThat("a dose form in no dose form group has no routes",
 		    emrConceptService.getRoutesOfAdministration(conceptService.getConcept(5014)).size(), is(0));
 	}
