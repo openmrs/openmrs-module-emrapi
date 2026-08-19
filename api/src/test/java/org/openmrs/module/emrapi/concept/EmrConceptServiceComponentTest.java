@@ -195,8 +195,9 @@ public class EmrConceptServiceComponentTest extends BaseModuleContextSensitiveTe
 		executeDataSet("doseFormGroupMultipleGroupsDataset.xml");
 		
 		// Tablet is in Oral Solid, whose route is Oral, and in Oral Liquid, whose routes are Oral and Nasal
-		assertThat(namesOf(emrConceptService.getRoutesOfAdministration(conceptService.getConcept(5011))),
-		    is(setOf("Oral", "Nasal")));
+		List<Concept> tabletRoutes = emrConceptService.getRoutesOfAdministration(conceptService.getConcept(5011));
+		assertThat("Oral is a route of both of Tablet's groups, and should be reported once", tabletRoutes.size(), is(2));
+		assertThat(namesOf(tabletRoutes), is(setOf("Oral", "Nasal")));
 		assertThat("a dose form in no dose form group has no routes",
 		    emrConceptService.getRoutesOfAdministration(conceptService.getConcept(5014)).size(), is(0));
 	}
