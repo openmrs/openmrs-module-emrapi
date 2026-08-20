@@ -161,8 +161,8 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
 		List<Concept> doseFormGroups = new ArrayList<>();
 		for (ConceptSet parentSet : setsContainingDoseForm) {
 			Concept parentSetConcept = parentSet.getConceptSet();
-			if (!parentSetConcept.getRetired()
-			        && EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME.equals(parentSetConcept.getConceptClass().getName())) {
+			if (!parentSetConcept.getRetired() && EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME
+			        .equals(parentSetConcept.getConceptClass().getName())) {
 				doseFormGroups.add(parentSetConcept);
 			}
 		}
