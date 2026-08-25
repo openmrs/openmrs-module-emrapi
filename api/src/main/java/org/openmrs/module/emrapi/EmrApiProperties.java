@@ -12,6 +12,7 @@ package org.openmrs.module.emrapi;
 import lombok.Setter;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.openmrs.Concept;
+import org.openmrs.ConceptClass;
 import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptSource;
 import org.openmrs.EncounterRole;
@@ -361,6 +362,18 @@ public class EmrApiProperties {
 	
 	public ConceptMapType getNarrowerThanConceptMapType() {
 		return conceptService.getConceptMapTypeByUuid(EmrApiConstants.NARROWER_THAN_CONCEPT_MAP_TYPE_UUID);
+	}
+	
+	public ConceptMapType getRouteOfAdministrationConceptMapType() {
+		return conceptService.getConceptMapTypeByUuid(EmrApiConstants.ROUTE_OF_ADMINISTRATION_CONCEPT_MAP_TYPE_UUID);
+	}
+	
+	public ConceptClass getDoseFormConceptClass() {
+		return conceptService.getConceptClassByName(EmrApiConstants.DOSE_FORM_CONCEPT_CLASS_NAME);
+	}
+	
+	public ConceptClass getDoseFormGroupConceptClass() {
+		return conceptService.getConceptClassByName(EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME);
 	}
 	
 	public Integer getLastViewedPatientSizeLimit() {

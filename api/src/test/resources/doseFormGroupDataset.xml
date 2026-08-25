@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+    This Source Code Form is subject to the terms of the Mozilla Public License,
+    v. 2.0. If a copy of the MPL was not distributed with this file, You can
+    obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+    the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+
+    Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+    graphic logo is a trademark of OpenMRS Inc.
+
+-->
+<!--
+    Metadata for the dose form tests in EmrConceptServiceComponentTest, and for
+    DoseFormGroupControllerTest, which exposes the same data over REST.
+
+    Two dose form groups, each a concept set of dose forms, each mapped to a route of
+    administration reference term:
+
+      Oral Solid (5001) -> Tablet (5011), Capsule (5012)
+        route term ROUTE-ORAL (5031), which concept Oral (5021) claims via a SAME-AS mapping
+        route term ROUTE-RETIRED (5033), which only the retired concept Retired Oral (5022)
+        claims via SAME-AS
+      Injectable (5002) -> Solution for Injection (5013)
+        route term ROUTE-UNRESOLVED (5032), which no concept claims via SAME-AS
+
+    Ointment (5014) is a dose form belonging to no group at all, which is allowed: it is still
+    returned, with an empty list of dose form groups.
+
+    Retired Tablet (5015), Retired Group (5004) and Retired Oral (5022) are retired and so must not
+    be returned at all, not even as a group of Tablet, which Retired Group claims.
+    ConceptService.getConceptsByClass() does not filter on retired, so EmrConceptService has to.
+
+    Retired Group is also mapped to route term ROUTE-RECTAL (5035), which the non-retired concept
+    Rectal (5024) claims via SAME-AS. That route resolves perfectly well and is reachable from
+    Tablet, so the only thing keeping it out of getRoutesOfAdministration(Tablet) is the retired
+    check on the parent sets: ConceptService.getSetsContainingConcept() does not filter on retired
+    either.
+
+    Note that term 5031 carries mappings of two different types (route-of-administration from
+    the group, SAME-AS from the route concept). That is deliberate: it is the case
+    ConceptService.getConceptByMapping() rejects, and the reason routes are resolved with
+    EmrConceptService.getConceptsSameAs() instead.
+
+    The "same-as" concept map type (id 2) and the "Misc" (11) concept class come from the core
+    standardTestDataset; the route-of-administration map type and the "Drug form" and "Dose Form
+    Group" concept classes do not, so they are created here. The dose form concept class really is
+    named "Drug form" in the dictionary, which is why that name is used here.
+-->
+<dataset>
+
+    <concept_class concept_class_id="50" name="Dose Form Group" description="Groups dose forms sharing routes of administration" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="0f7b3d2e-6f1a-4c9b-9f4d-2a1c6b8e5d70"/>
+    <concept_class concept_class_id="51" name="Drug form" description="The form a drug is dosed in" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="1e8c4d3f-7a2b-4d0c-8e5f-3b2c7d9a6e81"/>
+
+    <concept_map_type concept_map_type_id="20" name="route of administration" description="Maps a dose form group to a route of administration" is_hidden="0" retired="0" creator="1" date_created="2004-08-12 00:00:00.0" uuid="8ee5b13d-7d8e-11e1-909d-c80aa9edcf4e"/>
+
+    <concept_reference_source concept_source_id="50" name="Dose Form Test Source" description="Source used only by the dose form group tests" hl7_code="DFTS" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="5f2c1a90-4d7e-4b3c-8a6f-1b9d0e3c7a41"/>
+
+    <!-- dose form groups -->
+    <concept concept_id="5001" retired="false" datatype_id="4" class_id="50" is_set="true" creator="1" date_created="2004-08-12 00:00:00.0" uuid="a1c4e8b2-3f6d-4a9c-b5e7-8d2f0a6c1b93"/>
+    <concept concept_id="5002" retired="false" datatype_id="4" class_id="50" is_set="true" creator="1" date_created="2004-08-12 00:00:00.0" uuid="b2d5f9c3-4a7e-4b0d-c6f8-9e3a1b7d2c04"/>
+    <!-- a retired dose form group, which claims Tablet but must not be reported as one of its groups -->
+    <concept concept_id="5004" retired="true" datatype_id="4" class_id="50" is_set="true" creator="1" date_created="2004-08-12 00:00:00.0" uuid="c4e6b1d7-5a8f-4c2e-d0a9-1f4b3c8e2d05"/>
+    <!-- dose forms -->
+    <concept concept_id="5011" retired="false" datatype_id="4" class_id="51" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="c3e6a0d4-5b8f-4c1e-d7a9-0f4b2c8e3d15"/>
+    <concept concept_id="5012" retired="false" datatype_id="4" class_id="51" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="d4f7b1e5-6c9a-4d2f-e8b0-1a5c3d9f4e26"/>
+    <concept concept_id="5013" retired="false" datatype_id="4" class_id="51" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="e5a8c2f6-7d0b-4e3a-f9c1-2b6d4e0a5f37"/>
+    <!-- Ointment deliberately belongs to no dose form group, which is allowed -->
+    <concept concept_id="5014" retired="false" datatype_id="4" class_id="51" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="a6b9c2d5-8e1f-4a3b-c7d0-3e5f1a8b6c48"/>
+    <!-- a retired dose form, which must not be reported -->
+    <concept concept_id="5015" retired="true" datatype_id="4" class_id="51" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="b7c0d3e6-9f2a-4b4c-d8e1-4f6a2b9c7d59"/>
+    <!-- routes of administration -->
+    <concept concept_id="5021" retired="false" datatype_id="4" class_id="11" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="f6b9d3a7-8e1c-4f4b-a0d2-3c7e5f1b6a48"/>
+    <!-- a retired route concept, so the route term it claims resolves to nothing -->
+    <concept concept_id="5022" retired="true" datatype_id="4" class_id="11" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="a7c0e4b8-9f2d-4a5c-b1e3-4d8f6a2c7b59"/>
+    <!-- reachable only through the retired dose form group, so it must never be returned -->
+    <concept concept_id="5024" retired="false" datatype_id="4" class_id="11" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="c9e2a6d0-1b4f-4c7e-d3a5-6f0b8c4e9c24"/>
+
+    <concept_name concept_name_id="5001" concept_id="5001" name="Oral Solid" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="a1c4e8b2-3f6d-4a9c-b5e7-8d2f0a6c1b01"/>
+    <concept_name concept_name_id="5002" concept_id="5002" name="Injectable" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="b2d5f9c3-4a7e-4b0d-c6f8-9e3a1b7d2c02"/>
+    <concept_name concept_name_id="5011" concept_id="5011" name="Tablet" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="c3e6a0d4-5b8f-4c1e-d7a9-0f4b2c8e3d11"/>
+    <concept_name concept_name_id="5012" concept_id="5012" name="Capsule" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="d4f7b1e5-6c9a-4d2f-e8b0-1a5c3d9f4e12"/>
+    <concept_name concept_name_id="5013" concept_id="5013" name="Solution for Injection" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="e5a8c2f6-7d0b-4e3a-f9c1-2b6d4e0a5f13"/>
+    <concept_name concept_name_id="5014" concept_id="5014" name="Ointment" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="a6b9c2d5-8e1f-4a3b-c7d0-3e5f1a8b6c14"/>
+    <concept_name concept_name_id="5021" concept_id="5021" name="Oral" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="f6b9d3a7-8e1c-4f4b-a0d2-3c7e5f1b6a21"/>
+    <concept_name concept_name_id="5004" concept_id="5004" name="Retired Group" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="c4e6b1d7-5a8f-4c2e-d0a9-1f4b3c8e2004"/>
+    <concept_name concept_name_id="5015" concept_id="5015" name="Retired Tablet" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="b7c0d3e6-9f2a-4b4c-d8e1-4f6a2b9c7015"/>
+    <concept_name concept_name_id="5022" concept_id="5022" name="Retired Oral" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="a7c0e4b8-9f2d-4a5c-b1e3-4d8f6a2c7022"/>
+    <concept_name concept_name_id="5024" concept_id="5024" name="Rectal" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="c9e2a6d0-1b4f-4c7e-d3a5-6f0b8c4e9024"/>
+
+    <concept_set concept_set_id="5101" concept_id="5011" concept_set="5001" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="11c4e8b2-3f6d-4a9c-b5e7-8d2f0a6c1101"/>
+    <concept_set concept_set_id="5102" concept_id="5012" concept_set="5001" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="2" uuid="22d5f9c3-4a7e-4b0d-c6f8-9e3a1b7d2102"/>
+    <concept_set concept_set_id="5103" concept_id="5013" concept_set="5002" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="33e6a0d4-5b8f-4c1e-d7a9-0f4b2c8e3103"/>
+    <concept_set concept_set_id="5105" concept_id="5011" concept_set="5004" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="55a8c2f6-7d0b-4e3a-f9c1-2b6d4e0a5105"/>
+
+    <concept_reference_term concept_reference_term_id="5031" concept_source_id="50" code="ROUTE-ORAL" name="Oral route" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="44f7b1e5-6c9a-4d2f-e8b0-1a5c3d9f4131"/>
+    <concept_reference_term concept_reference_term_id="5032" concept_source_id="50" code="ROUTE-UNRESOLVED" name="Route with no matching concept" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="55a8c2f6-7d0b-4e3a-f9c1-2b6d4e0a5132"/>
+    <concept_reference_term concept_reference_term_id="5033" concept_source_id="50" code="ROUTE-RETIRED" name="Route whose only matching concept is retired" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="66b9d3a7-8e1c-4f4b-a0d2-3c7e5f1b6133"/>
+    <concept_reference_term concept_reference_term_id="5035" concept_source_id="50" code="ROUTE-RECTAL" name="Rectal route" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="c9e2a6d0-1b4f-4c7e-d3a5-6f0b8c4e9135"/>
+
+    <concept_reference_map concept_map_id="5041" concept_id="5001" concept_reference_term_id="5031" concept_map_type_id="20" creator="1" date_created="2004-08-12 00:00:00.0" uuid="66b9d3a7-8e1c-4f4b-a0d2-3c7e5f1b6141"/>
+    <concept_reference_map concept_map_id="5042" concept_id="5002" concept_reference_term_id="5032" concept_map_type_id="20" creator="1" date_created="2004-08-12 00:00:00.0" uuid="77c0e4b8-9f2d-4a5c-b1e3-4d8f6a2c7142"/>
+    <concept_reference_map concept_map_id="5043" concept_id="5021" concept_reference_term_id="5031" concept_map_type_id="2" creator="1" date_created="2004-08-12 00:00:00.0" uuid="88d1f5c9-0a3e-4b6d-c2f4-5e9a7b3d8143"/>
+    <concept_reference_map concept_map_id="5044" concept_id="5001" concept_reference_term_id="5033" concept_map_type_id="20" creator="1" date_created="2004-08-12 00:00:00.0" uuid="99e2a6d0-1b4f-4c7e-d3a5-6f0b8c4e9144"/>
+    <concept_reference_map concept_map_id="5045" concept_id="5022" concept_reference_term_id="5033" concept_map_type_id="2" creator="1" date_created="2004-08-12 00:00:00.0" uuid="a0f3b7e1-2c5a-4d8f-e4b6-701c9d5f0145"/>
+    <!-- the retired group's route, which resolves perfectly well and so is only kept out by the retired check -->
+    <concept_reference_map concept_map_id="5051" concept_id="5004" concept_reference_term_id="5035" concept_map_type_id="20" creator="1" date_created="2004-08-12 00:00:00.0" uuid="d4c7e1b5-6a9e-4b2d-c8f0-145a3b9d7151"/>
+    <concept_reference_map concept_map_id="5052" concept_id="5024" concept_reference_term_id="5035" concept_map_type_id="2" creator="1" date_created="2004-08-12 00:00:00.0" uuid="e5d8f2c6-7b0a-4c3e-d9a1-256b4c0e8152"/>
+
+</dataset>

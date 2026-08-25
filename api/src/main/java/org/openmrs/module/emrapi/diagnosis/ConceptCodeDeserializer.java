@@ -18,6 +18,8 @@ import org.openmrs.ConceptClass;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSource;
+import org.openmrs.module.emrapi.concept.DoseFormGroupRoutes;
+import org.openmrs.module.emrapi.concept.DoseFormMembership;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 
 import java.io.IOException;
@@ -39,6 +41,26 @@ public class ConceptCodeDeserializer extends JsonDeserializer<Concept> {
 			
 			@Override
 			public List<Concept> getConceptsSameOrNarrowerThan(ConceptReferenceTerm term) {
+				return null; // not needed here
+			}
+			
+			@Override
+			public List<Concept> getConceptsSameAs(ConceptReferenceTerm term) {
+				return null; // not needed here
+			}
+			
+			@Override
+			public List<DoseFormMembership> getDoseFormMemberships() {
+				return null; // not needed here
+			}
+			
+			@Override
+			public List<DoseFormGroupRoutes> getDoseFormGroupRoutes() {
+				return null; // not needed here
+			}
+			
+			@Override
+			public List<Concept> getRoutesOfAdministration(Concept doseForm) {
 				return null; // not needed here
 			}
 			

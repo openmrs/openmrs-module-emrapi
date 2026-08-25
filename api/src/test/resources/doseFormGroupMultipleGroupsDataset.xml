@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+    This Source Code Form is subject to the terms of the Mozilla Public License,
+    v. 2.0. If a copy of the MPL was not distributed with this file, You can
+    obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+    the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+
+    Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+    graphic logo is a trademark of OpenMRS Inc.
+
+-->
+<!--
+    Loaded on top of doseFormGroupDataset.xml to put one dose form in more than one dose form
+    group, which is the case CIEL supports: a third dose form group, Oral Liquid (5003), that also
+    claims Tablet (5011) as a set member, alongside Oral Solid (5001).
+
+    Oral Liquid is mapped to two routes of administration: ROUTE-ORAL (5031), which Oral Solid is
+    mapped to as well, and ROUTE-NASAL (5034), which concept Nasal (5023) claims via a SAME-AS
+    mapping. So the routes of Tablet are the union of the routes of both its groups, with Oral
+    counted once.
+-->
+<dataset>
+
+    <concept concept_id="5003" retired="false" datatype_id="4" class_id="50" is_set="true" creator="1" date_created="2004-08-12 00:00:00.0" uuid="c3e6a0d4-5b8f-4c1e-d7a9-0f4b2c8e3d03"/>
+    <concept concept_id="5023" retired="false" datatype_id="4" class_id="11" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" uuid="b8d1f5c9-0a3e-4b6d-c2f4-5e9a7b3d8c23"/>
+
+    <concept_name concept_name_id="5003" concept_id="5003" name="Oral Liquid" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="c3e6a0d4-5b8f-4c1e-d7a9-0f4b2c8e3003"/>
+    <concept_name concept_name_id="5023" concept_id="5023" name="Nasal" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="b8d1f5c9-0a3e-4b6d-c2f4-5e9a7b3d8023"/>
+
+    <concept_set concept_set_id="5104" concept_id="5011" concept_set="5003" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="44f7b1e5-6c9a-4d2f-e8b0-1a5c3d9f4104"/>
+
+    <concept_reference_term concept_reference_term_id="5034" concept_source_id="50" code="ROUTE-NASAL" name="Nasal route" creator="1" date_created="2004-08-12 00:00:00.0" retired="false" uuid="77c0e4b8-9f2d-4a5c-b1e3-4d8f6a2c7134"/>
+
+    <concept_reference_map concept_map_id="5046" concept_id="5003" concept_reference_term_id="5031" concept_map_type_id="20" creator="1" date_created="2004-08-12 00:00:00.0" uuid="b1a4c8f2-3d6b-4e9a-f5c7-812d0e6a1146"/>
+    <concept_reference_map concept_map_id="5047" concept_id="5003" concept_reference_term_id="5034" concept_map_type_id="20" creator="1" date_created="2004-08-12 00:00:00.0" uuid="c2b5d9a3-4e7c-4f0b-a6d8-923e1f7b2147"/>
+    <concept_reference_map concept_map_id="5048" concept_id="5023" concept_reference_term_id="5034" concept_map_type_id="2" creator="1" date_created="2004-08-12 00:00:00.0" uuid="d3c6e0b4-5f8d-4a1c-b7e9-034f2a8c3148"/>
+
+</dataset>
