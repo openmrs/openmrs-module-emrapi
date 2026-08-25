@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.Concept;
 import org.openmrs.ConceptClass;
 import org.openmrs.ConceptMap;
+import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
 import org.openmrs.ConceptSet;
@@ -159,10 +160,10 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
 		// reachable only through a retired dose form group has been withdrawn and must not be offered.
 		List<ConceptSet> setsContainingDoseForm = conceptService.getSetsContainingConcept(doseForm);
 		List<Concept> doseFormGroups = new ArrayList<>();
+		ConceptClass doseFormGroupClass = emrApiProperties.getDoseFormGroupConceptClass();
 		for (ConceptSet parentSet : setsContainingDoseForm) {
 			Concept parentSetConcept = parentSet.getConceptSet();
-			if (!parentSetConcept.getRetired() && EmrApiConstants.DOSE_FORM_GROUP_CONCEPT_CLASS_NAME
-			        .equals(parentSetConcept.getConceptClass().getName())) {
+			if (!parentSetConcept.getRetired() && doseFormGroupClass.equals(parentSetConcept.getConceptClass())) {
 				doseFormGroups.add(parentSetConcept);
 			}
 		}
@@ -204,9 +205,9 @@ public class EmrConceptServiceImpl extends BaseOpenmrsService implements EmrConc
 	 */
 	private List<Concept> getRoutesOfDoseFormGroup(Concept doseFormGroup) {
 		List<Concept> routes = new ArrayList<Concept>();
+		ConceptMapType routeOfAdministrationMapType = emrApiProperties.getRouteOfAdministrationConceptMapType();
 		for (ConceptMap conceptMap : doseFormGroup.getConceptMappings()) {
-			if (EmrApiConstants.ROUTE_OF_ADMINISTRATION_CONCEPT_MAP_TYPE_UUID
-			        .equals(conceptMap.getConceptMapType().getUuid())) {
+			if (routeOfAdministrationMapType.equals(conceptMap.getConceptMapType())) {
 				ConceptReferenceTerm term = conceptMap.getConceptReferenceTerm();
 				Concept route = getRouteConcept(term);
 				if (route == null) {
