@@ -270,4 +270,16 @@
             <column name="start_date_time"/>
         </createIndex>
     </changeSet>
+
+    <changeSet id="emrapi-202605061002" author="openmrs">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="emrapi_procedure" columnName="body_site_coded"/>
+        </preConditions>
+        <comment>Make body_site_coded field nullable in emrapi_procedure table</comment>
+
+        <dropNotNullConstraint
+                tableName="emrapi_procedure"
+                columnName="body_site_coded"
+                columnDataType="int"/>
+    </changeSet>
 </databaseChangeLog>
