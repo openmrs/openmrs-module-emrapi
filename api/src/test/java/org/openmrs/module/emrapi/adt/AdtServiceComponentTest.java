@@ -275,7 +275,6 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 	}
 	
 	@Test
-	@Disabled("Unignore after fixing EA-141")
 	public void test_getVisitsAndHasVisitDuring() throws Exception {
 		
 		ContextSensitiveMetadataTestUtils.setupSupportsVisitLocationTag(locationService);
@@ -338,7 +337,10 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 		
 		service.ensureActiveVisit(patient, outpatientDepartment);
 		assertTrue(service.hasVisitDuring(patient, outpatientDepartment, now, futureDate));
-		assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, now));
+		
+		// Offset by 1 second to prevent the database timestamp truncation from overlapping with the new visit
+		Date oneSecondAgo = new DateTime(now).minusSeconds(1).toDate();
+		assertFalse(service.hasVisitDuring(patient, outpatientDepartment, stopDate, oneSecondAgo));
 		
 		// now lets just add another retrospective visit to do a quick test of the getVisits method
 		startDate = new DateTime(2012, 1, 5, 0, 0, 0).toDate();
@@ -637,7 +639,7 @@ public class AdtServiceComponentTest extends BaseModuleContextSensitiveTest {
 	/**
 	 * I'm sure there's a standard matcher for this, but sometimes we run into bugs comparing a Date to
 	 * a java.sql.Timestamp
-	 * 
+	 *
 	 * @param expected
 	 * @return a matcher that checks whether a given date is on or after 'expected'
 	 */
