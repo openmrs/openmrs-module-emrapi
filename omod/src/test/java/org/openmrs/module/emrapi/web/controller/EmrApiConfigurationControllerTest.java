@@ -9,10 +9,11 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.disposition.DispositionService;
@@ -22,7 +23,7 @@ import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.DelegatingResourceDescription;
 import org.openmrs.module.webservices.rest.web.v1_0.resource.openmrs2_0.LocationResource2_0;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -33,9 +34,9 @@ import java.util.Set;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensitiveTest {
 	
@@ -58,7 +59,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 	@Autowired
 	DispositionService dispositionService;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		executeDataSet("baseTestDataset.xml");
 		dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources
@@ -71,7 +72,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		request.addParameter("v", "full");
 		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
 		String jsonString = new ObjectMapper().writeValueAsString(config);
-		Assert.assertTrue(jsonString.contains("unknownLocation"));
+		Assertions.assertTrue(jsonString.contains("unknownLocation"));
 	}
 	
 	@Test
@@ -94,7 +95,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		DelegatingResourceDescription drd = new LocationResource2_0().getRepresentationDescription(Representation.FULL);
 		Set<String> expectedProps = drd.getProperties().keySet();
 		for (String prop : expectedProps) {
-			Assert.assertTrue("Expected property: " + prop, unknownLocation.containsKey(prop));
+			Assertions.assertTrue(unknownLocation.containsKey(prop), "Expected property: " + prop);
 		}
 		for (int i = 1; i <= 15; i++) {
 			assertTrue(unknownLocation.containsKey("address" + i));
@@ -108,7 +109,8 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
 		assertEquals(2, config.size());
 		assertThat(config.keySet(), containsInAnyOrder("unknownLocation", "admissionEncounterType"));
-		assertEquals(1, mapNode(config, "unknownLocation").size());
+		// webservices.rest 3.x and later add resourceVersion to custom representations of resources
+		assertThat(mapNode(config, "unknownLocation").keySet(), containsInAnyOrder("display", "resourceVersion"));
 		assertEquals("Unknown Location", mapNode(config, "unknownLocation").get("display"));
 		assertEquals("06087111-222-11e3-9c1a-0800200c9a66", mapNode(config, "admissionEncounterType").get("uuid"));
 		assertEquals("Admission", mapNode(config, "admissionEncounterType").get("name"));
@@ -144,7 +146,7 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 				assertThat(d.get("conceptCode"), equalTo("org.openmrs.module.emrapi:Discharged"));
 				assertThat(listNode(d, "additionalObs").size(), equalTo(0));
 			} else {
-				Assert.fail("Unexpected disposition uuid: " + d.get("uuid"));
+				Assertions.fail("Unexpected disposition uuid: " + d.get("uuid"));
 			}
 		}
 	}

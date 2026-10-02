@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.rest.resource;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.ProviderRole;
 import org.openmrs.api.context.Context;

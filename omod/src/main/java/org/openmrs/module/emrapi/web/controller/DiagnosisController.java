@@ -15,6 +15,7 @@ import java.util.List;
 import org.openmrs.Patient;
 import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisService;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/rest/**/emrapi")
+@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/emrapi")
 public class DiagnosisController extends BaseRestController {
 	
 	@Autowired

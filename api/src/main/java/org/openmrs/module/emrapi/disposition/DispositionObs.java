@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.disposition;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 

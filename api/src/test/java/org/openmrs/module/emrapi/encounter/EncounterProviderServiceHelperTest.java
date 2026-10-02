@@ -9,9 +9,9 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -27,10 +27,10 @@ import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
 import java.util.Collections;
 import java.util.Iterator;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -46,7 +46,7 @@ public class EncounterProviderServiceHelperTest {
 	
 	private MockedStatic<Context> context;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		
 		initMocks(this);
@@ -78,7 +78,7 @@ public class EncounterProviderServiceHelperTest {
 		encounterProviderServiceHelper = new EncounterProviderServiceHelper(providerService, encounterService);
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() {
 		context.close();
 	}

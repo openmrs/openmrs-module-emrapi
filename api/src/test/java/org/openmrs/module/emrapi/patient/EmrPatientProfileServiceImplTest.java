@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.patient;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Patient;
 import org.openmrs.Person;
 import org.openmrs.Relationship;
@@ -21,8 +21,8 @@ import org.openmrs.module.emrapi.person.image.EmrPersonImageService;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +36,7 @@ public class EmrPatientProfileServiceImplTest {
 	
 	private EmrPersonImageService emrPersonImageService;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		emrPatientProfileService = new EmrPatientProfileServiceImpl();
 		patientService = mock(PatientService.class);

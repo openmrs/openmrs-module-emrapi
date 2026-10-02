@@ -10,8 +10,8 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -58,7 +58,7 @@ public class TransferToSpecificLocationDispositionActionTest extends Authenticat
 	
 	private Concept dispositionObsGroupConcept = new Concept();
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		locationService = mock(LocationService.class);
 		adtService = mock(AdtService.class);

@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.utils;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
@@ -18,9 +18,10 @@ import org.openmrs.api.PatientService;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ModulePropertiesTest {
 	
@@ -30,7 +31,7 @@ public class ModulePropertiesTest {
 	
 	private PatientService patientService;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		administrationService = mock(AdministrationService.class);
 		patientService = mock(PatientService.class);
@@ -78,10 +79,12 @@ public class ModulePropertiesTest {
 		assertThat(moduleProperties.getIntegerByGlobalProperty("someInteger"), is(123));
 	}
 	
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void getIntegerByGlobalProperty_shouldFailForUnparseableInteger() throws Exception {
-		when(administrationService.getGlobalProperty("someInteger")).thenReturn("AAA");
-		moduleProperties.getIntegerByGlobalProperty("someInteger");
+		assertThrows(IllegalStateException.class, () -> {
+			when(administrationService.getGlobalProperty("someInteger")).thenReturn("AAA");
+			moduleProperties.getIntegerByGlobalProperty("someInteger");
+		});
 	}
 	
 }

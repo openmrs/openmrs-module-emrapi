@@ -10,8 +10,8 @@
 package org.openmrs.module.emrapi.encounter;
 
 import com.thoughtworks.xstream.mapper.Mapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.EncounterProvider;
 import org.openmrs.module.emrapi.encounter.builder.EncounterProviderBuilder;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
@@ -26,7 +26,7 @@ public class EncounterProviderMapperTest {
 	
 	private EncounterProviderMapper encounterProviderMapper;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		encounterProviderMapper = new EncounterProviderMapper();
 	}

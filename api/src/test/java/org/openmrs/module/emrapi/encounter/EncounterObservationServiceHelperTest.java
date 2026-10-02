@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.openmrs.Concept;
@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -70,7 +70,7 @@ public class EncounterObservationServiceHelperTest {
 	
 	private EncounterObservationServiceHelper encounterObservationServiceHelper;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		initMocks(this);
 		obsMapper = new ObsMapper(conceptService, emrApiProperties, obsService, orderService);
@@ -224,12 +224,14 @@ public class EncounterObservationServiceHelperTest {
 		assertEquals("closed", voidedObs.getVoidReason());
 	}
 	
-	@Test(expected = ConceptNotFoundException.class)
+	@Test
 	public void shouldReturnErrorWhenObservationConceptIsNotFound() throws Exception {
-		List<EncounterTransaction.Observation> observations = asList(
-		    new EncounterTransaction.Observation().setConcept(getConcept("non-existent")));
-		Encounter encounter = new Encounter();
-		encounterObservationServiceHelper.update(encounter, observations);
+		assertThrows(ConceptNotFoundException.class, () -> {
+			List<EncounterTransaction.Observation> observations = asList(
+			    new EncounterTransaction.Observation().setConcept(getConcept("non-existent")));
+			Encounter encounter = new Encounter();
+			encounterObservationServiceHelper.update(encounter, observations);
+		});
 	}
 	
 	@Test

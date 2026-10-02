@@ -9,10 +9,11 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.openmrs.ConceptClass;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -53,7 +54,7 @@ public class ConceptMapperTest {
 	
 	private MockedStatic<Context> context;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		initMocks(this);
 		localeUtility = mockStatic(LocaleUtility.class);
@@ -63,7 +64,7 @@ public class ConceptMapperTest {
 		context.when(Context::getAdministrationService).thenReturn(administrationService);
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() {
 		localeUtility.close();
 		context.close();
@@ -108,7 +109,7 @@ public class ConceptMapperTest {
 		
 		EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(conceptBuilder.get());
 		
-		Assert.assertEquals("French Test Name", encounterTransactionConcept.getShortName());
+		Assertions.assertEquals("French Test Name", encounterTransactionConcept.getShortName());
 	}
 	
 	@Test
@@ -137,7 +138,7 @@ public class ConceptMapperTest {
 		
 		EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(conceptBuilder.get());
 		
-		Assert.assertEquals("French Name Full", encounterTransactionConcept.getShortName());
+		Assertions.assertEquals("French Name Full", encounterTransactionConcept.getShortName());
 	}
 	
 	@Test
@@ -163,7 +164,7 @@ public class ConceptMapperTest {
 		
 		EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(conceptBuilder.get());
 		
-		Assert.assertEquals("English Name Short", encounterTransactionConcept.getShortName());
+		Assertions.assertEquals("English Name Short", encounterTransactionConcept.getShortName());
 	}
 	
 	@Test
@@ -185,7 +186,7 @@ public class ConceptMapperTest {
 		
 		EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(conceptBuilder.get());
 		
-		Assert.assertEquals("English Name Full", encounterTransactionConcept.getShortName());
+		Assertions.assertEquals("English Name Full", encounterTransactionConcept.getShortName());
 	}
 	
 	@Test
@@ -207,7 +208,7 @@ public class ConceptMapperTest {
 		
 		EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(conceptBuilder.get());
 		
-		Assert.assertEquals("Italian Name Full", encounterTransactionConcept.getShortName());
+		Assertions.assertEquals("Italian Name Full", encounterTransactionConcept.getShortName());
 	}
 	
 	@Test
@@ -234,7 +235,7 @@ public class ConceptMapperTest {
 		ConceptMapper conceptMapper = new ConceptMapper();
 		EncounterTransaction.Concept encounterTransactionConcept = conceptMapper.map(concept);
 		
-		Assert.assertEquals((double) 20, encounterTransactionConcept.getHiNormal(), 0.0);
-		Assert.assertEquals((double) 15, encounterTransactionConcept.getLowNormal(), 0.0);
+		Assertions.assertEquals((double) 20, encounterTransactionConcept.getHiNormal(), 0.0);
+		Assertions.assertEquals((double) 15, encounterTransactionConcept.getLowNormal(), 0.0);
 	}
 }

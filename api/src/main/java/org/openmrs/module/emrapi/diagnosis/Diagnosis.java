@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.annotate.JsonProperty;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.util.OpenmrsUtil;

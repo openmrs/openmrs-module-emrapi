@@ -25,28 +25,28 @@
     <concept_name concept_id="402" concept_name_id="1402" name="My Coded Diagnosis" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="74a4c3d3-e6d0-407d-8ed3-3895e4b61f5b"/>
     <concept_reference_term concept_reference_term_id="2" concept_source_id="1" code="Coded Diagnosis" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="2" concept_id="402" concept_reference_term_id="2" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
-    <concept_set concept_set_id="2" concept_id="402" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+    <concept_set concept_set_id="2" concept_id="402" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="e5a0d0e2-0000-4000-8000-000000000002"></concept_set>
     <concept_numeric concept_id="402" allow_decimal="0"></concept_numeric>
 
     <concept concept_id="403" retired="false" datatype_id="1" class_id="5" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="646dfcfe-c548-49b7-8837-c40d4b6de5bd"/>
     <concept_name concept_id="403" concept_name_id="1403" name="My Non-Coded Diagnosis" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="646dfcfe-c548-49b7-8837-c40d4b6de5bd"/>
     <concept_reference_term concept_reference_term_id="3" concept_source_id="1" code="Non-Coded Diagnosis" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="3" concept_id="403" concept_reference_term_id="3" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
-    <concept_set concept_set_id="3" concept_id="403" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+    <concept_set concept_set_id="3" concept_id="403" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="e5a0d0e2-0000-4000-8000-000000000003"></concept_set>
     <concept_numeric concept_id="403" allow_decimal="0"></concept_numeric>
 
     <concept concept_id="404" retired="false" datatype_id="1" class_id="5" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="589e92a0-91c4-447d-b71d-e28fd17b5865"/>
     <concept_name concept_id="404" concept_name_id="1404" name="My Diagnosis Certainty" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="589e92a0-91c4-447d-b71d-e28fd17b5865"/>
     <concept_reference_term concept_reference_term_id="4" concept_source_id="1" code="Diagnosis Certainty" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="4" concept_id="404" concept_reference_term_id="4" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
-    <concept_set concept_set_id="4" concept_id="404" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+    <concept_set concept_set_id="4" concept_id="404" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="e5a0d0e2-0000-4000-8000-000000000004"></concept_set>
     <concept_numeric concept_id="404" allow_decimal="0"></concept_numeric>
                                                                                                          ‰
     <concept concept_id="405" retired="false" datatype_id="1" class_id="5" is_set="false" creator="1" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="4256cd44-9632-4b97-afdb-9528eb1af715"/>
     <concept_name concept_id="405" concept_name_id="1405" name="My Diagnosis Order" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="4256cd44-9632-4b97-afdb-9528eb1af715"/>
     <concept_reference_term concept_reference_term_id="5" concept_source_id="1" code="Diagnosis Order" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="5" concept_id="405" concept_reference_term_id="5" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
-    <concept_set concept_set_id="5" concept_id="405" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+    <concept_set concept_set_id="5" concept_id="405" concept_set="401" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="e5a0d0e2-0000-4000-8000-000000000005"></concept_set>
     <concept_numeric concept_id="405" allow_decimal="0"></concept_numeric>
 
     <concept concept_id="406" retired="false" datatype_id="1" class_id="11" is_set="false" creator="501" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="d102c80f-1yz9-4da3-bb88-8122ce8868dd"/>
@@ -67,13 +67,13 @@
     <concept_name concept_id="408" concept_name_id="1408" name="Diabetes" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="d102c80f-1yz9-4da3-bb88-8122ce7768de"/>
     <concept_reference_term concept_reference_term_id="8" concept_source_id="2" code="ABC123" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="8" concept_id="408" concept_reference_term_id="8" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
-    <concept_set concept_set_id="6" concept_id="408" concept_set="402" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+    <concept_set concept_set_id="6" concept_id="408" concept_set="402" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="e5a0d0e2-0000-4000-8000-000000000006"></concept_set>
 
     <concept concept_id="409" retired="false" datatype_id="1" class_id="11" is_set="false" creator="501" date_created="2004-08-12 00:00:00.0" version="" changed_by="1" date_changed="2005-02-25 11:43:43.0" uuid="d102c80f-1fg9-4da3-bb88-8122ce8897de"/>
     <concept_name concept_id="409" concept_name_id="1409" name="Diabetes Mellitus" locale="en" creator="1" date_created="2004-08-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false" uuid="d102c80f-1fg9-4da3-bb88-8122ce7768de"/>
     <concept_reference_term concept_reference_term_id="9" concept_source_id="2" code="ABC124" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_term>
     <concept_reference_map concept_map_id="9" concept_id="409" concept_reference_term_id="9" concept_map_type_id="1" creator="1" date_created="2004-08-12 00:00:00.0"></concept_reference_map>
-    <concept_set concept_set_id="7" concept_id="409" concept_set="402" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1"></concept_set>
+    <concept_set concept_set_id="7" concept_id="409" concept_set="402" creator="1" date_created="2004-08-12 00:00:00.0" sort_weight="1" uuid="e5a0d0e2-0000-4000-8000-000000000007"></concept_set>
 
     <global_property property="emr.concept.diagnosisSetOfSets" property_value="baef67ac-b24e-4b04-ac83-c3b994132b85" uuid="4f55827e-26fe-102b-hacb-0017a47871b3"/>
     <global_property property="emrapi.conceptSourcesForDiagnosisSearch" property_value="ICD-10-WHO" uuid="4f55827e-26fe-999b-hacb-0017a47871b3"/>

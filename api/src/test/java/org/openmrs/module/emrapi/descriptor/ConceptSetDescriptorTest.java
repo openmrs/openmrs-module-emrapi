@@ -10,15 +10,16 @@
 package org.openmrs.module.emrapi.descriptor;
 
 import org.hamcrest.core.IsNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.api.ConceptService;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConceptSetDescriptorTest {
 	
@@ -30,7 +31,7 @@ public class ConceptSetDescriptorTest {
 	
 	private Concept secondMemberConcept;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		conceptService = mock(ConceptService.class);
 		
@@ -63,14 +64,15 @@ public class ConceptSetDescriptorTest {
 		
 	}
 	
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void shouldRaiseExceptionIfRequiredConceptDoesNotExist() {
+		assertThrows(IllegalStateException.class, () -> {
+			ConceptSetDescriptorImpl conceptSetDescriptorImpl = new ConceptSetDescriptorImpl();
 		
-		ConceptSetDescriptorImpl conceptSetDescriptorImpl = new ConceptSetDescriptorImpl();
-		
-		conceptSetDescriptorImpl.setup(conceptService, "someConceptSource",
-		    ConceptSetDescriptorField.required("setConcept", "setConceptCode"),
-		    ConceptSetDescriptorField.required("firstMemberConcept", "nonExistingConceptCode"));
+			conceptSetDescriptorImpl.setup(conceptService, "someConceptSource",
+			    ConceptSetDescriptorField.required("setConcept", "setConceptCode"),
+			    ConceptSetDescriptorField.required("firstMemberConcept", "nonExistingConceptCode"));
+		});
 	}
 	
 	@Test

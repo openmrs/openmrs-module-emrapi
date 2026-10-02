@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.ConceptAnswer;
 import org.openmrs.ConceptMap;
@@ -27,8 +27,8 @@ import org.openmrs.module.emrapi.test.MockMetadataTestUtil;
 import java.util.Locale;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,7 +43,7 @@ public class DiagnosisMetadataTest {
 	
 	private ConceptService conceptService;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		sameAs = new ConceptMapType();
 		emrConceptSource = new ConceptSource();

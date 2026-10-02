@@ -490,7 +490,7 @@ public class EmrApiProperties {
 	
 	protected String getGlobalProperty(String globalPropertyName, boolean required) {
 		String globalProperty = administrationService.getGlobalProperty(globalPropertyName);
-		if (required && org.apache.commons.lang.StringUtils.isEmpty(globalProperty)) {
+		if (required && org.apache.commons.lang3.StringUtils.isEmpty(globalProperty)) {
 			throw new IllegalStateException("Configuration required: " + globalPropertyName);
 		}
 		return globalProperty;

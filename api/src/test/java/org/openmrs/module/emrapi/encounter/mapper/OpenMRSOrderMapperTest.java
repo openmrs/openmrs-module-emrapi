@@ -9,9 +9,9 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -33,6 +33,7 @@ import java.util.Set;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OpenMRSOrderMapperTest {
 	
@@ -45,7 +46,7 @@ public class OpenMRSOrderMapperTest {
 	@Mock(answer = Answers.RETURNS_DEEP_STUBS)
 	private Encounter encounter;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 	}
@@ -71,24 +72,26 @@ public class OpenMRSOrderMapperTest {
 		
 		Order order = orderMapper.map(etOrder, encounter);
 		
-		Assert.assertEquals(encounter, order.getEncounter());
-		Assert.assertEquals(Order.Urgency.STAT, order.getUrgency());
-		Assert.assertEquals(mrsBloodConcept, order.getConcept());
-		Assert.assertEquals(provider, order.getOrderer());
+		Assertions.assertEquals(encounter, order.getEncounter());
+		Assertions.assertEquals(Order.Urgency.STAT, order.getUrgency());
+		Assertions.assertEquals(mrsBloodConcept, order.getConcept());
+		Assertions.assertEquals(provider, order.getOrderer());
 	}
 	
-	@Test(expected = APIException.class)
+	@Test
 	public void shouldThrowExceptionForInvalidUrgencyType() throws Exception {
-		Provider provider = mock(Provider.class);
-		handleEncounterProvider(provider);
+		assertThrows(APIException.class, () -> {
+			Provider provider = mock(Provider.class);
+			handleEncounterProvider(provider);
 		
-		EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
-		etOrder.setUrgency("STT");
+			EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
+			etOrder.setUrgency("STT");
 		
-		OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
+			OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
 		
-		orderMapper.map(etOrder, encounter);
+			orderMapper.map(etOrder, encounter);
 		
+		});
 	}
 	
 	@Test
@@ -109,7 +112,7 @@ public class OpenMRSOrderMapperTest {
 		OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
 		Order order = orderMapper.map(etOrder, encounter);
 		
-		Assert.assertEquals(Order.Action.DISCONTINUE, order.getAction());
+		Assertions.assertEquals(Order.Action.DISCONTINUE, order.getAction());
 	}
 	
 	@Test
@@ -133,10 +136,10 @@ public class OpenMRSOrderMapperTest {
 		Order order = orderMapper.map(etOrder, encounter);
 		
 		verify(orderService).getOrderByUuid("previousOrderUuid");
-		Assert.assertEquals(encounter, order.getEncounter());
-		Assert.assertEquals("Comment", order.getCommentToFulfiller());
-		Assert.assertEquals(currentDate, order.getAutoExpireDate());
-		Assert.assertEquals(provider, order.getOrderer());
+		Assertions.assertEquals(encounter, order.getEncounter());
+		Assertions.assertEquals("Comment", order.getCommentToFulfiller());
+		Assertions.assertEquals(currentDate, order.getAutoExpireDate());
+		Assertions.assertEquals(provider, order.getOrderer());
 	}
 	
 	private void handleEncounterProvider(Provider provider) {

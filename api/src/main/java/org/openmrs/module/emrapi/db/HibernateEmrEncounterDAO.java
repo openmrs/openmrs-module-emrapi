@@ -9,15 +9,12 @@
  */
 package org.openmrs.module.emrapi.db;
 
-import org.hibernate.Criteria;
+import org.hibernate.query.Query;
 import org.openmrs.Patient;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
-import org.openmrs.Obs;
 
 import java.util.List;
 
@@ -33,32 +30,45 @@ public class HibernateEmrEncounterDAO implements EmrEncounterDAO {
 	public List<Encounter> getEncountersByObsValueText(Patient patient, Concept obsConcept, String valueText,
 	        EncounterType encounterType, boolean includeAll) {
 		
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
-		
 		// we want to return an encounters (but not duplicate encounters)
-		criteria.setProjection(Projections.groupProperty("encounter"));
-		
-		criteria.add(Restrictions.eq("valueText", valueText));
-		
-		if (!includeAll) {
-			criteria.add(Restrictions.eq("voided", false));
-		}
-		
-		if (obsConcept != null) {
-			criteria.add(Restrictions.eq("concept", obsConcept));
-		}
+		StringBuilder hql = new StringBuilder("select distinct o.encounter from Obs o");
 		
 		if (encounterType != null) {
 			// join on the encounter table
-			criteria.createAlias("encounter", "encounter");
-			criteria.add(Restrictions.eq("encounter.encounterType", encounterType));
+			hql.append(" join o.encounter encounter");
+		}
+		
+		hql.append(" where o.valueText = :valueText");
+		
+		if (!includeAll) {
+			hql.append(" and o.voided = false");
+		}
+		
+		if (obsConcept != null) {
+			hql.append(" and o.concept = :concept");
+		}
+		
+		if (encounterType != null) {
+			hql.append(" and encounter.encounterType = :encounterType");
 		}
 		
 		if (patient != null) {
-			criteria.add(Restrictions.eq("person", patient));
+			hql.append(" and o.person = :person");
 		}
 		
-		return criteria.list();
+		Query<Encounter> query = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(hql.toString());
+		query.setParameter("valueText", valueText);
+		if (obsConcept != null) {
+			query.setParameter("concept", obsConcept);
+		}
+		if (encounterType != null) {
+			query.setParameter("encounterType", encounterType);
+		}
+		if (patient != null) {
+			query.setParameter("person", patient);
+		}
+		
+		return query.list();
 	}
 	
 	@Override

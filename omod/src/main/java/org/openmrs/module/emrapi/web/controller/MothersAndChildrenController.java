@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import org.openmrs.module.emrapi.maternal.MothersAndChildrenSearchCriteria;
 import org.openmrs.module.emrapi.rest.converter.SimpleBeanConverter;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
@@ -36,7 +37,7 @@ public class MothersAndChildrenController {
 	@Autowired
 	private MaternalService maternalService;
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/maternal/mothersAndChildren")
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/maternal/mothersAndChildren")
 	@ResponseBody
 	public SimpleObject getMothersAndChildren(HttpServletRequest request, HttpServletResponse response,
 	        @RequestParam(required = false, value = "mother") List<String> motherUuids,

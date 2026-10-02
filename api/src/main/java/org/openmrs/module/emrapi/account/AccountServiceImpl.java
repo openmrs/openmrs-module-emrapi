@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.account;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Person;
 import org.openmrs.Privilege;
 import org.openmrs.Provider;

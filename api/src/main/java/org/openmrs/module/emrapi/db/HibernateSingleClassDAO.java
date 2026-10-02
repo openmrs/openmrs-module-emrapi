@@ -53,7 +53,8 @@ public abstract class HibernateSingleClassDAO<T> implements SingleClassDAO<T> {
 	@Override
 	@Transactional(readOnly = true)
 	public List<T> getAll() {
-		return (List<T>) sessionFactory.getCurrentSession().createCriteria(mappedClass).list();
+		return sessionFactory.getHibernateSessionFactory().getCurrentSession()
+		        .createQuery("from " + mappedClass.getName(), mappedClass).list();
 	}
 	
 	@Override

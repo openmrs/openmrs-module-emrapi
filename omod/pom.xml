@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>emrapi</artifactId>
-		<version>3.5.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>emrapi-omod</artifactId>
@@ -49,67 +49,18 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-        	<artifactId>webservices.rest-omod-1.8</artifactId>
-        	<version>${webservices.restVersion}</version>
-            <scope>provided</scope>
-        </dependency>
-
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-1.9</artifactId>
+			<artifactId>webservices.rest-omod-common</artifactId>
 			<version>${webservices.restVersion}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-1.10</artifactId>
+			<artifactId>webservices.rest-omod</artifactId>
 			<version>${webservices.restVersion}</version>
 			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-1.11</artifactId>
-			<version>${webservices.restVersion}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-1.12</artifactId>
-			<version>${webservices.restVersion}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-2.0</artifactId>
-			<version>${webservices.restVersion}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-2.1</artifactId>
-			<version>${webservices.restVersion}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.openmrs.module</groupId>
-			<artifactId>webservices.rest-omod-2.2</artifactId>
-			<version>${webservices.restVersion}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>${javaxVersion}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -119,26 +70,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-        <dependency>
-            <groupId>org.openmrs.module</groupId>
-            <artifactId>reportingcompatibility-api</artifactId>
-            <version>2.0.2</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>1.9.13</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 	<build>

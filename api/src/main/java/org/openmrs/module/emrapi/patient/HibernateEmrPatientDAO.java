@@ -10,10 +10,8 @@
 package org.openmrs.module.emrapi.patient;
 
 import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.query.Query;
 import org.openmrs.Location;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
@@ -23,14 +21,14 @@ import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.emrapi.EmrApiProperties;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -44,7 +42,7 @@ public class HibernateEmrPatientDAO implements EmrPatientDAO {
 	
 	@Override
 	public List<Patient> findPatients(String query, Location checkedInAt, Integer start, Integer maxResults) {
-		EntityManager em = sessionFactory.getHibernateSessionFactory().unwrap(EntityManager.class);
+		EntityManager em = sessionFactory.getHibernateSessionFactory().getCurrentSession();
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Patient> cq = cb.createQuery(Patient.class);
 		Root<Patient> patient = cq.from(Patient.class);
@@ -86,27 +84,29 @@ public class HibernateEmrPatientDAO implements EmrPatientDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Visit> getVisitsForPatient(Patient patient, Integer startIndex, Integer limit) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Visit.class);
-		criteria.add(Restrictions.eq("patient", patient));
-		criteria.add(Restrictions.eq("voided", false));
-		criteria.addOrder(Order.desc("startDatetime"));
+		Query<Visit> query = sessionFactory.getHibernateSessionFactory().getCurrentSession()
+		        .createQuery("from Visit v where v.patient = :patient and v.voided = false order by v.startDatetime desc");
+		query.setParameter("patient", patient);
 		if (startIndex != null) {
-			criteria.setFirstResult(startIndex);
+			query.setFirstResult(startIndex);
 		}
 		if (limit != null) {
-			criteria.setMaxResults(limit);
+			query.setMaxResults(limit);
 		}
-		return criteria.list();
+		return query.list();
 	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Obs> getVisitNoteObservations(Collection<Visit> visits) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Obs.class);
-		criteria.createAlias("encounter", "encounter");
-		criteria.add(Restrictions.in("encounter.visit", visits));
-		criteria.add(Restrictions.eq("encounter.encounterType", emrApiProperties.getVisitNoteEncounterType()));
-		criteria.add(Restrictions.eq("voided", false));
-		return criteria.list();
+		if (visits == null || visits.isEmpty()) {
+			return new ArrayList<>();
+		}
+		Query<Obs> query = sessionFactory.getHibernateSessionFactory().getCurrentSession()
+		        .createQuery("select o from Obs o join o.encounter encounter where encounter.visit in (:visits)"
+		                + " and encounter.encounterType = :encounterType and o.voided = false");
+		query.setParameterList("visits", visits);
+		query.setParameter("encounterType", emrApiProperties.getVisitNoteEncounterType());
+		return query.list();
 	}
 }

@@ -9,7 +9,8 @@
  */
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
+import org.openmrs.ConditionVerificationStatus;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 
@@ -51,13 +52,13 @@ public class EmrDiagnosisDAOImpl implements EmrDiagnosisDAO {
 		}
 		queryString += " order by d.dateCreated desc";
 		
-		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
-		query.setInteger("visitId", visit.getId());
+		Query query = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(queryString);
+		query.setParameter("visitId", visit.getId());
 		if (primaryOnly) {
-			query.setInteger("rankId", PRIMARY_RANK);
+			query.setParameter("rankId", PRIMARY_RANK);
 		}
 		if (confirmedOnly) {
-			query.setString("certainty", CONFIRMED_CERTAINTY);
+			query.setParameter("certainty", ConditionVerificationStatus.valueOf(CONFIRMED_CERTAINTY));
 		}
 		
 		return (List<org.openmrs.Diagnosis>) query.list();

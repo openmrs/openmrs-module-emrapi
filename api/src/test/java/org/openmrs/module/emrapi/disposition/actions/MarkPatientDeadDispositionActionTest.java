@@ -10,8 +10,8 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.openmrs.Concept;
@@ -58,7 +58,7 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
 	
 	private Concept dateOfDeathConcept = new Concept();
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		dispositionService = mock(DispositionService.class);
 		dispositionDescriptor = mock(DispositionDescriptor.class);

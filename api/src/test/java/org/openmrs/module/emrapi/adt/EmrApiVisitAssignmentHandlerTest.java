@@ -9,12 +9,13 @@
  */
 package org.openmrs.module.emrapi.adt;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openmrs.api.APIException;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -28,7 +29,9 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.VisitService;
 import org.openmrs.module.emrapi.EmrApiConstants;
 import org.openmrs.module.emrapi.EmrApiProperties;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -48,7 +51,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+// the jupiter base class runs Mockito with strict stubs, the JUnit 4 one did not
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitiveTest {
 	
 	EmrApiVisitAssignmentHandler handler;
@@ -65,7 +71,7 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 	
 	EncounterType encounterType;
 	
-	@Before
+	@BeforeEach
 	public void before() {
 		handler = new EmrApiVisitAssignmentHandler();
 		visitService = mock(VisitService.class);
@@ -91,27 +97,29 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		encounterType.setUuid("61ae96f4-6afe-4351-b6f8-cd4fc383cce1");
 	}
 	
-	@Ignore("TEMP HACK: disable this while we decide whether or not we want this functionality")
-	@Test(expected = IllegalStateException.class)
+	@Disabled("TEMP HACK: disable this while we decide whether or not we want this functionality")
+	@Test
 	public void testThrowsExceptionIfNoSuitableVisitExists() throws Exception {
-		Patient patient = new Patient();
-		Location location = new Location();
+		assertThrows(IllegalStateException.class, () -> {
+			Patient patient = new Patient();
+			Location location = new Location();
 		
-		Visit notSuitable = new Visit();
-		notSuitable.setPatient(patient);
-		notSuitable.setStartDatetime(DateUtils.addDays(new Date(), -7));
-		notSuitable.setStopDatetime(DateUtils.addDays(new Date(), -6));
-		notSuitable.setLocation(location);
+			Visit notSuitable = new Visit();
+			notSuitable.setPatient(patient);
+			notSuitable.setStartDatetime(DateUtils.addDays(new Date(), -7));
+			notSuitable.setStopDatetime(DateUtils.addDays(new Date(), -6));
+			notSuitable.setLocation(location);
 		
-		when(visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
-		    any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
-		    anyBoolean(), anyBoolean())).thenReturn(Collections.singletonList(notSuitable));
+			when(visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
+			    any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
+			    anyBoolean(), anyBoolean())).thenReturn(Collections.singletonList(notSuitable));
 		
-		Encounter encounter = new Encounter();
-		encounter.setPatient(patient);
-		encounter.setLocation(location);
+			Encounter encounter = new Encounter();
+			encounter.setPatient(patient);
+			encounter.setLocation(location);
 		
-		handler.beforeCreateEncounter(encounter);
+			handler.beforeCreateEncounter(encounter);
+		});
 	}
 	
 	@Test
@@ -142,9 +150,9 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		handler.beforeCreateEncounter(encounter);
 		encounter.setEncounterDatetime(encounterDatetime);
 		
-		Assert.assertThat(encounter.getVisit(), is(suitable));
-		Assert.assertThat(suitable.getEncounters(), contains(encounter));
-		Assert.assertThat(encounter.getEncounterDatetime(), is(encounterDatetime));
+		MatcherAssert.assertThat(encounter.getVisit(), is(suitable));
+		MatcherAssert.assertThat(suitable.getEncounters(), contains(encounter));
+		MatcherAssert.assertThat(encounter.getEncounterDatetime(), is(encounterDatetime));
 	}
 	
 	@Test
@@ -173,8 +181,8 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		handler.beforeCreateEncounter(encounter);
 		
 		// there is a visit on the encounter
-		Assert.assertNotNull(encounter.getVisit());
-		Assert.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime())); // no check for end date for a visit that is started today since it is still open
+		Assertions.assertNotNull(encounter.getVisit());
+		Assertions.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime())); // no check for end date for a visit that is started today since it is still open
 	}
 	
 	@Test
@@ -207,9 +215,9 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		handler.beforeCreateEncounter(encounter);
 		
 		// there is a visit on the encounter
-		Assert.assertNotNull(encounter.getVisit());
-		Assert.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime()));
-		Assert.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStopDatetime(), encounter.getEncounterDatetime())); // has stop time since it is in the past
+		Assertions.assertNotNull(encounter.getVisit());
+		Assertions.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime()));
+		Assertions.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStopDatetime(), encounter.getEncounterDatetime())); // has stop time since it is in the past
 	}
 	
 	@Test
@@ -234,44 +242,46 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		handler.beforeCreateEncounter(encounter);
 		
 		// there is a visit on the encounter
-		Assert.assertNull(encounter.getVisit());
+		Assertions.assertNull(encounter.getVisit());
 	}
 	
-	@Test(expected = APIException.class)
+	@Test
 	public void testThrowsExceptionWhenPatientHasActiveVisitAtAnotherLocation() {
-		Patient patient = new Patient();
-		Location locationA = new Location();
-		Location locationB = new Location();
-		locationB.addTag(new LocationTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS, "Tag that supports visits"));
+		assertThrows(APIException.class, () -> {
+			Patient patient = new Patient();
+			Location locationA = new Location();
+			Location locationB = new Location();
+			locationB.addTag(new LocationTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS, "Tag that supports visits"));
 		
-		// patient has an open (active) visit at locationA
-		Visit activeVisitElsewhere = new Visit();
-		activeVisitElsewhere.setPatient(patient);
-		activeVisitElsewhere.setStartDatetime(DateUtils.addHours(new Date(), -2));
-		activeVisitElsewhere.setLocation(locationA);
-		// stopDatetime == null -> still active
+			// patient has an open (active) visit at locationA
+			Visit activeVisitElsewhere = new Visit();
+			activeVisitElsewhere.setPatient(patient);
+			activeVisitElsewhere.setStartDatetime(DateUtils.addHours(new Date(), -2));
+			activeVisitElsewhere.setLocation(locationA);
+			// stopDatetime == null -> still active
 		
-		when(visitService.getVisits(isNull(), anyCollection(), isNull(), isNull(), isNull(), any(Date.class), isNull(),
-		    isNull(), isNull(), eq(true), eq(false))).thenReturn(Collections.singletonList(activeVisitElsewhere));
-		when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))
-		        .thenReturn("default:1");
-		when(adminService
-		        .getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ALLOW_OVERLAPPING_VISITS_AT_ANOTHER_LOCATION))
-		                .thenReturn("false");
-		VisitType visitType = new VisitType();
-		visitType.setId(1);
-		when(visitService.getVisitType(1)).thenReturn(visitType);
-		encounterTypetoVisitTypeMapper.setAdminService(adminService);
-		encounterTypetoVisitTypeMapper.setVisitService(visitService);
-		handler.setEncounterTypetoVisitTypeMapper(encounterTypetoVisitTypeMapper);
+			when(visitService.getVisits(isNull(), anyCollection(), isNull(), isNull(), isNull(), any(Date.class), isNull(),
+			    isNull(), isNull(), eq(true), eq(false))).thenReturn(Collections.singletonList(activeVisitElsewhere));
+			when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))
+			        .thenReturn("default:1");
+			when(adminService
+			        .getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ALLOW_OVERLAPPING_VISITS_AT_ANOTHER_LOCATION))
+			                .thenReturn("false");
+			VisitType visitType = new VisitType();
+			visitType.setId(1);
+			when(visitService.getVisitType(1)).thenReturn(visitType);
+			encounterTypetoVisitTypeMapper.setAdminService(adminService);
+			encounterTypetoVisitTypeMapper.setVisitService(visitService);
+			handler.setEncounterTypetoVisitTypeMapper(encounterTypetoVisitTypeMapper);
 		
-		Encounter encounter = new Encounter();
-		encounter.setPatient(patient);
-		encounter.setLocation(locationB);
-		encounter.setEncounterDatetime(new Date());
-		encounter.setEncounterType(encounterType);
+			Encounter encounter = new Encounter();
+			encounter.setPatient(patient);
+			encounter.setLocation(locationB);
+			encounter.setEncounterDatetime(new Date());
+			encounter.setEncounterType(encounterType);
 		
-		handler.beforeCreateEncounter(encounter);
+			handler.beforeCreateEncounter(encounter);
+		});
 	}
 	
 	@Test
@@ -306,7 +316,7 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		
 		handler.beforeCreateEncounter(encounter);
 		
-		Assert.assertNotNull(encounter.getVisit());
+		Assertions.assertNotNull(encounter.getVisit());
 	}
 	
 	@Test
@@ -344,13 +354,13 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		
 		handler.beforeCreateEncounter(encounter);
 		
-		Assert.assertThat(encounter.getVisit(), is(suitable));
-		Assert.assertThat(suitable.getEncounters(), contains(encounter));
-		Assert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStartDatetime()));
-		Assert.assertThat(firstOrder.getDateActivated(), not(firstOrderOriginalDate));
-		Assert.assertThat(firstOrder.getDateActivated(), is(encounter.getEncounterDatetime()));
-		Assert.assertThat(secondOrder.getDateActivated(), is(secondOrderOriginalDate));
-		Assert.assertThat(secondOrder.getDateActivated(), not(encounter.getEncounterDatetime()));
+		MatcherAssert.assertThat(encounter.getVisit(), is(suitable));
+		MatcherAssert.assertThat(suitable.getEncounters(), contains(encounter));
+		MatcherAssert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStartDatetime()));
+		MatcherAssert.assertThat(firstOrder.getDateActivated(), not(firstOrderOriginalDate));
+		MatcherAssert.assertThat(firstOrder.getDateActivated(), is(encounter.getEncounterDatetime()));
+		MatcherAssert.assertThat(secondOrder.getDateActivated(), is(secondOrderOriginalDate));
+		MatcherAssert.assertThat(secondOrder.getDateActivated(), not(encounter.getEncounterDatetime()));
 	}
 	
 	@Test
@@ -376,9 +386,9 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		
 		handler.beforeCreateEncounter(encounter);
 		
-		Assert.assertThat(encounter.getVisit(), is(suitable));
-		Assert.assertThat(suitable.getEncounters(), contains(encounter));
-		Assert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStopDatetime()));
+		MatcherAssert.assertThat(encounter.getVisit(), is(suitable));
+		MatcherAssert.assertThat(suitable.getEncounters(), contains(encounter));
+		MatcherAssert.assertThat(encounter.getEncounterDatetime(), is(suitable.getStopDatetime()));
 	}
 	
 }

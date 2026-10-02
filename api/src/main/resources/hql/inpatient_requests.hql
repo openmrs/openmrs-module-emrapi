@@ -4,13 +4,15 @@ select
     dispoEncounter,
     dispo.obsGroup,
     dispo,
-    (select o from Obs o where o.obsGroup = dispo.obsGroup and o.voided = 0 and o.concept = :admitLocationConcept) as admitLocation,
-    (select o from Obs o where o.obsGroup = dispo.obsGroup and o.voided = 0 and o.concept = :transferLocationConcept) as transferLocation
+    admitLocation,
+    transferLocation
 from
     Obs as dispo
 inner join dispo.encounter as dispoEncounter
 inner join dispoEncounter.visit as visit
 inner join dispo.person as person
+left join Obs as admitLocation on admitLocation.obsGroup = dispo.obsGroup and admitLocation.voided = false and admitLocation.concept = :admitLocationConcept
+left join Obs as transferLocation on transferLocation.obsGroup = dispo.obsGroup and transferLocation.voided = false and transferLocation.concept = :transferLocationConcept
 where
     dispo.voided = false
     and dispoEncounter.voided = false

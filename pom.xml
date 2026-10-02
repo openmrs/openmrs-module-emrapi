@@ -10,7 +10,7 @@
 
     <groupId>org.openmrs.module</groupId>
     <artifactId>emrapi</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>EMR API Module</name>
     <description>Higher-level APIs to support building EMR functionality in OpenMRS, to supplement the data-level APIs
@@ -38,21 +38,30 @@
     </modules>
 
     <properties>
-        <openmrsPlatformVersion>2.8.0</openmrsPlatformVersion>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <legacyuiVersion>1.16.0</legacyuiVersion>
+        <openmrsPlatformVersion>3.0.0-SNAPSHOT</openmrsPlatformVersion>
+        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <legacyuiVersion>3.0.0-SNAPSHOT</legacyuiVersion>
         <lombokVersion>1.18.38</lombokVersion>
         <openmrsTestutilsVersion>1.8.0-SNAPSHOT</openmrsTestutilsVersion>
-        <metadatamappingVersion>1.6.0</metadatamappingVersion>
+        <metadatamappingVersion>3.0.0-SNAPSHOT</metadatamappingVersion>
         <metadatasharingVersion>1.9.0</metadatasharingVersion>
-        <eventVersion>2.8.0</eventVersion>
+        <eventVersion>5.0.0-SNAPSHOT</eventVersion>
         <allergyapiVersion>1.4</allergyapiVersion>
-        <webservices.restVersion>2.42.0</webservices.restVersion>
-        <javaxVersion>4.0.1</javaxVersion>
-        <mockitoInlineVersion>4.8.0</mockitoInlineVersion>
-        <byteBuddyVersion>1.17.6</byteBuddyVersion>
+        <webservices.restVersion>5.0.0-SNAPSHOT</webservices.restVersion>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.openmrs</groupId>
+                <artifactId>openmrs-bom</artifactId>
+                <version>${openmrsPlatformVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -77,23 +86,21 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.21</version>
             <scope>provided</scope>
             <type>jar</type>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jms_1.1_spec</artifactId>
-            <version>1.1.1</version>
-            <type>jar</type>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.openmrs.contrib</groupId>
             <artifactId>testutils</artifactId>
             <version>${openmrsTestutilsVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- testutils is compiled against commons-lang 2, which core no longer provides -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -103,39 +110,16 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Needed because the UI Framework module uses HttpSession in its api project -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.12.5</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>uk.co.modular-it</groupId>
             <artifactId>hamcrest-date</artifactId>
             <version>0.9.3</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>${mockitoInlineVersion}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.bytebuddy</groupId>
-            <artifactId>byte-buddy</artifactId>
-            <version>${byteBuddyVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -160,6 +144,14 @@
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
+                        <!-- metadatasharing is optional (aware_of) and has no Platform 3.0 version; its Spring context cannot load on 3.0 -->
+                        <classpathDependencyExcludes>
+                            <classpathDependencyExclude>org.openmrs.module:metadatasharing-api</classpathDependencyExclude>
+                            <classpathDependencyExclude>org.openmrs.module:metadatasharing-api-common</classpathDependencyExclude>
+                            <classpathDependencyExclude>org.openmrs.module:metadatasharing-api-1.9</classpathDependencyExclude>
+                            <classpathDependencyExclude>org.openmrs.module:metadatasharing-api-1.11</classpathDependencyExclude>
+                            <classpathDependencyExclude>org.openmrs.module:metadatasharing-api-2.0</classpathDependencyExclude>
+                        </classpathDependencyExcludes>
                     </configuration>
                 </plugin>
                 <plugin>

@@ -9,10 +9,11 @@
  */
 package org.openmrs.module.emrapi.utils;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.openmrs.Patient;
@@ -28,19 +29,19 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 public class GeneralUtilsTest {
 	
 	private MockedStatic<Context> mockedContext;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		mockedContext = Mockito.mockStatic(Context.class);
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() {
 		mockedContext.close();
 	}
@@ -49,7 +50,7 @@ public class GeneralUtilsTest {
 	public void shouldGetDefaultLocaleForUser() {
 		User user = new User();
 		user.setUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE, "ht");
-		Assert.assertEquals("ht", GeneralUtils.getDefaultLocale(user).toString());
+		Assertions.assertEquals("ht", GeneralUtils.getDefaultLocale(user).toString());
 	}
 	
 	@Test
@@ -94,9 +95,9 @@ public class GeneralUtilsTest {
 		when(us.getUser(eq(user.getId()))).thenReturn(user);
 		
 		List<Patient> lastViewed = GeneralUtils.getLastViewedPatients(user);
-		Assert.assertEquals(7, lastViewed.get(0).getId().intValue());
-		Assert.assertEquals(6, lastViewed.get(1).getId().intValue());
-		Assert.assertEquals(2, lastViewed.get(2).getId().intValue());
+		Assertions.assertEquals(7, lastViewed.get(0).getId().intValue());
+		Assertions.assertEquals(6, lastViewed.get(1).getId().intValue());
+		Assertions.assertEquals(2, lastViewed.get(2).getId().intValue());
 	}
 	
 	/**
@@ -122,9 +123,9 @@ public class GeneralUtilsTest {
 		when(us.getUser(eq(user.getId()))).thenReturn(user);
 		
 		List<Patient> lastViewed = GeneralUtils.getLastViewedPatients(user);
-		Assert.assertEquals(2, lastViewed.size());
-		Assert.assertEquals(3, lastViewed.get(0).getId().intValue());
-		Assert.assertEquals(2, lastViewed.get(1).getId().intValue());
+		Assertions.assertEquals(2, lastViewed.size());
+		Assertions.assertEquals(3, lastViewed.get(0).getId().intValue());
+		Assertions.assertEquals(2, lastViewed.get(1).getId().intValue());
 	}
 	
 }

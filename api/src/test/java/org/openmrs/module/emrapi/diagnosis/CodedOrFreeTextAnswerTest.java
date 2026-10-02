@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.ConceptName;
 import org.openmrs.api.ConceptNameType;
@@ -17,7 +17,7 @@ import org.openmrs.api.ConceptNameType;
 import java.util.Locale;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CodedOrFreeTextAnswerTest {
 	

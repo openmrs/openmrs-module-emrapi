@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.jms.MapMessage;
-import javax.jms.Message;
+import jakarta.jms.MapMessage;
+import jakarta.jms.Message;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Patient;
@@ -46,12 +46,12 @@ public class PatientViewedEventListener implements EventListener {
 	}
 	
 	/**
-	 * @see EventListener#onMessage(javax.jms.Message)
+	 * @see EventListener#onMessage(jakarta.jms.Message)
 	 * @param message
 	 */
 	@Override
 	public void onMessage(final Message message) {
-		Daemon.runInDaemonThread(new Runnable() {
+		Daemon.runInDaemonThreadWithoutResult(new Runnable() {
 			
 			@Override
 			public void run() {

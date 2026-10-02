@@ -10,7 +10,7 @@
 package org.openmrs.module.emrapi.event;
 
 import org.apache.activemq.command.ActiveMQMapMessage;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openmrs.GlobalProperty;
@@ -24,8 +24,8 @@ import org.openmrs.module.emrapi.utils.GeneralUtils;
 import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.jms.MapMessage;
-import javax.jms.Message;
+import jakarta.jms.MapMessage;
+import jakarta.jms.Message;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,7 +67,7 @@ public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTe
 	
 	/**
 	 * @verifies add the patient to the last viewed user property
-	 * @see PatientViewedEventListener#processMessage(javax.jms.Message)
+	 * @see PatientViewedEventListener#processMessage(jakarta.jms.Message)
 	 */
 	@Test
 	public void processMessage_shouldAddThePatientToTheLastViewedUserProperty() throws Exception {
@@ -86,7 +86,7 @@ public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTe
 	
 	/**
 	 * @verifies remove the first patient and add the new one to the start if the list is full
-	 * @see PatientViewedEventListener#processMessage(javax.jms.Message)
+	 * @see PatientViewedEventListener#processMessage(jakarta.jms.Message)
 	 */
 	@Test
 	public void processMessage_shouldRemoveTheFirstPatientAndAddTheNewOneToTheStartIfTheListIsFull() throws Exception {
@@ -109,7 +109,7 @@ public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTe
 	
 	/**
 	 * @verifies not add a duplicate and should move the existing patient to the start
-	 * @see PatientViewedEventListener#processMessage(javax.jms.Message)
+	 * @see PatientViewedEventListener#processMessage(jakarta.jms.Message)
 	 */
 	@Test
 	public void processMessage_shouldNotAddADuplicateAndShouldMoveTheExistingPatientToTheStart() throws Exception {
@@ -130,7 +130,7 @@ public class PatientViewedEventListenerTest extends BaseModuleContextSensitiveTe
 	
 	/**
 	 * @verifies not remove any patient if a duplicate is added to a full list
-	 * @see PatientViewedEventListener#processMessage(javax.jms.Message)
+	 * @see PatientViewedEventListener#processMessage(jakarta.jms.Message)
 	 */
 	@Test
 	public void processMessage_shouldNotRemoveAnyPatientIfADuplicateIsAddedToAFullList() throws Exception {

@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.account;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.openmrs.User;
 import org.openmrs.annotation.Handler;

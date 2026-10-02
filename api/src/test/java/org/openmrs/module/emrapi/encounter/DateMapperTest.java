@@ -9,14 +9,15 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DateMapperTest {
 	
@@ -33,9 +34,11 @@ public class DateMapperTest {
 		
 	}
 	
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void shouldThrowExceptionForWrongUTCformat() throws Exception {
-		String utcDateString = "2015-07-30T11:00:00.000";
-		Date actualDate = new DateMapper().convertUTCToDate(utcDateString);
+		assertThrows(RuntimeException.class, () -> {
+			String utcDateString = "2015-07-30T11:00:00.000";
+			Date actualDate = new DateMapper().convertUTCToDate(utcDateString);
+		});
 	}
 }

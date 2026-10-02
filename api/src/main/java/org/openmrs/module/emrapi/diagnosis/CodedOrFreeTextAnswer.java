@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.diagnosis;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptName;

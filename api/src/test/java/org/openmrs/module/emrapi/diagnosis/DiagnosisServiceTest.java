@@ -13,8 +13,8 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -72,7 +72,7 @@ public class DiagnosisServiceTest {
 	
 	private Concept diagnosisGroupingConcept;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		emrApiProperties = mock(EmrApiProperties.class);
 		conceptService = mock(ConceptService.class);

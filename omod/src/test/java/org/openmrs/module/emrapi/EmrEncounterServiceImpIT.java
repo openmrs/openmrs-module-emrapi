@@ -9,21 +9,21 @@
  */
 package org.openmrs.module.emrapi;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Encounter;
 import org.openmrs.Obs;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.encounter.EmrEncounterService;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class EmrEncounterServiceImpIT extends BaseModuleWebContextSensitiveTest {
 	
@@ -34,7 +34,7 @@ public class EmrEncounterServiceImpIT extends BaseModuleWebContextSensitiveTest 
 	
 	private String visitUuid;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		executeDataSet("baseMetaData.xml");
 		executeDataSet("encounterTransactionDataset.xml");

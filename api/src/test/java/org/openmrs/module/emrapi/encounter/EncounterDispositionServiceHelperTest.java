@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.openmrs.*;
 import org.openmrs.api.ConceptService;
@@ -26,10 +26,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -53,7 +53,7 @@ public class EncounterDispositionServiceHelperTest {
 	
 	private Concept dispositionConcept;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		initMocks(this);
 		encounterDispositionServiceHelper = new EncounterDispositionServiceHelper(conceptService);
@@ -211,19 +211,19 @@ public class EncounterDispositionServiceHelperTest {
 		for (Obs obsGroupMember : obsGroupMembers) {
 			if (obsGroupMember.getConcept().getUuid().equals(EmrApiConstants.CONCEPT_CODE_DISPOSITION + UUID_SUFFIX)) {
 				dispositionConceptExists = true;
-				assertEquals("Disposition answer not being added correctly", code + UUID_SUFFIX,
-				    obsGroupMember.getValueCoded().getUuid());
+				assertEquals(code + UUID_SUFFIX,
+				    obsGroupMember.getValueCoded().getUuid(), "Disposition answer not being added correctly");
 			} else if (obsGroupMember.getConcept().getUuid().equals(noteConceptUuid)) {
 				noteConceptExists = true;
-				assertEquals("Error in disposition note value", dispositionNoteValue, obsGroupMember.getValueText());
+				assertEquals(dispositionNoteValue, obsGroupMember.getValueText(), "Error in disposition note value");
 			}
 			assertNotNull(obs.getObsDatetime());
 			assertNotEquals(encounter.getEncounterDatetime(), obsGroupMember.getObsDatetime());
 			assertEquals(encounter.getPatient(), obs.getPerson());
 			assertEquals(encounter.getLocation(), obs.getLocation());
 		}
-		assertTrue("disposition not being added correctly", dispositionConceptExists);
-		assertTrue("Disposition note is not being added correctly", noteConceptExists);
+		assertTrue(dispositionConceptExists, "disposition not being added correctly");
+		assertTrue(noteConceptExists, "Disposition note is not being added correctly");
 	}
 	
 	private Obs buildDispositionGroupObservation() {

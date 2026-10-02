@@ -9,9 +9,9 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openmrs.module.emrapi.utils.CustomJsonDateDeserializer;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
 

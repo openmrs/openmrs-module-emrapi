@@ -9,11 +9,11 @@
  */
 package org.openmrs.module.emrapi.adt;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatcher;
 import org.mockito.MockedStatic;
@@ -67,14 +67,14 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -94,6 +94,7 @@ import static org.openmrs.module.emrapi.TestUtils.hasProviders;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.ADMISSION;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.DISCHARGE;
 import static org.openmrs.module.emrapi.adt.AdtAction.Type.TRANSFER;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AdtServiceTest {
 	
@@ -151,7 +152,7 @@ public class AdtServiceTest {
 	
 	private MockedStatic<Context> mockedContext;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		personForCurrentUser = new Person();
 		personForCurrentUser.addName(new PersonName("Current", "User", "Person"));
@@ -230,7 +231,7 @@ public class AdtServiceTest {
 		this.service = service;
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() {
 		mockedContext.close();
 	}
@@ -949,13 +950,15 @@ public class AdtServiceTest {
 		verify(mockPatientService).mergePatients(preferred, notPreferred);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void shouldNotAllowMergingAnUnknownRecordIntoAPermanentOne() {
-		Patient preferred = new Patient();
-		Patient notPreferred = new Patient();
-		preferred.addAttribute(new PersonAttribute(emrApiProperties.getUnknownPatientPersonAttributeType(), "true"));
+		assertThrows(IllegalArgumentException.class, () -> {
+			Patient preferred = new Patient();
+			Patient notPreferred = new Patient();
+			preferred.addAttribute(new PersonAttribute(emrApiProperties.getUnknownPatientPersonAttributeType(), "true"));
 		
-		service.mergePatients(preferred, notPreferred);
+			service.mergePatients(preferred, notPreferred);
+		});
 	}
 	
 	@Test
@@ -977,20 +980,22 @@ public class AdtServiceTest {
 		return map;
 	}
 	
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void test_admitPatient_failsIfPatientIsAlreadyAdmitted() throws Exception {
-		Patient patient = new Patient();
+		assertThrows(IllegalStateException.class, () -> {
+			Patient patient = new Patient();
 		
-		Encounter admit = buildEncounter(patient, new Date());
-		admit.setEncounterType(admissionEncounterType);
-		Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
-		existing.addEncounter(admit);
+			Encounter admit = buildEncounter(patient, new Date());
+			admit.setEncounterType(admissionEncounterType);
+			Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
+			existing.addEncounter(admit);
 		
-		when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
+			when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 		
-		AdtAction admission = new AdtAction(existing, inpatientDepartment, buildProviderMap(), ADMISSION);
+			AdtAction admission = new AdtAction(existing, inpatientDepartment, buildProviderMap(), ADMISSION);
 		
-		service.createAdtEncounterFor(admission);
+			service.createAdtEncounterFor(admission);
+		});
 	}
 	
 	@Test
@@ -1016,16 +1021,18 @@ public class AdtServiceTest {
 		}));
 	}
 	
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void test_dischargePatient_failsIfPatientIsNotAdmitted() throws Exception {
-		Patient patient = new Patient();
+		assertThrows(IllegalStateException.class, () -> {
+			Patient patient = new Patient();
 		
-		Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
-		when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
+			Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
+			when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
 		
-		AdtAction discharge = new AdtAction(existing, inpatientDepartment, buildProviderMap(), DISCHARGE);
+			AdtAction discharge = new AdtAction(existing, inpatientDepartment, buildProviderMap(), DISCHARGE);
 		
-		service.createAdtEncounterFor(discharge);
+			service.createAdtEncounterFor(discharge);
+		});
 	}
 	
 	@Test
@@ -1100,52 +1107,56 @@ public class AdtServiceTest {
 		}));
 	}
 	
-	@Test(expected = ExistingVisitDuringTimePeriodException.class)
+	@Test
 	public void test_createRetrospectiveVisit_shouldThrowExceptionIfExistingVisitDuringDatetime() throws Exception {
+		assertThrows(ExistingVisitDuringTimePeriodException.class, () -> {
+			final Patient patient = new Patient();
 		
-		final Patient patient = new Patient();
+			final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
+			final Date stopDate = new DateTime(2012, 1, 2, 0, 0, 0, 999).toDate();
 		
-		final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
-		final Date stopDate = new DateTime(2012, 1, 2, 0, 0, 0, 999).toDate();
+			when(mockVisitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
+			    Collections.singletonList(patient), Collections.singletonList(mirebalaisHospital), null, null, stopDate,
+			    startDate, null, null, true, false)).thenReturn(Collections.singletonList(new Visit()));
 		
-		when(mockVisitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
-		    Collections.singletonList(patient), Collections.singletonList(mirebalaisHospital), null, null, stopDate,
-		    startDate, null, null, true, false)).thenReturn(Collections.singletonList(new Visit()));
-		
-		service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+		});
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void test_createRetrospectiveVisit_shouldThrowExceptionIfStartTimeAfterStopTime() throws Exception {
+		assertThrows(IllegalArgumentException.class, () -> {
+			final Patient patient = new Patient();
 		
-		final Patient patient = new Patient();
+			final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
+			final Date stopDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
 		
-		final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
-		final Date stopDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
-		
-		service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+		});
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void test_createRetrospectiveVisit_shouldFailExceptionIfStartTimeInFuture() throws Exception {
+		assertThrows(IllegalArgumentException.class, () -> {
+			final Patient patient = new Patient();
 		
-		final Patient patient = new Patient();
+			final Date startDate = new DateTime(3000, 1, 2, 0, 0, 0, 0).toDate();
+			final Date stopDate = new DateTime(3000, 1, 2, 1, 1, 1, 1).toDate();
 		
-		final Date startDate = new DateTime(3000, 1, 2, 0, 0, 0, 0).toDate();
-		final Date stopDate = new DateTime(3000, 1, 2, 1, 1, 1, 1).toDate();
-		
-		service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+		});
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void test_createRetrospectiveVisit_shouldFailExceptionIfStopTimeInFuture() throws Exception {
+		assertThrows(IllegalArgumentException.class, () -> {
+			final Patient patient = new Patient();
 		
-		final Patient patient = new Patient();
+			final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
+			final Date stopDate = new DateTime(3000, 1, 1, 0, 0, 0, 0).toDate();
 		
-		final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
-		final Date stopDate = new DateTime(3000, 1, 1, 0, 0, 0, 0).toDate();
-		
-		service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
+		});
 	}
 	
 	@Test

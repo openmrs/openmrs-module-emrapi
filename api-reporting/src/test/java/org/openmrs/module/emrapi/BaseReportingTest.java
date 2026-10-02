@@ -9,24 +9,24 @@
  */
 package org.openmrs.module.emrapi;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.openmrs.module.Module;
 import org.openmrs.module.ModuleFactory;
-import org.openmrs.test.BaseModuleContextSensitiveTest;
+import org.openmrs.test.jupiter.BaseModuleContextSensitiveTest;
 
 import java.io.File;
 
 public abstract class BaseReportingTest extends BaseModuleContextSensitiveTest {
 	
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		Module mod = new Module("", "reporting", "", "", "", "1.25.0", "");
 		mod.setFile(new File(""));
 		ModuleFactory.getStartedModulesMap().put(mod.getModuleId(), mod);
 	}
 	
-	@AfterClass
+	@AfterAll
 	public static void afterClass() {
 		ModuleFactory.getStartedModulesMap().remove("reporting");
 	}

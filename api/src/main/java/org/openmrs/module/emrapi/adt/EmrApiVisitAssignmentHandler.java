@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.adt;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateTime;
 import org.openmrs.Encounter;
 import org.openmrs.Order;

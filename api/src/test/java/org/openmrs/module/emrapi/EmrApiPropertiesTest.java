@@ -9,16 +9,16 @@
  */
 package org.openmrs.module.emrapi;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptService;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -33,7 +33,7 @@ public class EmrApiPropertiesTest {
 	@Mock
 	private ConceptService conceptService;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		initMocks(this);
 		emrApiProperties = new EmrApiProperties();
@@ -85,14 +85,14 @@ public class EmrApiPropertiesTest {
 		when(administrationService.getGlobalProperty(EmrApiConstants.EMR_CONCEPT_SOURCES_FOR_DIAGNOSIS_SEARCH))
 		        .thenReturn("ICD-10-WHO");
 		when(conceptService.getConceptSourceByName(anyString())).thenReturn(null);
-		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
-		Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().isEmpty());
+		Assertions.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+		Assertions.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().isEmpty());
 		
 		ConceptSource icd10Source = new ConceptSource();
 		icd10Source.setName("ICD-10-WHO");
 		when(conceptService.getConceptSourceByName(anyString())).thenReturn(icd10Source);
-		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
-		Assert.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().size() > 0);
+		Assertions.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+		Assertions.assertTrue(emrApiProperties.getConceptSourcesForDiagnosisSearch().size() > 0);
 		
 	}
 	

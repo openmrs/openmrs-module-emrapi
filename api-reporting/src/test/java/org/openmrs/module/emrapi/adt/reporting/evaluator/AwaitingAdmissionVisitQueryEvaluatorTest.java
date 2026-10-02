@@ -10,8 +10,8 @@
 package org.openmrs.module.emrapi.adt.reporting.evaluator;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Cohort;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -42,7 +42,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseReportingTest {
 	
@@ -73,7 +73,7 @@ public class AwaitingAdmissionVisitQueryEvaluatorTest extends BaseReportingTest 
 	
 	private Concept admitToHospital;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		executeDataSet("baseTestDataset.xml");
 		dispositionService.setDispositionConfig("testDispositionConfig.json"); // use demo disposition config from test resources

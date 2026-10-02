@@ -9,14 +9,15 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.emrapi.web.controller.types.DoseFormGroupsResponse;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.springframework.stereotype.Controller;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping(value = "/rest/**/emrapi/doseFormGroups")
+@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/doseFormGroups")
 public class DoseFormGroupController {
 	
 	/**
