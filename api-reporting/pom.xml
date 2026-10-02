@@ -13,9 +13,9 @@
     <name>EMR API Reporting API</name>
 
     <properties>
-        <reportingVersion>2.0.0-SNAPSHOT</reportingVersion>
+        <reportingVersion>2.0.0</reportingVersion>
         <serialization.xstreamVersion>0.2.16</serialization.xstreamVersion>
-        <calculationVersion>2.0.0-SNAPSHOT</calculationVersion>
+        <calculationVersion>2.0.0</calculationVersion>
     </properties>
 
     <dependencies>
