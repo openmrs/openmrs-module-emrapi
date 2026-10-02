@@ -9,9 +9,10 @@
  */
 package org.openmrs.module.emrapi.encounter.domain;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.openmrs.CareSetting;
 import org.openmrs.ConceptMap;
 import org.openmrs.module.emrapi.utils.CustomJsonDateSerializer;
@@ -244,7 +245,7 @@ public class EncounterTransaction {
 		
 		private String shortName;
 		
-		@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+		@JsonInclude(JsonInclude.Include.NON_NULL)
 		private String units;
 		
 		private String conceptClass;

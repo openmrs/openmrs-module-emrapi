@@ -14,6 +14,7 @@ import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.emrapi.visit.VisitDomainWrapper;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/rest/**/emrapi/inpatient")
+@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/inpatient")
 @Deprecated
 public class InpatientVisitsController {
 	

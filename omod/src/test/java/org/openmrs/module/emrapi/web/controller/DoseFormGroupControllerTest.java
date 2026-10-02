@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The dose form to dose form group to route of administration mappings themselves are the
@@ -38,7 +38,7 @@ public class DoseFormGroupControllerTest extends BaseModuleWebContextSensitiveTe
 	@Autowired
 	DoseFormGroupController controller;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		executeDataSet("doseFormGroupDataset.xml");
 	}
@@ -50,8 +50,8 @@ public class DoseFormGroupControllerTest extends BaseModuleWebContextSensitiveTe
 	public void shouldReturnDoseFormsAndDoseFormGroups() throws Exception {
 		Map<String, List<Map<String, Object>>> response = getDoseFormGroups();
 		
-		assertNotNull("response should contain a doseForms entry", response.get("doseForms"));
-		assertNotNull("response should contain a doseFormGroups entry", response.get("doseFormGroups"));
+		assertNotNull(response.get("doseForms"), "response should contain a doseForms entry");
+		assertNotNull(response.get("doseFormGroups"), "response should contain a doseFormGroups entry");
 		
 		Map<String, Set<String>> groupsByDoseForm = new HashMap<String, Set<String>>();
 		for (Map<String, Object> entry : response.get("doseForms")) {
@@ -83,8 +83,7 @@ public class DoseFormGroupControllerTest extends BaseModuleWebContextSensitiveTe
 	@Test
 	public void shouldReturnConceptsInTheRequestedRepresentation() throws Exception {
 		Map<String, Object> asFull = firstDoseForm(representation("full"));
-		assertTrue("expected more than a REF, got " + asFull.keySet(),
-		    asFull.keySet().containsAll(Arrays.asList("uuid", "display", "datatype", "conceptClass")));
+		assertTrue(asFull.keySet().containsAll(Arrays.asList("uuid", "display", "datatype", "conceptClass")), "expected more than a REF, got " + asFull.keySet());
 		
 		// The default is REF, not DEFAULT: a Concept's default representation drags its names,
 		// descriptions, mappings, answers, set members and attributes along, and CIEL ships around 86
@@ -102,8 +101,8 @@ public class DoseFormGroupControllerTest extends BaseModuleWebContextSensitiveTe
 	public void shouldSupportACustomRepresentation() throws Exception {
 		Map<String, List<Map<String, Object>>> response = getDoseFormGroups(representation("custom:(doseForms)"));
 		
-		assertNotNull("doseForms was asked for", response.get("doseForms"));
-		assertEquals("only doseForms was asked for", 1, response.keySet().size());
+		assertNotNull(response.get("doseForms"), "doseForms was asked for");
+		assertEquals(1, response.keySet().size(), "only doseForms was asked for");
 	}
 	
 	private MockHttpServletRequest representation(String v) {

@@ -10,8 +10,8 @@
 package org.openmrs.module.emrapi.exitfromcare;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.PatientProgram;
@@ -28,14 +28,15 @@ import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ExitFromCareServiceTest {
 	
@@ -51,7 +52,7 @@ public class ExitFromCareServiceTest {
 	
 	EmrApiProperties mockEmrApiProperties;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		mockProgramWorkflowService = mock(ProgramWorkflowService.class);
 		mockVisitService = mock(VisitService.class);
@@ -171,12 +172,14 @@ public class ExitFromCareServiceTest {
 		assertThat(pp1.getOutcome(), is(validOutcome2));
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void closePatientPrograms_shouldThrowExceptionIfDateInFuture() {
-		Patient patient = new Patient();
-		Concept outcome = new Concept();
-		Date futureDate = new DateTime().plusDays(1).toDate();
-		exitFromCareService.closePatientPrograms(patient, outcome, futureDate);
+		assertThrows(IllegalArgumentException.class, () -> {
+			Patient patient = new Patient();
+			Concept outcome = new Concept();
+			Date futureDate = new DateTime().plusDays(1).toDate();
+			exitFromCareService.closePatientPrograms(patient, outcome, futureDate);
+		});
 	}
 	
 	@Test
@@ -417,23 +420,27 @@ public class ExitFromCareServiceTest {
 		assertTrue(patient.getDeathDate().equals(now) || patient.getDeathDate().after(now));
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void markPatientDied_shouldFailIfDeathDateInFuture() {
-		Patient patient = new Patient();
-		Date futureDate = new DateTime().plusDays(1).toDate();
+		assertThrows(IllegalArgumentException.class, () -> {
+			Patient patient = new Patient();
+			Date futureDate = new DateTime().plusDays(1).toDate();
 		
-		exitFromCareService.markPatientDead(patient, null, futureDate);
+			exitFromCareService.markPatientDead(patient, null, futureDate);
 		
+		});
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void markPatientDead_shouldFailIfDeathDateBeforeBirthDate() {
-		Patient patient = new Patient();
-		Date birthDate = new DateTime().minusDays(20).toDate();
-		patient.setBirthdate(birthDate);
-		Date deathDate = new DateTime().minusDays(30).toDate();
+		assertThrows(IllegalArgumentException.class, () -> {
+			Patient patient = new Patient();
+			Date birthDate = new DateTime().minusDays(20).toDate();
+			patient.setBirthdate(birthDate);
+			Date deathDate = new DateTime().minusDays(30).toDate();
 		
-		exitFromCareService.markPatientDead(patient, null, deathDate);
+			exitFromCareService.markPatientDead(patient, null, deathDate);
+		});
 	}
 	
 	@Test

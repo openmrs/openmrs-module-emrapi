@@ -10,8 +10,8 @@
 package org.openmrs.module.emrapi.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
 import org.openmrs.api.AdministrationService;
@@ -23,7 +23,7 @@ import org.openmrs.module.emrapi.diagnosis.Diagnosis;
 import org.openmrs.module.emrapi.diagnosis.DiagnosisMetadata;
 import org.openmrs.module.emrapi.test.ContextSensitiveMetadataTestUtils;
 import org.openmrs.module.emrapi.test.builder.ObsBuilder;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,10 +32,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,7 +61,7 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
 	
 	private MockMvc mockMvc;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		// Execute the dataset
 		executeDataSet("pastVisitSetup.xml");
@@ -157,13 +159,14 @@ public class VisitControllerTest extends BaseModuleWebContextSensitiveTest {
 		List<Map<String, Object>> firstVisitNotes = (List<Map<String, Object>>) firstVisitEntry.get("visitNotes");
 		List<Map<String, Object>> firstVisitDiagnoses = (List<Map<String, Object>>) firstVisitEntry.get("diagnoses");
 		
-		assert firstVisit.size() == 1;
+		// webservices.rest 3.x and later add resourceVersion to custom representations of resources
+		assert firstVisit.keySet().equals(new HashSet<>(Arrays.asList("uuid", "resourceVersion")));
 		assert firstVisit.get("uuid").equals(firstVisitUuid);
 		assert firstVisitNotes == null;
 		assert firstVisitDiagnoses.size() == 3;
 		
 		for (Map<String, Object> diagnosis : firstVisitDiagnoses) {
-			assert diagnosis.size() == 1;
+			assert diagnosis.keySet().equals(new HashSet<>(Arrays.asList("certainty", "resourceVersion")));
 			assert diagnosis.get("certainty").equals("CONFIRMED");
 		}
 	}

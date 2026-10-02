@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.internal.util.collections.Sets;
 import org.openmrs.Concept;
@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -60,7 +60,7 @@ public class ObsMapperTest {
 	
 	private ObsMapper obsMapper = null;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		initMocks(this);
 		obsMapper = new ObsMapper(conceptService, emrApiProperties, obsService, orderService);

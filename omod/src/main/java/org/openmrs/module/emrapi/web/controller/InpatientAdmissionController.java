@@ -18,6 +18,7 @@ import org.openmrs.module.emrapi.adt.InpatientAdmissionSearchCriteria;
 import org.openmrs.module.emrapi.rest.converter.InpatientAdmissionConverter;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RequestContext;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.resource.impl.NeedsPaging;
@@ -28,8 +29,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ public class InpatientAdmissionController {
 	@Autowired
 	private AdtService adtService;
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/inpatient/admission")
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/inpatient/admission")
 	@ResponseBody
 	public SimpleObject getInpatientAdmissions(HttpServletRequest request, HttpServletResponse response,
 	        @RequestParam(required = false, value = "visitLocation") Location visitLocation,

@@ -3,7 +3,7 @@ select
 from
   Obs o
 where
-  o.voided = 'false'
+  o.voided = false
   and (o.encounter.visit = :visit)
   and o.concept = :diagnosisOrderConcept
 group by o.encounter, o.obsGroup

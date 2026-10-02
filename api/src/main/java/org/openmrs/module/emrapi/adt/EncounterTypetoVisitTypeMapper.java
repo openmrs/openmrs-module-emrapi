@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.adt;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.VisitType;

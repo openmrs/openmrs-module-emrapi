@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.disposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.CareSetting;
 import org.openmrs.Concept;
 import org.openmrs.EncounterType;
@@ -34,10 +34,10 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +53,7 @@ public class DispositionServiceTest {
 	
 	private DispositionDescriptor dispositionDescriptor;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		
 		emrConceptService = mock(EmrConceptService.class);

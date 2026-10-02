@@ -20,6 +20,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 import org.openmrs.module.webservices.rest.SimpleObject;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.util.LocaleUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,7 +39,7 @@ import java.util.Set;
 import static org.springframework.web.bind.annotation.ValueConstants.DEFAULT_NONE;
 
 @Controller
-@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/concept")
+@RequestMapping(method = RequestMethod.GET, value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/concept")
 public class EmrConceptSearchController {
 	
 	@Autowired

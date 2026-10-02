@@ -9,10 +9,10 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.openmrs.Encounter;
@@ -48,7 +48,7 @@ public class EncounterTransactionMapperTest {
 	
 	private EncounterTransactionMapper encounterTransactionMapper;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		initMocks(this);
 		encounterTransactionMapper = new EncounterTransactionMapper(encounterObservationsMapper, encounterProviderMapper,
@@ -56,7 +56,7 @@ public class EncounterTransactionMapperTest {
 		mockedContext = mockStatic(Context.class);
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() {
 		mockedContext.close();
 	}
@@ -69,14 +69,14 @@ public class EncounterTransactionMapperTest {
 		mockedContext.when(() -> Context.getRegisteredComponents(EncounterTransactionHandler.class)).thenReturn(null);
 		EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, includeAll);
 		
-		Assert.assertEquals(encounter.getUuid(), encounterTransaction.getEncounterUuid());
-		Assert.assertEquals(encounter.getVisit().getUuid(), encounterTransaction.getVisitUuid());
-		Assert.assertEquals(encounter.getPatient().getUuid(), encounterTransaction.getPatientUuid());
-		Assert.assertEquals(encounter.getEncounterType().getUuid(), encounterTransaction.getEncounterTypeUuid());
-		Assert.assertEquals(encounter.getLocation().getUuid(), encounterTransaction.getLocationUuid());
-		Assert.assertEquals(encounter.getLocation().getName(), encounterTransaction.getLocationName());
-		Assert.assertEquals(encounter.getVisit().getLocation().getUuid(), encounterTransaction.getVisitLocationUuid());
-		Assert.assertEquals(encounter.getVisit().getVisitType().getUuid(), encounterTransaction.getVisitTypeUuid());
+		Assertions.assertEquals(encounter.getUuid(), encounterTransaction.getEncounterUuid());
+		Assertions.assertEquals(encounter.getVisit().getUuid(), encounterTransaction.getVisitUuid());
+		Assertions.assertEquals(encounter.getPatient().getUuid(), encounterTransaction.getPatientUuid());
+		Assertions.assertEquals(encounter.getEncounterType().getUuid(), encounterTransaction.getEncounterTypeUuid());
+		Assertions.assertEquals(encounter.getLocation().getUuid(), encounterTransaction.getLocationUuid());
+		Assertions.assertEquals(encounter.getLocation().getName(), encounterTransaction.getLocationName());
+		Assertions.assertEquals(encounter.getVisit().getLocation().getUuid(), encounterTransaction.getVisitLocationUuid());
+		Assertions.assertEquals(encounter.getVisit().getVisitType().getUuid(), encounterTransaction.getVisitTypeUuid());
 	}
 	
 	@Test
@@ -86,7 +86,7 @@ public class EncounterTransactionMapperTest {
 		
 		EncounterTransaction encounterTransaction = encounterTransactionMapper.map(encounter, false);
 		
-		Assert.assertEquals(null, encounterTransaction.getEncounterTypeUuid());
+		Assertions.assertEquals(null, encounterTransaction.getEncounterTypeUuid());
 	}
 	
 	@Test

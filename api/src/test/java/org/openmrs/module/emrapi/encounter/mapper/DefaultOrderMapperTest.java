@@ -9,11 +9,11 @@
  */
 package org.openmrs.module.emrapi.encounter.mapper;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.openmrs.CareSetting;
 import org.openmrs.Concept;
@@ -45,7 +45,8 @@ import java.util.Locale;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockStatic;
 
 public class DefaultOrderMapperTest {
@@ -80,14 +81,14 @@ public class DefaultOrderMapperTest {
 	
 	private MockedStatic<LocaleUtility> localeUtility;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		localeUtility = mockStatic(LocaleUtility.class);
 		context = mockStatic(Context.class);
 		orderMapper = new DefaultOrderMapper();
 	}
 	
-	@After
+	@AfterEach
 	public void teardown() {
 		localeUtility.close();
 		context.close();

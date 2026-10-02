@@ -9,17 +9,17 @@
  */
 package org.openmrs.module.emrapi.event;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.jms.MapMessage;
-import javax.jms.Message;
+import jakarta.jms.MapMessage;
+import jakarta.jms.Message;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Patient;
 import org.openmrs.User;
 import org.openmrs.event.Event;
@@ -61,13 +61,13 @@ public class ApplicationEventServiceTest {
 		}
 	}
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		listener = new MockEmrEventListener();
 		Event.subscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, listener);
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() {
 		Event.unsubscribe(EmrApiConstants.EVENT_TOPIC_NAME_PATIENT_VIEWED, listener);
 	}

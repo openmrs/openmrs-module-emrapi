@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openmrs.EncounterProvider;
 import org.openmrs.Obs;
 import org.openmrs.module.emrapi.diagnosis.CodedOrFreeTextAnswer;

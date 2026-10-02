@@ -9,9 +9,9 @@
  */
 package org.openmrs.module.emrapi.visit;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.openmrs.Encounter;
 import org.openmrs.Visit;
@@ -27,7 +27,7 @@ public class VisitResponseMapperTest {
 	
 	private VisitResponseMapper visitResponseMapper;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		initMocks(this);
 		visitResponseMapper = new VisitResponseMapper(encounterTransactionMapper);
@@ -40,12 +40,12 @@ public class VisitResponseMapperTest {
 		
 		VisitResponse visitResponse = visitResponseMapper.map(visit);
 		
-		Assert.assertEquals(visit.getUuid(), visitResponse.getVisitUuid());
-		Assert.assertEquals(visit.getEncounters().size(), visitResponse.getEncounters().size());
+		Assertions.assertEquals(visit.getUuid(), visitResponse.getVisitUuid());
+		Assertions.assertEquals(visit.getEncounters().size(), visitResponse.getEncounters().size());
 	}
 	
 	@Test
 	public void testMapsNullVisitToNull() throws Exception {
-		Assert.assertNull(visitResponseMapper.map(null));
+		Assertions.assertNull(visitResponseMapper.map(null));
 	}
 }

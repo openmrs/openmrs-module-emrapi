@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.openmrs.Concept;
@@ -36,7 +36,8 @@ import java.util.HashMap;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -58,7 +59,7 @@ public class EmrOrderServiceImplTest {
 	@Mock
 	private OpenMRSOrderGroupMapper openMRSOrderGroupMapper;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		initMocks(this);
 	}

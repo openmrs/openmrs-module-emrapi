@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.adt;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.contrib.testdata.TestDataManager;
@@ -20,7 +20,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class InpatientAdmissionTest {
 	
@@ -44,7 +44,7 @@ public class InpatientAdmissionTest {
 	
 	Encounter encounter6;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		tdm = new TestDataManager();
 		admission = new InpatientAdmission();

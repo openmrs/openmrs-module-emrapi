@@ -13,6 +13,7 @@ import org.openmrs.module.emrapi.encounter.ActiveEncounterParameters;
 import org.openmrs.module.emrapi.encounter.EmrEncounterService;
 import org.openmrs.module.emrapi.encounter.EncounterSearchParameters;
 import org.openmrs.module.emrapi.encounter.domain.EncounterTransaction;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
-@RequestMapping(value = "/rest/**/emrapi/encounter")
+@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/encounter")
 public class EmrEncounterController extends BaseRestController {
 	
 	@Autowired

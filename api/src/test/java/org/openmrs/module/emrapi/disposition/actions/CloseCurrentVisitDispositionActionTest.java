@@ -10,8 +10,8 @@
 package org.openmrs.module.emrapi.disposition.actions;
 
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
 import org.openmrs.Obs;
@@ -48,7 +48,7 @@ public class CloseCurrentVisitDispositionActionTest extends AuthenticatedUserTes
 	
 	private VisitDomainWrapper visitDomainWrapper;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		
 		adtService = mock(AdtService.class);

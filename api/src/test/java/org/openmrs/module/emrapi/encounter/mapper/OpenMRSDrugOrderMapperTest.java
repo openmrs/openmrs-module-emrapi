@@ -10,10 +10,8 @@
 package org.openmrs.module.emrapi.encounter.mapper;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -39,7 +37,8 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,14 +71,12 @@ public class OpenMRSDrugOrderMapperTest {
 	@Mock
 	private OrderMetadataService orderMetadataService;
 	
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 	
 	private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
 	
 	private Encounter encounter;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		initMocks(this);
 		

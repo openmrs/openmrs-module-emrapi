@@ -3,7 +3,7 @@ select
 from
   Obs o
 where
-  o.voided = 'false'
+  o.voided = false
   and (o.encounter.visit = :visit)
   and o.concept = :diagnosisCertaintyConcept
   and o.valueCoded = :confirmedCertaintyConcept

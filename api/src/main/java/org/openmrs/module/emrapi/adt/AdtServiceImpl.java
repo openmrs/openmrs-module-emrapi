@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.adt;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.joda.time.DateTime;
 import org.openmrs.Concept;
 import org.openmrs.Encounter;
@@ -936,7 +936,9 @@ public class AdtServiceImpl extends BaseOpenmrsService implements AdtService {
 		parameters.put("admissionDecisionConcept", emrApiProperties.getAdmissionDecisionConcept());
 		parameters.put("denyAdmissionConcept", emrApiProperties.getDenyAdmissionConcept());
 		parameters.put("patientIds", patientIds);
+		parameters.put("limitByPatient", patientIds != null);
 		parameters.put("visitIds", visitIds);
+		parameters.put("limitByVisit", visitIds != null);
 		return emrApiDAO.executeHqlFromResource("hql/visits_awaiting_admission.hql", parameters, Visit.class);
 	}
 	

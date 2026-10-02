@@ -9,7 +9,7 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.FlushMode;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.openmrs.module.emrapi.utils.GeneralUtils.getCurrentDateIfNull;
 
 @Transactional

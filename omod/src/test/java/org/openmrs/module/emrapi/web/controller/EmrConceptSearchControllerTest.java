@@ -9,14 +9,14 @@
  */
 package org.openmrs.module.emrapi.web.controller;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.ConceptService;
 import org.openmrs.module.emrapi.EmrApiProperties;
 import org.openmrs.module.webservices.rest.SimpleObject;
-import org.openmrs.web.test.BaseModuleWebContextSensitiveTest;
+import org.openmrs.web.test.jupiter.BaseModuleWebContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class EmrConceptSearchControllerTest extends BaseModuleWebContextSensitiveTest {
 	
@@ -39,7 +39,7 @@ public class EmrConceptSearchControllerTest extends BaseModuleWebContextSensitiv
 	@Qualifier("conceptService")
 	private ConceptService cs;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		executeDataSet("baseMetaData.xml");
 		executeDataSet("diagnosisMetaData.xml");
@@ -77,34 +77,34 @@ public class EmrConceptSearchControllerTest extends BaseModuleWebContextSensitiv
 		source.setName("foobar"); // so that "ICD-10-WHO" can't be found by name - produces empty list of ConceptSources
 		cs.saveConceptSource(source);
 		
-		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
-		Assert.assertEquals(0, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
+		Assertions.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+		Assertions.assertEquals(0, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
 		
 		List<SimpleObject> response = (List<SimpleObject>) conceptSearchController.search("Diabetes", 100, null);
-		Assert.assertEquals(2, response.size());
+		Assertions.assertEquals(2, response.size());
 		
 		List<String> actualUuids = new ArrayList<String>();
 		for (Map simpleObject : response) {
-			Assert.assertNull(simpleObject.get("code"));
+			Assertions.assertNull(simpleObject.get("code"));
 			actualUuids.add((String) simpleObject.get("conceptUuid"));
 		}
 		
 		source.setName("ICD-10-WHO"); // so that "ICD-10-WHO" conceptSource is not null - produces non-empty list of ConceptSources
 		cs.saveConceptSource(source);
 		
-		Assert.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
-		Assert.assertEquals(1, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
+		Assertions.assertNotNull(emrApiProperties.getConceptSourcesForDiagnosisSearch());
+		Assertions.assertEquals(1, emrApiProperties.getConceptSourcesForDiagnosisSearch().size());
 		
 		response = (List<SimpleObject>) conceptSearchController.search("Diabetes", 100, null);
-		Assert.assertEquals(2, response.size());
+		Assertions.assertEquals(2, response.size());
 		
 		List<String> expectedUuids = new ArrayList<String>();
 		for (Map simpleObject : response) {
-			Assert.assertNotNull(simpleObject.get("code"));
+			Assertions.assertNotNull(simpleObject.get("code"));
 			expectedUuids.add((String) simpleObject.get("conceptUuid"));
 		}
 		
 		//both lists shall have the same concepts identified by the unique UUID.
-		Assert.assertArrayEquals(expectedUuids.toArray(), actualUuids.toArray());
+		Assertions.assertArrayEquals(expectedUuids.toArray(), actualUuids.toArray());
 	}
 }

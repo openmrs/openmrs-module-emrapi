@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.disposition;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.Obs;
@@ -22,10 +22,10 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +53,7 @@ public class DispositionDescriptorTest {
 	
 	private DispositionDescriptor dispositionDescriptor;
 	
-	@Before
+	@BeforeEach
 	public void setup() {
 		dispositionDescriptor = new DispositionDescriptor();
 		dispositionDescriptor.setDispositionSetConcept(dispositionSetConcept);

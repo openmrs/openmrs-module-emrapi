@@ -15,6 +15,7 @@ import org.openmrs.Visit;
 import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * "ensureActiveVisit")
  */
 @Controller
-@RequestMapping(value = "/rest/**/emrapi/activevisit")
+@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/activevisit")
 public class ActiveVisitController extends BaseRestController {
 	
 	@Autowired

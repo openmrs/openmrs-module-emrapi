@@ -9,9 +9,9 @@
  */
 package org.openmrs.module.emrapi.encounter;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -49,11 +49,11 @@ import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -109,7 +109,7 @@ public class EmrEncounterServiceTest {
 	
 	private Patient patient;
 	
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 		initMocks(this);
 		emrEncounterService = new EmrEncounterServiceImpl(patientService, visitService, encounterService, locationService,
@@ -131,7 +131,7 @@ public class EmrEncounterServiceTest {
 		mockedContext = Mockito.mockStatic(Context.class);
 	}
 	
-	@After
+	@AfterEach
 	public void tearDown() {
 		mockedContext.close();
 	}

@@ -27,7 +27,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.ArgumentMatcher;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterRole;
@@ -42,8 +43,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Various utils to help with testing
@@ -68,7 +69,7 @@ public class TestUtils {
 				// pass
 			}
 		}
-		Assert.fail(
+		Assertions.fail(
 		    "Collection does not contain an element with " + property + " = " + value + ". Collection: " + collection);
 	}
 	
@@ -113,11 +114,11 @@ public class TestUtils {
 			return;
 		}
 		if (actual == null) {
-			Assert.fail(substring + " is not contained in " + actual);
+			Assertions.fail(substring + " is not contained in " + actual);
 		}
 		
 		if (!actual.contains(substring)) {
-			Assert.fail(substring + " is not contained in " + actual);
+			Assertions.fail(substring + " is not contained in " + actual);
 		}
 	}
 	
@@ -128,11 +129,11 @@ public class TestUtils {
 		if (expected == null && actual == null)
 			return;
 		if (expected == null || actual == null)
-			Assert.fail(expected + " does not match " + actual);
+			Assertions.fail(expected + " does not match " + actual);
 		String test1 = stripWhitespaceAndConvertToLowerCase(expected);
 		String test2 = stripWhitespaceAndConvertToLowerCase(actual);
 		if (!test1.equals(test2)) {
-			Assert.fail(expected + " does not match " + actual);
+			Assertions.fail(expected + " does not match " + actual);
 		}
 	}
 	
@@ -145,12 +146,12 @@ public class TestUtils {
 			return;
 		}
 		if (actual == null) {
-			Assert.fail(substring + " is not contained in " + actual);
+			Assertions.fail(substring + " is not contained in " + actual);
 		}
 		
 		if (!Pattern.compile(stripWhitespaceAndConvertToLowerCase(substring), Pattern.DOTALL)
 		        .matcher(stripWhitespaceAndConvertToLowerCase(actual)).find()) {
-			Assert.fail(substring + " is not contained in " + actual);
+			Assertions.fail(substring + " is not contained in " + actual);
 		}
 	}
 	
@@ -168,7 +169,7 @@ public class TestUtils {
 		
 		if (Pattern.compile(stripWhitespaceAndConvertToLowerCase(substring), Pattern.DOTALL)
 		        .matcher(stripWhitespaceAndConvertToLowerCase(actual)).find()) {
-			Assert.fail(substring + " found in  " + actual);
+			Assertions.fail(substring + " found in  " + actual);
 		}
 	}
 	

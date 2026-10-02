@@ -13,7 +13,7 @@ import lombok.Setter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class EmrApiDAOImpl implements EmrApiDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> executeHql(String queryString, Map<String, Object> parameters, Class<T> clazz) {
-		Query query = sessionFactory.getCurrentSession().createQuery(queryString);
+		Query query = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(queryString);
 		for (String parameter : parameters.keySet()) {
 			Object value = parameters.get(parameter);
 			if (value instanceof Collection) {

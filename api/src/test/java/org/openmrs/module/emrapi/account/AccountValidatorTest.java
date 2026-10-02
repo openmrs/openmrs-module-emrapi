@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.account;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openmrs.Person;
 import org.openmrs.PersonName;
@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class AccountValidatorTest {
@@ -65,7 +65,7 @@ public class AccountValidatorTest {
 	
 	private ProviderRole someProviderRole;
 	
-	@Before
+	@BeforeEach
 	public void setValidator() {
 		
 		accountService = Mockito.mock(AccountService.class);

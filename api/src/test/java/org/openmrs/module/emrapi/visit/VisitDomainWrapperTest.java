@@ -9,11 +9,11 @@
  */
 package org.openmrs.module.emrapi.visit;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.MockedStatic;
 import org.openmrs.Concept;
@@ -49,14 +49,15 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.co.it.modular.hamcrest.date.DateMatchers.within;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class VisitDomainWrapperTest {
 	
@@ -74,7 +75,7 @@ public class VisitDomainWrapperTest {
 	
 	private DispositionDescriptor dispositionDescriptor;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		visit = mock(Visit.class);
 		emrApiProperties = mock(EmrApiProperties.class);
@@ -308,11 +309,13 @@ public class VisitDomainWrapperTest {
 		assertFalse(visitDomainWrapper.hasBeenDischarged());
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void shouldFailIfDateOutsideOfVisit() {
-		Date now = new Date();
-		when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -3));
-		visitDomainWrapper.isAdmitted(DateUtils.addHours(now, -4));
+		assertThrows(IllegalArgumentException.class, () -> {
+			Date now = new Date();
+			when(visit.getStartDatetime()).thenReturn(DateUtils.addHours(new Date(), -3));
+			visitDomainWrapper.isAdmitted(DateUtils.addHours(now, -4));
+		});
 	}
 	
 	@Test
@@ -637,15 +640,16 @@ public class VisitDomainWrapperTest {
 		
 	}
 	
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void shouldFailIfNoEncounters() throws Exception {
+		assertThrows(IllegalStateException.class, () -> {
+			Date startDate = new DateTime(2012, 2, 20, 10, 10).toDate();
 		
-		Date startDate = new DateTime(2012, 2, 20, 10, 10).toDate();
+			Visit visit = new Visit();
+			visit.setStartDatetime(startDate);
 		
-		Visit visit = new Visit();
-		visit.setStartDatetime(startDate);
-		
-		new VisitDomainWrapper(visit).closeOnLastEncounterDatetime();
+			new VisitDomainWrapper(visit).closeOnLastEncounterDatetime();
+		});
 	}
 	
 	@Test

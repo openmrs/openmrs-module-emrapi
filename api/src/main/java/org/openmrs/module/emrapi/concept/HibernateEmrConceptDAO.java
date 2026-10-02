@@ -10,24 +10,22 @@
 package org.openmrs.module.emrapi.concept;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.query.Query;
 import org.openmrs.Concept;
 import org.openmrs.ConceptClass;
 import org.openmrs.ConceptMap;
@@ -35,7 +33,6 @@ import org.openmrs.ConceptMapType;
 import org.openmrs.ConceptName;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSearchResult;
-import org.openmrs.ConceptSet;
 import org.openmrs.ConceptSource;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
@@ -55,10 +52,15 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 	
 	@Override
 	public List<Concept> getConceptsMappedTo(Collection<ConceptMapType> mapTypes, ConceptReferenceTerm term) {
-		Criteria crit = sessionFactory.getCurrentSession().createCriteria(Concept.class);
-		crit.createCriteria("conceptMappings").add(Restrictions.in("conceptMapType", mapTypes))
-		        .add(Restrictions.eq("conceptReferenceTerm", term));
-		return crit.list();
+		if (mapTypes == null || mapTypes.isEmpty()) {
+			return new ArrayList<Concept>();
+		}
+		Query<Concept> query = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(
+		    "select c from Concept c join c.conceptMappings m where m.conceptMapType in (:mapTypes)"
+		            + " and m.conceptReferenceTerm = :term");
+		query.setParameterList("mapTypes", mapTypes);
+		query.setParameter("term", term);
+		return query.list();
 	}
 	
 	/**
@@ -77,43 +79,59 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 		
 		// find matches based on name
 		{
-			Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ConceptName.class, "cn");
-			criteria.add(Restrictions.eq("voided", false));
+			StringBuilder hql = new StringBuilder("select cn from ConceptName cn join cn.concept cpt");
+			Map<String, Object> params = new HashMap<String, Object>();
+			
+			boolean joinMappings = !CollectionUtils.isEmpty(sources) && CollectionUtils.isEmpty(inSets);
+			if (joinMappings) {
+				hql.append(" join cpt.conceptMappings mapping join mapping.conceptReferenceTerm refTerm");
+			}
+			
+			hql.append(" where cn.voided = false");
 			if (StringUtils.isNotBlank(locale.getCountry()) || StringUtils.isNotBlank(locale.getVariant())) {
 				Locale[] locales = new Locale[] { locale, new Locale(locale.getLanguage()) };
-				criteria.add(Restrictions.in("locale", locales));
+				hql.append(" and cn.locale in (:locales)");
+				params.put("locales", Arrays.asList(locales));
 			} else {
-				criteria.add(Restrictions.eq("locale", locale));
+				hql.append(" and cn.locale = :locale");
+				params.put("locale", locale);
 			}
-			criteria.setMaxResults(limit);
 			
-			Criteria conceptCriteria = criteria.createCriteria("concept", "cpt");
-			conceptCriteria.add(Restrictions.eq("retired", false));
+			hql.append(" and cpt.retired = false");
 			
 			if (inSets != null) {
-				DetachedCriteria allowedSetMembers = DetachedCriteria.forClass(ConceptSet.class);
-				allowedSetMembers.add(Restrictions.in("conceptSet", inSets));
-				allowedSetMembers.setProjection(Projections.property("concept"));
-				criteria.add(Subqueries.propertyIn("concept", allowedSetMembers));
+				if (inSets.isEmpty()) {
+					hql.append(" and 1 = 0");
+				} else {
+					hql.append(" and cn.concept in (select cs.concept from ConceptSet cs where cs.conceptSet in (:inSets))");
+					params.put("inSets", inSets);
+				}
 			}
 			
 			if (!CollectionUtils.isEmpty(classes) && CollectionUtils.isEmpty(inSets)) {
-				conceptCriteria.add(Restrictions.in("conceptClass", classes));
+				hql.append(" and cpt.conceptClass in (:classes)");
+				params.put("classes", classes);
 			}
 			
-			if (!CollectionUtils.isEmpty(sources) && CollectionUtils.isEmpty(inSets)) {
-				Criteria mappingCriteria = conceptCriteria.createCriteria("conceptMappings");
-				mappingCriteria.createAlias("conceptReferenceTerm", "refTerm");
-				mappingCriteria.add(Restrictions.in("refTerm.conceptSource", sources));
-				mappingCriteria.add(Restrictions.eqProperty("concept", "cpt.conceptId"));
+			if (joinMappings) {
+				hql.append(" and refTerm.conceptSource in (:sources)");
+				hql.append(" and mapping.concept = cpt");
+				params.put("sources", sources);
 			}
 			
+			int i = 0;
 			for (String word : uniqueWords) {
-				criteria.add(Restrictions.ilike("name", word, MatchMode.ANYWHERE));
+				hql.append(" and lower(cn.name) like :word").append(i);
+				params.put("word" + i, "%" + word.toLowerCase() + "%");
+				i++;
 			}
+			
+			Query<ConceptName> nameQuery = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(hql.toString());
+			setParameters(nameQuery, params);
+			nameQuery.setMaxResults(limit);
 			
 			Set<Concept> conceptsMatchedByPreferredName = new HashSet<Concept>();
-			for (ConceptName matchedName : (List<ConceptName>) criteria.list()) {
+			for (ConceptName matchedName : nameQuery.list()) {
 				results.add(new ConceptSearchResult(null, matchedName.getConcept(), matchedName,
 				        calculateMatchScore(query, uniqueWords, matchedName)));
 				if (matchedName.isLocalePreferred()) {
@@ -122,32 +140,37 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 			}
 			
 			// don't display synonym matches if the preferred name matches too
-			for (Iterator<ConceptSearchResult> i = results.iterator(); i.hasNext();) {
-				ConceptSearchResult candidate = i.next();
+			for (Iterator<ConceptSearchResult> it = results.iterator(); it.hasNext();) {
+				ConceptSearchResult candidate = it.next();
 				if (!candidate.getConceptName().isLocalePreferred()
 				        && conceptsMatchedByPreferredName.contains(candidate.getConcept())) {
-					i.remove();
+					it.remove();
 				}
 			}
 		}
 		
 		// find matches based on mapping
 		if (!CollectionUtils.isEmpty(sources)) {
-			Criteria criteria = sessionFactory.getCurrentSession().createCriteria(ConceptMap.class);
-			criteria.setMaxResults(limit);
-			
-			Criteria conceptCriteria = criteria.createCriteria("concept");
-			conceptCriteria.add(Restrictions.eq("retired", false));
+			StringBuilder hql = new StringBuilder(
+			        "select m from ConceptMap m join m.concept c join m.conceptReferenceTerm term where c.retired = false");
+			Map<String, Object> params = new HashMap<String, Object>();
 			if (classes != null) {
-				conceptCriteria.add(Restrictions.in("conceptClass", classes));
+				if (classes.isEmpty()) {
+					hql.append(" and 1 = 0");
+				} else {
+					hql.append(" and c.conceptClass in (:classes)");
+					params.put("classes", classes);
+				}
 			}
+			hql.append(" and term.retired = false and term.conceptSource in (:sources) and lower(term.code) like :code");
+			params.put("sources", sources);
+			params.put("code", query.toLowerCase());
 			
-			Criteria mappedTerm = criteria.createCriteria("conceptReferenceTerm");
-			mappedTerm.add(Restrictions.eq("retired", false));
-			mappedTerm.add(Restrictions.in("conceptSource", sources));
-			mappedTerm.add(Restrictions.ilike("code", query, MatchMode.EXACT));
+			Query<ConceptMap> mappingQuery = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(hql.toString());
+			setParameters(mappingQuery, params);
+			mappingQuery.setMaxResults(limit);
 			
-			for (ConceptMap mapping : (List<ConceptMap>) criteria.list()) {
+			for (ConceptMap mapping : mappingQuery.list()) {
 				results.add(new ConceptSearchResult(null, mapping.getConcept(), null, calculateMatchScore(query, mapping)));
 			}
 		}
@@ -210,6 +233,16 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 		}
 		
 		return phrase.trim().replace('\n', ' ').split(" ");
+	}
+	
+	private void setParameters(Query<?> query, Map<String, Object> params) {
+		for (Map.Entry<String, Object> param : params.entrySet()) {
+			if (param.getValue() instanceof Collection) {
+				query.setParameterList(param.getKey(), (Collection<?>) param.getValue());
+			} else {
+				query.setParameter(param.getKey(), param.getValue());
+			}
+		}
 	}
 	
 	private Double calculateMatchScore(String query, ConceptMap matchedMapping) {

@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.account;
 
-import junit.framework.Assert;
-import org.apache.commons.lang.time.DateUtils;
+import org.junit.jupiter.api.Assertions;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
@@ -36,9 +36,9 @@ import java.util.Locale;
 import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -111,9 +111,9 @@ public class AccountDomainWrapperTest {
 		account.setGender("M");
 		
 		Person person = account.getPerson();
-		Assert.assertEquals("Mark", person.getGivenName());
-		Assert.assertEquals("Jones", person.getFamilyName());
-		Assert.assertEquals("M", person.getGender());
+		Assertions.assertEquals("Mark", person.getGivenName());
+		Assertions.assertEquals("Jones", person.getFamilyName());
+		Assertions.assertEquals("M", person.getGender());
 	}
 	
 	@Test
@@ -126,9 +126,9 @@ public class AccountDomainWrapperTest {
 		person.setGender("M");
 		
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
-		Assert.assertEquals("Mark", account.getGivenName());
-		Assert.assertEquals("Jones", account.getFamilyName());
-		Assert.assertEquals("M", account.getGender());
+		Assertions.assertEquals("Mark", account.getGivenName());
+		Assertions.assertEquals("Jones", account.getFamilyName());
+		Assertions.assertEquals("M", account.getGender());
 	}
 	
 	@Test
@@ -147,12 +147,12 @@ public class AccountDomainWrapperTest {
 		account.setCapabilities(capabilities);
 		
 		User user = account.getUser();
-		Assert.assertEquals("mjones", user.getUsername());
-		Assert.assertEquals(person, user.getPerson());
-		Assert.assertEquals("fr", user.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE).toString());
-		Assert.assertTrue(user.hasRole(fullPrivileges.toString()));
-		Assert.assertTrue(user.hasRole(archiveApp.toString()));
-		Assert.assertTrue(user.hasRole(receptionApp.toString()));
+		Assertions.assertEquals("mjones", user.getUsername());
+		Assertions.assertEquals(person, user.getPerson());
+		Assertions.assertEquals("fr", user.getUserProperty(OpenmrsConstants.USER_PROPERTY_DEFAULT_LOCALE).toString());
+		Assertions.assertTrue(user.hasRole(fullPrivileges.toString()));
+		Assertions.assertTrue(user.hasRole(archiveApp.toString()));
+		Assertions.assertTrue(user.hasRole(receptionApp.toString()));
 	}
 	
 	@Test
@@ -171,11 +171,11 @@ public class AccountDomainWrapperTest {
 		when(userService.getUsersByPerson(eq(person), eq(false))).thenReturn(Collections.singletonList(user));
 		
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
-		Assert.assertEquals("mjones", account.getUsername());
-		Assert.assertEquals("fr", account.getDefaultLocale().toString());
-		Assert.assertEquals(fullPrivileges, account.getPrivilegeLevel());
-		Assert.assertTrue(account.getCapabilities().contains(receptionApp));
-		Assert.assertTrue(account.getCapabilities().contains(archiveApp));
+		Assertions.assertEquals("mjones", account.getUsername());
+		Assertions.assertEquals("fr", account.getDefaultLocale().toString());
+		Assertions.assertEquals(fullPrivileges, account.getPrivilegeLevel());
+		Assertions.assertTrue(account.getCapabilities().contains(receptionApp));
+		Assertions.assertTrue(account.getCapabilities().contains(archiveApp));
 	}
 	
 	@Test
@@ -195,8 +195,8 @@ public class AccountDomainWrapperTest {
 		account.setUsername("");
 		
 		// make sure the person has been created, but not the user or provider
-		Assert.assertNotNull(account.getPerson());
-		Assert.assertNull(account.getUser());
+		Assertions.assertNotNull(account.getPerson());
+		Assertions.assertNull(account.getUser());
 	}
 	
 	@Test
@@ -213,11 +213,11 @@ public class AccountDomainWrapperTest {
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
 		account.setUserEnabled(false);
 		
-		Assert.assertTrue(user.getRetired());
+		Assertions.assertTrue(user.getRetired());
 		// TODO: figure out how to set retired by
-		//Assert.assertNotNull(user.getRetiredBy());
-		Assert.assertNotNull(user.getRetireReason());
-		Assert.assertNotNull(user.getDateRetired());
+		//Assertions.assertNotNull(user.getRetiredBy());
+		Assertions.assertNotNull(user.getRetireReason());
+		Assertions.assertNotNull(user.getDateRetired());
 	}
 	
 	@Test
@@ -239,10 +239,10 @@ public class AccountDomainWrapperTest {
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
 		account.setUserEnabled(true);
 		
-		Assert.assertFalse(user.getRetired());
-		Assert.assertNull(user.getRetiredBy());
-		Assert.assertNull(user.getRetireReason());
-		Assert.assertNull(user.getDateRetired());
+		Assertions.assertFalse(user.getRetired());
+		Assertions.assertNull(user.getRetiredBy());
+		Assertions.assertNull(user.getRetireReason());
+		Assertions.assertNull(user.getDateRetired());
 	}
 	
 	@Test
@@ -253,7 +253,7 @@ public class AccountDomainWrapperTest {
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
 		account.setUserEnabled(true);
 		
-		Assert.assertNotNull(account.getUser());
+		Assertions.assertNotNull(account.getUser());
 	}
 	
 	@Test
@@ -268,7 +268,7 @@ public class AccountDomainWrapperTest {
 		when(userService.getUsersByPerson(eq(person), eq(false))).thenReturn(Collections.singletonList(user));
 		
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
-		Assert.assertFalse(account.getUserEnabled());
+		Assertions.assertFalse(account.getUserEnabled());
 		
 	}
 	
@@ -284,7 +284,7 @@ public class AccountDomainWrapperTest {
 		when(userService.getUsersByPerson(eq(person), eq(false))).thenReturn(Collections.singletonList(user));
 		
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
-		Assert.assertTrue(account.getUserEnabled());
+		Assertions.assertTrue(account.getUserEnabled());
 		
 	}
 	
@@ -294,7 +294,7 @@ public class AccountDomainWrapperTest {
 		Person person = new Person();
 		
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
-		Assert.assertNull(account.getUserEnabled());
+		Assertions.assertNull(account.getUserEnabled());
 		
 	}
 	
@@ -322,12 +322,12 @@ public class AccountDomainWrapperTest {
 		roles.add(adminApp);
 		account.setCapabilities(roles);
 		
-		Assert.assertEquals("msmith", user.getUsername());
-		Assert.assertTrue(user.getRoles().contains(limitedPrivileges));
-		Assert.assertTrue(user.getRoles().contains(archiveApp));
-		Assert.assertTrue(user.getRoles().contains(adminApp));
-		Assert.assertFalse(user.getRoles().contains(receptionApp));
-		Assert.assertFalse(user.getRoles().contains(fullPrivileges));
+		Assertions.assertEquals("msmith", user.getUsername());
+		Assertions.assertTrue(user.getRoles().contains(limitedPrivileges));
+		Assertions.assertTrue(user.getRoles().contains(archiveApp));
+		Assertions.assertTrue(user.getRoles().contains(adminApp));
+		Assertions.assertFalse(user.getRoles().contains(receptionApp));
+		Assertions.assertFalse(user.getRoles().contains(fullPrivileges));
 		
 	}
 	
@@ -345,7 +345,7 @@ public class AccountDomainWrapperTest {
 		ProviderRole newProviderRole = new ProviderRole();
 		account.setProviderRole(newProviderRole);
 		
-		Assert.assertEquals(newProviderRole, account.getProviderRole());
+		Assertions.assertEquals(newProviderRole, account.getProviderRole());
 	}
 	
 	@Test
@@ -360,7 +360,7 @@ public class AccountDomainWrapperTest {
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
 		account.setProviderRole(null);
 		
-		Assert.assertNull(account.getProviderRole());
+		Assertions.assertNull(account.getProviderRole());
 	}
 	
 	@Test
@@ -381,8 +381,8 @@ public class AccountDomainWrapperTest {
 		AccountDomainWrapper account = initializeNewAccountDomainWrapper(person);
 		account.setCapabilities(null);
 		
-		Assert.assertFalse(user.getRoles().contains(receptionApp));
-		Assert.assertFalse(user.getRoles().contains(archiveApp));
+		Assertions.assertFalse(user.getRoles().contains(receptionApp));
+		Assertions.assertFalse(user.getRoles().contains(archiveApp));
 	}
 	
 	@Test

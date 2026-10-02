@@ -14,6 +14,7 @@ import org.openmrs.module.emrapi.adt.AdtService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +24,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class LocationThatSupportsVisitsController {
@@ -32,7 +33,7 @@ public class LocationThatSupportsVisitsController {
 	@Autowired
 	private AdtService adtService;
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/locationThatSupportsVisits")
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/locationThatSupportsVisits")
 	@ResponseBody
 	public SimpleObject getLocationThatSupportsVisits(HttpServletRequest request, HttpServletResponse response,
 	        @RequestParam(required = true, value = "location") Location location) {

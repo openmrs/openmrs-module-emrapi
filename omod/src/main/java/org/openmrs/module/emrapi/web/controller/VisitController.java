@@ -20,6 +20,7 @@ import org.openmrs.module.emrapi.patient.EmrPatientService;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
+import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.webservices.rest.web.RestUtil;
 import org.openmrs.module.webservices.rest.web.representation.CustomRepresentation;
 import org.openmrs.module.webservices.rest.web.representation.Representation;
@@ -34,8 +35,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class VisitController extends BaseRestController {
 	 * Custom representation supported includes:
 	 * visit:Visit,diagnoses:List<org.openmrs.Diagnosis>,visitNotes:Obs
 	 */
-	@RequestMapping(method = RequestMethod.GET, value = "/rest/**/emrapi/patient/{patientUuid}/visit")
+	@RequestMapping(method = RequestMethod.GET, value = "/rest/" + RestConstants.VERSION_1 + "/emrapi/patient/{patientUuid}/visit")
 	public ResponseEntity<?> getVisitsWithDiagnosesAndNotesByPatient(HttpServletRequest request,
 	        HttpServletResponse response, @PathVariable("patientUuid") String patientUuid) {
 		

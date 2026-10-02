@@ -9,8 +9,8 @@
  */
 package org.openmrs.module.emrapi.patient;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Cohort;
 import org.openmrs.api.PatientService;
 import org.openmrs.module.emrapi.BaseReportingTest;
@@ -39,7 +39,7 @@ public class EmrApiPatientDataLibraryComponentTest extends BaseReportingTest {
 	@Autowired
 	private EmrApiPatientDataLibrary library;
 	
-	@Before
+	@BeforeEach
 	public void setup() throws Exception {
 		executeDataSet("baseTestDataset.xml");
 	}

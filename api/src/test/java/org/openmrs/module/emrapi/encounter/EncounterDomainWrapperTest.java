@@ -11,8 +11,8 @@ package org.openmrs.module.emrapi.encounter;
 
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterProvider;
 import org.openmrs.EncounterRole;
@@ -34,7 +34,8 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.openmrs.module.emrapi.TestUtils.isJustNow;
@@ -45,7 +46,7 @@ public class EncounterDomainWrapperTest {
 	
 	private Encounter encounter;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		encounter = mock(Encounter.class);
 		encounterDomainWrapper = new EncounterDomainWrapper(encounter);
@@ -116,32 +117,34 @@ public class EncounterDomainWrapperTest {
 		
 	}
 	
-	@Test(expected = EncounterDateBeforeVisitStartDateException.class)
+	@Test
 	public void test_attachToVisit_shouldFailIfEncounterDateBeforeVisitStartDate() throws Exception {
+		assertThrows(EncounterDateBeforeVisitStartDateException.class, () -> {
+			Encounter encounter = new Encounter();
+			encounter.setEncounterDatetime(new DateMidnight(2012, 12, 12).toDate());
+			EncounterDomainWrapper encounterWrapper = new EncounterDomainWrapper(encounter);
 		
-		Encounter encounter = new Encounter();
-		encounter.setEncounterDatetime(new DateMidnight(2012, 12, 12).toDate());
-		EncounterDomainWrapper encounterWrapper = new EncounterDomainWrapper(encounter);
+			Visit visit = new Visit();
+			visit.setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
+			visit.setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
 		
-		Visit visit = new Visit();
-		visit.setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
-		visit.setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-		
-		encounterWrapper.attachToVisit(visit);
+			encounterWrapper.attachToVisit(visit);
+		});
 	}
 	
-	@Test(expected = EncounterDateAfterVisitStopDateException.class)
+	@Test
 	public void test_attachToVisit_shouldFailIfEncounterDateAfterVisitStopDate() throws Exception {
+		assertThrows(EncounterDateAfterVisitStopDateException.class, () -> {
+			Encounter encounter = new Encounter();
+			encounter.setEncounterDatetime(new DateMidnight(2012, 12, 16).toDate());
+			EncounterDomainWrapper encounterWrapper = new EncounterDomainWrapper(encounter);
 		
-		Encounter encounter = new Encounter();
-		encounter.setEncounterDatetime(new DateMidnight(2012, 12, 16).toDate());
-		EncounterDomainWrapper encounterWrapper = new EncounterDomainWrapper(encounter);
+			Visit visit = new Visit();
+			visit.setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
+			visit.setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
 		
-		Visit visit = new Visit();
-		visit.setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
-		visit.setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-		
-		encounterWrapper.attachToVisit(visit);
+			encounterWrapper.attachToVisit(visit);
+		});
 	}
 	
 	@Test
