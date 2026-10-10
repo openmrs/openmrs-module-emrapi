@@ -30,8 +30,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Listens for {@link PatientViewedEvent}s, the viewed patient gets added to the last viewed patients
- * user property of the user who viewed them.
+ * Listens for {@link PatientViewedEvent}s, the viewed patient gets added to the last viewed
+ * patients user property of the user who viewed them.
  */
 @Component
 public class PatientViewedEventListener {
@@ -41,7 +41,8 @@ public class PatientViewedEventListener {
 	private volatile DaemonToken daemonToken;
 	
 	/**
-	 * Called by {@link org.openmrs.module.emrapi.EmrApiActivator} with the token core passes the module.
+	 * Called by {@link org.openmrs.module.emrapi.EmrApiActivator} with the token core passes the
+	 * module.
 	 */
 	public void setDaemonToken(DaemonToken daemonToken) {
 		this.daemonToken = daemonToken;

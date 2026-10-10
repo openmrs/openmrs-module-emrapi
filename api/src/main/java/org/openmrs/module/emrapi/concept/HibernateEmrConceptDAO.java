@@ -55,9 +55,9 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 		if (mapTypes == null || mapTypes.isEmpty()) {
 			return new ArrayList<Concept>();
 		}
-		Query<Concept> query = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(
-		    "select c from Concept c join c.conceptMappings m where m.conceptMapType in (:mapTypes)"
-		            + " and m.conceptReferenceTerm = :term");
+		Query<Concept> query = sessionFactory.getHibernateSessionFactory().getCurrentSession()
+		        .createQuery("select c from Concept c join c.conceptMappings m where m.conceptMapType in (:mapTypes)"
+		                + " and m.conceptReferenceTerm = :term");
 		query.setParameterList("mapTypes", mapTypes);
 		query.setParameter("term", term);
 		return query.list();
@@ -126,7 +126,8 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 				i++;
 			}
 			
-			Query<ConceptName> nameQuery = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(hql.toString());
+			Query<ConceptName> nameQuery = sessionFactory.getHibernateSessionFactory().getCurrentSession()
+			        .createQuery(hql.toString());
 			setParameters(nameQuery, params);
 			nameQuery.setMaxResults(limit);
 			
@@ -166,7 +167,8 @@ public class HibernateEmrConceptDAO implements EmrConceptDAO {
 			params.put("sources", sources);
 			params.put("code", query.toLowerCase());
 			
-			Query<ConceptMap> mappingQuery = sessionFactory.getHibernateSessionFactory().getCurrentSession().createQuery(hql.toString());
+			Query<ConceptMap> mappingQuery = sessionFactory.getHibernateSessionFactory().getCurrentSession()
+			        .createQuery(hql.toString());
 			setParameters(mappingQuery, params);
 			mappingQuery.setMaxResults(limit);
 			

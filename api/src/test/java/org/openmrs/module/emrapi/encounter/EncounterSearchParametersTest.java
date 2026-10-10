@@ -17,7 +17,7 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EncounterSearchParametersTest {
-
+	
 	/**
 	 * Bahmni posts these parameters as JSON, with the browser's offset on each date, and relies on
 	 * Jackson's default date parsing.
@@ -27,7 +27,7 @@ public class EncounterSearchParametersTest {
 		EncounterSearchParameters parameters = new ObjectMapper().readValue(
 		    "{\"encounterDateTimeFrom\":\"2024-01-01T00:00:00.000+0530\",\"encounterDateTimeTo\":1704047400000}",
 		    EncounterSearchParameters.class);
-
+		
 		assertEquals(Instant.parse("2023-12-31T18:30:00Z"), parameters.getEncounterDateTimeFrom().toInstant());
 		assertEquals(Instant.parse("2023-12-31T18:30:00Z"), parameters.getEncounterDateTimeTo().toInstant());
 	}

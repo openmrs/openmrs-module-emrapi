@@ -68,7 +68,7 @@ public class ConceptSetDescriptorTest {
 	public void shouldRaiseExceptionIfRequiredConceptDoesNotExist() {
 		assertThrows(IllegalStateException.class, () -> {
 			ConceptSetDescriptorImpl conceptSetDescriptorImpl = new ConceptSetDescriptorImpl();
-		
+			
 			conceptSetDescriptorImpl.setup(conceptService, "someConceptSource",
 			    ConceptSetDescriptorField.required("setConcept", "setConceptCode"),
 			    ConceptSetDescriptorField.required("firstMemberConcept", "nonExistingConceptCode"));

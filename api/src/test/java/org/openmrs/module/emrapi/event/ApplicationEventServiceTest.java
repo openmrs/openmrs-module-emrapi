@@ -28,7 +28,7 @@ public class ApplicationEventServiceTest extends BaseModuleContextSensitiveTest 
 	
 	@Autowired
 	private ApplicationEvents applicationEvents;
-
+	
 	/**
 	 * @verifies publish the patient viewed event
 	 * @see ApplicationEventService#patientViewed(org.openmrs.Patient, org.openmrs.User)

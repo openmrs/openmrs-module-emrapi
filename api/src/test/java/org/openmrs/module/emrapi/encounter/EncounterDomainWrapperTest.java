@@ -123,11 +123,11 @@ public class EncounterDomainWrapperTest {
 			Encounter encounter = new Encounter();
 			encounter.setEncounterDatetime(new DateMidnight(2012, 12, 12).toDate());
 			EncounterDomainWrapper encounterWrapper = new EncounterDomainWrapper(encounter);
-		
+			
 			Visit visit = new Visit();
 			visit.setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
 			visit.setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-		
+			
 			encounterWrapper.attachToVisit(visit);
 		});
 	}
@@ -138,11 +138,11 @@ public class EncounterDomainWrapperTest {
 			Encounter encounter = new Encounter();
 			encounter.setEncounterDatetime(new DateMidnight(2012, 12, 16).toDate());
 			EncounterDomainWrapper encounterWrapper = new EncounterDomainWrapper(encounter);
-		
+			
 			Visit visit = new Visit();
 			visit.setStartDatetime(new DateTime(2012, 12, 13, 10, 10, 10).toDate());
 			visit.setStopDatetime(new DateTime(2012, 12, 15, 10, 10, 10).toDate());
-		
+			
 			encounterWrapper.attachToVisit(visit);
 		});
 	}

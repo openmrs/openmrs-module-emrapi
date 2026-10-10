@@ -10,9 +10,9 @@
 package org.openmrs.module.emrapi.event;
 
 /**
- * Published through core's {@link org.openmrs.event.EventPublisher} when a user views a patient, see
- * {@link ApplicationEventService#patientViewed(org.openmrs.Patient, org.openmrs.User)}. Listen for it
- * with a Spring {@link org.springframework.context.event.EventListener}.
+ * Published through core's {@link org.openmrs.event.EventPublisher} when a user views a patient,
+ * see {@link ApplicationEventService#patientViewed(org.openmrs.Patient, org.openmrs.User)}. Listen
+ * for it with a Spring {@link org.springframework.context.event.EventListener}.
  *
  * @since 4.0.0
  */

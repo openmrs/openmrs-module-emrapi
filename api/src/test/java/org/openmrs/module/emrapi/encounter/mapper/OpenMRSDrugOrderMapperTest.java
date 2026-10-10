@@ -71,7 +71,6 @@ public class OpenMRSDrugOrderMapperTest {
 	@Mock
 	private OrderMetadataService orderMetadataService;
 	
-	
 	private OpenMRSDrugOrderMapper openMRSDrugOrderMapper;
 	
 	private Encounter encounter;

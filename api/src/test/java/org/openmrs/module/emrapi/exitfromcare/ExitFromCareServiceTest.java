@@ -425,9 +425,9 @@ public class ExitFromCareServiceTest {
 		assertThrows(IllegalArgumentException.class, () -> {
 			Patient patient = new Patient();
 			Date futureDate = new DateTime().plusDays(1).toDate();
-		
+			
 			exitFromCareService.markPatientDead(patient, null, futureDate);
-		
+			
 		});
 	}
 	
@@ -438,7 +438,7 @@ public class ExitFromCareServiceTest {
 			Date birthDate = new DateTime().minusDays(20).toDate();
 			patient.setBirthdate(birthDate);
 			Date deathDate = new DateTime().minusDays(30).toDate();
-		
+			
 			exitFromCareService.markPatientDead(patient, null, deathDate);
 		});
 	}

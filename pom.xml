@@ -39,6 +39,8 @@
 
     <properties>
         <openmrsPlatformVersion>3.0.0-SNAPSHOT</openmrsPlatformVersion>
+        <!-- formatter the code base is formatted with; the 3.0 one reformats every catch block -->
+        <openmrsPlatformToolsVersion>2.8.0</openmrsPlatformToolsVersion>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.proc>full</maven.compiler.proc>

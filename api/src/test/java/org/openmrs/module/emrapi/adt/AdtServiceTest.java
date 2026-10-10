@@ -956,7 +956,7 @@ public class AdtServiceTest {
 			Patient preferred = new Patient();
 			Patient notPreferred = new Patient();
 			preferred.addAttribute(new PersonAttribute(emrApiProperties.getUnknownPatientPersonAttributeType(), "true"));
-		
+			
 			service.mergePatients(preferred, notPreferred);
 		});
 	}
@@ -984,16 +984,16 @@ public class AdtServiceTest {
 	public void test_admitPatient_failsIfPatientIsAlreadyAdmitted() throws Exception {
 		assertThrows(IllegalStateException.class, () -> {
 			Patient patient = new Patient();
-		
+			
 			Encounter admit = buildEncounter(patient, new Date());
 			admit.setEncounterType(admissionEncounterType);
 			Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
 			existing.addEncounter(admit);
-		
+			
 			when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
-		
+			
 			AdtAction admission = new AdtAction(existing, inpatientDepartment, buildProviderMap(), ADMISSION);
-		
+			
 			service.createAdtEncounterFor(admission);
 		});
 	}
@@ -1025,12 +1025,12 @@ public class AdtServiceTest {
 	public void test_dischargePatient_failsIfPatientIsNotAdmitted() throws Exception {
 		assertThrows(IllegalStateException.class, () -> {
 			Patient patient = new Patient();
-		
+			
 			Visit existing = buildVisit(patient, atFacilityVisitType, mirebalaisHospital, new Date(), null);
 			when(mockVisitService.getVisitsByPatient(patient)).thenReturn(Arrays.asList(existing));
-		
+			
 			AdtAction discharge = new AdtAction(existing, inpatientDepartment, buildProviderMap(), DISCHARGE);
-		
+			
 			service.createAdtEncounterFor(discharge);
 		});
 	}
@@ -1111,14 +1111,14 @@ public class AdtServiceTest {
 	public void test_createRetrospectiveVisit_shouldThrowExceptionIfExistingVisitDuringDatetime() throws Exception {
 		assertThrows(ExistingVisitDuringTimePeriodException.class, () -> {
 			final Patient patient = new Patient();
-		
+			
 			final Date startDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
 			final Date stopDate = new DateTime(2012, 1, 2, 0, 0, 0, 999).toDate();
-		
+			
 			when(mockVisitService.getVisits(Collections.singletonList(emrApiProperties.getAtFacilityVisitType()),
 			    Collections.singletonList(patient), Collections.singletonList(mirebalaisHospital), null, null, stopDate,
 			    startDate, null, null, true, false)).thenReturn(Collections.singletonList(new Visit()));
-		
+			
 			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 		});
 	}
@@ -1127,10 +1127,10 @@ public class AdtServiceTest {
 	public void test_createRetrospectiveVisit_shouldThrowExceptionIfStartTimeAfterStopTime() throws Exception {
 		assertThrows(IllegalArgumentException.class, () -> {
 			final Patient patient = new Patient();
-		
+			
 			final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
 			final Date stopDate = new DateTime(2012, 1, 1, 0, 0, 0, 0).toDate();
-		
+			
 			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 		});
 	}
@@ -1139,10 +1139,10 @@ public class AdtServiceTest {
 	public void test_createRetrospectiveVisit_shouldFailExceptionIfStartTimeInFuture() throws Exception {
 		assertThrows(IllegalArgumentException.class, () -> {
 			final Patient patient = new Patient();
-		
+			
 			final Date startDate = new DateTime(3000, 1, 2, 0, 0, 0, 0).toDate();
 			final Date stopDate = new DateTime(3000, 1, 2, 1, 1, 1, 1).toDate();
-		
+			
 			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 		});
 	}
@@ -1151,10 +1151,10 @@ public class AdtServiceTest {
 	public void test_createRetrospectiveVisit_shouldFailExceptionIfStopTimeInFuture() throws Exception {
 		assertThrows(IllegalArgumentException.class, () -> {
 			final Patient patient = new Patient();
-		
+			
 			final Date startDate = new DateTime(2012, 1, 2, 0, 0, 0, 0).toDate();
 			final Date stopDate = new DateTime(3000, 1, 1, 0, 0, 0, 0).toDate();
-		
+			
 			service.createRetrospectiveVisit(patient, outpatientDepartment, startDate, stopDate);
 		});
 	}

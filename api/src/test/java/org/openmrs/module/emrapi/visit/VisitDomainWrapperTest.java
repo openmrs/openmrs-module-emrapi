@@ -644,10 +644,10 @@ public class VisitDomainWrapperTest {
 	public void shouldFailIfNoEncounters() throws Exception {
 		assertThrows(IllegalStateException.class, () -> {
 			Date startDate = new DateTime(2012, 2, 20, 10, 10).toDate();
-		
+			
 			Visit visit = new Visit();
 			visit.setStartDatetime(startDate);
-		
+			
 			new VisitDomainWrapper(visit).closeOnLastEncounterDatetime();
 		});
 	}

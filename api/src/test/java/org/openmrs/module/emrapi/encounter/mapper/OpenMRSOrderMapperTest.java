@@ -83,14 +83,14 @@ public class OpenMRSOrderMapperTest {
 		assertThrows(APIException.class, () -> {
 			Provider provider = mock(Provider.class);
 			handleEncounterProvider(provider);
-		
+			
 			EncounterTransaction.Order etOrder = new EncounterTransaction.Order();
 			etOrder.setUrgency("STT");
-		
+			
 			OpenMRSOrderMapper orderMapper = new OpenMRSOrderMapper(orderService, conceptService);
-		
+			
 			orderMapper.map(etOrder, encounter);
-		
+			
 		});
 	}
 	

@@ -211,8 +211,8 @@ public class EncounterDispositionServiceHelperTest {
 		for (Obs obsGroupMember : obsGroupMembers) {
 			if (obsGroupMember.getConcept().getUuid().equals(EmrApiConstants.CONCEPT_CODE_DISPOSITION + UUID_SUFFIX)) {
 				dispositionConceptExists = true;
-				assertEquals(code + UUID_SUFFIX,
-				    obsGroupMember.getValueCoded().getUuid(), "Disposition answer not being added correctly");
+				assertEquals(code + UUID_SUFFIX, obsGroupMember.getValueCoded().getUuid(),
+				    "Disposition answer not being added correctly");
 			} else if (obsGroupMember.getConcept().getUuid().equals(noteConceptUuid)) {
 				noteConceptExists = true;
 				assertEquals(dispositionNoteValue, obsGroupMember.getValueText(), "Error in disposition note value");

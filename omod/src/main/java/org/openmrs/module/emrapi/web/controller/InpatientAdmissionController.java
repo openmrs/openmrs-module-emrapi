@@ -40,8 +40,7 @@ public class InpatientAdmissionController {
 	@Autowired
 	private AdtService adtService;
 	
-	@RequestMapping(method = RequestMethod.GET, value = {
-	        "/rest/" + RestConstants.VERSION_1 + "/emrapi/inpatient/admission",
+	@RequestMapping(method = RequestMethod.GET, value = { "/rest/" + RestConstants.VERSION_1 + "/emrapi/inpatient/admission",
 	        "/rest/emrapi/inpatient/admission" })
 	@ResponseBody
 	public SimpleObject getInpatientAdmissions(HttpServletRequest request, HttpServletResponse response,

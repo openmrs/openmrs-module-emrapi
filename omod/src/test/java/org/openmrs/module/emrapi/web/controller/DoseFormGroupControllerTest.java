@@ -83,7 +83,8 @@ public class DoseFormGroupControllerTest extends BaseModuleWebContextSensitiveTe
 	@Test
 	public void shouldReturnConceptsInTheRequestedRepresentation() throws Exception {
 		Map<String, Object> asFull = firstDoseForm(representation("full"));
-		assertTrue(asFull.keySet().containsAll(Arrays.asList("uuid", "display", "datatype", "conceptClass")), "expected more than a REF, got " + asFull.keySet());
+		assertTrue(asFull.keySet().containsAll(Arrays.asList("uuid", "display", "datatype", "conceptClass")),
+		    "expected more than a REF, got " + asFull.keySet());
 		
 		// The default is REF, not DEFAULT: a Concept's default representation drags its names,
 		// descriptions, mappings, answers, set members and attributes along, and CIEL ships around 86

@@ -103,21 +103,21 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		assertThrows(IllegalStateException.class, () -> {
 			Patient patient = new Patient();
 			Location location = new Location();
-		
+			
 			Visit notSuitable = new Visit();
 			notSuitable.setPatient(patient);
 			notSuitable.setStartDatetime(DateUtils.addDays(new Date(), -7));
 			notSuitable.setStopDatetime(DateUtils.addDays(new Date(), -6));
 			notSuitable.setLocation(location);
-		
+			
 			when(visitService.getVisits(any(Collection.class), any(Collection.class), any(Collection.class),
 			    any(Collection.class), any(Date.class), any(Date.class), any(Date.class), any(Date.class), any(Map.class),
 			    anyBoolean(), anyBoolean())).thenReturn(Collections.singletonList(notSuitable));
-		
+			
 			Encounter encounter = new Encounter();
 			encounter.setPatient(patient);
 			encounter.setLocation(location);
-		
+			
 			handler.beforeCreateEncounter(encounter);
 		});
 	}
@@ -182,7 +182,8 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		
 		// there is a visit on the encounter
 		Assertions.assertNotNull(encounter.getVisit());
-		Assertions.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime())); // no check for end date for a visit that is started today since it is still open
+		Assertions
+		        .assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime())); // no check for end date for a visit that is started today since it is still open
 	}
 	
 	@Test
@@ -216,7 +217,8 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 		
 		// there is a visit on the encounter
 		Assertions.assertNotNull(encounter.getVisit());
-		Assertions.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime()));
+		Assertions
+		        .assertTrue(DateUtils.isSameDay(encounter.getVisit().getStartDatetime(), encounter.getEncounterDatetime()));
 		Assertions.assertTrue(DateUtils.isSameDay(encounter.getVisit().getStopDatetime(), encounter.getEncounterDatetime())); // has stop time since it is in the past
 	}
 	
@@ -252,34 +254,35 @@ public class EmrApiVisitAssignmentHandlerTest extends BaseModuleContextSensitive
 			Location locationA = new Location();
 			Location locationB = new Location();
 			locationB.addTag(new LocationTag(EmrApiConstants.LOCATION_TAG_SUPPORTS_VISITS, "Tag that supports visits"));
-		
+			
 			// patient has an open (active) visit at locationA
 			Visit activeVisitElsewhere = new Visit();
 			activeVisitElsewhere.setPatient(patient);
 			activeVisitElsewhere.setStartDatetime(DateUtils.addHours(new Date(), -2));
 			activeVisitElsewhere.setLocation(locationA);
 			// stopDatetime == null -> still active
-		
+			
 			when(visitService.getVisits(isNull(), anyCollection(), isNull(), isNull(), isNull(), any(Date.class), isNull(),
 			    isNull(), isNull(), eq(true), eq(false))).thenReturn(Collections.singletonList(activeVisitElsewhere));
-			when(adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))
-			        .thenReturn("default:1");
-			when(adminService
-			        .getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ALLOW_OVERLAPPING_VISITS_AT_ANOTHER_LOCATION))
-			                .thenReturn("false");
+			when(
+			    adminService.getGlobalProperty(EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ENCOUNTER_TYPE_TO_VISIT_TYPE_MAP))
+			            .thenReturn("default:1");
+			when(adminService.getGlobalProperty(
+			    EmrApiConstants.GP_VISIT_ASSIGNMENT_HANDLER_ALLOW_OVERLAPPING_VISITS_AT_ANOTHER_LOCATION))
+			            .thenReturn("false");
 			VisitType visitType = new VisitType();
 			visitType.setId(1);
 			when(visitService.getVisitType(1)).thenReturn(visitType);
 			encounterTypetoVisitTypeMapper.setAdminService(adminService);
 			encounterTypetoVisitTypeMapper.setVisitService(visitService);
 			handler.setEncounterTypetoVisitTypeMapper(encounterTypetoVisitTypeMapper);
-		
+			
 			Encounter encounter = new Encounter();
 			encounter.setPatient(patient);
 			encounter.setLocation(locationB);
 			encounter.setEncounterDatetime(new Date());
 			encounter.setEncounterType(encounterType);
-		
+			
 			handler.beforeCreateEncounter(encounter);
 		});
 	}
