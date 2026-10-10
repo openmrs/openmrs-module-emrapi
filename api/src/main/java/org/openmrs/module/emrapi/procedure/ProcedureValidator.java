@@ -58,9 +58,6 @@ public class ProcedureValidator implements Validator {
 					errors.reject("Procedure.error.endDateTimeBeforeStartDateTime");
 				}
 			}
-			if (procedure.getBodySite() == null) {
-				errors.reject("Procedure.error.bodySiteRequired");
-			}
 			if (procedure.getEstimatedStartDate() == null && procedure.getStartDateTime() == null) {
 				errors.reject("Procedure.error.startDateTimeRequired");
 			}
