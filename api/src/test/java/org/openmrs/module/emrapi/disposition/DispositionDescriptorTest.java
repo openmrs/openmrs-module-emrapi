@@ -9,11 +9,13 @@
  */
 package org.openmrs.module.emrapi.disposition;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openmrs.Concept;
 import org.openmrs.Location;
 import org.openmrs.Obs;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.LocationService;
 import org.openmrs.module.emrapi.concept.EmrConceptService;
 
@@ -26,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -252,7 +255,7 @@ public class DispositionDescriptorTest {
 	
 	/**
 	 * commenting this out until we know if we actually need to build this functionality
-	 * 
+	 *
 	 * @Test public void shouldBuildDipositionObsWithAdmissionLocation() { Disposition
 	 *       admissionDisposition = new Disposition(); admissionDisposition.setConceptCode("ADMISSION");
 	 *       Location admissionLocation = new Location(); Obs dispositionObsGroup =
@@ -275,5 +278,22 @@ public class DispositionDescriptorTest {
 		
 		return dispositionSet;
 	}
-	
+    
+    @Test
+    public void setup_shouldThrowInformativeErrorWhenDispositionSetIsMissing() {
+        ConceptService mockConceptService = mock(ConceptService.class);
+        when(mockConceptService.getConceptByMapping(anyString(), anyString())).thenReturn(null);
+        
+        try {
+            new DispositionDescriptor(mockConceptService);
+            
+            Assert.fail("Should have thrown IllegalStateException");
+        }
+        catch (IllegalStateException e) {
+            System.out.println("Caught Expected Error: " + e.getMessage());
+            assertTrue(e.getMessage().contains("Configuration Error"));
+            assertTrue(e.getMessage().contains("Please verify that the concept source"));
+        }
+    }
+    
 }
