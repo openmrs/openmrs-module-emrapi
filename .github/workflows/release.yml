@@ -27,5 +27,7 @@ jobs:
     secrets:
       MAVEN_REPO_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
       MAVEN_REPO_API_KEY: ${{ secrets.MAVEN_REPO_API_KEY }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       BOT_PAT: ${{ secrets.BOT_PAT }}
 
