@@ -106,6 +106,31 @@ public class EncounterDispositionServiceHelperTest {
 	}
 	
 	@Test
+	public void shouldVoidASavedDispositionNoteWithTheValuesItWasSavedWith() {
+		String noteConceptUuid = "disposition-note" + UUID_SUFFIX;
+		Concept noteConcept = newConcept(ConceptDatatype.TEXT, noteConceptUuid);
+		Encounter encounter = createEncounter("e-uuid");
+		Obs dispositionGroupObservation = buildDispositionGroupObservation();
+		Obs savedNote = new ObsBuilder().setConcept(noteConcept).setUuid(UUID.randomUUID().toString()).get();
+		savedNote.setObsId(7);
+		savedNote.setValueText("saved note");
+		savedNote.setComment("saved comment");
+		dispositionGroupObservation.addGroupMember(savedNote);
+		encounter.addObs(dispositionGroupObservation);
+		EncounterTransaction.Disposition disposition = new EncounterTransaction.Disposition();
+		disposition.setCode("ADMIT").setAdditionalObs(
+		    Arrays.asList(new EncounterTransaction.Observation().setConcept(getConcept(noteConceptUuid))
+		            .setValue("changed note").setComment("changed comment").setVoided(true).setVoidReason("removed")));
+		
+		encounterDispositionServiceHelper.update(encounter, disposition);
+		
+		assertTrue(savedNote.getVoided());
+		assertEquals("removed", savedNote.getVoidReason());
+		assertEquals("saved comment", savedNote.getComment());
+		assertEquals("saved note", savedNote.getValueText());
+	}
+	
+	@Test
 	public void shouldUpdateDispositionAsObsGroup() {
 		String noteConceptUuid = "disposition-note" + UUID_SUFFIX;
 		String dispositionNoteValue = "disposition note text";

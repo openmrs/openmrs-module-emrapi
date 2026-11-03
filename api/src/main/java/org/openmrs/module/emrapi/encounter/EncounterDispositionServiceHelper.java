@@ -131,6 +131,12 @@ public class EncounterDispositionServiceHelper {
 	
 	private Obs updateObsFromObservation(EncounterTransaction.Observation observation, Obs obs) throws ParseException {
 		if (observation != null && obs != null) {
+			if (observation.getVoided() && obs.getId() != null) {
+				// a saved obs is voided as it was saved, without the request's other values
+				obs.setVoided(true);
+				obs.setVoidReason(observation.getVoidReason());
+				return obs;
+			}
 			obs.setConcept(getConceptByUuid(observation.getConceptUuid()));
 			obs.setComment(observation.getComment());
 			if (observation.getVoided()) {

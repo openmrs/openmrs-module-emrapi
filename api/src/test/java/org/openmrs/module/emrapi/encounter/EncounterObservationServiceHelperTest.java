@@ -359,6 +359,43 @@ public class EncounterObservationServiceHelperTest {
 	}
 	
 	@Test
+	public void shouldVoidASavedDiagnosisWithTheValuesItWasSavedWith() {
+		String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
+		String existingObsUuid = "obs-uuid";
+		Date savedDatetime = new Date(1000);
+		EncounterTransaction.Diagnosis diagnosisRequest = new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED")
+		        .setOrder("PRIMARY").setComments("changed comment")
+		        .setCodedAnswer(new EncounterTransaction.Concept(diagnosisConceptUuid, "conceptName")).setVoided(true)
+		        .setExistingObs(existingObsUuid);
+		diagnosisRequest.setVoidReason("removed");
+		diagnosisRequest.setDiagnosisDateTime(new Date(2000));
+		
+		Obs savedDiagnosis = new Obs(1);
+		savedDiagnosis.setUuid(existingObsUuid);
+		savedDiagnosis.setComment("saved comment");
+		savedDiagnosis.setObsDatetime(savedDatetime);
+		savedDiagnosis.addGroupMember(new Obs(2));
+		Encounter encounter = new Encounter();
+		encounter.setEncounterDatetime(new Date());
+		
+		when(obsService.getObsByUuid(existingObsUuid)).thenReturn(savedDiagnosis);
+		when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class)))
+		        .thenReturn(savedDiagnosis);
+		when(conceptService.getConceptByUuid(diagnosisConceptUuid)).thenReturn(new Concept());
+		
+		encounterObservationServiceHelper.updateDiagnoses(encounter, asList(diagnosisRequest));
+		
+		assertTrue(encounter.getObsAtTopLevel(true).contains(savedDiagnosis));
+		assertTrue(savedDiagnosis.getVoided());
+		assertEquals("removed", savedDiagnosis.getVoidReason());
+		assertEquals("saved comment", savedDiagnosis.getComment());
+		assertEquals(savedDatetime, savedDiagnosis.getObsDatetime());
+		for (Obs member : savedDiagnosis.getGroupMembers(true)) {
+			assertTrue(member.getVoided());
+		}
+	}
+	
+	@Test
 	public void shouldLinkOrderWithObservation() throws ParseException {
 		Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
 		Order obsOrder = fetchOrder("order-uuid");

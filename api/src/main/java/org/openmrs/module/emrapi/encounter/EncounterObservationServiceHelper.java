@@ -62,6 +62,14 @@ public class EncounterObservationServiceHelper {
 	
 	public void updateDiagnoses(Encounter encounter, List<EncounterTransaction.Diagnosis> diagnoses) {
 		for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
+			Obs existingObs = diagnosisRequest.getExistingObs() == null ? null
+			        : obsService.getObsByUuid(diagnosisRequest.getExistingObs());
+			if (diagnosisRequest.isVoided() && existingObs != null) {
+				// a saved diagnosis is voided as it was saved, without the request's other values
+				voidDiagnosisObservation(diagnosisRequest, existingObs);
+				encounter.addObs(existingObs);
+				continue;
+			}
 			org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
 			Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
 			if (diagnosisRequest.getDiagnosisDateTime() != null) {
