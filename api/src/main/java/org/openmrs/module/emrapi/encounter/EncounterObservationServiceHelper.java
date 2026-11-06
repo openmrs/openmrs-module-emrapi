@@ -62,7 +62,15 @@ public class EncounterObservationServiceHelper {
 	
 	public void updateDiagnoses(Encounter encounter, List<EncounterTransaction.Diagnosis> diagnoses) {
 		for (EncounterTransaction.Diagnosis diagnosisRequest : diagnoses) {
-			org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest);
+			Obs existingObs = diagnosisRequest.getExistingObs() == null ? null
+			        : obsService.getObsByUuid(diagnosisRequest.getExistingObs());
+			if (diagnosisRequest.isVoided() && existingObs != null) {
+				// a saved diagnosis is voided as it was saved, without the request's other values
+				voidDiagnosisObservation(diagnosisRequest, existingObs);
+				encounter.addObs(existingObs);
+				continue;
+			}
+			org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = createDiagnosis(diagnosisRequest, existingObs);
 			Obs obs = emrApiProperties.getDiagnosisMetadata().buildDiagnosisObsGroup(diagnosis);
 			if (diagnosisRequest.getDiagnosisDateTime() != null) {
 				obs.setObsDatetime(diagnosisRequest.getDiagnosisDateTime());
@@ -87,13 +95,13 @@ public class EncounterObservationServiceHelper {
 		}
 	}
 	
-	private org.openmrs.module.emrapi.diagnosis.Diagnosis createDiagnosis(EncounterTransaction.Diagnosis diagnosisRequest) {
+	private org.openmrs.module.emrapi.diagnosis.Diagnosis createDiagnosis(EncounterTransaction.Diagnosis diagnosisRequest,
+	        Obs existingObs) {
 		CodedOrFreeTextAnswer codedOrFreeTextAnswer = getCodedOrFreeTextAnswer(diagnosisRequest);
 		org.openmrs.module.emrapi.diagnosis.Diagnosis.Order order = org.openmrs.module.emrapi.diagnosis.Diagnosis.Order
 		        .valueOf(diagnosisRequest.getOrder());
 		org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty certainty = org.openmrs.module.emrapi.diagnosis.Diagnosis.Certainty
 		        .valueOf(diagnosisRequest.getCertainty());
-		Obs existingObs = obsService.getObsByUuid(diagnosisRequest.getExistingObs());
 		org.openmrs.module.emrapi.diagnosis.Diagnosis diagnosis = new org.openmrs.module.emrapi.diagnosis.Diagnosis(
 		        codedOrFreeTextAnswer, order);
 		diagnosis.setCertainty(certainty);
