@@ -396,6 +396,33 @@ public class EncounterObservationServiceHelperTest {
 	}
 	
 	@Test
+	public void shouldLookUpASavedDiagnosisOnceWhenUpdatingIt() {
+		String diagnosisConceptUuid = "f100e906-2c1c-11e3-bd6a-d72943d76e9f";
+		String existingObsUuid = "obs-uuid";
+		EncounterTransaction.Diagnosis diagnosisRequest = new EncounterTransaction.Diagnosis().setCertainty("CONFIRMED")
+		        .setOrder("PRIMARY").setCodedAnswer(new EncounterTransaction.Concept(diagnosisConceptUuid, "conceptName"))
+		        .setExistingObs(existingObsUuid);
+		Obs savedDiagnosis = new Obs(1);
+		savedDiagnosis.setUuid(existingObsUuid);
+		savedDiagnosis.addGroupMember(new Obs(2));
+		Encounter encounter = new Encounter();
+		encounter.setEncounterDatetime(new Date());
+		
+		when(obsService.getObsByUuid(existingObsUuid)).thenReturn(savedDiagnosis);
+		when(diagnosisMetadata.buildDiagnosisObsGroup(any(org.openmrs.module.emrapi.diagnosis.Diagnosis.class)))
+		        .thenReturn(savedDiagnosis);
+		when(conceptService.getConceptByUuid(diagnosisConceptUuid)).thenReturn(new Concept());
+		
+		encounterObservationServiceHelper.updateDiagnoses(encounter, asList(diagnosisRequest));
+		
+		ArgumentCaptor<org.openmrs.module.emrapi.diagnosis.Diagnosis> diagnosisCaptor = ArgumentCaptor
+		        .forClass(org.openmrs.module.emrapi.diagnosis.Diagnosis.class);
+		verify(diagnosisMetadata).buildDiagnosisObsGroup(diagnosisCaptor.capture());
+		assertSame(savedDiagnosis, diagnosisCaptor.getValue().getExistingObs());
+		verify(obsService, times(1)).getObsByUuid(existingObsUuid);
+	}
+	
+	@Test
 	public void shouldLinkOrderWithObservation() throws ParseException {
 		Concept numericConcept = newConcept(new ConceptDataTypeBuilder().numeric(), NUMERIC_CONCEPT_UUID);
 		Order obsOrder = fetchOrder("order-uuid");
