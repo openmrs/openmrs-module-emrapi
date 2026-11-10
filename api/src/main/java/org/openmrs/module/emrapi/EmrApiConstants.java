@@ -170,6 +170,8 @@ public class EmrApiConstants {
 	
 	public static final String CONCEPT_CODE_DATE_OF_DEATH = "Date of Death";
 	
+	public static final String CONCEPT_CODE_CAUSE_OF_DEATH = "Cause of Death";
+	
 	public static final String CONCEPT_CODE_UNKNOWN_CAUSE_OF_DEATH = "Unknown Cause of Death";
 	
 	public static final String CONCEPT_CODE_PATIENT_DIED = "Patient Died";

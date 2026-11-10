@@ -13,6 +13,7 @@ import org.openmrs.Concept;
 import org.openmrs.Obs;
 import org.openmrs.Patient;
 import org.openmrs.module.emrapi.EmrApiProperties;
+import org.openmrs.module.emrapi.disposition.DispositionDescriptor;
 import org.openmrs.module.emrapi.disposition.DispositionService;
 import org.openmrs.module.emrapi.encounter.EncounterDomainWrapper;
 import org.openmrs.module.emrapi.exitfromcare.ExitFromCareService;
@@ -23,7 +24,9 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * Sets the death and deathDate fields on a Patient, and saves those changes. TODO implement an API
+ * Sets the death, deathDate and causeOfDeath fields on a Patient, and saves those changes. The
+ * cause of death is taken from the disposition obs group if present, otherwise it defaults to the
+ * "Unknown Cause of Death" concept. TODO implement an API
  * method for recording a patient's death in this module (based on, but cleaner than, the
  * PatientService.processDeath method)
  */
@@ -43,10 +46,13 @@ public class MarkPatientDeadDispositionAction implements DispositionAction {
 	public void action(EncounterDomainWrapper encounterDomainWrapper, Obs dispositionObsGroupBeingCreated,
 	        Map<String, String[]> requestParameters) {
 		
-		Date deathDate = dispositionService.getDispositionDescriptor().getDateOfDeath(dispositionObsGroupBeingCreated);
+		DispositionDescriptor dispositionDescriptor = dispositionService.getDispositionDescriptor();
+		Date deathDate = dispositionDescriptor.getDateOfDeath(dispositionObsGroupBeingCreated);
 		
-		// TODO: support pulling cause of death from the disposition
-		Concept causeOfDeath = emrApiProperties.getUnknownCauseOfDeathConcept();
+		Concept causeOfDeath = dispositionDescriptor.getCauseOfDeath(dispositionObsGroupBeingCreated);
+		if (causeOfDeath == null) {
+			causeOfDeath = emrApiProperties.getUnknownCauseOfDeathConcept();
+		}
 		
 		Patient patient = encounterDomainWrapper.getEncounter().getPatient();
 		exitFromCareService.markPatientDead(patient, causeOfDeath, deathDate);
