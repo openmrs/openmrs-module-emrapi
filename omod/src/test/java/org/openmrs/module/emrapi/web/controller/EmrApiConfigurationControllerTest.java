@@ -155,13 +155,14 @@ public class EmrApiConfigurationControllerTest extends BaseModuleWebContextSensi
 		request.addParameter("v", "custom:(dispositionDescriptor:full)");
 		SimpleObject config = emrApiConfigurationController.getEmrApiConfiguration(request, response);
 		Map<String, Object> descriptor = mapNode(config, "dispositionDescriptor");
-		assertThat(descriptor.keySet().size(), equalTo(5));
+		assertThat(descriptor.keySet().size(), equalTo(6));
 		assertThat(mapNode(descriptor, "dispositionSetConcept", "name").get("name"), equalTo("Disposition Construct"));
 		assertThat(mapNode(descriptor, "dispositionConcept", "name").get("name"), equalTo("Disposition"));
 		assertThat(mapNode(descriptor, "admissionLocationConcept", "name").get("name"), equalTo("Admission Location"));
 		assertThat(mapNode(descriptor, "internalTransferLocationConcept", "name").get("name"),
 		    equalTo("Internal Transfer Location"));
 		assertThat(mapNode(descriptor, "dateOfDeathConcept", "name").get("name"), equalTo("Date of Death"));
+		assertThat(mapNode(descriptor, "causeOfDeathConcept", "name").get("name"), equalTo("Cause of Death"));
 	}
 	
 	@Test

@@ -85,12 +85,16 @@ public class ContextSensitiveMetadataTestUtils {
 		Concept dateOfDeath = new ConceptBuilder(conceptService, dateDatatype, misc).addName("Date of Death")
 		        .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH).saveAndGet();
 		
+		Concept causeOfDeath = new ConceptBuilder(conceptService, codedDatatype, misc).addName("Cause of Death")
+		        .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_CAUSE_OF_DEATH).saveAndGet();
+		
 		Concept disposition = new ConceptBuilder(conceptService, codedDatatype, convSet).addName("Disposition")
 		        .addAnswers(admit, discharge, death, transferOut, observation)
 		        .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DISPOSITION).saveAndGet();
 		
 		new ConceptBuilder(conceptService, naDatatype, convSet).addName("Disposition Construct")
-		        .addSetMembers(disposition, transferTo, admissionLocation, internalTransferLocation, dateOfDeath)
+		        .addSetMembers(disposition, transferTo, admissionLocation, internalTransferLocation, dateOfDeath,
+		            causeOfDeath)
 		        .addMapping(sameAs, emrSource, EmrApiConstants.CONCEPT_CODE_DISPOSITION_CONCEPT_SET).saveAndGet();
 		
 		return dispositionService.getDispositionDescriptor();
