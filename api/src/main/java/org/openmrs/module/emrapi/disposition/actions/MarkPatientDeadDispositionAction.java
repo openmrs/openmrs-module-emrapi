@@ -26,9 +26,8 @@ import java.util.Map;
 /**
  * Sets the death, deathDate and causeOfDeath fields on a Patient, and saves those changes. The
  * cause of death is taken from the disposition obs group if present, otherwise it defaults to the
- * "Unknown Cause of Death" concept. TODO implement an API
- * method for recording a patient's death in this module (based on, but cleaner than, the
- * PatientService.processDeath method)
+ * "Unknown Cause of Death" concept. TODO implement an API method for recording a patient's death in
+ * this module (based on, but cleaner than, the PatientService.processDeath method)
  */
 @Component("markPatientDeadDispositionAction")
 public class MarkPatientDeadDispositionAction implements DispositionAction {
