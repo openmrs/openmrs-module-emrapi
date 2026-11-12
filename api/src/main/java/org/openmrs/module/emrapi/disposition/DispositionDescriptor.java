@@ -39,6 +39,8 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 	
 	private Concept dateOfDeathConcept;
 	
+	private Concept causeOfDeathConcept;
+	
 	public DispositionDescriptor(ConceptService conceptService) {
 		setup(conceptService, EmrApiConstants.EMR_CONCEPT_SOURCE_NAME,
 		    ConceptSetDescriptorField.required("dispositionSetConcept",
@@ -47,7 +49,8 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 		    ConceptSetDescriptorField.optional("admissionLocationConcept", EmrApiConstants.CONCEPT_CODE_ADMISSION_LOCATION),
 		    ConceptSetDescriptorField.optional("internalTransferLocationConcept",
 		        EmrApiConstants.CONCEPT_CODE_INTERNAL_TRANSFER_LOCATION),
-		    ConceptSetDescriptorField.optional("dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH));
+		    ConceptSetDescriptorField.optional("dateOfDeathConcept", EmrApiConstants.CONCEPT_CODE_DATE_OF_DEATH),
+		    ConceptSetDescriptorField.optional("causeOfDeathConcept", EmrApiConstants.CONCEPT_CODE_CAUSE_OF_DEATH));
 	}
 	
 	/**
@@ -96,6 +99,14 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 		this.dateOfDeathConcept = dateOfDeathConcept;
 	}
 	
+	public Concept getCauseOfDeathConcept() {
+		return causeOfDeathConcept;
+	}
+	
+	public void setCauseOfDeathConcept(Concept causeOfDeathConcept) {
+		this.causeOfDeathConcept = causeOfDeathConcept;
+	}
+	
 	public Obs buildObsGroup(Disposition disposition, EmrConceptService emrConceptService) {
 		Obs dispoObs = new Obs();
 		dispoObs.setConcept(dispositionConcept);
@@ -127,6 +138,10 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 		return findMember(obsGroup, dateOfDeathConcept);
 	}
 	
+	public Obs getCauseOfDeathObs(Obs obsGroup) {
+		return findMember(obsGroup, causeOfDeathConcept);
+	}
+	
 	public Location getAdmissionLocation(Obs obsGroup, LocationService locationService) {
 		Obs admissionLocationObs = getAdmissionLocationObs(obsGroup);
 		if (admissionLocationObs != null) {
@@ -154,6 +169,15 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 		}
 	}
 	
+	public Concept getCauseOfDeath(Obs obsGroup) {
+		Obs causeOfDeathObs = getCauseOfDeathObs(obsGroup);
+		if (causeOfDeathObs != null) {
+			return causeOfDeathObs.getValueCoded();
+		} else {
+			return null;
+		}
+	}
+	
 	public List<Obs> getAdditionalObs(Obs obsGroup) {
 		List<Obs> notDisposition = new ArrayList<Obs>();
 		if (obsGroup.hasGroupMembers()) {
@@ -161,7 +185,8 @@ public class DispositionDescriptor extends ConceptSetDescriptor {
 				if (!candidate.getConcept().equals(dispositionConcept)
 				        && !candidate.getConcept().equals(admissionLocationConcept)
 				        && !candidate.getConcept().equals(internalTransferLocationConcept)
-				        && !candidate.getConcept().equals(dateOfDeathConcept)) {
+				        && !candidate.getConcept().equals(dateOfDeathConcept)
+				        && !candidate.getConcept().equals(causeOfDeathConcept)) {
 					notDisposition.add(candidate);
 				}
 			}

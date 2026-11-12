@@ -41,6 +41,8 @@ public class DispositionDescriptorTest {
 	
 	private Concept dateOfDeathConcept = new Concept();
 	
+	private Concept causeOfDeathConcept = new Concept();
+	
 	private Concept admissionConcept = new Concept();
 	
 	private Location admissionLocation = new Location(1);
@@ -61,6 +63,7 @@ public class DispositionDescriptorTest {
 		dispositionDescriptor.setAdmissionLocationConcept(admissionLocationConcept);
 		dispositionDescriptor.setInternalTransferLocationConcept(transferLocationConcept);
 		dispositionDescriptor.setDateOfDeathConcept(dateOfDeathConcept);
+		dispositionDescriptor.setCauseOfDeathConcept(causeOfDeathConcept);
 		
 		emrConceptService = mock(EmrConceptService.class);
 		when(emrConceptService.getConcept("ADMISSION")).thenReturn(admissionConcept);
@@ -233,6 +236,11 @@ public class DispositionDescriptorTest {
 		dateOfDeathObs.setValueDate(dateOfDeath);
 		dispositionObsGroup.addGroupMember(dateOfDeathObs);
 		
+		Obs causeOfDeathObs = new Obs();
+		causeOfDeathObs.setConcept(causeOfDeathConcept);
+		causeOfDeathObs.setValueCoded(new Concept());
+		dispositionObsGroup.addGroupMember(causeOfDeathObs);
+		
 		Concept additionalObsConcept = new Concept();
 		Obs additionalObs = new Obs();
 		additionalObs.setConcept(additionalObsConcept);
@@ -242,6 +250,26 @@ public class DispositionDescriptorTest {
 		// additional obs function should only return the single additional obs
 		List<Obs> additionalObsList = Collections.singletonList(additionalObs);
 		assertThat(dispositionDescriptor.getAdditionalObs(dispositionObsGroup), is(additionalObsList));
+	}
+	
+	@Test
+	public void shouldFetchCauseOfDeathOffObsGroup() {
+		Obs dispositionObsGroup = createDispositionObsGroup();
+		
+		Concept causeOfDeath = new Concept();
+		Obs causeOfDeathObs = new Obs();
+		causeOfDeathObs.setConcept(causeOfDeathConcept);
+		causeOfDeathObs.setValueCoded(causeOfDeath);
+		dispositionObsGroup.addGroupMember(causeOfDeathObs);
+		
+		assertThat(dispositionDescriptor.getCauseOfDeathObs(dispositionObsGroup), is(causeOfDeathObs));
+		assertThat(dispositionDescriptor.getCauseOfDeath(dispositionObsGroup), is(causeOfDeath));
+	}
+	
+	@Test
+	public void shouldNotFailIfNoMatchingObsWhenFetchingCauseOfDeath() {
+		Obs dispositionObsGroup = createDispositionObsGroup();
+		assertNull(dispositionDescriptor.getCauseOfDeath(dispositionObsGroup));
 	}
 	
 	@Test

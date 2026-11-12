@@ -110,4 +110,32 @@ public class MarkPatientDeadDispositionActionTest extends AuthenticatedUserTestH
 		verify(exitFromCareService, times(1)).markPatientDead(patient, unknown, expectedDeathDate);
 	}
 	
+	@Test
+	public void testActionShouldMarkPatientAsDeadWithCauseOfDeathFromDisposition() throws Exception {
+		Concept unknown = new Concept();
+		when(emrApiProperties.getUnknownCauseOfDeathConcept()).thenReturn(unknown);
+		
+		Concept causeOfDeath = new Concept();
+		Date expectedDeathDate = (new DateTime(2013, 05, 10, 20, 26)).toDate();
+		
+		Patient patient = new Patient();
+		
+		final Encounter encounter = new Encounter();
+		encounter.setVisit(new Visit());
+		encounter.addProvider(new EncounterRole(), new Provider());
+		encounter.setEncounterDatetime((new DateTime(2013, 05, 13, 20, 26)).toDate());
+		encounter.setPatient(patient);
+		
+		final Obs dispositionObsGroup = new Obs();
+		dispositionObsGroup.setConcept(dispositionObsGroupConcept);
+		encounter.addObs(dispositionObsGroup);
+		
+		when(dispositionDescriptor.getDateOfDeath(dispositionObsGroup)).thenReturn(expectedDeathDate);
+		when(dispositionDescriptor.getCauseOfDeath(dispositionObsGroup)).thenReturn(causeOfDeath);
+		
+		action.action(new EncounterDomainWrapper(encounter), dispositionObsGroup, null);
+		
+		verify(exitFromCareService, times(1)).markPatientDead(patient, causeOfDeath, expectedDeathDate);
+	}
+	
 }
